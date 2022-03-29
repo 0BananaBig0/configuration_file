@@ -1,0 +1,18 @@
+Before doing the following steps, make sure that your linux can't find the right driver for your printer.(Everytime, you add a printer for your linux, it will list all drivers of all printers it has. You should check it carefully.)Also, you can go to the office site of your printer to find the driver. And this text only supports brother printer.
+1,download the linux-brprinter-installer-2.2.2-1 to a folder(~/printer)
+2,cd ~/printer
+3,if you use a zsh shell, not a bash shell(the default shell is bash shell in linux), excute the following command. otherwis, skip the step:
+  bash
+4,and then excute the following command
+  sudo bash linux-brprinter-installer-2.2.2-1 HL-2560DN
+all the options, you should choose y.
+You should modify the HL-2560DN to the model of your printer. Because my printer is brother HL2560DN, so I write HL-2560.
+5,after finish the installing I advise that you should modfiy the "Error Policy" from xxx to "Abort job".And all things linux-brprinter-installer-2.2.2-1 creates in the ~/printer can be removed.
+安装完后去打印机哪里设置任务失败时放弃任务，否则会有bug
+The path of "Error Policy" is Setting->Decives->Printers->Additional Printer Settings->HL2560DN(the model of your printer, double click it)->Policies
+
+Which model it supports, I have listed as folloing:  
+DCP-110C, DCP-115C, DCP-120C, DCP-130C, DCP-145C, DCP-1518, DCP-155C, DCP-1608, DCP-1618W, DCP-1619, DCP-165C, DCP-185C, DCP-330C, DCP-350C, DCP-385C, DCP-540CN, DCP-560CN, DCP-585CW, DCP-6690CW, DCP-7010, DCP-7025, DCP-7030, DCP-7040, DCP-7055, DCP-7057, DCP-7060D, DCP-7080, DCP-7080D, DCP-7090DW, DCP-7180DN, DCP-7190DW, DCP-7195DW, DCP-8060, DCP-8070D, DCP-8085DN, DCP-9010CN, DCP-9020CDN, DCP-9030CDN, DCP-9040CN, DCP-9042CDN, DCP-9055CDN, DCP-B7500D, DCP-B7520DW, DCP-B7530DN, DCP-B7535DW, DCP-J100, DCP-J105, DCP-L2535DW, DCP-L2550DW, DCP-L8400CDN, DCP-T300, DCP-T310, DCP-T428W, DCP-T500W, DCP-T510W, DCP-T700W, DCP-T710W, FAX-1840C, FAX-2480C, FAX-2820, FAX-2890, FAX-2920, FAX-2990, HL-1118, HL-1208, HL-1218W, HL-1850, HL-1870N, HL-2040, HL-2070N, HL-2130, HL-2140, HL-2150N, HL-2170W, HL-2240, HL-2240D, HL-2250DN, HL-2260, HL-2260D, HL-2560DN, HL-2595DW, HL-3040CN, HL-3070CW, HL-3150CDN, HL-3160CDW, HL-3170CDW, HL-3190CDW, HL-4150CDN, HL-4570CDW, HL-5240, HL-5250DN, HL-5340D, HL-5350DN, HL-5370DW, HL-5440D, HL-5450DN, HL-5580D, HL-5585D, HL-5590DN, HL-5595DN(H), HL-6050D, HL-6050DN, HL-6180DW, HL-B2000D, HL-B2050DN, HL-L8250CDN, HL-L8260CDN, HL-L9200CDW, HL-L9310CDW, HL-T4000DW, MFC-1813, MFC-1818, MFC-1906, MFC-1908, MFC-1919NW, MFC-210C, MFC-215C, MFC-230C, MFC-240C, MFC-250C, MFC-290C, MFC-3240C, MFC-3360C, MFC-410CN, MFC-425CN, MFC-440CN, MFC-465CN, MFC-490CW, MFC-5440CN, MFC-5460CN, MFC-5490CN, MFC-5890CN, MFC-640CW, MFC-6490CW, MFC-665CW, MFC-685CW, MFC-6890CDW, MFC-7220, MFC-7290, MFC-7340, MFC-7360, MFC-7380, MFC-7420, MFC-7450, MFC-7470D, MFC-7480D, MFC-7840N, MFC-7860DN, MFC-7880DN, MFC-7895DW, MFC-790CW, MFC-795CW, MFC-8370DN, MFC-8440, MFC-8460N, MFC-8510DN, MFC-8515DN, MFC-8520DN, MFC-8530DN, MFC-8535DN, MFC-8540DN, MFC-8860DN, MFC-8880DN, MFC-9120CN, MFC-9140CDN, MFC-9150CDN, MFC-9320CW, MFC-9340CDW, MFC-9350CDW, MFC-9440CN, MFC-9450CDN, MFC-9465CDN, MFC-9840CDW, MFC-B7700D, MFC-B7720DN, MFC-J200, MFC-J220, MFC-J2320, MFC-J2330DW, MFC-J2510, MFC-J265W, MFC-J2720, MFC-J2730DW, MFC-J3520, MFC-J3530DW, MFC-J3720, MFC-J3930DW, MFC-J410, MFC-J430W, MFC-J5910DW, MFC-J615W, MFC-J625DW, MFC-J6710DW, MFC-J6910DW, MFC-J825DW, MFC-L8650CDW, MFC-L8900CDW, MFC-T4500DW, MFC-T800W, MFC-T810W, MFC-T910DW
+————————————————
+版权声明：本文为CSDN博主「yukun_hh」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/yukun_hh/article/details/108412567

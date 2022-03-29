@@ -1,0 +1,55 @@
+{
+  "languageserver": {
+    /* "clangd": {
+     *   "command": "clangd",
+     *   "rootPatterns": ["compile_flags.txt", "compile_commands.json"],
+     *   "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
+     * }, */
+    "svlangserver": {
+       "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
+       "filetypes": ["systemverilog","vhdl","verilog"],
+       "settings": {
+         "systemverilog.includeIndexing": ["**/*.{v,sv,svh}"],
+         "systemverilog.excludeIndexing": ["test/**/*.sv*"],
+         "systemverilog.defines" : [],
+         "systemverilog.disableLinting" : true,
+         "systemverilog.launchConfiguration": "/usr/local/bin/verilator -sv -Wall --lint-only",
+         "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
+       }
+    /* },
+     * "hdlChecker": {
+     *    "command": "hdl_checker",
+     *    "args": ["--lsp"],
+     *    "filetypes": [
+     *     "vhdl",
+     *     "verilog",
+     *     "systemverilog"
+     *    ] */
+    }
+  },
+  "coc.preferences.rootPatterns": [".git",".hg",".projections.json",".project",".svn",".root"],
+  "coc.preferences.jumpCommand":"edit",
+  "coc.source.around.firstMatch": false,
+  "coc.source.buffer.firstMatch": false,
+  "suggest.maxCompleteItemCount":9,
+  "suggest.noselect": true,
+  "suggest.enablePreselect": false,
+  "suggest.triggerAfterInsertEnter": true,
+  "suggest.autoTrigger":"none",
+  "suggest.detailField": "preview",
+  "suggest.snippetIndicator": "",
+  "suggest.echodocSupport": true,
+  "signature.target": "echo",
+  "diagnostic.enable":true,
+  "diagnostic.displayByAle":false,
+  "diagnostic.messageTarget": "echo",
+  "diagnostic.errorSign": "✗ ",
+  "diagnostic.warningSign": "⚡",
+  "pyright.disableDiagnostics":true,
+  "clangd.disableDiagnostics": true,
+  "markdownlint.onOpen": false,
+  "markdownlint.onSave": false,
+  "markdownlint.onChange": false,
+  "git.addGBlameToVirtualText": true,
+  "git.addGBlameToBufferVar": true
+}
