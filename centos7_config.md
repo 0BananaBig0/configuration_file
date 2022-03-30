@@ -223,35 +223,6 @@ cmake -S llvm -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release llvm -DLLV
 cd build
 make -j20
 sudo make install
-sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/local/bin/clang++ 100
-sudo update-alternatives --install /usr/bin/clang clang /usr/local/bin/clang 100
-sudo update-alternatives --install /usr/bin/clangd clangd /usr/local/bin/clangd 100
-sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/local/bin/clang-format 100
-sudo update-alternatives --install /usr/bin/clang-apply-replacements clang-apply-replacements /usr/local/bin/clang-apply-replacements 100
-sudo update-alternatives --install /usr/bin/clang-change-namespace clang-change-namespace /usr/local/bin/clang-change-namespace 100
-sudo update-alternatives --install /usr/bin/clang-check clang-check /usr/local/bin/clang-check 100
-sudo update-alternatives --install /usr/bin/clang-cl clang-cl /usr/local/bin/clang-cl 100
-sudo update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/local/bin/clang-cpp 100
-sudo update-alternatives --install /usr/bin/clang-doc clang-doc /usr/local/bin/clang-doc 100
-sudo update-alternatives --install /usr/bin/clang-extdef-mapping clang-extdef-mapping /usr/local/bin/clang-extdef-mapping 100
-sudo update-alternatives --install /usr/bin/clang-include-fixer clang-include-fixer /usr/local/bin/clang-include-fixer 100
-sudo update-alternatives --install /usr/bin/clang-move clang-move /usr/local/bin/clang-move 100
-sudo update-alternatives --install /usr/bin/clang-offload-bundler clang-offload-bundler /usr/local/bin/clang-offload-bundler 100
-sudo update-alternatives --install /usr/bin/clang-offload-wrapper clang-offload-wrapper /usr/local/bin/clang-offload-wrapper 100
-sudo update-alternatives --install /usr/bin/clang-query clang-query /usr/local/bin/clang-query 100
-sudo update-alternatives --install /usr/bin/clang-refactor clang-refactor /usr/local/bin/clang-refactor 100
-sudo update-alternatives --install /usr/bin/clang-rename clang-rename /usr/local/bin/clang-rename 100
-sudo update-alternatives --install /usr/bin/clang-reorder-fields clang-reorder-fields /usr/local/bin/clang-reorder-fields 100
-sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps /usr/local/bin/clang-scan-deps 100
-sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/local/bin/clang-tidy 100
-sudo update-alternatives --remove clang-tidy-diff /usr/local/bin/clang-tidy-diff.py
-sudo update-alternatives --install /usr/bin/lldb lldb /usr/local/bin/lldb 100
-sudo update-alternatives --install /usr/bin/lld lld /usr/local/bin/lld 100
-sudo update-alternatives --install /usr/bin/llc llc /usr/local/bin/llc 100
-sudo update-alternatives --install /usr/bin/lldb-argdumper lldb-argdumper /usr/local/bin/lldb-argdumper 100
-sudo update-alternatives --install /usr/bin/lldb-instr lldb-instr /usr/local/bin/lldb-instr 100
-sudo update-alternatives --install /usr/bin/lldb-server lldb-server /usr/local/bin/lldb-server 100
-sudo update-alternatives --install /usr/bin/lldb-vscode lldb-vscode /usr/local/bin/lldb-vscode 100
 ```
 
 # 9,install zsh,omz,zinit,ksh
