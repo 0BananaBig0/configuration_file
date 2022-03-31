@@ -180,6 +180,7 @@ cd ~/Downloads/program
 git clone https://github.91chi.fun//https://github.com/hugsy/gef.git
 python3 -m pip install keystone-engine unicorn capstone ropper
 cp /home/hxliang/.gdbinit ~
+cp /home/hxliang/.gdbgef ~ #only use for gdb command line.
 ```
 
 # (12)use zinit, omz and zsh
@@ -189,7 +190,8 @@ cp /home-local/celab106_z2mini/.local/share/zinit ~/.local/share -r
 cp /home-local/celab106_z2mini/.oh-my-zsh ~
 cp /home-local/celab106_z2mini/.zshrc ~
 ```
-Ask your 10.34.24.11 administrators to do the following things
+Ask your 10.34.24.11 administrators to do the following things \
+Note: 可能会导致该用户在vnc时执行/etc/profile文件失效,因此需要把配置放到/etc/zshrc中。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致执行失效。
 ```
 ssh -X root@10.34.24.11
 id hxliang #check the uid and gid

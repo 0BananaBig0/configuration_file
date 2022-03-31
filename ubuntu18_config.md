@@ -1031,7 +1031,8 @@ https://github.com/pwndbg/pwndbg \
 https://github.com/vim-vdebug/vdebug(vim的插件,it is not tested with C++）\
 https://github.com/puremourning/vimspector(比较接近vscode调试的vim插件)\
 nemiver(ubuntu直接使用apt下载即可，是一个古老且比较完美的debug界面,由于需要经常使用鼠标操作，且变量观察相对麻烦，界面容易变形，暂时不作使用)\
-termdebug(vim自带debug功能，该有的都有，唯一问题就是界面有闪烁)
+termdebug(vim自带debug功能，该有的都有，唯一问题就是界面有闪烁)\
+configure gdb
 ```
 cd ~/Downloads/program
 git clone https://github.91chi.fun//https://github.com/hugsy/gef.git
@@ -1047,7 +1048,7 @@ set print sevenbit-strings off
 set print array-indexes on
 set print vtbl on
 set confirm off
-source ~/Downloads/program/gef/gef.py
+
 
 python
 import sys
@@ -1055,6 +1056,13 @@ sys.path.insert(0, '/usr/share/gcc/python')
 from libstdcxx.v6.printers import register_libstdcxx_printers
 register_libstdcxx_printers (None)
 end
+```
+configure gef #only use for gdb command line.
+```
+gvim ~/.gdbgef #add the following content, do not add the following content to .gdbinit, it will affect vimspector.
+```
+```
+source ~/Downloads/program/gef/gef.py
 ```
 note:'/usr/share/gcc/python' is the path of libstdcxx
 

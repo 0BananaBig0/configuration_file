@@ -165,11 +165,10 @@ fi
 系统永久更换gcc版本
 ```
 sudo su
-vim /etc/bashrc 
-vim /etc/zshrc 
-#在这两个文件添加后会导致omz的ZSH_CACHE_DIRECTORY环境变量切换出现问题。
+vim /etc/profile 
+#在这个文件添加后会导致omz的ZSH_CACHE_DIRECTORY环境变量切换出现问题。
 ```
-在这两个文件添加如下内容
+在这个文件添加如下内容
 ```
 source /opt/rh/devtoolset-9/enable #or scl enable devtoolset-9 bash #only for .bashrc 
 ```
@@ -187,10 +186,9 @@ git config --global user.email "1184903633@qq.com"
 系统永久更换git版本
 ```
 sudo su
-vim /etc/bashrc
-vim /etc/zshrc
+vim /etc/profile
 ```
-在这两个文件添加如下内容
+在这个文件添加如下内容
 ```
 source /opt/rh/rh-git227/enable #temporary, if want to make it to become permanent, add it to your .zshrc or .bashrc
 ```
@@ -346,7 +344,7 @@ set print sevenbit-strings off
 set print array-indexes on
 set print vtbl on
 set confirm off
-source ~/Downloads/program/gef/gef.py
+
 
 python
 import sys
@@ -354,6 +352,13 @@ sys.path.insert(0, '/opt/rh/devtoolset-9/root/usr/share/gdb/python')
 from libstdcxx.v6.printers import register_libstdcxx_printers
 register_libstdcxx_printers (None)
 end
+```
+configure gef # only use for gdb command line.
+```
+gvim ~/.gdbgef #add the following content, do not add the following content to .gdbinit, it will affect vimspector.
+```
+```
+source ~/Downloads/program/gef/gef.py
 ```
 note:'/opt/rh/devtoolset-9/root/usr/share/gdb/python' is the path of libstdcxx
 
@@ -1028,6 +1033,7 @@ sudo yum -y install code
 ```
 
 # 40,为ldap用户在特定ip的服务器更换shell，以hxliang用户和10.34.24.11为例
+Note: 可能会导致该用户在vnc时执行/etc/profile文件失效,因此需要把配置放到/etc/zshrc中。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致执行失效。
 ```
 ssh -X root@10.34.24.11
 id hxliang #check the uid and gid
