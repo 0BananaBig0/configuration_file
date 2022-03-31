@@ -165,10 +165,11 @@ fi
 系统永久更换gcc版本
 ```
 sudo su
-vim /etc/profile 
-#在这个文件添加后会导致omz的ZSH_CACHE_DIRECTORY环境变量切换出现问题。
+vim /etc/bashrc 
+vim /etc/zshrc 
+#在这两个文件添加后会导致omz的ZSH_CACHE_DIRECTORY环境变量切换出现问题。
 ```
-添加如下内容
+在这两个文件添加如下内容
 ```
 source /opt/rh/devtoolset-9/enable #or scl enable devtoolset-9 bash #only for .bashrc 
 ```
@@ -186,9 +187,10 @@ git config --global user.email "1184903633@qq.com"
 系统永久更换git版本
 ```
 sudo su
-vim /etc/profile
+vim /etc/bashrc
+vim /etc/zshrc
 ```
-添加如下内容
+在这两个文件添加如下内容
 ```
 source /opt/rh/rh-git227/enable #temporary, if want to make it to become permanent, add it to your .zshrc or .bashrc
 ```
