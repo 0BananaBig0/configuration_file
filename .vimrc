@@ -550,10 +550,9 @@ function Lazy_Plugin_Configuration()
 
 
 
-  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc
-  " generate the menu at the top, mark the last line of the menu and delete
-  " the space line. If you want to go to the last line of the menu, you
-  " can press `` in normal mode
+  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu 
+  " at the top, mark the last line of the menu and delete the space line.
+  " If you want to go to the last line of the menu, you can press `` in normal mode
   nnoremap <silent><Leader>gm ggO<ESC>:GenTocGFM<CR>m`ggdd
   nnoremap <silent><Leader>um :UpdateToc<CR>
   let g:vmt_auto_update_on_save = 0
@@ -563,13 +562,12 @@ function Lazy_Plugin_Configuration()
   " nerdcommenter插件快速注释
   let g:NERDSpaceDelims            = 1      " 在注释符号后加一个空格
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
+  let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
   let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
-  let g:NERDAltDelims_java         = 1      " JAVA 语言使用默认的注释符号
   let g:NERDCommentEmptyLines      = 1      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
-  let g:NERDCustomDelimiters = { 'yacc': { 'left': '  /*','right': '*/' },'lex': { 'left': '  /*','right': '*/' } }
-  map <silent><F3> <plug>NERDCommenterSexy
+  map <silent><F3> <plug>NERDCommenterComment
   map <silent><Localleader><F3> <plug>NERDCommenterUncomment
 
 
@@ -663,7 +661,7 @@ if has("gui_running")
   set guitablabel=%t " tab只显示文件名不显示标签
 endif
 set shortmess+=c
-set showcmd         " select模式下显示选中的行数
+set showcmd
 set foldmethod=manual
 " \ 打印空格
 " [FORMAT=%{&fenc}-%{&ff}]显示正在编辑的文件的编码和所在类系统类型
@@ -865,7 +863,7 @@ function! Delete_Trailling_Space()
   exec "silent :%s/\\s\\+$//e"
   exec "silent normal! ``"
 endfunction
-" Press Enter at normal mode ,-Enter，格式和当前行保持一致
+" Press Enter at normal mode <space>Enter，格式和当前行保持一致
 nnoremap <silent><Localleader><CR> i<CR><ESC>
 " Ctrl-Enter新建行和当前行格式保持一致,normal模式下仅对注释类型有效
 nnoremap <silent><C-CR> o<ESC>
@@ -873,4 +871,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
