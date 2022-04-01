@@ -365,8 +365,7 @@ function Lazy_On_Plugin_Configuration()
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
   let g:vimspector_variables_display_mode = 'full'
   function! s:SetUpUI() abort
-    call win_gotoid( g:vimspector_session_windows.stack_trace )
-    q
+    call win_execute( g:vimspector_session_windows.stack_trace, 'q' )
     call win_gotoid( g:vimspector_session_windows.watches )
     nunmenu WinBar
     call win_gotoid( g:vimspector_session_windows.variables )
@@ -874,3 +873,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
