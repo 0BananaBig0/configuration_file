@@ -27,30 +27,6 @@
           }
         ]
       }
-    },
-    "cpp:attach": {
-      "adapter": "CodeLLDB",
-      "configuration": {
-        "name": "cpp:attach",
-        "stopAtEntry": true,
-        "type": "cppdbg",
-        "request": "attach",
-        "program": "${workspaceRoot}/.exe",
-        "MIMode": "lldb",
-        "breakpointers": {
-          "exception": {
-            "cpp_throw": "Y",
-            "cpp_catch": "Y"
-          }
-        },
-        "setupCommands": [
-          {
-            "description": "Enable pretty-printing for gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-          }
-        ]
-      }
     }
   }
 }
