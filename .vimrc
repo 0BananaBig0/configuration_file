@@ -332,8 +332,11 @@ function Lazy_On_Plugin_Configuration()
   nmap <silent><F2> <Plug>VimspectorContinue
   nnoremap <silent><S-F2> :VimspectorReset<CR>
   nnoremap <silent>]<F2> :call vimspector#Restart()<CR>
-  nmap <silent>]<F3> <Plug>VimspectorPause
-  nmap <silent>]<S-F3> <Plug>VimspectorStop
+  nmap <silent>]<C-F2> <Plug>VimspectorPause
+  nmap <silent>]<S-F2> <Plug>VimspectorStop
+  nmap <silent>]<F3> <Plug>VimspectorBalloonEval
+  xmap <silent>]<F3> <Plug>VimspectorBalloonEval
+  nmap <silent>]<S-F3> <Plug>VimspectorRunToCursor
   nmap <silent><F4> <Plug>VimspectorToggleBreakpoint
   nnoremap <silent><S-F4> :call vimspector#ClearBreakpoints()<CR>
   nmap <silent>]<F4> <Plug>VimspectorToggleConditionalBreakpoint
@@ -342,14 +345,11 @@ function Lazy_On_Plugin_Configuration()
   nnoremap <silent><F5> :silent call plug#load('vimspector')<CR>
   nnoremap <silent>]<F5> :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 19<CR>:silent call plug#load('vimspector')<CR>:call vimspector#Launch()<CR>
   nnoremap <silent><Leader><F5> :silent call Cpp_Workspace_Configuration()<CR>
-  nmap <silent>]<F6> <Plug>VimspectorBalloonEval
-  xmap <silent>]<F6> <Plug>VimspectorBalloonEval
-  nmap <silent>]<S-F6> <Plug>VimspectorRunToCursor
+  nmap <silent><F6> <Plug>VimspectorStepOver
+  nmap <silent><C-F6> <Plug>VimspectorStepInto
+  nmap <silent><S-F6> <Plug>VimspectorStepOut
   nmap <silent>]<F7> <Plug>VimspectorUpFrame
   nmap <silent>]<S-F7> <Plug>VimspectorDownFrame
-  nmap <silent><F8> <Plug>VimspectorStepOver
-  nmap <silent><C-F8> <Plug>VimspectorStepInto
-  nmap <silent><S-F8> <Plug>VimspectorStepOut
   nnoremap <silent><C-1> :call win_gotoid( g:vimspector_session_windows.variables )<CR>
   nnoremap <silent><C-3> :call win_gotoid( g:vimspector_session_windows.code )<CR>
   nnoremap <silent><C-4> :call win_gotoid( g:vimspector_session_windows.terminal )<CR>
@@ -576,8 +576,8 @@ function Lazy_Plugin_Configuration()
   let g:asyncrun_open = 6
   let g:asyncrun_bell = 1
   " 设置 F6 打开或关闭 Quickfix 窗口
-  nnoremap <silent><F6> :silent call asyncrun#quickfix_toggle(6)<CR>
-  nnoremap <Localleader><F6> :AsyncRun! 
+  nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
+  nnoremap <Localleader><F8> :AsyncRun! 
 
 
 
@@ -851,13 +851,13 @@ nnoremap <silent><Localleader>w :w<CR>
 nnoremap <silent><Localleader><F4> :%retab!<CR>
 " 比较文件
 nnoremap <Localleader><F5> :vert diffsplit 
-nnoremap <silent><Localleader><F7> :call Delete_Blank_Line()<CR>
+nnoremap <silent><Localleader><F6> :call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec "silent normal! m`"
   exec "silent :g/^\s*$/d"
   exec "silent normal! ``"
 endfunction
-nnoremap <silent><Localleader><F8> :call Delete_Trailling_Space()<CR>
+nnoremap <silent><Localleader><F7> :call Delete_Trailling_Space()<CR>
 function! Delete_Trailling_Space()
   exec "silent normal! m`"
   exec "silent :%s/\\s\\+$//e"
