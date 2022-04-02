@@ -303,7 +303,8 @@ function Lazy_On_Plugin_Configuration()
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :silent call plug#load('vim-fugitive')<CR>:silent call plug#load('vim-gitgutter')<CR>:set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>:set statusline+=%=\ %{GitStatus()}\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
+  nnoremap <silent><Leader>git :silent call plug#load('vim-fugitive')<CR>:silent call plug#load('vim-gitgutter')<CR>:set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>:set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
+  let g:fugitive_no_maps = 1
   function! GitStatus()
     let [a,m,r] = GitGutterGetHunkSummary()
     return printf('+%d ~%d -%d', a, m, r)
@@ -575,7 +576,6 @@ function Lazy_Plugin_Configuration()
   " asyncrun setting,自动打开 quickfix window ，高度为 6
   let g:asyncrun_open = 6
   let g:asyncrun_bell = 1
-  " 设置 F6 打开或关闭 Quickfix 窗口
   nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
   nnoremap <Localleader><F8> :AsyncRun! 
 
