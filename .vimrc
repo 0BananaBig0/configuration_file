@@ -568,7 +568,7 @@ function Lazy_Plugin_Configuration()
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
   map <silent><F3> <plug>NERDCommenterComment
-  map <silent><Localleader><F3> <plug>NERDCommenterUncomment
+  map <silent><S-F3> <plug>NERDCommenterUncomment
 
 
 
