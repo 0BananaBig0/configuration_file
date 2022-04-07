@@ -148,6 +148,7 @@ reboot
 sudo apt install git
 git config --global user.name "Banana-Two"
 git config --global user.email "1184903633@qq.com"
+git config --global alias.logline "log --graph --abbrev-commit"
 sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 ## 安装zinit

@@ -191,7 +191,7 @@ cp /home-local/celab106_z2mini/.oh-my-zsh ~
 cp /home-local/celab106_z2mini/.zshrc ~
 ```
 Ask your 10.34.24.11 administrators to do the following things \
-Note: 可能会导致该用户在vnc时执行/etc/profile文件失效,因此需要把配置放到/etc/zshrc中。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致执行失效。
+Note: 可能会导致该用户在vnc时执行/etc/profile文件失效。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致ldap用户执行失效。解决办法，手动关闭vnc再重启。
 ```
 ssh -X root@10.34.24.11
 id hxliang #check the uid and gid

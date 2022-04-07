@@ -182,6 +182,7 @@ if [ -f "/opt/rh/devtoolset-7/enable" ]; then
 fi
 git config --global user.name "Banana-Two"
 git config --global user.email "1184903633@qq.com"
+git config --global alias.logline "log --graph --abbrev-commit"
 ```
 系统永久更换git版本
 ```
@@ -1030,10 +1031,11 @@ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 sudo yum update
 sudo yum -y install code
+sudo vim /etc/yum.repos.d/vscode.repo #change "enable=1" to "enable=0"
 ```
 
 # 40,为ldap用户在特定ip的服务器更换shell，以hxliang用户和10.34.24.11为例
-Note: 可能会导致该用户在vnc时执行/etc/profile文件失效,因此需要把配置放到/etc/zshrc中。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致执行失效。
+Note: 可能会导致该用户在vnc时执行/etc/profile文件失效。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致ldap用户执行失效。解决办法，手动关闭vnc再重启。
 ```
 ssh -X root@10.34.24.11
 id hxliang #check the uid and gid
