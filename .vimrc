@@ -446,7 +446,7 @@ function Format_C_CPP_CMAKE()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
-            \ 'args': ['-style="{BasedOnStyle: Microsoft, AccessModifierOffset: 0, ConstructorInitializerIndentWidth: 2, ContinuationIndentWidth: 2, IndentAccessModifiers: true, IndentWidth: 2, TabWidth: 2}"'],
+            \ 'args': ['-style="{BasedOnStyle: Microsoft, AccessModifierOffset: 0, ConstructorInitializerIndentWidth: 2, ContinuationIndentWidth: 2, IndentAccessModifiers: true, IndentWidth: 2, TabWidth: 2, ColumnLimit: 73}"'],
             \ }
   let g:neoformat_cmake_cmakeformat = {
             \ 'exe': 'cmake-format',
