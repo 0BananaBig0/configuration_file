@@ -68,7 +68,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
 Plug 'luochen1990/rainbow' " 彩虹括号
 Plug 'Yggdroot/indentLine' " 缩进显示
-Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'} " 补全插件  build from source code by using yarn: https://yarnpkg.com
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件  build from source code by using yarn: https://yarnpkg.com
 Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}  " 文件目录插件
 Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}  " 标签窗口列表插件
 Plug 'MattesGroeger/vim-bookmarks',{'on':['BookmarkToggle','BookmarkShowAll','BookmarkAnnotate']} " 书签插件，用于写代码注解等等
