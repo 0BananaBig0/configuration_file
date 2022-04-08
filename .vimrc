@@ -102,7 +102,7 @@ colorscheme dracula " 颜色主题配置
 " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
-nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 21<CR>
+nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>
 autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
 function! Show_Current_Module()
   let module_line = search('module','bnWz')
