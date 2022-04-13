@@ -68,6 +68,7 @@
 * [40,为ldap用户在特定ip的服务器更换shell，以hxliang用户和10.34.24.11为例](#40为ldap用户在特定ip的服务器更换shell以hxliang用户和10342411为例)
 * [41,安装批量文件编码转换工具，以及解决windows文件名在linux显示乱码的工具](#41安装批量文件编码转换工具以及解决windows文件名在linux显示乱码的工具)
 * [42,更换python的方法](#42更换python的方法)
+* [43,install fd to replace find.](#43install-fd-to-replace-find)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1065,4 +1066,9 @@ Note:不要在NTFS和FAT文件 系统中使用convmv，否则可能产生意外�
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 100
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
 sudo update-alternatives --config python #选择python2
+```
+
+# 43,install fd to replace find.
+```
+cargo install fd-find
 ```

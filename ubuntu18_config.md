@@ -100,6 +100,7 @@
   * [安装下载B站视频小工具you-get](#安装下载b站视频小工具you-get)
   * [钉钉](#钉钉)
   * [rst file to html file](#rst-file-to-html-file)
+  * [install fd to replace find.](#install-fd-to-replace-find)
 * [60,安装rust和exa,使用exa代替ls](#60安装rust和exa使用exa代替ls)
 * [61,修复sudo apt update出现错误：](#61修复sudo-apt-update出现错误)
 * [62,如何确定系统所用屏保软件](#62如何确定系统所用屏保软件)
@@ -1366,6 +1367,10 @@ python3 -m pip install you-get
 ## rst file to html file
 ```
 sudo python3 -m pip install sphinx sphinx-rtd-theme
+```
+## install fd to replace find.
+```
+cargo install fd-find
 ```
 
 # 60,安装rust和exa,使用exa代替ls
