@@ -366,8 +366,8 @@ function Lazy_On_Plugin_Configuration()
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
   let g:vimspector_variables_display_mode = 'full'
   function! s:SetUpUI() abort
-    call win_execute( g:vimspector_session_windows.stack_trace, 'q' )
-    call win_gotoid( g:vimspector_session_windows.watches )
+    call win_execute( g:vimspector_session_windows.watches, 'q' )
+    call win_gotoid( g:vimspector_session_windows.stack_trace )
     nunmenu WinBar
     call win_gotoid( g:vimspector_session_windows.variables )
     23wincmd _
