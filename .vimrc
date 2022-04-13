@@ -354,7 +354,7 @@ function Lazy_On_Plugin_Configuration()
   nnoremap <silent><C-1> :call win_gotoid( g:vimspector_session_windows.variables )<CR>
   nnoremap <silent><C-3> :call win_gotoid( g:vimspector_session_windows.code )<CR>
   nnoremap <silent><C-4> :call win_gotoid( g:vimspector_session_windows.terminal )<CR>
-  nnoremap <silent><C-7> :call win_gotoid( g:vimspector_session_windows.watches )<CR>
+  nnoremap <silent><C-7> :call win_gotoid( g:vimspector_session_windows.stack_trace )<CR>
   nnoremap <silent><C-9> :VimspectorShowOutput Console<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
