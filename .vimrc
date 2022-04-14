@@ -229,6 +229,9 @@ function Lazy_On_Plugin_Configuration()
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
   let g:vista_cursor_delay = 0
+  let g:vista_blink = [0,0]
+  let g:vista_top_level_blink = [0,0]
+  let g:vista_echo_cursor_strategy = "floating_win"
 
 
 
