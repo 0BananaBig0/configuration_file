@@ -85,7 +85,9 @@ cp /home-local/celab106_z2mini/.vimrc_no_the_third_plugged ~/.vimrc
 # (2)use exa to replace ls and use fd to replce find
 ```
 # add the following to your .bashrc
-export PATH=$PATH:/home-local/celab106_z2mini/.cargo/bin
+if [ -d "/home-local/celab106_z2mini/.cargo/bin" ]; then
+  export PATH=$PATH:/home-local/celab106_z2mini/.cargo/bin
+fi
 ```
 
 # (3)add some tools
