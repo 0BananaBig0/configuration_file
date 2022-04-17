@@ -349,6 +349,7 @@ function Lazy_On_Plugin_Configuration()
   nmap <silent><S-F6> <Plug>VimspectorStepOut
   nmap <silent>]<F7> <Plug>VimspectorUpFrame
   nmap <silent>]<S-F7> <Plug>VimspectorDownFrame
+  nnoremap <silent>]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
   nnoremap <silent><C-1> :call win_gotoid( g:vimspector_session_windows.variables )<CR>
   nnoremap <silent><C-3> :call win_gotoid( g:vimspector_session_windows.code )<CR>
   nnoremap <silent><C-4> :call win_gotoid( g:vimspector_session_windows.terminal )<CR>
@@ -362,7 +363,6 @@ function Lazy_On_Plugin_Configuration()
   sign define vimspectorPCBP          text=●>  texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentThread text=>   texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
-  let g:vimspector_variables_display_mode = 'full'
   function! s:SetUpUI() abort
     call win_execute( g:vimspector_session_windows.watches, 'q' )
     call win_gotoid( g:vimspector_session_windows.stack_trace )
