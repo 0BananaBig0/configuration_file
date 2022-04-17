@@ -98,7 +98,7 @@ call plug#end()
 
 
 
-colorscheme dracula " 颜色主题配置
+colorscheme dracula
 " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
@@ -169,7 +169,7 @@ function! CocTimerStart(timer)
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
-    silent call plug#load('vim-which-key') " this will update the interface so that highlight plugin works correctly
+    silent call plug#load('vim-which-key')
     silent call plug#load('nerdcommenter')
     silent call plug#load('asyncrun.vim')
 endfunction
@@ -177,7 +177,8 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 function Lazy_On_Plugin_Configuration()
   " Use tab for trigger completion with characters ahead and navigate.After we select the word we needn't press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin before putting this into your config.
-  " ctrl+j: jump to the next parameter in the completed function, ctrl+k:jump to the previous parameter in the completed function
+  " ctrl+j: jump to the next parameter in the completed function, 
+  " ctrl+k:jump to the previous parameter in the completed function
   inoremap <silent><expr> <TAB>
         \ pumvisible() ? "\<C-n>" :
         \ <SID>check_back_space() ? "\<TAB>" :
@@ -189,12 +190,6 @@ function Lazy_On_Plugin_Configuration()
   endfunction
   " Make <CR> auto-select the first completion item
   inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm() :"\<CR>"
-  " Make <S-CR> auto-select the first completion item and notify coc.nvim to
-  " format on shift-enter, <S-CR> could be remapped by other vim plugin
-  " because it will trigger CmdLineLeave to affect the fcitx-remote, so I
-  " only use it when I type codes
-  inoremap <silent><expr> <S-CR> pumvisible() ? coc#_select_confirm()
-          \: "\<C-g>u\<S-CR>\<c-r>=coc#on_enter()\<S-CR>"
   nmap <silent><Localleader>d <Plug>(coc-definition)
   nmap <silent><Localleader>n <Plug>(coc-rename)
   nmap <silent><Localleader>i <Plug>(coc-implementation)
@@ -874,3 +869,5 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
+
