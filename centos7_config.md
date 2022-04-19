@@ -69,6 +69,7 @@
 * [41,安装批量文件编码转换工具，以及解决windows文件名在linux显示乱码的工具](#41安装批量文件编码转换工具以及解决windows文件名在linux显示乱码的工具)
 * [42,更换python的方法](#42更换python的方法)
 * [43,install fd to replace find.](#43install-fd-to-replace-find)
+* [44,add new dynamic library](#44add-new-dynamic-library)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1071,4 +1072,10 @@ sudo update-alternatives --config python #选择python2
 # 43,install fd to replace find.
 ```
 cargo install fd-find
+```
+
+# 44,add new dynamic library
+add the following content to your .bashrc or .zshrc
+```
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 ```

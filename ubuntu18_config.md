@@ -108,6 +108,7 @@
 * [64,解决nfs挂载硬盘普通用户没有访问权限问题](#64解决nfs挂载硬盘普通用户没有访问权限问题)
 * [65,使独立显卡仅用于计算，显示全交给英特尔集显](#65使独立显卡仅用于计算显示全交给英特尔集显)
 * [66,更新git](#66更新git)
+* [67,add new dynamic library](#67add-new-dynamic-library)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1468,10 +1469,16 @@ EndSection
 reboot
 nvidia-smi #xorg任务消失了
 ```
+Note:调用集显,终端有时会显示异常。
 
 # 66,更新git
 ```
 sudo add-apt-repository ppa:git-core/ppa
 sudo apt update
 sudo apt upgrade -y
+```
+# 67,add new dynamic library
+add the following content to your .bashrc or .zshrc
+```
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 ```

@@ -204,3 +204,9 @@ add the following content to passwd
 hxliang:x:1000004:1000001:hxliang:/home/hxliang:/usr/local/bin/zsh
 ```
 1000004 is hxliang's uid. 1000001 is hxliang's gid(Maybe same)
+
+# (13)add new dynamic library
+add the following content to your .bashrc or .zshrc
+```
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+```
