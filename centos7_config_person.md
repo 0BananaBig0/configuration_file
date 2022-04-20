@@ -44,7 +44,7 @@ mkdir ~/.config/nvim -p
 ln -s /home/hxliang/.vimrc ~/.config/nvim/init.vim
 ln -s /home/hxliang/.vim/coc-settings.json ~/.config/nvim/
 mkdir ~/Downloads/program/ -p
-cp /home-local/celab106_z2mini/Downloads/program/Goneovim-v0.5.1-linux/ ~/Downloads/program/ -r
+cp /home-local/celab106_z2mini/Downloads/program/goneovim-linux/ ~/Downloads/program/ -r
 ```
 Note:If the plugin of vim has some problems, you can uninstall it and reinstall it. Our plugins management plugin is vimplug.\ 
 If Updating plugin failes, you may need to go to the ~/.vim/plugged/the_name_of_pluggin and execute "git stash" and "git stash clear" , then update it again.

@@ -39,7 +39,7 @@ mkdir ~/.config/nvim -p
 ln -s /home/hxliang/.vimrc ~/.config/nvim/init.vim
 ln -s /home/hxliang/.vim/coc-settings.json ~/.config/nvim/
 mkdir ~/Downloads/program/ -p
-cp /home-local/celab106_z2mini/Downloads/program/Goneovim-v0.5.1-linux/ ~/Downloads/program/ -r
+cp /home-local/celab106_z2mini/Downloads/program/goneovim-linux/ ~/Downloads/program/ -r
 ```
 ## 4,add the following content to your .bashrc
 ```
