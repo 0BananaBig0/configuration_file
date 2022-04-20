@@ -93,7 +93,6 @@ Plug 'skywind3000/asyncrun.vim',{'on':[]} " 异步执行shell命令插件，如�
 Plug 'skywind3000/vim-quickui' " 菜单栏插件
 Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
 Plug 'Banana-Two/verilog_indent',{'for': ['verilog', 'systemverilog']} " verilog indent file
-Plug 'HonkW93/automatic-verilog',{'on':[]} " verilog自动实例化插件,用法请参考https://github.com/HonkW93/automatic-verilog
 call plug#end()
 
 
@@ -102,7 +101,7 @@ colorscheme dracula
 " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
-nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>
+nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>:IndentLinesDisable<CR>
 autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
 function! Show_Current_Module()
   let module_line = search('module','bnWz')
@@ -164,7 +163,6 @@ function! CocTimerStart(timer)
       autocmd FileType c,cpp,python,verilog silent call plug#load('ale')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-      autocmd FileType verilog silent call plug#load('automatic-verilog')
       autocmd FileType c,cpp,cmake silent call Format_C_CPP_CMAKE()
     augroup END
     silent call Lazy_On_Plugin_Configuration()
@@ -630,16 +628,6 @@ function Lazy_Plugin_Configuration()
   noremap <silent><Leader>qb :call quickui#tools#list_buffer('e')<CR>
   " hit \qt to preview tags
   noremap <silent><Leader>qt :call quickui#tools#preview_tag('')<CR>
-
-
-
-  " automatic-verilog setting https://blog.honk.wang/posts/AutoMatic/
-  nnoremap <silent><Leader>ai  :call AutoInst(0)<CR>
-  nnoremap <silent><Leader>ap  :call AutoPara(0)<CR>
-  nnoremap <silent><Leader>av  :call AutoParaValue(0)<CR>
-  nnoremap <silent><Leader>ar  :call AutoReg()<CR>
-  nnoremap <silent><Leader>aw  :call AutoWire()<CR>
-  nnoremap <silent><Leader>ad :call AutoDef()<CR>
 endfunction
 
 
@@ -869,5 +857,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
-
