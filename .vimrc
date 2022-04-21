@@ -442,7 +442,7 @@ function Format_C_CPP_CMAKE()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
-            \ 'args': ['-style="{BasedOnStyle: GNU, AccessModifierOffset: 0, AlignConsecutiveMacros: AcrossEmptyLinesAndComments, AllowShortBlocksOnASingleLine: Always, AllowShortLoopsOnASingleLine: true, AlwaysBreakAfterDefinitionReturnType: None, AlwaysBreakAfterReturnType: None, AlwaysBreakTemplateDeclarations: Yes, BreakBeforeBinaryOperators: None, BreakBeforeBraces: Allman, BreakInheritanceList: AfterComma, BreakConstructorInitializers: AfterColon, ConstructorInitializerIndentWidth: 2, ContinuationIndentWidth: 2, IndentAccessModifiers: true, IndentCaseBlocks: true, SpaceAfterTemplateKeyword: false, SpaceBeforeParens: Never, SpaceBeforeRangeBasedForLoopColon: false, Standard: Latest, TabWidth: 2}"'],
+            \ 'args': ['-style="{BasedOnStyle: GNU, AccessModifierOffset: 0, AlignConsecutiveMacros: AcrossEmptyLinesAndComments, AllowShortBlocksOnASingleLine: Always, AlwaysBreakAfterDefinitionReturnType: None, AlwaysBreakAfterReturnType: None, AlwaysBreakTemplateDeclarations: Yes, BreakBeforeBinaryOperators: None, BreakBeforeBraces: Allman, BreakInheritanceList: AfterComma, BreakConstructorInitializers: AfterColon, ConstructorInitializerIndentWidth: 2, ContinuationIndentWidth: 2, IndentAccessModifiers: true, IndentCaseBlocks: true, SpaceAfterTemplateKeyword: false, SpaceBeforeParens: Never, SpaceBeforeRangeBasedForLoopColon: false, Standard: Latest, TabWidth: 2}"'],
             \ }
   let g:neoformat_cmake_cmakeformat = {
             \ 'exe': 'cmake-format',
