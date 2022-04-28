@@ -50,20 +50,13 @@
 
 set nocompatible  " 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 " 侦测文件类型
-filetype on
-" 载入文件类型插件
-filetype plugin on
-" 为特定文件类型载入相关缩进文件
-filetype indent on
-" 语法高亮，不否认当前颜色设置
-syntax enable
 set t_Co=256             " 开启256色支持
 set updatetime=33   " 不少插件的信息更新都会需要这个时间
 " 使用localleader映射的快捷键必须出现在let g:maplocalleader = ' '之后
 let g:maplocalleader = ' '
 
 
-
+let g:plug_url_format = "https://git::@github.91chi.fun//https://github.com/%s.git"
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
 Plug 'luochen1990/rainbow' " 彩虹括号
@@ -857,3 +850,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
