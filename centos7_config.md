@@ -178,13 +178,19 @@ source /opt/rh/devtoolset-9/enable #or scl enable devtoolset-9 bash #only for .b
 # 6,install different verisons and config git
 ```
 sudo yum install -y git rh-git227
+```
 #add the following content to your .bashrc or .zshrc
+```
 if [ -f "/opt/rh/devtoolset-7/enable" ]; then
   source /opt/rh/devtoolset-7/enable #or scl enable devtoolset-7 bash #only for .bashrc 
 fi
+```
+#execute the following command
+```
 git config --global user.name "Banana-Two"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
+git config --global core.editor gvim
 ```
 系统永久更换git版本
 ```

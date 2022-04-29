@@ -349,6 +349,8 @@ sudo fc-cache
 sudo dnf install git
 git config --global user.name "Banana-Two"
 git config --global user.email "1184903633@qq.com"
+git config --global alias.logline "log --graph --abbrev-commit"
+git config --global core.editor gvim
 ```
 # 19,ale找不到头文件的解决办法：
 ## 对于cmake和catkin:
