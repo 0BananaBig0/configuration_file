@@ -353,6 +353,11 @@ set print sevenbit-strings off
 set print array-indexes on
 set print vtbl on
 set confirm off
+set history filename ~/.cache/.gdbHistory
+set history save on
+set history size 333
+set history remove-duplicates 0
+
 
 
 python
@@ -361,6 +366,7 @@ sys.path.insert(0, '/opt/rh/devtoolset-9/root/usr/share/gdb/python')
 from libstdcxx.v6.printers import register_libstdcxx_printers
 register_libstdcxx_printers (None)
 end
+
 
 
 # // Add function to change string pointer to char pointer

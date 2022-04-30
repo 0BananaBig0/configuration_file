@@ -1052,6 +1052,11 @@ set print sevenbit-strings off
 set print array-indexes on
 set print vtbl on
 set confirm off
+set history filename ~/.cache/.gdbHistory
+set history save on
+set history size 333
+set history remove-duplicates 0
+
 
 
 python
