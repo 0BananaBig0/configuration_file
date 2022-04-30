@@ -72,6 +72,7 @@
   * [Install svlangserver](#install-svlangserver)
 * [42,解决verilog找不到模块问题,ale使用iverilog,verilator](#42解决verilog找不到模块问题ale使用iverilogverilator)
 * [43,C/C++/python debug工具以及配置.gdbinit](#43ccpython-debug工具以及配置gdbinit)
+  * [configure gdb](#configure-gdb)
 * [44,如何卸载XDM](#44如何卸载xdm)
 * [45,使用sshfs远程挂载目录:](#45使用sshfs远程挂载目录)
 * [46,安装打印机驱动](#46安装打印机驱动)
@@ -109,6 +110,7 @@
 * [65,使独立显卡仅用于计算，显示全交给英特尔集显](#65使独立显卡仅用于计算显示全交给英特尔集显)
 * [66,更新git](#66更新git)
 * [67,add new dynamic library](#67add-new-dynamic-library)
+* [68,install rr debugger](#68install-rr-debugger)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1036,7 +1038,9 @@ https://github.com/vim-vdebug/vdebug(vim的插件,it is not tested with C++）\
 https://github.com/puremourning/vimspector(比较接近vscode调试的vim插件)\
 nemiver(ubuntu直接使用apt下载即可，是一个古老且比较完美的debug界面,由于需要经常使用鼠标操作，且变量观察相对麻烦，界面容易变形，暂时不作使用)\
 termdebug(vim自带debug功能，该有的都有，唯一问题就是界面有闪烁)\
-configure gdb
+https://github.com/rr-debugger/rr#system-requirements(一个拥有比gdb更成熟的回溯能力的debug工具)
+
+## configure gdb
 ```
 cd ~/Downloads/program
 git clone https://github.91chi.fun//https://github.com/hugsy/gef.git
@@ -1487,4 +1491,18 @@ sudo apt upgrade -y
 add the following content to your .bashrc or .zshrc
 ```
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+```
+
+# 68,install rr debugger
+```
+sudo apt-get install ccache cmake make g++-multilib gdb \
+  pkg-config coreutils python3-pexpect manpages-dev git \
+  ninja-build capnproto libcapnp-dev
+cd ~/Downloads/program
+git clone https://github.91chi.fun//https://github.com/rr-debugger/rr.git
+cd rr
+mkdir obj && cd obj
+cmake .. -Ddisable32bit=ON
+make
+sudo make install
 ```
