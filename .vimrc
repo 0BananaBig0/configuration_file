@@ -445,6 +445,7 @@ function Format_C_CPP_CMAKE()
   let g:neoformat_enabled_cmake = ['cmakeformat']
   noremap <silent><F7> :Neoformat<CR>
   let g:neoformat_only_msg_on_error = 1
+  let g:neoformat_basic_format_retab = 1
 endfunction
 
 
@@ -850,4 +851,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
