@@ -401,6 +401,7 @@ sudo update-alternatives --install /usr/bin/valgrind-listener valgrind-listener 
 ```
 
 # 15,install ripgrep(command:rg)to replace grep
+(以后可以用cargo install ripgrep代替下面的步骤,不过要先完成步骤18)
 ```
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 sudo yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo

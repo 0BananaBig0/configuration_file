@@ -1406,6 +1406,7 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 ```
 ```
 cargo install exa
+cargo install ripgrep(以后换新系统用这个代替sudo dpkg -i xxx)
 ```
 添加下面这句环境路径到.bashrc或者.zshrc中
 ```
@@ -1487,6 +1488,7 @@ sudo add-apt-repository ppa:git-core/ppa
 sudo apt update
 sudo apt upgrade -y
 ```
+
 # 67,add new dynamic library
 add the following content to your .bashrc or .zshrc
 ```
