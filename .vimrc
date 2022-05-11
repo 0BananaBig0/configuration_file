@@ -56,6 +56,7 @@ set updatetime=33   " 不少插件的信息更新都会需要这个时间
 let g:maplocalleader = ' '
 
 
+
 let g:plug_url_format = "https://git::@github.91chi.fun//https://github.com/%s.git"
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
@@ -87,6 +88,7 @@ Plug 'skywind3000/vim-quickui' " 菜单栏插件
 Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
 Plug 'Banana-Two/verilog_indent',{'for': ['verilog', 'systemverilog']} " verilog indent file
 call plug#end()
+
 
 
 colorscheme dracula
@@ -140,6 +142,7 @@ let g:rainbow_active = 1 " set to 0 if you want to enable it later via :RainbowT
 " vim-indent-guides
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_tab_guides = 0
+let g:indent_guides_default_mapping = 0
 
 
 
@@ -847,3 +850,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
