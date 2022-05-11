@@ -60,7 +60,7 @@ let g:plug_url_format = "https://git::@github.91chi.fun//https://github.com/%s.g
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
 Plug 'luochen1990/rainbow' " 彩虹括号
-Plug 'Yggdroot/indentLine' " 缩进显示
+Plug 'nathanaelkane/vim-indent-guides' " 缩进显示
 Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件  build from source code by using yarn: https://yarnpkg.com
 Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}  " 文件目录插件
 Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}  " 标签窗口列表插件
@@ -89,12 +89,11 @@ Plug 'Banana-Two/verilog_indent',{'for': ['verilog', 'systemverilog']} " verilog
 call plug#end()
 
 
-
 colorscheme dracula
 " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
-nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>:IndentLinesDisable<CR>
+nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>:IndentGuidesDisable<CR>
 autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
 function! Show_Current_Module()
   let module_line = search('module','bnWz')
@@ -138,12 +137,9 @@ let g:rainbow_active = 1 " set to 0 if you want to enable it later via :RainbowT
 
 
 
-" indentLine setting,这个插件要用到concealleveal，这会导致光标移动时有轻微闪烁,可以通过设置更小的updatetime达到看不到闪烁的目的
-let g:indentLine_char_list = ['│','|', '¦', '┆', '┊','║']
-let g:indentLine_setColors = 0
-let g:indentLine_concealcursor = ''
-" if use this pluggin in markdown, some bugs will occur
-let g:indentLine_fileTypeExclude = ['text', 'sh','markdown']
+" vim-indent-guides
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_tab_guides = 0
 
 
 
