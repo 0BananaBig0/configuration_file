@@ -1,8 +1,11 @@
 {
-  "configurations": {
-    "cpp:launch": {
+  "configurations": 
+  {
+    "cpp:launch": 
+    {
       "adapter": "vscode-cpptools",
-      "configuration": {
+      "configuration": 
+      {
         "name": "cpp:launch",
         "stopAtEntry": true,
         "type": "cppdbg",
@@ -11,15 +14,18 @@
         "args": [],
         "cwd": "${workspaceRoot}",
         "environment": [],
-        "externalConsole": false,
+        "externalConsole": true,
         "MIMode": "gdb",
-        "breakpointers": {
-          "exception": {
+        "breakpointers": 
+        {
+          "exception": 
+          {
             "cpp_throw": "Y",
             "cpp_catch": "Y"
           }
         },
-        "setupCommands": [
+        "setupCommands": 
+        [
           {
             "description": "Enable pretty-printing for gdb",
             "text": "-enable-pretty-printing",
