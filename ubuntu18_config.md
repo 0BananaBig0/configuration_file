@@ -1500,6 +1500,9 @@ LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 sudo apt-get install ccache cmake make g++-multilib gdb \
   pkg-config coreutils python3-pexpect manpages-dev git \
   ninja-build capnproto libcapnp-dev
+sudo apt install linux-tools-common
+sudo apt install linux-tools-generic linux-cloud-tools-generic
+sudo apt install linux-tools-"$(uname -r)" linux-cloud-tools-"$(uname -r)"
 cd ~/Downloads/program
 git clone https://github.91chi.fun//https://github.com/rr-debugger/rr.git
 cd rr
@@ -1507,4 +1510,44 @@ mkdir obj && cd obj
 cmake .. -Ddisable32bit=ON
 make
 sudo make install
+perf stat -e br_inst_retired.conditional true
 ```
+on Intel CPUs, the good result is like the following content:
+```
+$ perf stat -e br_inst_retired.conditional true
+
+ Performance counter stats for 'true':
+
+            95,027      br_inst_retired.conditional
+
+       0.003255114 seconds time elapsed
+
+       0.003127000 seconds user
+       0.000000000 seconds sys
+```
+on AMD Ryzen CPUs, the good result is like the following content:
+```
+$ perf stat -e ex_ret_cond true
+
+ Performance counter stats for 'true':
+
+            17.525      ex_ret_cond:u
+
+       0,002422402 seconds time elapsed
+
+       0,002737000 seconds user
+       0,000000000 seconds sys
+```
+Otherwise, execute the following command
+```
+sudo gvim /etc/sysctl.conf
+```
+add the following content to sysctl.conf
+```
+kernel.perf_event_paranoid = -1
+```
+then execute the following command
+```
+sudo sysctl -p /etc/sysctl.conf
+```
+
