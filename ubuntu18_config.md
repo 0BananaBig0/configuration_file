@@ -1507,7 +1507,7 @@ cd ~/Downloads/program
 git clone https://github.91chi.fun//https://github.com/rr-debugger/rr.git
 cd rr
 mkdir obj && cd obj
-cmake .. -Ddisable32bit=ON
+cmake .. -Ddisable32bit=ON -DCMAKE_BUILD_TYPE=Release
 make
 sudo make install
 perf stat -e br_inst_retired.conditional true
