@@ -191,6 +191,8 @@ git config --global user.name "Banana-Two"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
+git config --global url."https://hub.fastgit.xyz/".insteadOf "https://github.com/"
+git config --global protocol.https.allow always
 ```
 系统永久更换git版本
 ```
@@ -492,6 +494,7 @@ git clone https://github.com/neovim/neovim
 cd neovim
 git checkout stable
 sudo yum -y install ninja-build libtool autoconf automake cmake3 gcc gcc-c++ make pkgconfig unzip patch gettext curl
+sed 's/https\:\/\/github\.com/https\:\/\/github\.91chi\.fun\/\/https\:\/\/github\.com/' `grep "https://github.com" . -irl` -i
 make CMAKE_BUILD_TYPE=Release #repeat until success
 sudo make install
 sudo su
