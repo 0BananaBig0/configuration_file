@@ -365,14 +365,6 @@ function Lazy_On_Plugin_Configuration()
     103wincmd |
     23wincmd _
     nunmenu WinBar
-    nnoremenu WinBar.Stop :call vimspector#Stop()<CR>
-    nnoremenu WinBar.Continue :call vimspector#Continue()<CR>
-    nnoremenu WinBar.Pause :call vimspector#Pause()<CR>
-    nnoremenu WinBar.Next :call vimspector#StepOver()<CR>
-    nnoremenu WinBar.Step :call vimspector#StepInto()<CR>
-    nnoremenu WinBar.Finish :call vimspector#StepOut()<CR>
-    nnoremenu WinBar.Restart :call vimspector#Restart()<CR>
-    nnoremenu WinBar.Reset :call vimspector#Reset()<CR>
   endfunction
   function s:SetUpTerminal()
     call win_gotoid( g:vimspector_session_windows.terminal )
@@ -850,4 +842,5 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
 
