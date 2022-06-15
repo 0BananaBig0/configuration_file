@@ -177,9 +177,9 @@ exit
 （5）分别为vim和neovim安装vim-plug(根用户和其它用户需要自己执行，这里我已为celab106_z2min执行) 
 ```
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+       https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 ```
 （6）sudo su进入的root用户可能无法使用vim和nvim，这是因为它们是被安装在/usr/local/bin中，如果想要sudo su进入的root用户使用，可以在.bashrc或.zshrc中添加下面这句话
 ```

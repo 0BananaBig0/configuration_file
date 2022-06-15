@@ -8,6 +8,8 @@
 * [4,install the third part software soure](#4install-the-third-part-software-soure)
 * [5,install gcc7,gcc9,gcc11,cmake3](#5install-gcc7gcc9gcc11cmake3)
 * [6,install different verisons and config git](#6install-different-verisons-and-config-git)
+* [add the following content to your .bashrc or .zshrc](#add-the-following-content-to-your-bashrc-or-zshrc)
+* [execute the following command](#execute-the-following-command)
 * [7,Synchronization time](#7synchronization-time)
 * [8,Complie and install LLVM13](#8complie-and-install-llvm13)
 * [9,install zsh,omz,zinit,ksh](#9install-zshomzzinitksh)
@@ -82,7 +84,7 @@ All programs which are installed by the command "sudo make install" will be back
 (5) Close the fast startup in win10. \
 (6) (Note, press ESC to enter the bios.)Enable USB boot in bios and disable fast boot and secure boot, also should change the boot order(make USB to be the first). \
 (7) When install Centos7, we must partiton the storeage manually.(My partiton:[/,133G],[/home,/133G],[/boot/,1G],[/boot/efi,512M],[/var,132.5G],[/swap,64G]) \
-(8) If we want to create a common a user, we must let it in /home-local. so that we can mount our file system easily. \
+(8) If we want to create a common user, we must let it in /home-local. so that we can mount our file system easily. \
 (9) After finishing installation,reboot system, pull out the USB disk and enter the bios to change the boot order(make centos to be the first) and enable fast boot.
 
 # 1,install the driver of Ethernet
@@ -494,7 +496,6 @@ git clone https://github.com/neovim/neovim
 cd neovim
 git checkout stable
 sudo yum -y install ninja-build libtool autoconf automake cmake3 gcc gcc-c++ make pkgconfig unzip patch gettext curl
-sed 's/https\:\/\/github\.com/https\:\/\/github\.91chi\.fun\/\/https\:\/\/github\.com/' `grep "https://github.com" . -irl` -i
 make CMAKE_BUILD_TYPE=Release #repeat until success
 sudo make install
 sudo su
@@ -504,9 +505,9 @@ exit
 （5）分别为vim和neovim安装vim-plug(根用户和其它用户需要自己执行，这里我已为celab106_z2min执行) 
 ```
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+       https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 ```
 （6）创建符号链接到/usr/bin，否则显示器直连服务器时的sudo su进入的root用户以及sudo命令无法使用vim
 ```

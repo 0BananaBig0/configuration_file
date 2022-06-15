@@ -166,9 +166,9 @@ sh -c "$(curl -fsSL https://git.io/zinit-install)"
 ## Install vim-plug
 ```
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+       https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 sudo su #option
 python3 -m pip install pylint yapf futures isort pygments cmake_format hdl_checker vim-vint cmakelang pyright
 # if you are in the root user,the following command you should excute
