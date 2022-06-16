@@ -35,23 +35,27 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 ```
-## 3,copy configuration file from celab106_z2mini and add some configurations
+## 3,copy configuration file from hxliang and add some configurations
 ```
-cp /home-local/celab106_z2mini/.vimrc ~
-cp /home-local/celab106_z2mini/.vim ~/.vim
-cp /home-local/celab106_z2mini/.config/goneovim ~/.config/ -r
+cp /home/hxliang/.vimrc_cpp ~/.vimrc
+cp /home/hxliang/.config/goneovim ~/.config/ -r
 mkdir ~/.config/nvim -p
-ln -s /home/hxliang/.vimrc ~/.config/nvim/init.vim
-ln -s /home/hxliang/.vim/coc-settings.json ~/.config/nvim/
+ln -s ~/.vimrc ~/.config/nvim/init.vim
+ln -s ~/.vim/coc-settings.json ~/.config/nvim/
 mkdir ~/Downloads/program/ -p
-cp /home-local/celab106_z2mini/Downloads/program/goneovim-linux/ ~/Downloads/program/ -r
+cp /home/hxliang/Downloads/program/goneovim-linux/ ~/Downloads/program/ -r
+gvim
+```
+execute the following commands in vim
+```
+:PlugInstall
 ```
 Note:If the plugin of vim has some problems, you can uninstall it and reinstall it. Our plugins management plugin is vimplug.\ 
 If Updating plugin failes, you may need to go to the ~/.vim/plugged/the_name_of_pluggin and execute "git stash" and "git stash clear" , then update it again.
 ## 4,add the following content to your .bashrc or .zshrc
 ```
 # the gui of neovim
-alias gnvim='~/Downloads/program/Goneovim-v0.5.1-linux/goneovim -p'
+alias gnvim='~/Downloads/program/goneovim-linux/goneovim -p'
 ```
 <!-- ## 5,open vim/gvim/gnvim/nvim and execute the following command:
    - ```
