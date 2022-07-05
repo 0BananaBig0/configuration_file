@@ -113,7 +113,7 @@
 * [68,install rr debugger](#68install-rr-debugger)
 * [69,解决network-manager中wired为unmanaged的问题](#69解决network-manager中wired为unmanaged的问题)
 * [70,install opencl intel runtime(2.0)](#70install-opencl-intel-runtime20)
-* [71,install opencl intel runtime(3.0)](#71install-opencl-intel-runtime30)
+* [71,install opencl intel runtime(2.1)](#71install-opencl-intel-runtime21)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1563,21 +1563,21 @@ sudo sysctl -p /etc/sysctl.conf
 # 70,install opencl intel runtime(2.0)
 ```
 sudo apt install ocl-icd-opencl-dev
-sudo apt install ocl-icd-dev beignet-opencl-icd opencl-headers
+sudo apt install ocl-icd-dev beignet-opencl-icd opencl-headers ocl-icd-libopencl1
 ```
 
-# 71,install opencl intel runtime(3.0)
+# 71,install opencl intel runtime(2.1)
 ```
 cd ~/Downloads/program
 mkdir neo
 cd neo
-wget https://ghproxy.com/https://github.com/intel/compute-runtime/releases/download/21.38.21026/intel-gmmlib_21.2.1_amd64.deb
-wget https://ghproxy.com/https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.8708/intel-igc-core_1.0.8708_amd64.deb
-wget https://ghproxy.com/https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.8708/intel-igc-opencl_1.0.8708_amd64.deb
-wget https://ghproxy.com/https://github.com/intel/compute-runtime/releases/download/21.38.21026/intel-opencl_21.38.21026_amd64.deb
-wget https://ghproxy.com/https://github.com/intel/compute-runtime/releases/download/21.38.21026/intel-ocloc_21.38.21026_amd64.deb
-wget https://ghproxy.com/https://github.com/intel/compute-runtime/releases/download/21.38.21026/intel-level-zero-gpu_1.2.21026_amd64.deb
-wget https://ghproxy.com/https://github.com/intel/compute-runtime/releases/download/21.38.21026/ww38.sum
-sha256sum -c ww38.sum
+wget https://github.91chi.fun//https://github.com/intel/compute-runtime/releases/download/20.40.18075/intel-gmmlib_20.2.5_amd64.deb
+wget https://github.91chi.fun//https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.5176/intel-igc-core_1.0.5176_amd64.deb
+wget https://github.91chi.fun//https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.5176/intel-igc-opencl_1.0.5176_amd64.deb
+wget https://github.91chi.fun//https://github.com/intel/compute-runtime/releases/download/20.40.18075/intel-opencl_20.40.18075_amd64.deb
+wget https://github.91chi.fun//https://github.com/intel/compute-runtime/releases/download/20.40.18075/intel-ocloc_20.40.18075_amd64.deb
+wget https://github.91chi.fun//https://github.com/intel/compute-runtime/releases/download/20.40.18075/intel-level-zero-gpu_1.0.18075_amd64.deb
+wget https://github.91chi.fun//https://github.com/intel/compute-runtime/releases/download/20.40.18075/ww40.sum
+sha256sum -c ww40.sum
 sudo dpkg -i *.deb
 ```
