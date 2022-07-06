@@ -508,17 +508,12 @@ function Lazy_Plugin_Configuration()
   nnoremap <silent>[l :ALEDetail<CR>
   " 使用clang对c和c++进行语法检查，对python使用pylint进行语法检查
   " 因为clangtidy和clangcheck仅在文件打开和保存时运行，所以由它们
-  " 产生的警告或者错误标记只有通过保存文件来消除
-  " 谨慎选择语法检测器，性能不好的语法检测器会导致ale和vim-which-key造成冲突，导致写入或退出插入模式后会卡顿，例如旧版iverilog
+  " 产生的警告或者错误标记只有通过保存文件来消除.谨慎选择语法检测器，
+  " 性能不好的语法检测器会导致ale和vim-which-key造成冲突，导致写入或退出插入模式后会卡顿，例如旧版iverilog
   let g:ale_linters = {
-  \   'c++':['clangd'],
   \   'python': ['pylint'],
   \   'verilog':['verilator'],
-  \   'c': ['clang'],
   \}
-  " Enable clang-tidy
-  let g:ale_c_clangd_options = '--clang-tidy'
-  let g:ale_cpp_clangd_options = '--clang-tidy'
   " disable the plist generation.
   let g:ale_cpp_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
   " set python3 to be default python
@@ -527,10 +522,13 @@ function Lazy_Plugin_Configuration()
   " 使coc和ale可以同时工作,01不同时工作，10同时工作
   let g:ale_disable_lsp = 0
   let g:ale_lsp_suggestions = 1
-  " 格式化python
   let g:ale_fixers = {
               \ 'python': ['yapf', 'isort'],
               \ }
+  let g:ale_c_clangtidy_executable = ''
+  let g:ale_cpp_clangtidy_executable = ''
+  let g:ale_c_clangd_executable = ''
+  let g:ale_cpp_clangd_executable = ''
 
 
 
@@ -853,4 +851,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
