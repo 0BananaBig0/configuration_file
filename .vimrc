@@ -189,10 +189,10 @@ function Lazy_On_Plugin_Configuration()
   nmap <silent><Localleader>r <Plug>(coc-references)
   nmap <silent><Localleader>n <Plug>(coc-rename)
   nmap <silent><Localleader>f <Plug>(coc-refactor)
-  nnoremap <silent>[td :silent call CocAction('jumpDefinition', 'tabe')<CR>
-  nnoremap <silent>[tc :silent call CocAction('jumpDeclaration', 'tabe')<CR>
-  nnoremap <silent>[ti :silent call CocAction('jumpImplementation', 'tabe')<CR>
-  nnoremap <silent>[tr :silent call CocAction('jumpReferences', 'tabe')<CR>
+  nnoremap <silent>[d :silent call CocAction('jumpDefinition', 'tabe')<CR>
+  nnoremap <silent>[c :silent call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap <silent>[i :silent call CocAction('jumpImplementation', 'tabe')<CR>
+  nnoremap <silent>[r :silent call CocAction('jumpReferences', 'tabe')<CR>
   nmap <silent><Localleader>an <plug>(coc-diagnostic-next)
   nmap <silent><Localleader>ap <plug>(coc-diagnostic-prev)
   nmap <silent><Localleader>en <plug>(coc-diagnostic-next-error)
@@ -478,16 +478,8 @@ autocmd FileType markdown nmap <silent><Localleader><F2> <Plug>MarkdownPreview
 function Lazy_Plugin_Configuration()
   " ale setting
   let g:ale_enabled = 0
-  " Go To Definition (:ALEGoToDefinition),[d will create new tab
-  nnoremap <silent>[ud :ALEGoToDefinition <CR>
-  nnoremap <silent>[d :ALEGoToDefinition -tab<CR>
-  " Finding references (:ALEFindReferences),[r will create new tab
-  nnoremap <silent>[ur :ALEFindReferences <CR>
-  nnoremap <silent>[r :ALEFindReferences -tab<CR>
   " On leaving insert mode, check the file
   let g:ale_lint_on_insert_leave = 1
-  " When you save a buffer, check the file
-  " let g:ale_lint_on_save = 1
   " When this option is set to `1`, highlights will be set for problems.
   let g:ale_set_highlights = 1
   " 自定义error和warning图标
@@ -499,17 +491,18 @@ function Lazy_Plugin_Configuration()
   let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
   " 打开文件时进行检查
   let g:ale_lint_on_enter = 0
-  " 普通模式下，[a前往上一个错误或警告，[n前往下一个错误或警告
-  nmap <silent>[a <Plug>(ale_previous_wrap)
+  " 普通模式下，[p前往上一个错误或警告，[n前往下一个错误或警告
+  nmap <silent>[p <Plug>(ale_previous_wrap)
   nmap <silent>[n <Plug>(ale_next_wrap)
-  " [c触发或关闭语法检查syntax change
-  nnoremap <silent>[c :ALEToggle<CR>
+  " [t触发或关闭语法检查syntax change
+  nnoremap <silent>[t :ALEToggle<CR>
   " [l查看错误或警告的详细信息
   nnoremap <silent>[l :ALEDetail<CR>
   " 使用clang对c和c++进行语法检查，对python使用pylint进行语法检查
   " 因为clangtidy和clangcheck仅在文件打开和保存时运行，所以由它们
   " 产生的警告或者错误标记只有通过保存文件来消除.谨慎选择语法检测器，
-  " 性能不好的语法检测器会导致ale和vim-which-key造成冲突，导致写入或退出插入模式后会卡顿，例如旧版iverilog
+  " 性能不好的语法检测器会导致ale和vim-which-key造成冲突，导致写入或
+  " 退出插入模式后会卡顿，例如旧版iverilog
   let g:ale_linters = {
   \   'python': ['pylint'],
   \   'verilog':['verilator'],
