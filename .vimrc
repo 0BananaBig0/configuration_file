@@ -110,19 +110,22 @@ function! Show_Current_Module()
   endwhile
   echo "module -->" module_name
 endfunction
-autocmd FileType c,cpp nnoremap <silent><Leader>` :call Show_Nearest_Class()<CR>
-function! Show_Nearest_Class()
+autocmd FileType c,cpp nnoremap <silent><Leader>` :call Show_Nearest_Class_Or_Struct()<CR>
+function! Show_Nearest_Class_Or_Struct()
   let class_line = search('\n'.'class','bnWz')
-  if(class_line > 0)
-    let class_name = getline(class_line+1)
+  let struct_line = search('\n'.'struct','bnWz')
+  if(class_line > struct_line)
+    let nearest_name = getline(class_line+1)
+  elseif(class_line < struct_line)
+    let nearest_name = getline(struct_line+1)
   else
-    let class_name = 'No class can be find.'
+    let nearest_name = 'No class/struct can be find.'
   endif
-  let class_end_poisition = strridx(class_name,'{')
-  if(class_end_poisition > 0)
-    let class_name = strpart(class_name,0,class_end_poisition)
+  let nearest_end_poisition = strridx(nearest_name,'{')
+  if(nearest_end_poisition > 0)
+    let nearest_name = strpart(nearest_name,0,nearest_end_poisition)
   endif
-  echo class_name
+  echo nearest_name
 endfunction
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -181,11 +184,15 @@ function Lazy_On_Plugin_Configuration()
   " Make <CR> auto-select the first completion item
   inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm() :"\<CR>"
   nmap <silent><Localleader>d <Plug>(coc-definition)
-  nmap <silent><Localleader>n <Plug>(coc-rename)
-  nmap <silent><Localleader>i <Plug>(coc-implementation)
-  nmap <silent><Localleader>f <Plug>(coc-refactor)
   nmap <silent><Localleader>c <Plug>(coc-declaration)
+  nmap <silent><Localleader>i <Plug>(coc-implementation)
   nmap <silent><Localleader>r <Plug>(coc-references)
+  nmap <silent><Localleader>n <Plug>(coc-rename)
+  nmap <silent><Localleader>f <Plug>(coc-refactor)
+  nnoremap <silent>[td :silent call CocAction('jumpDefinition', 'tabe')<CR>
+  nnoremap <silent>[tc :silent call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap <silent>[ti :silent call CocAction('jumpImplementation', 'tabe')<CR>
+  nnoremap <silent>[tr :silent call CocAction('jumpReferences', 'tabe')<CR>
   nmap <silent><Localleader>an <plug>(coc-diagnostic-next)
   nmap <silent><Localleader>ap <plug>(coc-diagnostic-prev)
   nmap <silent><Localleader>en <plug>(coc-diagnostic-next-error)
@@ -293,11 +300,15 @@ function Lazy_On_Plugin_Configuration()
   " vim-fugitive and vim-gitgutter setting
   nnoremap <silent><Leader>git :silent call plug#load('vim-fugitive')<CR>:silent call plug#load('vim-gitgutter')<CR>:set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>:set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
   let g:fugitive_no_maps = 1
+  let g:gitgutter_map_keys = 0
   function! GitStatus()
     let [a,m,r] = GitGutterGetHunkSummary()
     return printf('+%d ~%d -%d', a, m, r)
   endfunction
   let g:gitgutter_map_keys = 0
+  nmap <Leader>gp <Plug>(GitGutterPrevHunk)
+  nmap <Leader>gn <Plug>(GitGutterNextHunk)
+  nmap <Leader>gf <Plug>(GitGutterFold)
 
 
 
@@ -491,8 +502,8 @@ function Lazy_Plugin_Configuration()
   " 普通模式下，[a前往上一个错误或警告，[n前往下一个错误或警告
   nmap <silent>[a <Plug>(ale_previous_wrap)
   nmap <silent>[n <Plug>(ale_next_wrap)
-  " [t触发或关闭语法检查syntax change
-  nnoremap <silent>[t :ALEToggle<CR>
+  " [c触发或关闭语法检查syntax change
+  nnoremap <silent>[c :ALEToggle<CR>
   " [l查看错误或警告的详细信息
   nnoremap <silent>[l :ALEDetail<CR>
   " 使用clang对c和c++进行语法检查，对python使用pylint进行语法检查
@@ -842,5 +853,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
 
