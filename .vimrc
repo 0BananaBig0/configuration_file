@@ -852,7 +852,7 @@ nnoremap <silent><Localleader>q :q<CR>
 nnoremap <silent><Localleader>w :w<CR>
 nnoremap <silent><Localleader><F4> :%retab!<CR>
 " 比较文件
-nnoremap <Localleader><F5> :vert diffsplit
+nnoremap <Localleader><F5> :vert diffsplit 
 nnoremap <silent><Localleader><F6> :call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec "silent normal! m`"
