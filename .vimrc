@@ -95,7 +95,9 @@ colorscheme dracula
 " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
-nnoremap <silent><Leader>ppt :colorscheme zellner<CR>:set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>:IndentGuidesDisable<CR>
+nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
+                           \ :set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>
+                           \ :IndentGuidesDisable<CR>
 autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
 function! Show_Current_Module()
   let module_line = search('module','bnWz')
@@ -170,7 +172,7 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 function Lazy_On_Plugin_Configuration()
   " Use tab for trigger completion with characters ahead and navigate.After we select the word we needn't press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin before putting this into your config.
-  " ctrl+j: jump to the next parameter in the completed function, 
+  " ctrl+j: jump to the next parameter in the completed function,
   " ctrl+k:jump to the previous parameter in the completed function
   inoremap <silent><expr> <TAB>
         \ pumvisible() ? "\<C-n>" :
@@ -298,7 +300,12 @@ function Lazy_On_Plugin_Configuration()
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :silent call plug#load('vim-fugitive')<CR>:silent call plug#load('vim-gitgutter')<CR>:set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>:set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
+  nnoremap <silent><Leader>git :silent normal! m`<CR>
+                             \ :silent call plug#load('vim-fugitive')<CR>
+                             \ :silent call plug#load('vim-gitgutter')<CR>
+                             \ :set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>
+                             \ :set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
+                             \ :silent normal! ``<CR>
   let g:fugitive_no_maps = 1
   let g:gitgutter_map_keys = 0
   function! GitStatus()
@@ -343,7 +350,9 @@ function Lazy_On_Plugin_Configuration()
   nnoremap <silent>]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
   nnoremap <silent>]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   nnoremap <silent><F5> :silent call plug#load('vimspector')<CR>
-  nnoremap <silent>]<F5> :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 19<CR>:silent call plug#load('vimspector')<CR>:call vimspector#Launch()<CR>
+  nnoremap <silent>]<F5> :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 19<CR>
+                       \ :silent call plug#load('vimspector')<CR>
+                       \ :call vimspector#Launch()<CR>
   nnoremap <silent><Leader><F5> :silent call Cpp_Workspace_Configuration()<CR>
   nmap <silent><F6> <Plug>VimspectorStepOver
   nmap <silent><C-F6> <Plug>VimspectorStepInto
@@ -437,7 +446,27 @@ function Format_C_CPP_CMAKE()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
-            \ 'args': ['-style="{BasedOnStyle: GNU, AccessModifierOffset: 0, AlignConsecutiveMacros: AcrossEmptyLinesAndComments, AllowShortBlocksOnASingleLine: Always, AlwaysBreakAfterDefinitionReturnType: None, AlwaysBreakAfterReturnType: None, AlwaysBreakTemplateDeclarations: Yes, BreakBeforeBinaryOperators: None, BreakBeforeBraces: Allman, BreakInheritanceList: AfterComma, BreakConstructorInitializers: AfterColon, ConstructorInitializerIndentWidth: 2, ContinuationIndentWidth: 2, IndentAccessModifiers: true, IndentCaseBlocks: true, SpaceAfterTemplateKeyword: false, SpaceBeforeParens: Never, SpaceBeforeRangeBasedForLoopColon: false, Standard: Latest, TabWidth: 2}"'],
+            \ 'args': ['-style="{
+            \ BasedOnStyle: GNU,
+            \ AccessModifierOffset: 0,
+            \ AlignConsecutiveMacros: AcrossEmptyLinesAndComments,
+            \ AllowShortBlocksOnASingleLine: Always,
+            \ AlwaysBreakAfterDefinitionReturnType: None,
+            \ AlwaysBreakAfterReturnType: None,
+            \ AlwaysBreakTemplateDeclarations: Yes,
+            \ BreakBeforeBinaryOperators: None,
+            \ BreakBeforeBraces: Allman,
+            \ BreakInheritanceList: AfterComma,
+            \ BreakConstructorInitializers: AfterColon,
+            \ ConstructorInitializerIndentWidth: 2,
+            \ ContinuationIndentWidth: 2,
+            \ IndentAccessModifiers: true,
+            \ IndentCaseBlocks: true,
+            \ SpaceAfterTemplateKeyword: false,
+            \ SpaceBeforeParens: Never,
+            \ SpaceBeforeRangeBasedForLoopColon: false,
+            \ Standard: Latest,
+            \ TabWidth: 2}"'],
             \ }
   let g:neoformat_cmake_cmakeformat = {
             \ 'exe': 'cmake-format',
@@ -534,7 +563,7 @@ function Lazy_Plugin_Configuration()
 
 
 
-  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu 
+  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode
   nnoremap <silent><Leader>gm ggO<ESC>:GenTocGFM<CR>m`ggdd
@@ -823,7 +852,7 @@ nnoremap <silent><Localleader>q :q<CR>
 nnoremap <silent><Localleader>w :w<CR>
 nnoremap <silent><Localleader><F4> :%retab!<CR>
 " 比较文件
-nnoremap <Localleader><F5> :vert diffsplit 
+nnoremap <Localleader><F5> :vert diffsplit
 nnoremap <silent><Localleader><F6> :call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec "silent normal! m`"
@@ -836,8 +865,6 @@ function! Delete_Trailling_Space()
   exec "silent :%s/\\s\\+$//e"
   exec "silent normal! ``"
 endfunction
-" Press Enter at normal mode <space>Enter，格式和当前行保持一致
-nnoremap <silent><Localleader><CR> i<CR><ESC>
 " Ctrl-Enter新建行和当前行格式保持一致,normal模式下仅对注释类型有效
 nnoremap <silent><C-CR> o<ESC>
 inoremap <silent><C-CR> <ESC>o
