@@ -16,14 +16,6 @@
         "environment": [],
         "externalConsole": true,
         "MIMode": "gdb",
-        "breakpointers": 
-        {
-          "exception": 
-          {
-            "cpp_throw": "Y",
-            "cpp_catch": "Y"
-          }
-        },
         "setupCommands": 
         [
           {
@@ -32,6 +24,13 @@
             "ignoreFailures": true
           }
         ]
+      },
+      "breakpoints": 
+      {
+        "exception": 
+        {
+          "all": "Y"
+        }
       }
     }
   }
