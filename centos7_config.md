@@ -72,6 +72,7 @@
 * [42,更换python的方法](#42更换python的方法)
 * [43,install fd to replace find.](#43install-fd-to-replace-find)
 * [44,add new dynamic library](#44add-new-dynamic-library)
+* [45,add shell environment variables](#45add-shell-environment-variables)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -973,8 +974,8 @@ bazel run -c opt :install -- -s /usr/local/bin
 ```
 source /opt/rh/devtoolset-9/enable
 cd ~/Downloads/program
-git clone https://github.91chi.fun//https://github.com/verilator/verilator.git
 sudo yum -y install git perl python3 make ccache numactl autoconf flex flex-devel bison bison-devel
+git clone https://github.91chi.fun//https://github.com/verilator/verilator.git
 cd verilator
 unset VERILATOR_ROOT
 git checkout stable
@@ -1097,3 +1098,10 @@ add the following content to your .bashrc or .zshrc
 ```
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 ```
+
+# 45,add shell environment variables
+PATH: bin
+LD_LIBRARY_PATH: lib or lib64
+XDG_DATA_DIRS: share
+C_INCLUDE_PATH: include
+CPLUS_INCLUDE_PATH: include

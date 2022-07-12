@@ -114,6 +114,7 @@
 * [69,解决network-manager中wired为unmanaged的问题](#69解决network-manager中wired为unmanaged的问题)
 * [70,install opencl intel runtime(2.0)](#70install-opencl-intel-runtime20)
 * [71,install opencl intel runtime(2.1)](#71install-opencl-intel-runtime21)
+* [72,add shell environment variables](#72add-shell-environment-variables)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1581,3 +1582,10 @@ wget https://github.91chi.fun//https://github.com/intel/compute-runtime/releases
 sha256sum -c ww40.sum
 sudo dpkg -i *.deb
 ```
+
+# 72,add shell environment variables
+PATH: bin
+LD_LIBRARY_PATH: lib or lib64
+XDG_DATA_DIRS: share
+C_INCLUDE_PATH: include
+CPLUS_INCLUDE_PATH: include
