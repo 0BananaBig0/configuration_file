@@ -4,13 +4,13 @@
 * [(1) Configure vim/gvim/nvim/gnvim](#1-configure-vimgvimnvimgnvim)
   * [1,login your account](#1login-your-account)
   * [2,execute the following commands until it successes](#2execute-the-following-commands-until-it-successes)
-  * [3,copy configuration file from celab106_z2mini and add some configurations](#3copy-configuration-file-from-celab106_z2mini-and-add-some-configurations)
+  * [3,copy configuration file from hxliang and add some configurations](#3copy-configuration-file-from-hxliang-and-add-some-configurations)
   * [4,add the following content to your .bashrc or .zshrc](#4add-the-following-content-to-your-bashrc-or-zshrc)
   * [5,open vim/gvim/gnvim/nvim and execute the following command:](#5open-vimgvimgnvimnvim-and-execute-the-following-command)
   * [6,install some dependencies](#6install-some-dependencies)
   * [7,modify .vimrc](#7modify-vimrc)
   * [8,if you not want to use my recommended plugin. You can just do the following command](#8if-you-not-want-to-use-my-recommended-plugin-you-can-just-do-the-following-command)
-* [(2)use exa to replace ls and use fd to replce find](#2use-exa-to-replace-ls-and-use-fd-to-replce-find)
+* [(2)use some new command tools to replace old command tools](#2use-some-new-command-tools-to-replace-old-command-tools)
 * [(3)add some tools](#3add-some-tools)
 * [(4)close screensaver](#4close-screensaver)
 * [(5)解决centos下非root用户频繁出现Authentication is required to set](#5解决centos下非root用户频繁出现authentication-is-required-to-set)
@@ -86,13 +86,26 @@ use "hxliang" to replace "celab106_z2mini" in .vimrc
 cp /home-local/celab106_z2mini/.vimrc_no_the_third_plugged ~/.vimrc
 ```
 
-# (2)use exa to replace ls and use fd to replce find
+# (2)use some new command tools to replace old command tools
 ```
 # add the following to your .bashrc
 if [ -d "/home-local/celab106_z2mini/.cargo/bin" ]; then
   export PATH=$PATH:/home-local/celab106_z2mini/.cargo/bin
 fi
+if [ -d "/home-local/celab106_z2mini/.go/bin" ]; then
+  export PATH=$PATH:/home-local/celab106_z2mini/.go/bin
+fi
 ```
+fd-find replace find, command: fd
+dust replace du, command: dust
+procs replace ps, command: procs
+bottom replace top, command: btm
+exa replace ls, command: exa
+zoxide replace cd, command: z
+ripgrep replace grep, command: rg
+bat replace cat, command: bat
+hyperfine replace time, command: hyperfine
+duf replace df, command: duf
 
 # (3)add some tools
 ```

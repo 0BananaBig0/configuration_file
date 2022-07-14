@@ -101,8 +101,7 @@
   * [安装下载B站视频小工具you-get](#安装下载b站视频小工具you-get)
   * [钉钉](#钉钉)
   * [rst file to html file](#rst-file-to-html-file)
-  * [install fd to replace find.](#install-fd-to-replace-find)
-* [60,安装rust和exa,使用exa代替ls](#60安装rust和exa使用exa代替ls)
+* [60,安装rust和一些新的命令行工具](#60安装rust和一些新的命令行工具)
 * [61,修复sudo apt update出现错误：](#61修复sudo-apt-update出现错误)
 * [62,如何确定系统所用屏保软件](#62如何确定系统所用屏保软件)
 * [63,gnome文件的默认打开方式的配置文件](#63gnome文件的默认打开方式的配置文件)
@@ -115,6 +114,7 @@
 * [70,install opencl intel runtime(2.0)](#70install-opencl-intel-runtime20)
 * [71,install opencl intel runtime(3.0)(21.38.21026)](#71install-opencl-intel-runtime30213821026)
 * [72,add shell environment variables](#72add-shell-environment-variables)
+* [73,compile duf to replace df](#73compile-duf-to-replace-df)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1303,9 +1303,9 @@ sudo apt install software-properties-common
 sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt update
 sudo apt install golang-go
-#Set $GOPATH 下面这个貌似没有也可以
-mkdir -p ~/go/{bin,pkg,src}
-echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
+#Set $GOPATH
+mkdir -p ~/.go/{bin,pkg,src}
+echo 'export GOPATH="$HOME/.go"' >> ~/.bashrc
 echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
@@ -1386,12 +1386,8 @@ python3 -m pip install you-get
 ```
 sudo python3 -m pip install sphinx sphinx-rtd-theme
 ```
-## install fd to replace find.
-```
-cargo install fd-find
-```
 
-# 60,安装rust和exa,使用exa代替ls
+# 60,安装rust和一些新的命令行工具
 ```
 sudo apt install rustc
 cd ~
@@ -1412,8 +1408,15 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 #check-revoke = false
 ```
 ```
-cargo install exa
-cargo install ripgrep(以后换新系统用这个代替sudo dpkg -i xxx)
+cargo install fd-find # replace find, command: fd
+cargo install dust # replace du, command: dust
+cargo install procs # replace ps, command: procs
+cargo install bottom # replace top, command: btm
+cargo install exa # replace ls, command: exa
+cargo install zoxide # replace cd, command: z
+cargo install ripgrep # replace grep, command: rg
+cargo install bat # replace cat, command: bat
+cargo install hyperfine # replace time, command: hyperfine
 ```
 添加下面这句环境路径到.bashrc或者.zshrc中
 ```
@@ -1589,3 +1592,11 @@ LD_LIBRARY_PATH: lib or lib64
 XDG_DATA_DIRS: share
 C_INCLUDE_PATH: include
 CPLUS_INCLUDE_PATH: include
+
+# 73,compile duf to replace df
+```
+git clone https://github.91chi.fun//https://github.com/muesli/duf.git
+cd duf
+go build
+go install
+```

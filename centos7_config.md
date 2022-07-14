@@ -21,7 +21,7 @@
 * [15,install ripgrep(command:rg)to replace grep](#15install-ripgrepcommandrgto-replace-grep)
 * [16,install ttf fonts and font manage tool](#16install-ttf-fonts-and-font-manage-tool)
 * [17,compile and installl vim and neovim](#17compile-and-installl-vim-and-neovim)
-* [18,install rust and exa, use exa to replace ls](#18install-rust-and-exa-use-exa-to-replace-ls)
+* [18,install rust and some new command tools](#18install-rust-and-some-new-command-tools)
 * [19,install go，goneovim](#19install-gogoneovim)
   * [install go language](#install-go-language)
   * [replace the morror source of go:](#replace-the-morror-source-of-go)
@@ -70,9 +70,8 @@
 * [40,为ldap用户在特定ip的服务器更换shell，以hxliang用户和10.34.24.11为例](#40为ldap用户在特定ip的服务器更换shell以hxliang用户和10342411为例)
 * [41,安装批量文件编码转换工具，以及解决windows文件名在linux显示乱码的工具](#41安装批量文件编码转换工具以及解决windows文件名在linux显示乱码的工具)
 * [42,更换python的方法](#42更换python的方法)
-* [43,install fd to replace find.](#43install-fd-to-replace-find)
-* [44,add new dynamic library](#44add-new-dynamic-library)
-* [45,add shell environment variables](#45add-shell-environment-variables)
+* [43,add shell environment variables](#43add-shell-environment-variables)
+* [compile duf to replace df](#compile-duf-to-replace-df)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -546,7 +545,7 @@ ln -s /home-local/celab106_z2mini/.vim/coc-settings.json /home-local/celab106_z2
 ln -s /home-local/celab106_z2mini/.vimrc /home-local/celab106_z2mini/.config/nvim/init.vim     
 ```
 
-# 18,install rust and exa, use exa to replace ls
+# 18,install rust and some new command tools
 ```
 sudo yum install rustc
 cd ~
@@ -568,7 +567,15 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 ```
 ```
 sudo yum -y install cargo
-cargo install exa
+cargo install ripgrep # replace grep, command: rg
+cargo install fd-find # replace find, command: fd
+cargo install dust # replace du, command: dust
+cargo install procs # replace ps, command: procs
+cargo install bottom # replace top, command: btm
+cargo install exa # replace ls, command: exa
+cargo install zoxide # replace cd, command: z
+cargo install bat #replace cat, command: bat
+cargo install hyperfine #replace time, command: hyperfine
 ```
 add the following content .bashrc or .zshrc
 ```
@@ -581,9 +588,9 @@ root和user用户通过cargo安装的软件不一定通用,具体看PATH的设�
 ## install go language
 ```
 sudo yum install -y golang
-# Set $GOPATH , maybe we not need the following content
-mkdir -p ~/go/{bin,pkg,src}
-echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
+# Set $GOPATH
+mkdir -p ~/.go/{bin,pkg,src}
+echo 'export GOPATH="$HOME/.go"' >> ~/.bashrc
 echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
@@ -1088,20 +1095,17 @@ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
 sudo update-alternatives --config python #选择python2
 ```
 
-# 43,install fd to replace find.
-```
-cargo install fd-find
-```
-
-# 44,add new dynamic library
-add the following content to your .bashrc or .zshrc
-```
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-```
-
-# 45,add shell environment variables
+# 43,add shell environment variables
 PATH: bin
 LD_LIBRARY_PATH: lib or lib64
 XDG_DATA_DIRS: share
 C_INCLUDE_PATH: include
 CPLUS_INCLUDE_PATH: include
+
+# compile duf to replace df
+```
+git clone https://github.91chi.fun//https://github.com/muesli/duf.git
+cd duf
+go build
+go install
+```
