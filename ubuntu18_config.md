@@ -1304,8 +1304,8 @@ sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt update
 sudo apt install golang-go
 #Set $GOPATH
-mkdir -p ~/.go/{bin,pkg,src}
-echo 'export GOPATH="$HOME/.go"' >> ~/.bashrc
+mkdir -p ~/.local/.go/{bin,pkg,src}
+echo 'export GOPATH="$HOME/.local/.go"' >> ~/.bashrc
 echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```

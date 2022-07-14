@@ -92,8 +92,8 @@ cp /home-local/celab106_z2mini/.vimrc_no_the_third_plugged ~/.vimrc
 if [ -d "/home-local/celab106_z2mini/.cargo/bin" ]; then
   export PATH=$PATH:/home-local/celab106_z2mini/.cargo/bin
 fi
-if [ -d "/home-local/celab106_z2mini/.go/bin" ]; then
-  export PATH=$PATH:/home-local/celab106_z2mini/.go/bin
+if [ -d "/home-local/celab106_z2mini/.local/.go/bin" ]; then
+  export PATH=$PATH:/home-local/celab106_z2mini/.local/.go/bin
 fi
 ```
 fd-find replace find, command: fd

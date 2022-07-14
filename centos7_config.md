@@ -589,8 +589,8 @@ root和user用户通过cargo安装的软件不一定通用,具体看PATH的设�
 ```
 sudo yum install -y golang
 # Set $GOPATH
-mkdir -p ~/.go/{bin,pkg,src}
-echo 'export GOPATH="$HOME/.go"' >> ~/.bashrc
+mkdir -p ~/.local/.go/{bin,pkg,src}
+echo 'export GOPATH="$HOME/.local/.go"' >> ~/.bashrc
 echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
