@@ -547,7 +547,7 @@ ln -s /home-local/celab106_z2mini/.vimrc /home-local/celab106_z2mini/.config/nvi
 
 # 18,install rust and some new command tools
 ```
-sudo yum install rustc
+sudo yum -y install cargo rustc
 cd ~
 mkdir .cargo
 cd .cargo
@@ -566,13 +566,13 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 #check-revoke = false
 ```
 ```
-sudo yum -y install cargo
+# not do for root
+cargo install exa # replace ls, command: exa
 cargo install ripgrep # replace grep, command: rg
 cargo install fd-find # replace find, command: fd
 cargo install dust # replace du, command: dust
 cargo install procs # replace ps, command: procs
 cargo install bottom # replace top, command: btm
-cargo install exa # replace ls, command: exa
 cargo install zoxide # replace cd, command: z
 cargo install bat #replace cat, command: bat
 cargo install hyperfine #replace time, command: hyperfine
