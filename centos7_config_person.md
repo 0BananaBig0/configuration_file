@@ -95,6 +95,7 @@ fi
 if [ -d "/home-local/celab106_z2mini/.local/.go/bin" ]; then
   export PATH=$PATH:/home-local/celab106_z2mini/.local/.go/bin
 fi
+eval "$(zoxide init bash)"
 ```
 fd-find replace find, command: fd
 dust replace du, command: dust

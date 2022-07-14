@@ -570,7 +570,7 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 cargo install exa # replace ls, command: exa
 cargo install ripgrep # replace grep, command: rg
 cargo install fd-find # replace find, command: fd
-cargo install dust # replace du, command: dust
+cargo install du-dust # replace du, command: dust
 cargo install procs # replace ps, command: procs
 cargo install bottom # replace top, command: btm
 cargo install zoxide # replace cd, command: z
@@ -580,6 +580,14 @@ cargo install hyperfine #replace time, command: hyperfine
 add the following content .bashrc or .zshrc
 ```
 export PATH=$PATH:~/.cargo/bin
+```
+add the following content to .zshrc
+```
+eval "$(zoxide init zsh)"
+```
+add the following content to .bashrc
+```
+eval "$(zoxide init bash)"
 ```
 root和user用户通过cargo安装的软件不一定通用,具体看PATH的设置。
 我这里是单独分开来设置的,因此对celab106_z2mini和root用户都进行了配置。

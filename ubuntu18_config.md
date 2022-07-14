@@ -1410,7 +1410,7 @@ registry = "git://mirrors.ustc.edu.cn/crates.io-index"
 ```
 cargo install exa # replace ls, command: exa
 cargo install fd-find # replace find, command: fd
-cargo install dust # replace du, command: dust
+cargo install du-dust # replace du, command: dust
 cargo install procs # replace ps, command: procs
 cargo install bottom # replace top, command: btm
 cargo install zoxide # replace cd, command: z
@@ -1421,6 +1421,14 @@ cargo install hyperfine # replace time, command: hyperfine
 添加下面这句环境路径到.bashrc或者.zshrc中
 ```
 export PATH=$PATH:~/.cargo/bin
+```
+add the following content to .zshrc
+```
+eval "$(zoxide init zsh)"
+```
+add the following content to .bashrc
+```
+eval "$(zoxide init bash)"
 ```
 root和user用户通过cargo安装的软件不一定通用,具体看PATH的设置。
 我这里是单独分开来设置的,因此我进入了root用户,去到root文件夹配置了
