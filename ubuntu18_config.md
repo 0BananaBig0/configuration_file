@@ -101,6 +101,7 @@
   * [安装下载B站视频小工具you-get](#安装下载b站视频小工具you-get)
   * [钉钉](#钉钉)
   * [rst file to html file](#rst-file-to-html-file)
+  * [use httpie to replace replace curl and wget](#use-httpie-to-replace-replace-curl-and-wget)
 * [60,安装rust和一些新的命令行工具](#60安装rust和一些新的命令行工具)
 * [61,修复sudo apt update出现错误：](#61修复sudo-apt-update出现错误)
 * [62,如何确定系统所用屏保软件](#62如何确定系统所用屏保软件)
@@ -1385,6 +1386,10 @@ python3 -m pip install you-get
 ## rst file to html file
 ```
 sudo python3 -m pip install sphinx sphinx-rtd-theme
+```
+## use httpie to replace replace curl and wget
+```
+python3 -m pip install httpie # command: http/https
 ```
 
 # 60,安装rust和一些新的命令行工具

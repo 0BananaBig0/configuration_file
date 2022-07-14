@@ -97,16 +97,17 @@ if [ -d "/home-local/celab106_z2mini/.local/.go/bin" ]; then
 fi
 eval "$(zoxide init bash)"
 ```
-fd-find replace find, command: fd
-dust replace du, command: dust
-procs replace ps, command: procs
-bottom replace top, command: btm
-exa replace ls, command: exa
-zoxide replace cd, command: z
-ripgrep replace grep, command: rg
-bat replace cat, command: bat
-hyperfine replace time, command: hyperfine
-duf replace df, command: duf
+fd-find replaces find, command: fd
+dust replaces du, command: dust
+procs replaces ps, command: procs
+bottom replaces top, command: btm
+exa replaces ls, command: exa
+zoxide replaces cd, command: z
+ripgrep replaces grep, command: rg
+bat replaces cat, command: bat
+hyperfine replaces time, command: hyperfine
+duf replaces df, command: duf
+httpie replaces replaces curl and wget, command: http/https
 
 # (3)add some tools
 ```

@@ -298,6 +298,8 @@ python3 -m pip install pysnooper ipdb
 python3 -m pip install compiledb #(a tool for you to create a compile_commands.json if you use make to manage your c/c++ project)
 python3 -m pip install pylint yapf futures isort pygments cmake_format hdl_checker vim-vint cmakelang pyright gdbgui
 python3 -m pip install cppman you-get sphinx sphinx-rtd-theme
+# use httpie to replace replace curl and wget
+python3 -m pip install httpie # command: http/https
 ```
 
 # 13,compile and install gdb, configure .gdbinit
