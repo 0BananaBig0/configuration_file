@@ -76,6 +76,7 @@ Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','Le
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']} " LeaderF extension for navigate the marks.
 Plug 'sbdchd/neoformat',{'on':['Neoformat']} " 代码格式化插件
 Plug 'bfrg/vim-cpp-modern', {'on':[]}  " 高亮c++类模板等插件
+Plug 'brgmnn/vim-opencl', {'on':[]} " highlight opencl 2.0 syntax
 Plug 'vim-python/python-syntax', {'on':[]} " python 语法高亮插件
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown实时预览插件
 Plug 'godlygeek/tabular', {'on': []} " markdown表格插件
@@ -129,9 +130,11 @@ function! Show_Nearest_Class_Or_Struct()
   endif
   echo nearest_name
 endfunction
+autocmd BufNewFile,BufRead *.cl set filetype=OPENCL
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd FileType cpp,c silent call plug#load('vim-cpp-modern')
+  autocmd FileType OPENCL silent call plug#load('vim-opencl')
   autocmd FileType python silent call plug#load('python-syntax')
   autocmd VimEnter,BufRead *.launch setfiletype roslaunch
   autocmd BufRead *.launch silent call plug#load('vim-ros')
@@ -580,6 +583,8 @@ function Lazy_Plugin_Configuration()
   let g:NERDCommentEmptyLines      = 1      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
+  let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
+  let g:NERDCustomDelimiters = { 'opencl': { 'left': '//' } } " use // to comment cl source codes.
   map <silent><F3> <plug>NERDCommenterComment
   map <silent><S-F3> <plug>NERDCommenterUncomment
 
