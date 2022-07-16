@@ -160,7 +160,7 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     exec "CocStart"
     augroup Lazy_Call_Plugin
-      autocmd FileType c,cpp,python,verilog silent call plug#load('ale')
+      autocmd FileType c,cpp,python,verilog,opencl silent call plug#load('ale')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
       autocmd FileType c,cpp,cmake silent call Format_C_CPP_CMAKE()
@@ -531,7 +531,7 @@ function Lazy_Plugin_Configuration()
   nnoremap <silent>[t :ALEToggle<CR>
   " [l查看错误或警告的详细信息
   nnoremap <silent>[l :ALEDetail<CR>
-  " 使用clang对c和c++进行语法检查，对python使用pylint进行语法检查
+  " 使用cc对c和c++进行语法检查，对python使用pylint进行语法检查
   " 因为clangtidy和clangcheck仅在文件打开和保存时运行，所以由它们
   " 产生的警告或者错误标记只有通过保存文件来消除.谨慎选择语法检测器，
   " 性能不好的语法检测器会导致ale和vim-which-key造成冲突，导致写入或
@@ -539,9 +539,14 @@ function Lazy_Plugin_Configuration()
   let g:ale_linters = {
   \   'python': ['pylint'],
   \   'verilog':['verilator'],
+  \   'opencl':['cc']
   \}
   " disable the plist generation.
   let g:ale_cpp_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
+  let g:ale_c_clangtidy_executable = ''
+  let g:ale_cpp_clangtidy_executable = ''
+  let g:ale_c_clangd_executable = ''
+  let g:ale_cpp_clangd_executable = ''
   " set python3 to be default python
   let g:ale_python_executable = 'python3'
   let g:ale_python_pylint_use_global = 1
@@ -551,10 +556,6 @@ function Lazy_Plugin_Configuration()
   let g:ale_fixers = {
               \ 'python': ['yapf', 'isort'],
               \ }
-  let g:ale_c_clangtidy_executable = ''
-  let g:ale_cpp_clangtidy_executable = ''
-  let g:ale_c_clangd_executable = ''
-  let g:ale_cpp_clangd_executable = ''
 
 
 
@@ -877,3 +878,6 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
+
+
