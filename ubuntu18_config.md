@@ -175,7 +175,7 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://ghproxy.com/https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 sudo su #option
-python3 -m pip install pylint yapf futures isort pygments cmake_format hdl_checker vim-vint cmakelang pyright
+python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright # hdl_checker 
 # if you are in the root user,the following command you should excute
 exit
 # Because pylint only can be used by its owner

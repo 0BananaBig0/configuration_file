@@ -21,11 +21,10 @@
 
 <!-- vim-markdown-toc -->
 #Note:
-这里的hxliang是我的用户名，你们要替换回你自己的用户名。
 # (1) Configure vim/gvim/nvim/gnvim
 ## 1,login your account
 ```
-ssh -X hxliang@10.34.24.11
+ssh -X YourAccount@10.34.24.11
 ```
 ## 2,execute the following commands until it successes
 a plugin which is used to manage other plugins of vim and whose name is vim-plug
@@ -69,21 +68,20 @@ alias gnvim='~/Downloads/program/goneovim-linux/goneovim -p'
 ```
 CocInstall coc-omni coc-word coc-markdownlint coc-vimlsp coc-dictionary coc-tag coc-cmake coc-sh coc-css coc-json coc-pyright coc-yaml coc-cl coc-clangd coc-snippets 
 ```
-(第一个补全选项要么直接按enter要么按了tab一会儿后再按enter否则补全会有问题)
+(第一个补全选项要么直接按enter要么按了tab选择好后直接继续打代码。)
 如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱.
 ## 6,install some dependencies
 ```
 python3 -m pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
 python3 -m pip install pysnooper ipdb
 python3 -m pip install compiledb #(a tool for you to create a compile_commands.json if you use make to manage your c/c++ project)
-python3 -m pip install pylint yapf futures isort pygments cmake_format hdl_checker vim-vint cmakelang pyright gdbgui
+python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright gdbgui
 ```
 ## 7,modify .vimrc
-use "home" to replace "home-local" in .vimrc \
-use "hxliang" to replace "celab106_z2mini" in .vimrc
+use "YourAccount" to replace "hxliang" in .vimrc
 ## 8,if you not want to use my recommended plugin. You can just do the following command
 ```
-cp /home-local/celab106_z2mini/.vimrc_no_the_third_plugged ~/.vimrc
+cp /home/hxliang/.vimrc.noplugin ~/.vimrc
 ```
 
 # (2)use some new command tools to replace old command tools
@@ -207,9 +205,9 @@ cp /home/hxliang/.gdbgef ~ #only use for gdb command line.
 # (12)use zinit, omz and zsh
 ```
 mkdir -p ~/.local/share
-cp /home-local/celab106_z2mini/.local/share/zinit ~/.local/share -r
-cp /home-local/celab106_z2mini/.oh-my-zsh ~
-cp /home-local/celab106_z2mini/.zshrc ~
+cp /home/hxliang/.local/share/zinit ~/.local/share -r
+cp /home/hxliang/.oh-my-zsh ~
+cp /home/hxliang/.zshrc ~
 ```
 Ask your 10.34.24.11 administrators to do the following things \
 Note: 可能会导致该用户在vnc时执行/etc/profile文件失效。因为/etc/profile只会在用户登录时执行一次，shell的切换可能会导致ldap用户执行失效。解决办法，手动关闭vnc再重启。

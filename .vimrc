@@ -545,8 +545,8 @@ function Lazy_Plugin_Configuration()
   let g:ale_cpp_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
   let g:ale_c_clangtidy_executable = ''
   let g:ale_cpp_clangtidy_executable = ''
-  let g:ale_c_clangd_executable = ''
-  let g:ale_cpp_clangd_executable = ''
+  let g:ale_c_cc_executable = ''
+  let g:ale_cpp_cc_executable = ''
   " set python3 to be default python
   let g:ale_python_executable = 'python3'
   let g:ale_python_pylint_use_global = 1
