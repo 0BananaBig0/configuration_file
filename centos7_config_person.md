@@ -36,7 +36,9 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 ```
 ## 3,copy configuration file from hxliang and add some configurations
 ```
-cp /home/hxliang/.vimrc_cpp ~/.vimrc
+cd ~
+cp /home/hxliang/.vimrc.cpp ~/.vimrc
+cp /home/hxliang/.vim/.vimspectorjson ~/.vim -r
 cp /home/hxliang/.config/goneovim ~/.config/ -r
 mkdir ~/.config/nvim -p
 ln -s ~/.vimrc ~/.config/nvim/init.vim
