@@ -545,6 +545,7 @@ function Lazy_Plugin_Configuration()
   let g:ale_cpp_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
   let g:ale_c_clangtidy_executable = ''
   let g:ale_cpp_clangtidy_executable = ''
+  let g:ale_cpp_clangcheck_executable = ''
   let g:ale_c_cc_executable = ''
   let g:ale_cpp_cc_executable = ''
   " set python3 to be default python
@@ -878,6 +879,5 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
 
 
