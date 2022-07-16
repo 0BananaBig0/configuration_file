@@ -173,21 +173,22 @@ function! CocTimerStart(timer)
 endfunction
 silent call timer_start(333,'CocTimerStart',{'repeat':1})
 function Lazy_On_Plugin_Configuration()
-  " Use tab for trigger completion with characters ahead and navigate.After we select the word we needn't press enter key
-  " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin before putting this into your config.
-  " ctrl+j: jump to the next parameter in the completed function,
-  " ctrl+k:jump to the previous parameter in the completed function
+  " Use tab for trigger completion with characters ahead and navigate.
+  " After we select the word we needn't press enter key
+  " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
+  " by other plugin before putting this into your config.
   inoremap <silent><expr> <TAB>
         \ pumvisible() ? "\<C-n>" :
-        \ <SID>check_back_space() ? "\<TAB>" :
+        \ CheckBackspace() ? "\<TAB>" :
         \ coc#refresh()
   inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-  function! s:check_back_space() abort
+  function! CheckBackspace() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
   " Make <CR> auto-select the first completion item
-  inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm() :"\<CR>"
+  inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                                \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   nmap <silent><Localleader>d <Plug>(coc-definition)
   nmap <silent><Localleader>c <Plug>(coc-declaration)
   nmap <silent><Localleader>i <Plug>(coc-implementation)
@@ -228,7 +229,7 @@ function Lazy_On_Plugin_Configuration()
   let g:vista_cursor_delay = 0
   let g:vista_blink = [0,0]
   let g:vista_top_level_blink = [0,0]
-  let g:vista_echo_cursor_strategy = "floating_win"
+  let g:vista_echo_cursor_strategy = 'echo'
 
 
 
