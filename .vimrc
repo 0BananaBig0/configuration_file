@@ -177,17 +177,17 @@ function Lazy_On_Plugin_Configuration()
   " After we select the word we needn't press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
   " by other plugin before putting this into your config.
-  inoremap <silent><expr> <TAB>
+  inoremap <silent><expr><TAB>
         \ pumvisible() ? "\<C-n>" :
         \ CheckBackspace() ? "\<TAB>" :
         \ coc#refresh()
-  inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+  inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
   function! CheckBackspace() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
   " Make <CR> auto-select the first completion item
-  inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+  inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm()
                                 \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   nmap <silent><Localleader>d <Plug>(coc-definition)
   nmap <silent><Localleader>c <Plug>(coc-declaration)
@@ -317,9 +317,9 @@ function Lazy_On_Plugin_Configuration()
     return printf('+%d ~%d -%d', a, m, r)
   endfunction
   let g:gitgutter_map_keys = 0
-  nmap <Leader>gp <Plug>(GitGutterPrevHunk)
-  nmap <Leader>gn <Plug>(GitGutterNextHunk)
-  nmap <Leader>gf <Plug>(GitGutterFold)
+  nmap <silent><Leader>gp <Plug>(GitGutterPrevHunk)
+  nmap <silent><Leader>gn <Plug>(GitGutterNextHunk)
+  nmap <silent><Leader>gf <Plug>(GitGutterFold)
 
 
 
