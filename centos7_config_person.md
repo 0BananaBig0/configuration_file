@@ -68,7 +68,7 @@ alias gnvim='~/Downloads/program/goneovim-linux/goneovim -p'
    - coc.nvim may have the same problem like iamcco/markdown-preview.nvim, you can do the same thing to solve it. -->
 ## 5,open vim/gvim/gnvim/nvim and execute the following command:
 ```
-CocInstall coc-omni coc-word coc-markdownlint coc-vimlsp coc-dictionary coc-tag coc-cmake coc-sh coc-css coc-json coc-pyright coc-yaml coc-cl coc-clangd coc-snippets 
+CocInstall coc-word coc-markdownlint coc-vimlsp coc-dictionary coc-tag coc-cmake coc-sh coc-css coc-json coc-pyright coc-yaml coc-cl coc-clangd coc-snippets 
 ```
 (第一个补全选项要么直接按enter要么按了tab选择好后直接继续打代码。)
 如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱.
