@@ -538,7 +538,7 @@ sudo update-alternatives --install /usr/bin/vimtutor vimtutor /usr/local/bin/vim
 sudo update-alternatives --install /usr/bin/xxd xxd /usr/local/bin/xxd 3
 ```
 （7）安装coc插件和配置coc-settings.json \
-  1)coc-word,coc-markdownlint coc-vimlsp,coc-dictionary,coc-tag,coc-cmake,coc-sh,coc-css,coc-json,coc-pyright,coc-yaml,coc-cl,coc-clangd,coc-snippets (第一个补全选项要么直接按enter要么按了tab一会儿后再按enter否则补全会有问题)
+  1)coc-highlight,coc-word,coc-markdownlint coc-vimlsp,coc-dictionary,coc-tag,coc-cmake,coc-sh,coc-css,coc-json,coc-pyright,coc-yaml,coc-cl,coc-clangd,coc-snippets (第一个补全选项要么直接按enter要么按了tab一会儿后再按enter否则补全会有问题)
   如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱。\
   2)去[配置文件](https://github.com/Banana-Two/configuration_file)网站下载.vimrc文件并迁移到~里面
   3)去[配置文件](https://github.com/Banana-Two/configuration_file)网站下载coc-settings.json文件并迁移到~/.vim里面 \

@@ -428,7 +428,7 @@ Re: smplayer全屏当鼠标移动到屏幕底部,出现控制条时就闪屏:\
 (2)compiz 设置问题:到compizconfig的 常规选项-》常规 ,把 取消重定向全屏窗口 取消选择就好了 \
 
 # 8,本Ubuntu的coc.nvim插件安装了
-coc-word,coc-markdownlint coc-vimlsp,coc-dictionary,coc-tag,coc-cmake,coc-sh,coc-css,coc-json,coc-pyright,coc-yaml,coc-cl,coc-clangd,coc-snippets (第一个补全选项要么直接按enter要么按了tab一会儿后再按enter否则补全会有问题)
+coc-highlight,coc-word,coc-markdownlint coc-vimlsp,coc-dictionary,coc-tag,coc-cmake,coc-sh,coc-css,coc-json,coc-pyright,coc-yaml,coc-cl,coc-clangd,coc-snippets (第一个补全选项要么直接按enter要么按了tab一会儿后再按enter否则补全会有问题)
 如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱。
 
 # 9,本Ubuntu安装了gnome-tweaks,安装了如下插件：

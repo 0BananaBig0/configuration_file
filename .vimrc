@@ -130,10 +130,10 @@ function! Show_Nearest_Class_Or_Struct()
   endif
   echo nearest_name
 endfunction
-autocmd BufNewFile,BufRead *.cl set filetype=OPENCL
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd FileType cpp,c silent call plug#load('vim-cpp-modern')
+  autocmd BufNewFile,BufRead *.cl set filetype=OPENCL
   autocmd FileType OPENCL silent call plug#load('vim-opencl')
   autocmd FileType python silent call plug#load('python-syntax')
   autocmd VimEnter,BufRead *.launch setfiletype roslaunch
@@ -165,6 +165,7 @@ function! CocTimerStart(timer)
       autocmd FileType markdown silent call plug#load('tabular')
       autocmd FileType c,cpp,cmake silent call Format_C_CPP_CMAKE()
     augroup END
+    autocmd CursorHold * silent call CocActionAsync('highlight')
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
     silent call plug#load('vim-which-key')
@@ -879,5 +880,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
 
