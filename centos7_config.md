@@ -487,7 +487,7 @@ cd vim
             --enable-rubyinterp \
             --enable-perlinterp \
             --enable-multibyte \
-            --with-compiledby="brooksj"
+            --with-compiledby="Banana"
 make
 sudo make install
 ```

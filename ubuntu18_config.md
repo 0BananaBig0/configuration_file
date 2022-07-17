@@ -11,9 +11,12 @@
   * [Install vim-plug](#install-vim-plug)
   * [Install dein.vim](#install-deinvim)
   * [python-mode出问题解决方法](#python-mode出问题解决方法)
-* [5,本Ubuntu的vim版本为vim8.2](#5本ubuntu的vim版本为vim82)
-  * [建立符号链接](#建立符号链接)
-  * [卸载方法：](#卸载方法)
+* [5,compile and install lua, vim, neovim](#5compile-and-install-lua-vim-neovim)
+  * [(0)remove vim and neovim](#0remove-vim-and-neovim)
+  * [(1)compile and install lua](#1compile-and-install-lua)
+  * [(2)compile and install vim](#2compile-and-install-vim)
+  * [(3) compile and install neovim](#3-compile-and-install-neovim)
+  * [(4)建立符号链接](#4建立符号链接)
 * [6,本Ubuntu的nodejs版本使用下面的方法安装,版本已最新。](#6本ubuntu的nodejs版本使用下面的方法安装版本已最新)
 * [7,本Ubuntu安装的软件](#7本ubuntu安装的软件)
   * [安装ctags:](#安装ctags)
@@ -86,7 +89,6 @@
 * [53,关于vim离开搜索模式取消中文输入法](#53关于vim离开搜索模式取消中文输入法)
 * [54,解决ubuntu18,remmina经常崩溃的办法](#54解决ubuntu18remmina经常崩溃的办法)
 * [55,关于vim显示符号乱码问题](#55关于vim显示符号乱码问题)
-* [56,从源码编译vim和neovim,仅适合刚开始装系统还没有vim的时候](#56从源码编译vim和neovim仅适合刚开始装系统还没有vim的时候)
 * [56,如果因为indentLine插件导致json文件的引号被隐藏,可以做以下操作](#56如果因为indentline插件导致json文件的引号被隐藏可以做以下操作)
 * [57,install go language and goneovim](#57install-go-language-and-goneovim)
   * [install go language](#install-go-language)
@@ -232,20 +234,85 @@ git submodule update --recursive --init --force
 git submodule sync --recursive
 ```
 
-# 5,本Ubuntu的vim版本为vim8.2
-请不要安装vim-ultisnips和vim-snippets,这样会使vim出现错误。安装过程：neovim和vim共用vim-plug和coc安装的插件,但是不共用CocConfig。neovim的配置文件是~/config/nvim/init.vim,而vim则是~/.vimrc  \
-第56点为从源码安装vim
+# 5,compile and install lua, vim, neovim
+## (0)remove vim and neovim
 ```
-sudo add-apt-repository ppa:jonathonf/vim
-sudo apt-add-repository ppa:neovim-ppa/stable
-sudo apt update
-sudo apt install -y vim-gtk neovim
-sudo apt -y purge vim-tiny
+sudo apt install ppa-purge
+sudo ppa-purge ppa:jonathonf/vim
+sudo add-apt-repository --remove ppa:jonathonf/vim
+sudo ppa-purge ppa:neovim-ppa/stable
+sudo add-apt-repository --remove ppa:neovim-ppa/stable
+sudo apt purge *vim* -y
+sudo apt autoremove --purge
+sudo apt autoclean
+sudo rm /usr/share/vim /var/lib/vim -r
+dpkg -l | grep vim
+```
+## (1)compile and install lua
+```
+sudo apt install libreadline-dev
+cd ~/Downloads/program
+wget http://www.lua.org/ftp/lua-5.3.6.tar.gz
+x lua-5.3.6.tar.gz
+cd lua-5.3.6
+make linux
+sudo make install INSTALL_TOP=/usr # INSTALL_TOP is a variable of a Makefile of this project
+```
+Note: In ubuntu18, the path of lua header and library files are different from where vim wants to find.
+## (2)compile and install vim
+```
+sudo apt install libncurses5-dev python-dev python3-dev \
+                 libgtk2.0-dev libatk1.0-dev libbonoboui2-dev \
+                 libcairo2-dev libx11-dev libxpm-dev libxt-dev \
+                 libgnome2-dev libgnomeui-dev ruby-dev libperl-dev \
+                 tcl tcl-dev libgpm-dev libgpm2 gpm -y
+cd ~/Downloads/program
+git clone https://github.91chi.fun//https://github.com/vim/vim.git
+cd vim
+./configure --prefix=/usr \
+            --with-features=huge \
+            --enable-fail-if-missing \
+            --enable-luainterp=yes \
+            --enable-mzschemeinterp \
+            --enable-perlinterp=yes \
+            --enable-pythoninterp=yes \
+            --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu \
+            --enable-python3interp=yes \
+            --with-python3-config-dir=/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu \
+            --enable-tclinterp=yes \
+            --enable-rubyinterp=yes \
+            --enable-cscope \
+            --enable-terminal \
+            --enable-autoservername \
+            --enable-multibyte \
+            --enable-xim \
+            --enable-fontset --enable-gpm=yes \
+            --enable-gui=gtk2 \
+            --with-x \
+            --with-compiledby="Banana" \
+            # 请注意：把 config-3.6m-x86_64-linux-gnu 这个目录换成你自己的,就是你的操作系统自带的 \
+            # python3 的 config 目录,/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu 这个是我的目录, \
+            # 跟你的可能不一样,请自行查找.
+make
+sudo make install
+```
+## (3) compile and install neovim
+```
 sudo su
 python3 -m pip install neovim
-sudo apt install xclip
+exit
+sudo apt install xclip -y
+sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen -y
+cd ~/Downloads/program
+wget https://github.91chi.fun//https://github.com//neovim/neovim/releases/download/v0.7.2/nvim-linux64.deb
+sudo dpkg -i nvim-linux64.deb
+# git clone https://github.91chi.fun//https://github.com/neovim/neovim.git
+# cd neovim
+# git checkout stable
+# make CMAKE_BUILD_TYPE=Release #repeat until success
+# sudo make install
 ```
-## 建立符号链接
+## (4)建立符号链接
 使nvim和vim共享配置,注意在判断文件类型哪里nvim不允许==两边参数存在空格,vim和nvim的set配置也不许=左右两边的参数存在空格,但是let的语法允许
 ```
 ln -s /home/banana/.vim/coc-settings.json /home/banana/.config/nvim/coc-settings.json
@@ -253,11 +320,6 @@ ln -s /home/banana/.vimrc /home/banana/.config/nvim/init.vim
 sudo su
 ln -s /root/.vim/coc-settings.json /root/.config/nvim/coc-settings.json
 ln -s /root/.vimrc /root/.config/nvim/init.vim
-```
-## 卸载方法：
-```
-sudo apt install ppa-purge && sudo ppa-purge ppa:jonathonf/vim
-sudo add-apt-repository --remove ppa:jonathonf/vim
 ```
 觉得vim配置麻烦,可以使用vscode,vscode-neovim,这样的话neovim可以作为vscode的后端,用来编辑代码,又能使用IDE的插件。\
 如果不想用vscode,可以试试spacevim或者exvim。
@@ -1255,40 +1317,6 @@ NoDisplay=true
 # 55,关于vim显示符号乱码问题
 安装nerd系列的字体即可。https://www.nerdfonts.com/
 
-# 56,从源码编译vim和neovim,仅适合刚开始装系统还没有vim的时候
-如果已经安装vim,则要先卸载vim并删除相关文件和文件夹,不知为啥无法打开tcl支持
-```
-sudo apt purge *vim*
-sudo apt install libncurses5-dev libgnome2-dev libgnomeui-dev libgtk2.0-dev libatk1.0-dev libbonoboui2-dev libcairo2-dev libx11-dev libxpm-dev libxt-dev python-dev python3-dev ruby-dev lua5.1 liblua5.1-dev libperl-dev git tcl tcl-dev libtcl*
-git clone https://github.91chifun.workers.dev//https://github.com/vim/vim.git
-cd vim
-git checkout stable
-git pull
-./configure --with-features=huge \
-    --enable-multibyte \
-    --enable-rubyinterp=yes \
-    --enable-python3interp=yes \
-    --with-python-config-dir=/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu \
-    --enable-perlinterp=yes \
-    --enable-luainterp=yes \
-    --enable-gui=gtk2 \
-    --enable-cscope \
-    #请注意：把 python3-config-dir 这个目录换成你自己的,就是你的操作系统自带的 python3 的 config 目录,/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu 这个是我的目录,跟你的可能不一样,请自行查找
-make
-sudo make install
-cd ..
-git clone https://github.91chifun.workers.dev//https://github.com/neovim/neovim.git
-sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen
-cd neovim
-git checkout stable
-git pull
-sudo su
-python3 -m pip install neovim
-exit
-make
-sudo make install
-sudo apt install xclip
-```
 
 # 56,如果因为indentLine插件导致json文件的引号被隐藏,可以做以下操作
 ```
@@ -1600,11 +1628,11 @@ sudo dpkg -i *.deb
 ```
 
 # 72,add shell environment variables
-PATH: bin
-LD_LIBRARY_PATH: lib or lib64
-XDG_DATA_DIRS: share
-C_INCLUDE_PATH: include
-CPLUS_INCLUDE_PATH: include
+PATH: bin \
+LD_LIBRARY_PATH: lib or lib64 \
+XDG_DATA_DIRS: share \
+C_INCLUDE_PATH: include \
+CPLUS_INCLUDE_PATH: include \
 
 # 73,compile duf to replace df
 ```
