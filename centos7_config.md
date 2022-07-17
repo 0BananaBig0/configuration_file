@@ -437,19 +437,21 @@ remove all tools about vim except vim-minimal
 Note: Even though vim-minimal is on the list, do not remove it. Functions of sudo are dependent on vim-minimal.
 （2）先安装ctags和gtags
 ```
-source /opt/rh/devtoolset-9/enable
 yum list installed | grep -i ctags
 sudo yum remove ctags
 sudo yum -y install autoconf automake libtool
+cd ~/Downloads/program
 git clone https://github.com/universal-ctags/ctags.git
 cd ctags
+source /opt/rh/devtoolset-9/enable
 ./autogen.sh
 ./configure --prefix=/where/you/want # defaults to /usr/local
 make
 sudo make install # may require extra privileges depending on where to install
 cd ~/Downloads/program
 #去https://mirrors.aliyun.com/gnu/global/下载global-6.6.8.tar.gz
-x global-6.6.8.tar.gz #x为解压命令
+cd ~/Downloads/program
+x global-6.6.8.tar.gz # x为解压命令
 cd global-6.6.8
 sudo yum install ncurses-devel -y 
 ./configure
@@ -460,33 +462,36 @@ make installcheck
 ```
 （3）编译安装vim
 ```
-cd ~/Downloads/program
-source /opt/rh/devtoolset-9/enable
 sudo yum install -y ruby ruby-devel lua lua-devel luajit \
 luajit-devel git python python-devel \
 python36 python36-devel tcl-devel \
 perl perl-devel perl-ExtUtils-ParseXS \
 perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
-perl-ExtUtils-Embed libX* ncurses-devel gtk2-devel
-git clone https://github.com/vim/vim.git
+perl-ExtUtils-Embed libX* ncurses-devel gtk2-devel \
+gpm gpm-libs gpm-devel
+cd ~/Downloads/program
+git clone https://github.91chi.fun//https://github.com/vim/vim.git
 cd vim
+source /opt/rh/devtoolset-9/enable
 ./configure --with-features=huge \
             --enable-fail-if-missing \
-            --enable-gui=gtk2 \
+            --enable-luainterp=yes \
             --enable-mzschemeinterp \
-            --enable-tclinterp=yes \
-            --with-x \
-            --enable-fontset \
-            --enable-cscope \
-            --enable-multibyte \
-            --enable-pythoninterp \
+            --enable-perlinterp=yes \
+            --enable-pythoninterp=yes \
             --with-python-config-dir=/usr/lib64/python2.7/config \
-            --enable-python3interp \
+            --enable-python3interp=yes \
             --with-python3-config-dir=/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu \
-            --enable-luainterp \
-            --enable-rubyinterp \
-            --enable-perlinterp \
+            --enable-tclinterp=yes \
+            --enable-rubyinterp=yes \
+            --enable-cscope \
+            --enable-terminal \
+            --enable-autoservername \
             --enable-multibyte \
+            --enable-xim \
+            --enable-fontset --enable-gpm=yes \
+            --enable-gui=gtk2 \
+            --with-x \
             --with-compiledby="Banana"
 make
 sudo make install
@@ -495,7 +500,7 @@ sudo make install
 ```
 cd ~/Downloads/program
 source /opt/rh/devtoolset-9/enable
-git clone https://github.com/neovim/neovim
+git clone https://github.91chi.fun//https://github.com/neovim/neovim
 cd neovim
 git checkout stable
 sudo yum -y install ninja-build libtool autoconf automake cmake3 gcc gcc-c++ make pkgconfig unzip patch gettext curl

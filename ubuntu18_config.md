@@ -237,7 +237,7 @@ git submodule sync --recursive
 # 5,compile and install lua, vim, neovim
 ## (0)remove vim and neovim
 ```
-sudo apt install ppa-purge
+sudo apt install ppa-purge -y
 sudo ppa-purge ppa:jonathonf/vim
 sudo add-apt-repository --remove ppa:jonathonf/vim
 sudo ppa-purge ppa:neovim-ppa/stable
@@ -295,11 +295,14 @@ cd vim
             # 跟你的可能不一样,请自行查找.
 make
 sudo make install
+sudo ln -s /usr/bin/vim /usr/bin/vi
 ```
 ## (3) compile and install neovim
 ```
+sudo apt install python3.8 -y
 sudo su
 python3 -m pip install neovim
+python3.8 -m pip install neovim # if we use dpkg to install it, it requires the version of python >=3.7
 exit
 sudo apt install xclip -y
 sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen -y
