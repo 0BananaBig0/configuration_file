@@ -626,7 +626,7 @@ sudo apt install *clang*13* *llvm*13*
 ### Installation
 ```
 sudo su #option
-python3 -m pip install compiledb
+python3 -m pip install compiledb # think abot bear which has the same function as compiledb
 ```
 支持Python2.x和3.x(目前,仅在2.7和3.6版本中测试) \
 例如,对于bash完成支持,可以将sh-completion/compiledb.bash文件的内容添加到.bashrc文件中。 \

@@ -926,7 +926,7 @@ pandoc linux.md -o linux.pdf
 ### Installation
 ```
 sudo su
-python3 -m pip install compiledb
+python3 -m pip install compiledb # think about bear which has the same function as compiledb
 exit
 ```
 支持Python2.x和3.x(目前,仅在2.7和3.6版本中测试) \
