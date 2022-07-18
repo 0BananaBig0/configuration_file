@@ -72,7 +72,7 @@ ZSH_THEME="ys_modified"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-#plugins=(git extract colored-man-pages autojump zsh-autosuggestions zsh-syntax-highlighting)
+# plugins=(vi-mode)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -107,6 +107,9 @@ setopt no_nomatch
 # export GTK_IM_MODULE=fcitx
 # export QT_IM_MODULE=fcitx
 # source /home/banana/.oh-my-zsh/plugins/incr/incr*.zsh
+
+# export http_proxy='https://mirror.ghproxy.com/'
+# export https_proxy='https://mirror.ghproxy.com/'
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
@@ -149,8 +152,6 @@ zinit snippet OMZP::command-not-found
 zinit ice wait lucid
 zinit snippet OMZP::colored-man-pages
 zinit ice wait lucid
-zinit snippet OMZP::web-search
-zinit ice wait lucid
 zinit snippet OMZP::vi-mode
 zinit ice wait lucid
 zinit snippet OMZP::gitignore
@@ -166,6 +167,12 @@ zinit wait lucid for \
 zinit ice wait lucid
 zinit load zdharma-continuum/history-search-multi-word
 
+# <C-r> autocomplete
+zinit ice wait'1' lucid
+zinit light mellbourn/zabb
+zinit ice wait'1' lucid
+zinit light junegunn/fzf
+
 #This is my personal zshell envirnoment plugin, I create it on my github
 #I use it to delay loading my zshell envirnoment so that I can open the
 #terminal as fast as possible
@@ -180,6 +187,3 @@ zinit light Banana-Two/ubuntu18_zsh_configure
 # #ifconfig查看你的电脑ip地址
 # export ROS_HOSTNAME=192.168.3.3
 # export ROS_MASTER_URI=http://${ROS_HOSTNAME}:11311
-
-
-
