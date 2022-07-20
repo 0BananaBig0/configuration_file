@@ -318,9 +318,11 @@ sudo dpkg -i nvim-linux64.deb
 ## (4)建立符号链接
 使nvim和vim共享配置,注意在判断文件类型哪里nvim不允许==两边参数存在空格,vim和nvim的set配置也不许=左右两边的参数存在空格,但是let的语法允许
 ```
+mkdir /home/banana/.config/nvim -p
 ln -s /home/banana/.vim/coc-settings.json /home/banana/.config/nvim/coc-settings.json
 ln -s /home/banana/.vimrc /home/banana/.config/nvim/init.vim
 sudo su
+mkdir /root/.config/nvim -p
 ln -s /root/.vim/coc-settings.json /root/.config/nvim/coc-settings.json
 ln -s /root/.vimrc /root/.config/nvim/init.vim
 ```
