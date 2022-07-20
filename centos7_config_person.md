@@ -39,6 +39,7 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 cd ~
 cp /home/hxliang/.vimrc.cpp ~/.vimrc
 cp /home/hxliang/.vim/.vimspectorjson ~/.vim -r
+cp /home/hxliang/.vim/coc-settings.json ~/.vim
 cp /home/hxliang/.config/goneovim ~/.config/ -r
 mkdir ~/.config/nvim -p
 ln -s ~/.vimrc ~/.config/nvim/init.vim

@@ -181,7 +181,7 @@ python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint 
 # if you are in the root user,the following command you should excute
 exit
 # Because pylint only can be used by its owner
-python3 -m install pylint
+python3 -m pip install pylint
 ```
 ## Install dein.vim
 可以试试dein.vim(https://github.com/Shougo/dein.vim) \

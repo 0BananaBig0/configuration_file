@@ -57,7 +57,7 @@ let g:maplocalleader = ' '
 
 
 
-let g:plug_url_format = "https://git::@github.91chi.fun//https://github.com/%s.git"
+let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
 Plug 'luochen1990/rainbow' " 彩虹括号
@@ -108,10 +108,10 @@ function! Show_Current_Module()
     let module_name = strpart(module_name,0,module_end_poisition)
   endif
   let module_name = strpart(module_name,stridx(module_name,'module')+7)
-  while(strpart(module_name, 0 , 1) == ' ')
+  while(strpart(module_name, 0 , 1) ==? ' ')
     let module_name = strpart(module_name,1)
   endwhile
-  echo "module -->" module_name
+  echo 'module -->' module_name
 endfunction
 autocmd FileType c,cpp nnoremap <silent><Leader>` :call Show_Nearest_Class_Or_Struct()<CR>
 function! Show_Nearest_Class_Or_Struct()
@@ -158,9 +158,9 @@ let g:indent_guides_default_mapping = 0
 " After 333ms, call the coc.nvim,delay the coc startup,vim-plug lazy load
 let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
-    exec "CocStart"
+    exec 'CocStart'
     augroup Lazy_Call_Plugin
-      autocmd FileType c,cpp,python,verilog,opencl silent call plug#load('ale')
+      autocmd FileType c,cpp,python,verilog,opencl,vim silent call plug#load('ale')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
       autocmd FileType c,cpp,cmake silent call Format_C_CPP_CMAKE()
@@ -244,7 +244,7 @@ function Lazy_On_Plugin_Configuration()
     let cur_file_path = expand('%:p:h')
     " Look upwards (at parents) for a directory named '.git' begin form cur_file_path
     let location = finddir('.git', '.;')
-    if location == '.git'
+    if location ==? '.git'
       " current directory is workspace or current file path has .git directory
       let path_to_pro = getcwd()
     elseif strlen(strpart(location,0,1)) == 1
@@ -252,7 +252,7 @@ function Lazy_On_Plugin_Configuration()
       let path_to_pro = strpart(location,0,strridx(location,'/.git'))
     endif
     if len(location) > 0
-      if strpart(path_to_pro,0,1)!='/'
+      if strpart(path_to_pro,0,1)!=?'/'
         let path_to_pro='/'.path_to_pro
       endif
       let pro_dir = strpart(path_to_pro,strridx(path_to_pro,'/'))
@@ -260,21 +260,21 @@ function Lazy_On_Plugin_Configuration()
       let location = simplify(location.'/.vim-bookmarks'.pro_to_file)
     else
       " the bookmarks of the root and common user both are saved in the same directory
-      if strpart(cur_file_path,0,5) == '/root'
+      if strpart(cur_file_path,0,5) ==? '/root'
         let pro_to_file = cur_file_path
-      elseif strpart($SUDO_USER,0,1) == ''
+      elseif strpart($SUDO_USER,0,1) ==? ''
         let pro_to_file = strpart(cur_file_path,strlen($HOME))
       else
         let pro_to_file = strpart(cur_file_path,strlen('/home/'.$SUDO_USER))
       endif
-      if strpart($SUDO_USER,0,1) == ''
+      if strpart($SUDO_USER,0,1) ==? ''
         let location = $HOME.'/.vim/.vim-bookmarks'.pro_to_file
       else
         let location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'.pro_to_file
       endif
     endif
     if !isdirectory(location)
-      call mkdir(location,"p")
+      call mkdir(location,'p')
     endif
       return simplify(location.'/'.expand('%:t').'.'.bookmarkextension)
   endfunction
@@ -328,7 +328,7 @@ function Lazy_On_Plugin_Configuration()
     let root_location = finddir('.git', '.;')
     if (strlen(root_location) == 0)
       let root_location = expand('%:p:h')
-    elseif (root_location == '.git')
+    elseif (root_location ==? '.git')
       let root_location = '.'
     else
       let root_location = strpart(root_location,0,strridx(root_location,'/.git'))
@@ -336,7 +336,7 @@ function Lazy_On_Plugin_Configuration()
     let root_location = root_location.'/.vimspector.json'
     if !filereadable(root_location)
       let cpp_json_content = readfile($HOME.'/.vim/.vimspectorjson/cpp.json')
-      call writefile(cpp_json_content,root_location,"s")
+      call writefile(cpp_json_content,root_location,'s')
     endif
       exec 'tabe ' . root_location
   endfunction
@@ -403,7 +403,7 @@ function Lazy_On_Plugin_Configuration()
 
 
   " gen_tags setting
-  if (&filetype=='cpp')||(&filetype=='c')
+  if (&filetype==?'cpp')||(&filetype==?'c')
     let g:gen_tags#ctags_opts = ['--c++-kinds=+pxzl', '--c-kinds=+pxzl']
     let g:gen_tags#gtags_opts = ['-c', '--verbose']
   endif
@@ -424,10 +424,10 @@ function Lazy_On_Plugin_Configuration()
   let g:Lf_CacheDirectory = expand('~/.vim/cache')
   let g:Lf_CursorBlink = 0
   let g:Lf_RgConfig = [
-          \ "--max-columns=150",
-          \ "--type-add web:*.{html,css,js}*",
-          \ "--glob=!git/*",
-          \ "--hidden"
+          \ '--max-columns=150',
+          \ '--type-add web:*.{html,css,js}*',
+          \ '--glob=!git/*',
+          \ '--hidden'
       \ ]
   let g:Lf_PreviewInPopup = 1
   " open the preview window automatically
@@ -608,12 +608,12 @@ function Lazy_Plugin_Configuration()
   call quickui#menu#install('&File', [
               \ [ "&New File\tCtrl+n", 'echo 0' ],
               \ [ "&Open File\t(F3)", 'echo 1' ],
-              \ [ "&Close", 'echo 2' ],
-              \ [ "--", '' ],
-              \ [ "&Save\tCtrl+s", 'echo 3'],
-              \ [ "Save &As", 'echo 4' ],
-              \ [ "Save All", 'echo 5' ],
-              \ [ "--", '' ],
+              \ [ '&Close', 'echo 2' ],
+              \ [ '--', '' ],
+              \ [ '&Save\tCtrl+s', 'echo 3'],
+              \ [ 'Save &As', 'echo 4' ],
+              \ [ 'Save All', 'echo 5' ],
+              \ [ '--', '' ],
               \ [ "E&xit\tAlt+x", 'echo 6' ],
               \ ])
   " items containing tips, tips will display in the cmdline
@@ -623,17 +623,17 @@ function Lazy_Plugin_Configuration()
               \ [ '&Find', 'echo 3', 'help 3' ],
               \ ])
   " script inside %{...} will be evaluated and expanded in the string
-  call quickui#menu#install("&Option", [
+  call quickui#menu#install('&Option', [
         \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
         \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
         \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
         \ ])
   " register HELP menu with weight 10000
   call quickui#menu#install('H&elp', [
-        \ ["&Cheatsheet", 'help index', ''],
+        \ ['&Cheatsheet', 'help index', ''],
         \ ['T&ips', 'help tips', ''],
         \ ['--',''],
-        \ ["&Tutorial", 'help tutor', ''],
+        \ ['&Tutorial', 'help tutor', ''],
         \ ['&Quick Reference', 'help quickref', ''],
         \ ['&Summary', 'help summary', ''],
         \ ], 10000)
@@ -641,7 +641,7 @@ function Lazy_Plugin_Configuration()
   let g:quickui_show_tip = 1
   " color scheme for the menu plugin,five color schemes we can choose default is
   " borland,another four are gruvbox, solarized,papercol dark and papercol light
-  if has("gui_running")
+  if has('gui_running')
     let g:quickui_color_scheme = 'papercol light'
   else
     let g:quickui_color_scheme = 'papercol dark'
@@ -660,7 +660,7 @@ endfunction
 " 显示相关和实用设置
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 会使vim看起来不友好的命令
-if has("gui_running")
+if has('gui_running')
   if !has('nvim')
     " set guifont=Monospace\ 18   " 设置字体
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 19   " 设置字体
@@ -702,8 +702,9 @@ set number
 set signcolumn=number
 " Uncomment the following to have Vim jump to the last position when reopening a file
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-set enc=utf-8 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
-set fencs=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1 " 打开文件时进行解码的猜测列表
+set encoding=utf-8 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
+scriptencoding utf-8
+set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1 " 打开文件时进行解码的猜测列表
 " Tab键的显示宽度
 set tabstop=2
 " 按下Tab键时输入的宽度
@@ -719,7 +720,7 @@ set clipboard=unnamedplus
 " 设置魔术正则语法
 set magic
 " 去掉输入错误的提示声音
-set noeb
+set noerrorbells
 " 在处理未保存或只读文件的时候，弹出确认
 set confirm
 " 缩进
@@ -755,7 +756,7 @@ set matchtime=1
 " 光标移动到buffer的顶部和底部时保持3行距离
 set scrolloff=3
 " 设置搜索可以循环搜索
-set ws
+set wrapscan
 " 搜索和补全时忽略大小写,智能大小写,逐字符高亮
 set ignorecase
 set smartcase
@@ -764,37 +765,37 @@ set incsearch
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 新文件标题
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v exec ":call SetTitle()"
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v exec ':call SetTitle()'
 func SetTitle()
-  if &filetype=='sh'
-    call setline(1,"\#########################################################################")
-    call append(line("."), "\# File Name: ".expand("%"))
-    call append(line(".")+1, "\# Author: 16hxliang3")
-    call append(line(".")+2, "\# mail: 16hxliang3@stu.edu.cn")
-    call append(line(".")+3, "\# Created Time: ".strftime("%c"))
-    call append(line(".")+4, "\#########################################################################")
-    call append(line(".")+5, "\#!/bin/bash")
-    call append(line(".")+6, "")
+  if &filetype==?'sh'
+    call setline(1,'\#########################################################################')
+    call append(line('.'), '\# File Name: '.expand('%'))
+    call append(line('.')+1, '\# Author: 16hxliang3')
+    call append(line('.')+2, '\# mail: 16hxliang3@stu.edu.cn')
+    call append(line('.')+3, '\# Created Time: '.strftime('%c'))
+    call append(line('.')+4, '\#########################################################################')
+    call append(line('.')+5, '\#!/bin/bash')
+    call append(line('.')+6, '')
   else
-    call setline(1, "/*************************************************************************")
-    call append(line("."), "  > File Name: ".expand("%"))
-    call append(line(".")+1, "  > Author: 16hxliang3")
-    call append(line(".")+2, "  > Mail: 16hxliang3@stu.edu.cn ")
-    call append(line(".")+3, "  > Created Time: ".strftime("%c"))
-    call append(line(".")+4, " ************************************************************************/")
-    call append(line(".")+5, "")
+    call setline(1, '/*************************************************************************')
+    call append(line('.'), '  > File Name: '.expand('%'))
+    call append(line('.')+1, '  > Author: 16hxliang3')
+    call append(line('.')+2, '  > Mail: 16hxliang3@stu.edu.cn ')
+    call append(line('.')+3, '  > Created Time: '.strftime('%c'))
+    call append(line('.')+4, ' ************************************************************************/')
+    call append(line('.')+5, '')
   endif
-  if &filetype=='cpp'
-    call append(line(".")+6, "#include<iostream>")
-    call setline(line(".")+8, "")
-  elseif &filetype=='c'
-    call append(line(".")+6, "#include<stdio.h>")
-    call setline(line(".")+8, "")
-  elseif &filetype=='verilog'
-    call append(line(".")+6,"module ")
+  if &filetype==?'cpp'
+    call append(line('.')+6, '#include<iostream>')
+    call setline(line('.')+8, '')
+  elseif &filetype==?'c'
+    call append(line('.')+6, '#include<stdio.h>')
+    call setline(line('.')+8, '')
+  elseif &filetype==?'verilog'
+    call append(line('.')+6,'module ')
   endif
   " 新建文件后，自动定位到文件末尾
-  exec "silent normal! G"
+  exec 'silent normal! G'
 endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 键盘命令
@@ -802,27 +803,27 @@ endfunc
 autocmd FileType c,cpp,python,sh,verilog silent call Complie_Command()
 function Complie_Command()
   " 按F2编译运行,因为ale在退出插入模式后会自动检测语法，所以编译后运行可能会自动退出结果界面
-  if &filetype=='cpp'
+  if &filetype==?'cpp'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 g++ % -o E%<.exe -g && ./E%<.exe <CR>
     nnoremap <silent><Leader><F2> :AsyncRun! -save=1 g++ % -o E%<.exe -g <CR>
     nnoremap <silent><Localleader><Leader> :w<CR>:AsyncRun! -save=1 make<CR>
-  elseif &filetype=='c'
+  elseif &filetype==?'c'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 gcc % -o E%<.exe -g && ./E%<.exe <CR>
     nnoremap <silent><Leader><F2> :AsyncRun! -save=1 gcc % -o E%<.exe -g <CR>
     nnoremap <silent><Localleader><Leader> :w<CR>:AsyncRun! -save=1 make<CR>
-  elseif &filetype=='python'
+  elseif &filetype==?'python'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 python3 % <CR>
-  elseif &filetype=='sh'
+  elseif &filetype==?'sh'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 ./% <CR>
-  elseif &filetype=='verilog'
+  elseif &filetype==?'verilog'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd <CR>
   endif
 endfunction
 " Toggle Menu and Toolbar菜单栏和工具栏
-if has("gui_running")
+if has('gui_running')
   set guioptions-=m
   set guioptions-=T
-  nnoremap <silent><Localleader>m :call MENU_TOOGLE()<CR>
+  nnoremap <silent><Localleader>m :silent call MENU_TOOGLE()<CR>
   function! MENU_TOOGLE()
     if &guioptions=~#'T'
       set guioptions-=T
@@ -837,41 +838,41 @@ nnoremap <silent><Localleader>t :tabnew<CR>
 " alt+n跳到第n个tab，0<n<10
 function! TabPos_ActivateBuffer(num)
     let s:count = a:num
-    exe "tabfirst"
-    exe "tabnext" s:count
+    exe 'tabfirst'
+    exe 'tabnext' s:count
 endfunction
 function! TabPos_Initialize()
 for i in range(1, 9)
-        exe "noremap <silent><M-" . i . "> :call TabPos_ActivateBuffer(" . i . ")<CR>"
+        exe 'noremap <silent><M-" . i . "> :silent call TabPos_ActivateBuffer(" . i . ")<CR>'
     endfor
-    exe "noremap <silent><M-0> :call TabPos_ActivateBuffer(10)<CR>"
+    exe 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
 if has('nvim')
   autocmd UIEnter * silent call TabPos_Initialize()
 else
   autocmd GUIEnter * silent call TabPos_Initialize()
 endif
-nnoremap <silent><Localleader>b :call Close_and_Back_Tab()<CR>
+nnoremap <silent><Localleader>b :silent call Close_and_Back_Tab()<CR>
 function! Close_and_Back_Tab()
-  exec "tabp"
-  exec "+tabclose"
+  exec 'tabp'
+  exec '+tabclose'
 endfunction
 nnoremap <silent><Localleader>q :q<CR>
 nnoremap <silent><Localleader>w :w<CR>
 nnoremap <silent><Localleader><F4> :%retab!<CR>
 " 比较文件
 nnoremap <Localleader><F5> :vert diffsplit 
-nnoremap <silent><Localleader><F6> :call Delete_Blank_Line()<CR>
+nnoremap <silent><Localleader><F6> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
-  exec "silent normal! m`"
-  exec "silent :g/^\s*$/d"
-  exec "silent normal! ``"
+  exec 'silent normal! m`'
+  exec 'silent :g/^\s*$/d'
+  exec 'silent normal! ``'
 endfunction
-nnoremap <silent><Localleader><F7> :call Delete_Trailling_Space()<CR>
+nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space()<CR>
 function! Delete_Trailling_Space()
-  exec "silent normal! m`"
-  exec "silent :%s/\\s\\+$//e"
-  exec "silent normal! ``"
+  exec 'silent normal! m`'
+  exec 'silent :%s/\\s\\+$//e'
+  exec 'silent normal! ``'
 endfunction
 " Ctrl-Enter新建行和当前行格式保持一致,normal模式下仅对注释类型有效
 nnoremap <silent><C-CR> o<ESC>
@@ -879,5 +880,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
 
