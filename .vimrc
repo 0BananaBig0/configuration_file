@@ -843,7 +843,7 @@ function! TabPos_ActivateBuffer(num)
 endfunction
 function! TabPos_Initialize()
 for i in range(1, 9)
-        exe 'noremap <silent><M-" . i . "> :silent call TabPos_ActivateBuffer(" . i . ")<CR>'
+        exe 'noremap <silent><M-' . i . '> :silent call TabPos_ActivateBuffer(' . i . ')<CR>'
     endfor
     exe 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
