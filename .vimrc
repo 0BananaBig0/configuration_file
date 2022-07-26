@@ -203,6 +203,10 @@ function Lazy_On_Plugin_Configuration()
   nmap <silent><Localleader>ap <plug>(coc-diagnostic-prev)
   nmap <silent><Localleader>en <plug>(coc-diagnostic-next-error)
   nmap <silent><Localleader>ep <plug>(coc-diagnostic-prev-error)
+ " Use <C-j> for jump to next placeholder, it's default of coc.nvim
+  let g:coc_snippet_next = '<C-j>'
+  " Use <C-k> for jump to previous placeholder, it's default of coc.nvim
+  let g:coc_snippet_prev = '<C-k>'
 
 
 
