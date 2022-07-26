@@ -590,11 +590,15 @@ export PATH=$PATH:~/.cargo/bin
 ```
 add the following content to .zshrc
 ```
-eval "$(zoxide init zsh)"
+if command -v zoxide >/dev/null 2>&1;then
+  eval "$(zoxide init zsh)"
+fi
 ```
 add the following content to .bashrc
 ```
-eval "$(zoxide init bash)"
+if command -v zoxide >/dev/null 2>&1;then
+  eval "$(zoxide init bash)"
+fi
 ```
 root和user用户通过cargo安装的软件不一定通用,具体看PATH的设置。
 我这里是单独分开来设置的,因此对celab106_z2mini和root用户都进行了配置。
