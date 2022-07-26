@@ -557,6 +557,19 @@ function Lazy_Plugin_Configuration()
   let g:ale_fixers = {
               \ 'python': ['yapf', 'isort'],
               \ }
+  " configure ale complete
+  let g:ale_completion_enabled = 0
+  let g:ale_completion_delay = 0
+  let g:ale_completion_max_suggestions = 6
+  function! SmartInsertCompletion() abort
+    " Use the default CTRL-N in completion menus
+    if pumvisible()
+      return "\<C-n>"
+    endif
+    " Exit and re-enter insert mode, and use insert completion
+    return "\<C-c>a\<C-n>"
+  endfunction
+  inoremap <silent> <C-n> <C-R>=SmartInsertCompletion()<CR>
 
 
 
@@ -880,4 +893,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
