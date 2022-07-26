@@ -565,6 +565,7 @@ function Lazy_Plugin_Configuration()
   let g:ale_completion_enabled = 0
   let g:ale_completion_delay = 0
   let g:ale_completion_max_suggestions = 6
+  set completeopt=menu,menuone,popup,noselect,noinsert
   function! SmartInsertCompletion() abort
     " Use the default CTRL-N in completion menus
     if pumvisible()
