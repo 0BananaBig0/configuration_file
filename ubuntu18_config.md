@@ -118,6 +118,12 @@
 * [71,install opencl intel runtime(3.0)(21.38.21026)](#71install-opencl-intel-runtime30213821026)
 * [72,add shell environment variables](#72add-shell-environment-variables)
 * [73,compile duf to replace df](#73compile-duf-to-replace-df)
+* [74,configure multiple ssh keys](#74configure-multiple-ssh-keys)
+  * [(1) execute the following commands.](#1-execute-the-following-commands)
+  * [(2) add the following content to config file.](#2-add-the-following-content-to-config-file)
+  * [(3) execute the following commands.](#3-execute-the-following-commands)
+  * [(4) add the content of id_rsa.gitee to your gitee accout.](#4-add-the-content-of-id_rsagitee-to-your-gitee-accout)
+  * [(5) add the content of id_rsa.github to your github accout.](#5-add-the-content-of-id_rsagithub-to-your-github-accout)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1650,3 +1656,51 @@ cd duf
 go build
 go install
 ```
+
+# 74,configure multiple ssh keys
+##(1) execute the following commands.
+```
+mkdir ~/.ssh -p
+cd ~/.ssh
+ssh-keygen -t rsa -b 4096 -f id_rsa.github -C "YourEmail"
+ssh-keygen -t rsa -b 4096 -f id_rsa.gitee -C "YourEmail"
+gvim config
+```
+##(2) add the following content to config file.
+```
+# ------------ 配置说明（始） ------------
+# Host：别名，HostName：服务器域名或 IP 地址
+# User：用户名
+# 例：在 git clone git@github.com:torvalds/linux.git 中
+# User 是 git，Host 是 github.com
+# IdentityFile：私钥路径
+# ------------ 配置说明（末） ------------
+ 
+
+
+# ------------ 具体配置（始） ------------
+# GitHub
+Host github.com
+HostName github.com
+User git
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsa.github
+
+ 
+
+# Gitee
+Host gitee.com
+HostName gitee.com
+User git
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsa.gitee
+# ------------ 具体配置（末） ------------
+```
+##(3) execute the following commands.
+```
+chmod 700 ~/.ssh
+chmod 600 config id_rsa.gitee id_rsa.github
+chmod 644 id_rsa.gitee.pub id_rsa.github.pub
+```
+##(4) add the content of id_rsa.gitee to your gitee accout.
+##(5) add the content of id_rsa.github to your github accout.
