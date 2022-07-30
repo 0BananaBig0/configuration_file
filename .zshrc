@@ -177,7 +177,7 @@ zinit light junegunn/fzf
 #I use it to delay loading my zshell envirnoment so that I can open the
 #terminal as fast as possible
 zinit ice wait='1' lucid
-zinit light Banana-Two/ubuntu18_zsh_configure
+zinit light 0BananaBig0/ubuntu18_zsh_configure
 # # Set ROS melodic
 # source /opt/ros/melodic/setup.zsh
 # # source /home/banana/catkin_ws/devel/setup.zsh
