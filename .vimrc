@@ -738,7 +738,7 @@ set clipboard=unnamedplus
 " 设置魔术正则语法
 set magic
 " 去掉输入错误的提示声音
-set noerrorbells
+set belloff=all
 " 在处理未保存或只读文件的时候，弹出确认
 set confirm
 " 缩进
