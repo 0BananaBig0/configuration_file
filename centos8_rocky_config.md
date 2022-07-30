@@ -188,9 +188,9 @@ export PATH=$PATH:/usr/local/bin
 （7）安装coc插件和配置coc-settings.json \
   1)coc-omni,coc-word,coc-markdownlint coc-vimlsp,coc-dictionary,coc-tag,coc-cmake,coc-sh,coc-css,coc-json,coc-pyright,coc-yaml,coc-cl,coc-clangd,coc-snippets (第一个补全选项要么直接按enter要么按了tab一会儿后再按enter否则补全会有问题)
   如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱。\
-  2)去[配置文件](https://github.com/Banana-Two/configuration_file)网站下载.vimrc文件并迁移到~里面 \
-  3)去[配置文件](https://github.com/Banana-Two/configuration_file)网站下载coc-settings.json文件并迁移到~/.vim里面 \
-  4)去[配置文件](https://github.com/Banana-Two/configuration_file)网站下载.vimspectorjson文件并迁移到~/.vim里面 \
+  2)去[配置文件](https://github.com/0BananaBig0/configuration_file)网站下载.vimrc文件并迁移到~里面 \
+  3)去[配置文件](https://github.com/0BananaBig0/configuration_file)网站下载coc-settings.json文件并迁移到~/.vim里面 \
+  4)去[配置文件](https://github.com/0BananaBig0/configuration_file)网站下载.vimspectorjson文件并迁移到~/.vim里面 \
   5)如果同时安装了vim和nvim还需要建立符号链接:
 使nvim和vim共享配置,注意在判断文件类型哪里nvim不允许==两边参数存在空格,vim和nvim的set配置也不许=左右两边的参数存在空格,但是let的语法允许
 ```
@@ -333,7 +333,7 @@ else
 echo 'alias goneovim='/path/to/goneovim' >> ~/.bashrc
 ```
 # 安装配置文件
-去[配置文件](https://github.com/Banana-Two/configuration_file)下载settings.toml并迁移到~/.config/goneovim
+去[配置文件](https://github.com/0BananaBig0/configuration_file)下载settings.toml并迁移到~/.config/goneovim
 # 17,安装ttf字体和字体管理工具
 ```
 sudo yum install fontconfig ttmkfdir #去https://www.nerdfonts.com/font-downloads下载DejaVuSansMono,FantasqueSansMono,InconsolataLGC字体
@@ -347,7 +347,7 @@ sudo fc-cache
 # 18,git配置
 ```
 sudo dnf install git
-git config --global user.name "Banana-Two"
+git config --global user.name "0BananaBig0"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim

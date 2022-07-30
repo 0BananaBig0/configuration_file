@@ -66,7 +66,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件  build from sourc
 Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}  " 文件目录插件
 Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}  " 标签窗口列表插件
 Plug 'MattesGroeger/vim-bookmarks',{'on':['BookmarkToggle','BookmarkShowAll','BookmarkAnnotate']} " 书签插件，用于写代码注解等等
-Plug 'Banana-Two/fcitx.vim',{'branch':'fcitx4','on':[]} " Esc退出变回英文输入法，进入insert模式切换为原来的输入法
+Plug '0BananaBig0/fcitx.vim',{'branch':'fcitx4','on':[]} " Esc退出变回英文输入法，进入insert模式切换为原来的输入法
 Plug 'lfv89/vim-interestingwords',{'on':[]} " Multiple highlights
 Plug 'tpope/vim-fugitive',{'on':[]} " Git command
 Plug 'airblade/vim-gitgutter',{'on':[]} " Git status show
@@ -87,7 +87,7 @@ Plug 'preservim/nerdcommenter', {'on':[]} " nerdcommenter快速注释插件
 Plug 'skywind3000/asyncrun.vim',{'on':[]} " 异步执行shell命令插件，如果需要打开新终端，请去github看skywind3000/asyncrun.extra插件
 Plug 'skywind3000/vim-quickui' " 菜单栏插件
 Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
-Plug 'Banana-Two/verilog_indent',{'for': ['verilog', 'systemverilog']} " verilog indent file
+Plug '0BananaBig0/verilog_indent',{'for': ['verilog', 'systemverilog']} " verilog indent file
 call plug#end()
 
 
