@@ -4,7 +4,6 @@ AlignArrayOfStructures: Left
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
 AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
 AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
-AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
 AlignEscapedNewlines: Left
 AlignOperands:   AlignAfterOperator
 AllowShortEnumsOnASingleLine: false
