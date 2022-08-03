@@ -915,7 +915,7 @@ endfunction
 nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space()<CR>
 function! Delete_Trailling_Space()
   exec 'silent normal! m`'
-  exec 'silent :%s/\\s\\+$//e'
+  exec 'silent :%s/\s\+$//e'
   exec 'silent normal! ``'
 endfunction
 " Ctrl-Enter新建行和当前行格式保持一致,normal模式下仅对注释类型有效
