@@ -177,18 +177,19 @@ function Lazy_On_Plugin_Configuration()
   " After we select the word we needn't press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
   " by other plugin before putting this into your config.
-  inoremap <silent><expr><TAB>
-        \ pumvisible() ? "\<C-n>" :
-        \ CheckBackspace() ? "\<TAB>" :
+  inoremap <silent><expr> <TAB>
+        \ coc#pum#visible() ? coc#pum#next(1):
+        \ CheckBackspace() ? "\<Tab>" :
         \ coc#refresh()
-  inoremap <silent><expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+  inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+  " Make <CR> to accept selected completion item or notify coc.nvim to format
+  " <C-g>u breaks current undo, please make your own choice.
+  inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                                \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   function! CheckBackspace() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
-  " Make <CR> auto-select the first completion item
-  inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm()
-                                \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   nmap <silent><Localleader>d <Plug>(coc-definition)
   nmap <silent><Localleader>c <Plug>(coc-declaration)
   nmap <silent><Localleader>i <Plug>(coc-implementation)
@@ -455,26 +456,52 @@ function Format_C_CPP_CMAKE()
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
             \ 'args': ['-style="{
-            \ BasedOnStyle: GNU,
+            \ BasedOnStyle:  LLVM,
             \ AccessModifierOffset: 0,
+            \ AlignArrayOfStructures: Left,
             \ AlignConsecutiveMacros: AcrossEmptyLinesAndComments,
-            \ AllowShortBlocksOnASingleLine: Always,
-            \ AlwaysBreakAfterDefinitionReturnType: None,
-            \ AlwaysBreakAfterReturnType: None,
+            \ AlignConsecutiveAssignments: AcrossEmptyLinesAndComments,
+            \ AlignConsecutiveBitFields: AcrossEmptyLinesAndComments,
+            \ AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments,
+            \ AlignEscapedNewlines: Left,
+            \ AlignOperands:   AlignAfterOperator,
+            \ AllowShortEnumsOnASingleLine: false,
             \ AlwaysBreakTemplateDeclarations: Yes,
-            \ BreakBeforeBinaryOperators: None,
-            \ BreakBeforeBraces: Allman,
+            \ BreakBeforeBraces: Custom,
+            \ BraceWrapping:
+            \ {
+            \   AfterCaseLabel:  false,
+            \   AfterClass:      false,
+            \   AfterControlStatement: Never,
+            \   AfterEnum:       false,
+            \   AfterFunction:   false,
+            \   AfterNamespace:  false,
+            \   AfterObjCDeclaration: false,
+            \   AfterStruct:     false,
+            \   AfterUnion:      false,
+            \   AfterExternBlock: false,
+            \   BeforeCatch:     false,
+            \   BeforeElse:      false,
+            \   BeforeLambdaBody: false,
+            \   BeforeWhile:     false,
+            \   IndentBraces:    false,
+            \   SplitEmptyFunction: false,
+            \   SplitEmptyRecord: false,
+            \   SplitEmptyNamespace: false
+            \ },
             \ BreakInheritanceList: AfterComma,
             \ BreakConstructorInitializers: AfterColon,
-            \ ConstructorInitializerIndentWidth: 2,
-            \ ContinuationIndentWidth: 2,
+            \ ConstructorInitializerIndentWidth: 3,
+            \ ContinuationIndentWidth: 3,
             \ IndentAccessModifiers: true,
-            \ IndentCaseBlocks: true,
+            \ IndentCaseLabels: true,
+            \ IndentWidth:     3,
+            \ ObjCBlockIndentWidth: 3,
             \ SpaceAfterTemplateKeyword: false,
             \ SpaceBeforeParens: Never,
             \ SpaceBeforeRangeBasedForLoopColon: false,
-            \ Standard: Latest,
-            \ TabWidth: 2}"'],
+            \ BitFieldColonSpacing: After,
+            \ TabWidth: 3}"'],
             \ }
   let g:neoformat_cmake_cmakeformat = {
             \ 'exe': 'cmake-format',
@@ -724,13 +751,13 @@ set encoding=utf-8 " 把当前文件转换为当前系统编码进行处理，�
 scriptencoding utf-8
 set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1 " 打开文件时进行解码的猜测列表
 " Tab键的显示宽度
-set tabstop=2
+set tabstop=3
 " 按下Tab键时输入的宽度
-set softtabstop=2
+set softtabstop=3
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
 " 设置自动缩进时的缩进长度
-set shiftwidth=2
+set shiftwidth=3
 " 设置当文件被改动时自动载入
 set autoread
 " 共享剪贴板
@@ -898,3 +925,6 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
+
+
