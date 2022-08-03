@@ -462,7 +462,6 @@ function Format_C_CPP_CMAKE()
             \ AlignConsecutiveMacros: AcrossEmptyLinesAndComments,
             \ AlignConsecutiveAssignments: AcrossEmptyLinesAndComments,
             \ AlignConsecutiveBitFields: AcrossEmptyLinesAndComments,
-            \ AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments,
             \ AlignEscapedNewlines: Left,
             \ AlignOperands:   AlignAfterOperator,
             \ AllowShortEnumsOnASingleLine: false,
