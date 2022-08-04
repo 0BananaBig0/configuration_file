@@ -456,34 +456,34 @@ function Format_C_CPP_CMAKE()
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
             \ 'args': ['-style="{
-            \ BasedOnStyle:  LLVM,
+            \ BasedOnStyle: LLVM,
             \ AccessModifierOffset: 0,
             \ AlignArrayOfStructures: Left,
             \ AlignConsecutiveMacros: AcrossEmptyLinesAndComments,
             \ AlignConsecutiveAssignments: AcrossEmptyLinesAndComments,
             \ AlignConsecutiveBitFields: AcrossEmptyLinesAndComments,
             \ AlignEscapedNewlines: Left,
-            \ AlignOperands:   AlignAfterOperator,
+            \ AlignOperands: AlignAfterOperator,
             \ AllowShortEnumsOnASingleLine: false,
             \ AlwaysBreakTemplateDeclarations: Yes,
             \ BreakBeforeBraces: Custom,
             \ BraceWrapping:
             \ {
-            \   AfterCaseLabel:  false,
-            \   AfterClass:      false,
+            \   AfterCaseLabel: false,
+            \   AfterClass: false,
             \   AfterControlStatement: Never,
-            \   AfterEnum:       false,
-            \   AfterFunction:   false,
-            \   AfterNamespace:  false,
+            \   AfterEnum: false,
+            \   AfterFunction: false,
+            \   AfterNamespace: false,
             \   AfterObjCDeclaration: false,
-            \   AfterStruct:     false,
-            \   AfterUnion:      false,
+            \   AfterStruct: false,
+            \   AfterUnion: false,
             \   AfterExternBlock: false,
-            \   BeforeCatch:     false,
-            \   BeforeElse:      false,
+            \   BeforeCatch: false,
+            \   BeforeElse: false,
             \   BeforeLambdaBody: false,
-            \   BeforeWhile:     false,
-            \   IndentBraces:    false,
+            \   BeforeWhile: false,
+            \   IndentBraces: false,
             \   SplitEmptyFunction: false,
             \   SplitEmptyRecord: false,
             \   SplitEmptyNamespace: false
@@ -494,7 +494,7 @@ function Format_C_CPP_CMAKE()
             \ ContinuationIndentWidth: 3,
             \ IndentAccessModifiers: true,
             \ IndentCaseLabels: true,
-            \ IndentWidth:     3,
+            \ IndentWidth: 3,
             \ ObjCBlockIndentWidth: 3,
             \ SpaceAfterTemplateKeyword: false,
             \ SpaceBeforeParens: Never,
@@ -785,7 +785,7 @@ set iskeyword+=_,$,@,%,#,-
 " 增强模式中的命令行自动完成/补全操作
 set wildmode=list:longest
 " 使回格键（backspace）正常处理indent, eol, start等
-set backspace=2
+set backspace=3
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l,[,]
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
