@@ -163,7 +163,7 @@ function! CocTimerStart(timer)
       autocmd FileType c,cpp,python,verilog,opencl,vim silent call plug#load('ale')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-      autocmd FileType c,cpp,cmake silent call Format_C_CPP_CMAKE()
+      autocmd FileType c,cpp,cmake,opencl silent call Format_C_CPP_CMAKE()
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
@@ -465,6 +465,7 @@ function Format_C_CPP_CMAKE()
             \ AlignOperands: AlignAfterOperator,
             \ AllowShortEnumsOnASingleLine: false,
             \ AlwaysBreakTemplateDeclarations: Yes,
+            \ AttributeMacros: ["__kernel", "__global", "__ununsed"],
             \ BreakBeforeBraces: Custom,
             \ BraceWrapping:
             \ {
@@ -501,11 +502,14 @@ function Format_C_CPP_CMAKE()
             \ BitFieldColonSpacing: After,
             \ TabWidth: 3}"'],
             \ }
+  let g:neoformat_c_clangformat = g:neoformat_cpp_clangformat
+  let g:neoformat_opencl_clangformat = g:neoformat_cpp_clangformat
   let g:neoformat_cmake_cmakeformat = {
             \ 'exe': 'cmake-format',
             \ }
   let g:neoformat_enabled_cpp = ['clangformat']
   let g:neoformat_enabled_c = ['clangformat']
+  let g:neoformat_enabled_opencl = ['clangformat']
   let g:neoformat_enabled_cmake = ['cmakeformat']
   noremap <silent><F7> :Neoformat<CR>
   let g:neoformat_only_msg_on_error = 1
@@ -808,7 +812,7 @@ set incsearch
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 新文件标题
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v exec ':call SetTitle()'
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl exec ':call SetTitle()'
 func SetTitle()
   if &filetype==?'sh'
     call setline(1,'\#########################################################################')
@@ -847,19 +851,27 @@ autocmd FileType c,cpp,python,sh,verilog silent call Complie_Command()
 function Complie_Command()
   " 按F2编译运行,因为ale在退出插入模式后会自动检测语法，所以编译后运行可能会自动退出结果界面
   if &filetype==?'cpp'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 g++ % -o E%<.exe -g && ./E%<.exe <CR>
-    nnoremap <silent><Leader><F2> :AsyncRun! -save=1 g++ % -o E%<.exe -g <CR>
+    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
+                                      \ g++ % -o E%<.exe -g -lboost_program_options -lOpenCL
+                                      \ && ./E%<.exe <CR>
+    nnoremap <silent><Leader><F2> :AsyncRun! -save=1
+                                 \ g++ % -o E%<.exe -g -lboost_program_options -lOpenCL<CR>
     nnoremap <silent><Localleader><Leader> :w<CR>:AsyncRun! -save=1 make<CR>
   elseif &filetype==?'c'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 gcc % -o E%<.exe -g && ./E%<.exe <CR>
-    nnoremap <silent><Leader><F2> :AsyncRun! -save=1 gcc % -o E%<.exe -g <CR>
+    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
+                                      \ gcc % -o E%<.exe -g -lOpenCL
+                                      \ && ./E%<.exe <CR>
+    nnoremap <silent><Leader><F2> :AsyncRun! -save=1
+                                      \ gcc % -o E%<.exe -g -lOpenCL<CR>
     nnoremap <silent><Localleader><Leader> :w<CR>:AsyncRun! -save=1 make<CR>
   elseif &filetype==?'python'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 python3 % <CR>
   elseif &filetype==?'sh'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 ./% <CR>
   elseif &filetype==?'verilog'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd <CR>
+    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
+                                      \ iverilog *.v -o %<.vcd
+                                      \ && vvp %<.vcd <CR>
   endif
 endfunction
 " Toggle Menu and Toolbar菜单栏和工具栏
@@ -923,4 +935,5 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
 
