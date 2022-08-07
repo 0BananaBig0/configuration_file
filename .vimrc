@@ -460,7 +460,6 @@ function Format_C_CPP_CMAKE()
             \ AccessModifierOffset: 0,
             \ AlignArrayOfStructures: Left,
             \ AlignConsecutiveMacros: AcrossEmptyLinesAndComments,
-            \ AlignConsecutiveAssignments: AcrossEmptyLinesAndComments,
             \ AlignConsecutiveBitFields: AcrossEmptyLinesAndComments,
             \ AlignEscapedNewlines: Left,
             \ AlignOperands: AlignAfterOperator,
@@ -924,3 +923,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
