@@ -78,6 +78,8 @@ Plug 'sbdchd/neoformat',{'on':['Neoformat']} " 代码格式化插件
 Plug 'bfrg/vim-cpp-modern', {'on':[]}  " 高亮c++类模板等插件
 Plug 'brgmnn/vim-opencl', {'on':[]} " highlight opencl 2.0 syntax
 Plug 'vim-python/python-syntax', {'on':[]} " python 语法高亮插件
+Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
+Plug '0BananaBig0/verilog_indent',{'on':[]} " verilog indent file
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown实时预览插件
 Plug 'godlygeek/tabular', {'on': []} " markdown表格插件
 Plug 'dense-analysis/ale',{'on':[]}  " 动态检测语法插件,可鼠标停留显示信息
@@ -86,8 +88,6 @@ Plug 'mzlogin/vim-markdown-toc',{'on':[]} " markdown目录构建插件
 Plug 'preservim/nerdcommenter', {'on':[]} " nerdcommenter快速注释插件
 Plug 'skywind3000/asyncrun.vim',{'on':[]} " 异步执行shell命令插件，如果需要打开新终端，请去github看skywind3000/asyncrun.extra插件
 Plug 'skywind3000/vim-quickui' " 菜单栏插件
-Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
-Plug '0BananaBig0/verilog_indent',{'for': ['verilog', 'systemverilog']} " verilog indent file
 call plug#end()
 
 
@@ -132,12 +132,13 @@ function! Show_Nearest_Class_Or_Struct()
 endfunction
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
-  autocmd FileType cpp,c silent call plug#load('vim-cpp-modern')
   autocmd BufNewFile,BufRead *.cl set filetype=OPENCL
+  autocmd FileType cpp,c,OPENCL silent call plug#load('vim-cpp-modern')
   autocmd FileType OPENCL silent call plug#load('vim-opencl')
   autocmd FileType python silent call plug#load('python-syntax')
-  autocmd VimEnter,BufRead *.launch setfiletype roslaunch
+  autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
   autocmd BufRead *.launch silent call plug#load('vim-ros')
+  autocmd FileType verilog silent call plug#load('verilog_indent')
 augroup END
 
 
@@ -465,7 +466,7 @@ function Format_C_CPP_CMAKE()
             \ AlignOperands: AlignAfterOperator,
             \ AllowShortEnumsOnASingleLine: false,
             \ AlwaysBreakTemplateDeclarations: Yes,
-            \ AttributeMacros: ["__kernel", "__global", "__ununsed"],
+            \ AttributeMacros: ["__kernel", "__global", "__write_only", "__read_only"],
             \ BreakBeforeBraces: Custom,
             \ BraceWrapping:
             \ {
@@ -930,4 +931,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
