@@ -133,7 +133,7 @@ endfunction
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
-  autocmd FileType cpp,c,OPENCL silent call plug#load('vim-cpp-modern')
+  autocmd FileType cpp,c,opencl silent call plug#load('vim-cpp-modern')
   autocmd FileType python silent call plug#load('python-syntax')
   autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
   autocmd BufRead *.launch silent call plug#load('vim-ros')
