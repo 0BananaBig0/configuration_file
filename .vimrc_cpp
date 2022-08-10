@@ -72,8 +72,8 @@ Plug 'jsfaint/gen_tags.vim', {'on':['GenGTAGS','GenCtags','ClearGTAGS','ClearGta
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}  " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']} " LeaderF extension for navigate the marks.
 Plug 'sbdchd/neoformat',{'on':['Neoformat']} " 代码格式化插件
-Plug 'bfrg/vim-cpp-modern', {'on':[]}  " 高亮c++类模板等插件
 Plug 'brgmnn/vim-opencl', {'on':[]} " highlight opencl 2.0 syntax
+Plug 'bfrg/vim-cpp-modern', {'on':[]}  " 高亮c++类模板等插件
 Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
 Plug '0BananaBig0/verilog_indent',{'on':[]} " verilog indent file
 Plug 'dense-analysis/ale',{'on':[]}  " 动态检测语法插件,可鼠标停留显示信息
@@ -125,9 +125,8 @@ function! Show_Nearest_Class_Or_Struct()
 endfunction
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead *.cl set filetype=OPENCL
+  autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
   autocmd FileType cpp,c,OPENCL silent call plug#load('vim-cpp-modern')
-  autocmd FileType OPENCL silent call plug#load('vim-opencl')
   autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
   autocmd BufRead *.launch silent call plug#load('vim-ros')
   autocmd FileType verilog silent call plug#load('verilog_indent')
