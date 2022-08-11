@@ -126,7 +126,7 @@ endfunction
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
-  autocmd FileType cpp,c,OPENCL silent call plug#load('vim-cpp-modern')
+  autocmd FileType cpp,c,opencl silent call plug#load('vim-cpp-modern')
   autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
   autocmd BufRead *.launch silent call plug#load('vim-ros')
   autocmd FileType verilog silent call plug#load('verilog_indent')
@@ -174,7 +174,7 @@ function Lazy_On_Plugin_Configuration()
   inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
   " Make <CR> to accept selected completion item or notify coc.nvim to format
   " <C-g>u breaks current undo, please make your own choice.
-  inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+  inoremap <silent><expr> <CR> coc#pum#visible() ? coc#_select_confirm()
                                 \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   function! CheckBackspace() abort
     let col = col('.') - 1
@@ -701,7 +701,7 @@ set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1 "
 " Tab键的显示宽度
 set tabstop=3
 " 按下Tab键时输入的宽度
-set softtabstop=6
+set softtabstop=3
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
 " 设置自动缩进时的缩进长度
