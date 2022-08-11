@@ -750,7 +750,7 @@ set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1 "
 " Tab键的显示宽度
 set tabstop=3
 " 按下Tab键时输入的宽度
-set softtabstop=6
+set softtabstop=3
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
 " 设置自动缩进时的缩进长度
