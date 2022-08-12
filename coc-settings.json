@@ -31,7 +31,7 @@
   "diagnostic.virtualText": true,
   "pyright.disableDiagnostics": true,
   "clangd.disableDiagnostics": true,
-  "clangd.arguments": ["--completion-style=detailed"],
+  "clangd.arguments": ["--background-index","--completion-style=detailed","--header-insertion-decorators","--inlay-hints"],
   "markdownlint.onOpen": false,
   "markdownlint.onSave": false,
   "markdownlint.onChange": false
