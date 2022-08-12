@@ -204,10 +204,11 @@ function Lazy_On_Plugin_Configuration()
   nmap <silent><Localleader>ap <plug>(coc-diagnostic-prev)
   nmap <silent><Localleader>en <plug>(coc-diagnostic-next-error)
   nmap <silent><Localleader>ep <plug>(coc-diagnostic-prev-error)
- " Use <C-j> for jump to next placeholder, it's default of coc.nvim
-  let g:coc_snippet_next = '<C-j>'
-  " Use <C-k> for jump to previous placeholder, it's default of coc.nvim
-  let g:coc_snippet_prev = '<C-k>'
+  let g:coc_filetype_map = {'opencl': 'cpp'}
+  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
+           \ 'coc-dictionary', 'coc-clangd', 'coc-yaml',
+           \ 'coc-vimlsp', 'coc-sh', 'coc-pyright',
+           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-cmake']
 
 
 
@@ -930,4 +931,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
