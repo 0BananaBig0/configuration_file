@@ -200,10 +200,10 @@ function Lazy_On_Plugin_Configuration()
   nnoremap <silent>[c :silent call CocAction('jumpDeclaration', 'tabe')<CR>
   nnoremap <silent>[i :silent call CocAction('jumpImplementation', 'tabe')<CR>
   nnoremap <silent>[r :silent call CocAction('jumpReferences', 'tabe')<CR>
-  nmap <silent><Localleader>an <plug>(coc-diagnostic-next)
-  nmap <silent><Localleader>ap <plug>(coc-diagnostic-prev)
-  nmap <silent><Localleader>en <plug>(coc-diagnostic-next-error)
-  nmap <silent><Localleader>ep <plug>(coc-diagnostic-prev-error)
+  nmap <silent><Localleader>j <plug>(coc-diagnostic-next)
+  nmap <silent><Localleader>k <plug>(coc-diagnostic-prev)
+  nmap <silent><Localleader>ej <plug>(coc-diagnostic-next-error)
+  nmap <silent><Localleader>ek <plug>(coc-diagnostic-prev-error)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-clangd', 'coc-yaml',
@@ -553,9 +553,9 @@ function Lazy_Plugin_Configuration()
   let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
   " 打开文件时进行检查
   let g:ale_lint_on_enter = 0
-  " 普通模式下，[p前往上一个错误或警告，[n前往下一个错误或警告
-  nmap <silent>[p <Plug>(ale_previous_wrap)
-  nmap <silent>[n <Plug>(ale_next_wrap)
+  " 普通模式下，[k前往上一个错误或警告，[j前往下一个错误或警告
+  nmap <silent>[k <Plug>(ale_previous_wrap)
+  nmap <silent>[j <Plug>(ale_next_wrap)
   " [t触发或关闭语法检查syntax change
   nnoremap <silent>[t :ALEToggle<CR>
   " [l查看错误或警告的详细信息
