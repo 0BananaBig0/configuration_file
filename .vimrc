@@ -568,15 +568,15 @@ function Lazy_Plugin_Configuration()
   let g:ale_linters = {
   \   'python': ['pylint'],
   \   'verilog':['verilator'],
-  \   'opencl':['cc']
   \}
+  let g:ale_linter_aliases = {'opencl': 'cpp'}
   " disable the plist generation.
-  let g:ale_cpp_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
+  let g:ale_c_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
+  let g:ale_cpp_clangcheck_options = g:ale_c_clangcheck_options
   let g:ale_c_clangtidy_executable = ''
-  let g:ale_cpp_clangtidy_executable = ''
-  let g:ale_cpp_clangcheck_executable = ''
+  let g:ale_cpp_clangtidy_executable = g:ale_c_clangtidy_executable
   let g:ale_c_cc_executable = ''
-  let g:ale_cpp_cc_executable = ''
+  let g:ale_cpp_cc_executable = g:ale_c_cc_executable
   " set python3 to be default python
   let g:ale_python_executable = 'python3'
   let g:ale_python_pylint_use_global = 1
