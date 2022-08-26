@@ -513,9 +513,9 @@ function Lazy_Plugin_Configuration()
   let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
   " 打开文件时进行检查
   let g:ale_lint_on_enter = 0
-  " 普通模式下，[p前往上一个错误或警告，[n前往下一个错误或警告
-  nmap <silent>[p <Plug>(ale_previous_wrap)
-  nmap <silent>[n <Plug>(ale_next_wrap)
+  " 普通模式下，[k前往上一个错误或警告，[j前往下一个错误或警告
+  nmap <silent>[k <Plug>(ale_previous_wrap)
+  nmap <silent>[j <Plug>(ale_next_wrap)
   " [t触发或关闭语法检查syntax change
   nnoremap <silent>[t :ALEToggle<CR>
   " [l查看错误或警告的详细信息
@@ -528,15 +528,15 @@ function Lazy_Plugin_Configuration()
   let g:ale_linters = {
   \   'python': ['pylint'],
   \   'verilog':['verilator'],
-  \   'opencl':['cc']
   \}
+  let g:ale_linter_aliases = {'opencl': 'cpp'}
   " disable the plist generation.
-  let g:ale_cpp_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
+  let g:ale_c_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
+  let g:ale_cpp_clangcheck_options = g:ale_c_clangcheck_options
   let g:ale_c_clangtidy_executable = ''
-  let g:ale_cpp_clangtidy_executable = ''
-  let g:ale_cpp_clangcheck_executable = ''
+  let g:ale_cpp_clangtidy_executable = g:ale_c_clangtidy_executable
   let g:ale_c_cc_executable = ''
-  let g:ale_cpp_cc_executable = ''
+  let g:ale_cpp_cc_executable = g:ale_c_cc_executable
   " set python3 to be default python
   let g:ale_python_executable = 'python3'
   let g:ale_python_pylint_use_global = 1
