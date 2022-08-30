@@ -454,7 +454,7 @@ function Lazy_On_Plugin_Configuration()
 endfunction
 function Format_C_CPP_CMAKE()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
-  let g:neoformat_c_clangformat = {
+  let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
             \ 'args': ['-style="{
             \ BasedOnStyle: LLVM,
@@ -503,6 +503,8 @@ function Format_C_CPP_CMAKE()
             \ BitFieldColonSpacing: After,
             \ TabWidth: 3}"'],
             \ }
+  let g:neoformat_c_clangformat = g:neoformat_cpp_clangformat
+  let g:neoformat_opencl_clangformat = g:neoformat_cpp_clangformat
   let g:neoformat_enabled_cpp = ['clangformat']
   let g:neoformat_enabled_c = ['clangformat']
   let g:neoformat_enabled_opencl = ['clangformat']
@@ -931,3 +933,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
