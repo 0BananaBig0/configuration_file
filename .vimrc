@@ -97,7 +97,7 @@ colorscheme dracula
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
 nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
-                           \ :set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 23<CR>
+                           \ :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 23<CR>
                            \ :IndentGuidesDisable<CR>
 autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
 function! Show_Current_Module()
