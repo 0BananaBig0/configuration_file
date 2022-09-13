@@ -14,7 +14,7 @@
     }
   },
   "clangd.disableDiagnostics": true,
-  "clangd.arguments": ["--background-index","--completion-style=detailed","--header-insertion-decorators","--inlay-hints"],
+  "clangd.arguments": ["--background-index","--completion-style=detailed","--header-insertion=never","--inlay-hints"],
   "coc.preferences.rootPatterns": [".git",".hg",".projections.json",".project",".svn",".root"],
   "coc.preferences.jumpCommand": "edit",
   "diagnostic.enable": true,
