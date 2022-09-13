@@ -2,14 +2,14 @@
 
 * [Note:](#note)
 * [(1) Configure vim/gvim/nvim/gnvim](#1-configure-vimgvimnvimgnvim)
-  * [1,login your account](#1login-your-account)
-  * [2,execute the following commands until it successes](#2execute-the-following-commands-until-it-successes)
-  * [3,copy configuration file from hxliang and add some configurations](#3copy-configuration-file-from-hxliang-and-add-some-configurations)
-  * [4,add the following content to your .bashrc or .zshrc](#4add-the-following-content-to-your-bashrc-or-zshrc)
-  * [5,open vim/gvim/gnvim/nvim and execute the following command:](#5open-vimgvimgnvimnvim-and-execute-the-following-command)
-  * [6,install some dependencies](#6install-some-dependencies)
-  * [7,modify .vimrc](#7modify-vimrc)
-  * [8,if you not want to use my recommended plugin. You can just do the following command](#8if-you-not-want-to-use-my-recommended-plugin-you-can-just-do-the-following-command)
+   * [1,login your account](#1login-your-account)
+   * [2,execute the following commands until it successes](#2execute-the-following-commands-until-it-successes)
+   * [3,copy configuration file from hxliang and add some configurations](#3copy-configuration-file-from-hxliang-and-add-some-configurations)
+   * [4,add the following content to your .bashrc or .zshrc](#4add-the-following-content-to-your-bashrc-or-zshrc)
+   * [5,open vim/gvim/gnvim/nvim and execute the following command:](#5open-vimgvimgnvimnvim-and-execute-the-following-command)
+   * [6,install some dependencies](#6install-some-dependencies)
+   * [7,modify .vimrc](#7modify-vimrc)
+   * [8,if you not want to use my recommended plugin. You can just do the following command](#8if-you-not-want-to-use-my-recommended-plugin-you-can-just-do-the-following-command)
 * [(2)use some new command tools to replace old command tools](#2use-some-new-command-tools-to-replace-old-command-tools)
 * [(3)add some tools](#3add-some-tools)
 * [(4)close screensaver](#4close-screensaver)
@@ -29,8 +29,8 @@
 * [GitHub](#github)
 * [Gitee](#gitee)
 * [------------ 具体配置（末） ------------](#-------------具体配置末-------------)
-  * [4,add the content of id_rsa.gitee to your gitee accout.](#4add-the-content-of-id_rsagitee-to-your-gitee-accout)
-  * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
+   * [4,add the content of id_rsa.gitee to your gitee accout.](#4add-the-content-of-id_rsagitee-to-your-gitee-accout)
+   * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
 
 <!-- vim-markdown-toc -->
 #Note:
@@ -175,6 +175,8 @@ fi
 ```
 
 # (8)自己启动自己的vnc
+（有时候系统自动启动的vnc会黑屏，需要先用ssh登录到自己的用户，kill掉自己的vnc进程
+再重新启动vnc） 
 ```
 ssh -X UserAccount@10.34.24.11
 ps -ef | grep vnc #找到自己用户名然后使用kill关掉

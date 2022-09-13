@@ -125,6 +125,9 @@
    * [(4) add the content of id_rsa.gitee to your gitee accout.](#4-add-the-content-of-id_rsagitee-to-your-gitee-accout)
    * [(5) add the content of id_rsa.github to your github accout.](#5-add-the-content-of-id_rsagithub-to-your-github-accout)
 * [75 关于主目录下突然出现一个javasharedresources目录](#75-关于主目录下突然出现一个javasharedresources目录)
+* [76 install and use kvm](#76-install-and-use-kvm)
+   * [(1) install kvm](#1-install-kvm)
+   * [(2) create a virtual machine](#2-create-a-virtual-machine)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1718,3 +1721,18 @@ chmod 644 id_rsa.gitee.pub id_rsa.github.pub
 存放共享java类文件的目录。所有用java编写的软件执行时jvm都可能会生成这个目录。
 执行java时加上 -Xshareclasses:cacheDir=/path/to/other/dir 参数可以指定到其他目录，
 加上 -Xshareclasses:none可以完全禁止这个特性
+
+#76 install and use kvm
+##(1) install kvm
+```
+sudo apt install qemu-kvm libvirt-bin bridge-utils virtinst virt-manager
+sudo systemctl is-active libvirtd
+sudo usermod -aG libvirt $USER
+sudo usermod -aG kvm $USER
+brctl show
+sudo chmod 666 /var/run/libvirt/libvirt-sock
+```
+##(2) create a virtual machine
+```
+virt-manager
+```
