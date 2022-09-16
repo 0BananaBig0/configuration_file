@@ -1,39 +1,58 @@
 {
-  "languageserver": {
-    "svlangserver": {
-       "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
-       "filetypes": ["systemverilog","vhdl","verilog"],
-       "settings": {
-         "systemverilog.includeIndexing": ["**/*.{v,sv,svh}"],
-         "systemverilog.excludeIndexing": ["test/**/*.sv*"],
-         "systemverilog.defines" : [],
-         "systemverilog.disableLinting" : true,
-         "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
-         "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
-       }
-    }
-  },
-  "clangd.disableDiagnostics": true,
-  "clangd.arguments": ["--background-index","--completion-style=detailed","--header-insertion=never","--inlay-hints"],
-  "coc.preferences.rootPatterns": [".git",".hg",".projections.json",".project",".svn",".root"],
-  "coc.preferences.jumpCommand": "edit",
-  "diagnostic.enable": true,
-  "diagnostic.displayByAle": false,
-  "diagnostic.messageTarget": "echo",
-  "diagnostic.errorSign": "✗ ",
-  "diagnostic.warningSign": "⚡",
-  "diagnostic.virtualText": true,
-  "markdownlint.onOpen": false,
-  "markdownlint.onSave": false,
-  "markdownlint.onChange": false,
-  "pyright.disableDiagnostics": true,
-  "suggest.selection": "recentlyUsedByPrefix",
-  "suggest.autoTrigger":"none",
-  "suggest.maxCompleteItemCount": 9,
-  "suggest.noselect": true,
-  "suggest.triggerAfterInsertEnter": true,
-  "suggest.detailField": "preview",
-  "suggest.snippetIndicator": "",
-  "signature.target": "echo"
+   "languageserver": {
+      "svlangserver": {
+         "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
+         "filetypes": [
+            "systemverilog",
+            "vhdl",
+            "verilog"
+         ],
+         "settings": {
+            "systemverilog.includeIndexing": [
+               "**/*.{v,sv,svh}"
+            ],
+            "systemverilog.excludeIndexing": [
+               "test/**/*.sv*"
+            ],
+            "systemverilog.defines": [],
+            "systemverilog.disableLinting": true,
+            "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
+            "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
+         }
+      }
+   },
+   "clangd.disableDiagnostics": true,
+   "clangd.arguments": [
+      "--background-index",
+      "--completion-style=detailed",
+      "--header-insertion=never",
+      "--inlay-hints"
+   ],
+   "coc.preferences.rootPatterns": [
+      ".git",
+      ".hg",
+      ".projections.json",
+      ".project",
+      ".svn",
+      ".root"
+   ],
+   "coc.preferences.jumpCommand": "edit",
+   "diagnostic.enable": true,
+   "diagnostic.displayByAle": false,
+   "diagnostic.messageTarget": "echo",
+   "diagnostic.errorSign": "✗ ",
+   "diagnostic.warningSign": "⚡",
+   "diagnostic.virtualText": true,
+   "markdownlint.onOpen": false,
+   "markdownlint.onSave": false,
+   "markdownlint.onChange": false,
+   "pyright.disableDiagnostics": true,
+   "suggest.selection": "recentlyUsedByPrefix",
+   "suggest.autoTrigger": "none",
+   "suggest.maxCompleteItemCount": 9,
+   "suggest.noselect": true,
+   "suggest.triggerAfterInsertEnter": true,
+   "suggest.detailField": "preview",
+   "suggest.snippetIndicator": "",
+   "signature.target": "echo"
 }
-
