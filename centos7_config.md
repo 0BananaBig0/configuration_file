@@ -79,6 +79,7 @@
    * [(4) add the content of id_rsa.gitee to your gitee accout.](#4-add-the-content-of-id_rsagitee-to-your-gitee-accout)
    * [(5) add the content of id_rsa.github to your github accout.](#5-add-the-content-of-id_rsagithub-to-your-github-accout)
 * [45 服务器开启后再接入显示器无信号需要重启的解决方法：](#45-服务器开启后再接入显示器无信号需要重启的解决方法)
+* [46 服务器的Vivado无法识别fpga板子的解决方法：](#46-服务器的vivado无法识别fpga板子的解决方法)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1191,3 +1192,12 @@ xset -dpms
 建议全部取消。
 设计失误，故意的，还是本身就是为服务器设计的，都没考虑过休眠问题。
 反正很多发行版不用xset改，都会睡死。
+
+# 46 服务器的Vivado无法识别fpga板子的解决方法：
+(There is no active target available for server at localhost.) \
+安装JTAG驱动。
+```
+cd /cadtools/Xilinx/2022.1/Vivado/2022.1/data/xicom/cable_drivers/lin64/install_script/install_drivers
+sudo ./install_drivers 
+```
+安装完成后需要重新插拔JTAG。
