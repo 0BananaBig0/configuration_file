@@ -17,20 +17,19 @@
 * [(6)解决没有root权限的普通用户使用vnc提示:](#6解决没有root权限的普通用户使用vnc提示)
 * [(7)永久切换gcc/g++版本](#7永久切换gccg版本)
 * [(8)自己启动自己的vnc](#8自己启动自己的vnc)
-* [add the following content to your .bashrc or .zshrc](#add-the-following-content-to-your-bashrc-or-zshrc)
-* [------------ 配置说明（始） ------------](#-------------配置说明始-------------)
-* [Host：别名，HostName：服务器域名或 IP 地址](#host别名hostname服务器域名或-ip-地址)
-* [User：用户名](#user用户名)
-* [例：在 git clone git@github.com:torvalds/linux.git 中](#例在-git-clone-gitgithubcomtorvaldslinuxgit-中)
-* [User 是 git，Host 是 github.com](#user-是-githost-是-githubcom)
-* [IdentityFile：私钥路径](#identityfile私钥路径)
-* [------------ 配置说明（末） ------------](#-------------配置说明末-------------)
-* [------------ 具体配置（始） ------------](#-------------具体配置始-------------)
-* [GitHub](#github)
-* [Gitee](#gitee)
-* [------------ 具体配置（末） ------------](#-------------具体配置末-------------)
+* [(9)永久切换git版本](#9永久切换git版本)
+* [(10),默认浏览器和终端不需要vpn快速链接github](#10默认浏览器和终端不需要vpn快速链接github)
+   * [也可以使用github代理](#也可以使用github代理)
+* [(11)configure gdb](#11configure-gdb)
+* [(12)use zinit, omz and zsh](#12use-zinit-omz-and-zsh)
+* [(13)add new dynamic library](#13add-new-dynamic-library)
+* [(14)configure multiple ssh keys](#14configure-multiple-ssh-keys)
+   * [1,execute the following commands.](#1execute-the-following-commands)
+   * [2,add the following content to config file.](#2add-the-following-content-to-config-file)
+   * [3,execute the following commands.](#3execute-the-following-commands)
    * [4,add the content of id_rsa.gitee to your gitee accout.](#4add-the-content-of-id_rsagitee-to-your-gitee-accout)
    * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
+* [(15)服务器的Vivado无法识别fpga板子的解决方法：](#15服务器的vivado无法识别fpga板子的解决方法)
 
 <!-- vim-markdown-toc -->
 #Note:
@@ -187,7 +186,7 @@ vncserver :x -geometry 1920x1080 #x为端口
 也可以使用这个命令代替kill xxx
 ```
 vncserver -kill :x #其中x为你的vnc端口
-``
+```
 如果是第一次启动vnc
 ```
 ssh -X UserAccount@10.34.24.11
@@ -207,11 +206,11 @@ fi
 ```
 
 # (10),默认浏览器和终端不需要vpn快速链接github
-（1）默认浏览器在linux使用firefox，在win10使用edge因为不用翻墙就能下载插件。
-（2）浏览器下载“Hoxx VPN Proxy”插件，这个插件可以帮助浏览器翻墙。(注册账号时的密码请使用不与你的钱有关系的密码)
-（3）浏览器下载“GitHub加速”插件，这个插件可以提供不需要翻墙就能快速链接github的网址：
-      1）打开某一github仓库
-      2）点击网页上的加速按钮，这个按钮会提供四个网址，前三个是用于克隆别人的仓库的，使用的是HTTPS协议。由于github现在只允许使用SSH协议上传仓库，所以前三个网址只能用于克隆仓库，如果既需要克隆仓库也需要上传文件到仓库，需要使用第四个网址，第四个网址用于代替github的code按钮所提供的网址。
+（1）默认浏览器在linux使用firefox，在win10使用edge因为不用翻墙就能下载插件。\
+（2）浏览器下载“Hoxx VPN Proxy”插件，这个插件可以帮助浏览器翻墙。(注册账号时的密码请使用不与你的钱有关系的密码) \
+（3）浏览器下载“GitHub加速”插件，这个插件可以提供不需要翻墙就能快速链接github的网址：\
+      1）打开某一github仓库 \
+      2）点击网页上的加速按钮，这个按钮会提供四个网址，前三个是用于克隆别人的仓库的，使用的是HTTPS协议。由于github现在只允许使用SSH协议上传仓库，所以前三个网址只能用于克隆仓库，如果既需要克隆仓库也需要上传文件到仓库，需要使用第四个网址，第四个网址用于代替github的code按钮所提供的网址。\
       3）因为加速按钮前三个网址是别人提供的，有时由于未知力量可能会导致某一个或者某两个网址用不了，此时只需要把已克隆的本地仓库文件里面的.git/config的url更改为可以用的那个网址即可。
 ## 也可以使用[github代理](https://ghproxy.com/)
 
@@ -250,8 +249,8 @@ add the following content to your .bashrc or .zshrc
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 ```
 
-# (14),configure multiple ssh keys
-##1,execute the following commands.
+# (14)configure multiple ssh keys
+## 1,execute the following commands.
 ```
 mkdir ~/.ssh -p
 cd ~/.ssh
@@ -259,7 +258,7 @@ ssh-keygen -t rsa -b 4096 -f id_rsa.github -C "YourEmail"
 ssh-keygen -t rsa -b 4096 -f id_rsa.gitee -C "YourEmail"
 gvim config
 ```
-##2,add the following content to config file.
+## 2,add the following content to config file.
 ```
 # ------------ 配置说明（始） ------------
 # Host：别名，HostName：服务器域名或 IP 地址
@@ -289,11 +288,20 @@ PreferredAuthentications publickey
 IdentityFile ~/.ssh/id_rsa.gitee
 # ------------ 具体配置（末） ------------
 ```
-##3,execute the following commands.
+## 3,execute the following commands.
 ```
 chmod 700 ~/.ssh
 chmod 600 config id_rsa.gitee id_rsa.github
 chmod 644 id_rsa.gitee.pub id_rsa.github.pub
 ```
-##4,add the content of id_rsa.gitee to your gitee accout.
-##5,add the content of id_rsa.github to your github accout.
+## 4,add the content of id_rsa.gitee to your gitee accout.
+## 5,add the content of id_rsa.github to your github accout.
+
+# (15)服务器的Vivado无法识别fpga板子的解决方法：
+(There is no active target available for server at localhost.) \
+安装JTAG驱动。
+```
+cd /cadtools/Xilinx/2022.1/Vivado/2022.1/data/xicom/cable_drivers/lin64/install_script/install_drivers
+sudo ./install_drivers 
+```
+安装完成后需要重新插拔JTAG。
