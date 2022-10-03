@@ -171,7 +171,7 @@ git config --global user.name "0BananaBig0"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
-git config --global url."https://hub.fastgit.xyz/".insteadOf "https://github.com/"
+git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
 git config --global protocol.https.allow always
 sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
