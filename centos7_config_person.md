@@ -305,3 +305,13 @@ cd /cadtools/Xilinx/2022.1/Vivado/2022.1/data/xicom/cable_drivers/lin64/install_
 sudo ./install_drivers 
 ```
 安装完成后需要重新插拔JTAG。
+
+# (16)configure your git
+```
+git config --global user.name "YourName"
+git config --global user.email "YourEmail(NotUseSchoolEmailWhichWillBeExpiredAfterYourGraduation)"
+git config --global alias.logline "log --graph --abbrev-commit"
+git config --global core.editor gvim
+git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
+git config --global protocol.https.allow always
+```
