@@ -113,7 +113,9 @@
 * [66,更新git](#66更新git)
 * [67,add new dynamic library](#67add-new-dynamic-library)
 * [68,install rr debugger](#68install-rr-debugger)
-* [69,解决network-manager中wired为unmanaged的问题](#69解决network-manager中wired为unmanaged的问题)
+* [69,解决有线网无法正常使用的问题](#69解决有线网无法正常使用的问题)
+   * [(1) netword-managed无法正常使用](#1-netword-managed无法正常使用)
+   * [(2) ubuntu 18.04系统，有线网无法连接，无线网可以正常连接；](#2-ubuntu-1804系统有线网无法连接无线网可以正常连接)
 * [70,install opencl intel runtime(2.0)](#70install-opencl-intel-runtime20)
 * [71,install opencl intel runtime(2.2)(21.38.21026)](#71install-opencl-intel-runtime22213821026)
 * [72,add shell environment variables](#72add-shell-environment-variables)
@@ -1621,8 +1623,34 @@ then execute the following command
 sudo sysctl -p /etc/sysctl.conf
 ```
 
-# 69,解决network-manager中wired为unmanaged的问题
+# 69,解决有线网无法正常使用的问题
+##(1) netword-managed无法正常使用
 打开 /etc/NetworkManager/NetworkManager.conf， 将managed=false改为managed=true即可。
+这会导致有线网络完全受系统管理，个人无法管理。
+##(2) ubuntu 18.04系统，有线网无法连接，无线网可以正常连接；
+与该系统装在同一台电脑上的win10有线网可正常连接。进行以下测试：
+```
+运行ifconfig，只显示lo或wifi网卡
+运行ifconfig -a，能显示有线网卡
+运行ifconfig enp7s0 up后使用ifconfig能显示有线网卡，但是仍然没有有线网络
+```
+```
+sudo gvim /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf
+```
+将
+```
+[keyfile]
+unmanaged-devices=*,except:type:wifi,except:type:wwan
+```
+替换为
+```
+[keyfile]
+unmanaged-devices=*,except:type:ethernet,except:type:wifi,except:type:wwan
+```
+执行
+```
+sudo service network-manager restart
+```
 
 # 70,install opencl intel runtime(2.0)
 ```
