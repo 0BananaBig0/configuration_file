@@ -256,8 +256,8 @@ sudo yum install zsh ksh -y
 cd ~/Downloads/program
 sudo yum -y install gcc perl-ExtUtils-MakeMaker
 sudo yum -y install ncurses-devel
-tar xvf zsh-5.8.1.tar.xz
-cd zsh-5.8.1
+tar xvf zsh-5.9.tar.xz
+cd zsh-5.9
 ./configure
 make
 sudo make install
