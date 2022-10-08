@@ -30,6 +30,8 @@
    * [4,add the content of id_rsa.gitee to your gitee accout.](#4add-the-content-of-id_rsagitee-to-your-gitee-accout)
    * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
 * [(15)服务器的Vivado无法识别fpga板子的解决方法：](#15服务器的vivado无法识别fpga板子的解决方法)
+* [(16)configure your git](#16configure-your-git)
+* [(17)install ttf fonts and font manage tool](#17install-ttf-fonts-and-font-manage-tool)
 
 <!-- vim-markdown-toc -->
 #Note:
@@ -314,4 +316,15 @@ git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
 git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
 git config --global protocol.https.allow always
+```
+
+# (17)install ttf fonts and font manage tool
+```
+#去https://www.nerdfonts.com/font-downloads下载自己喜欢的字体，以DejaVuSansMono,FantasqueSansMono,InconsolataLGC字体为例
+unzip DejaVuSansMono.zip FantasqueSansMono.zip InconsolataLGC.zip #解压文件
+mkdir ~/.fonts -p
+cd ~/.fonts
+cp -r ~/Downloads/program/font/FantasqueSansMono ~/Downloads/program/font/DejaVuSansMono ~/Downloads/program/font/InconsolataLGC .
+chmod 755 DejaVuSansMono FantasqueSansMono InconsolataLGC -R
+fc-cache -fv
 ```
