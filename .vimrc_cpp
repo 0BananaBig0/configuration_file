@@ -762,13 +762,13 @@ set incsearch
 autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl exec ':call SetTitle()'
 func SetTitle()
   if &filetype==?'sh'
-    call setline(1,'\#########################################################################')
-    call append(line('.'), '\# File Name: '.expand('%'))
-    call append(line('.')+1, '\# Author: 16hxliang3')
-    call append(line('.')+2, '\# mail: 16hxliang3@stu.edu.cn')
-    call append(line('.')+3, '\# Created Time: '.strftime('%c'))
-    call append(line('.')+4, '\#########################################################################')
-    call append(line('.')+5, '\#!/bin/bash')
+    call setline(1,'#########################################################################')
+    call append(line('.'), '# File Name: '.expand('%'))
+    call append(line('.')+1, '# Author: 16hxliang3')
+    call append(line('.')+2, '# mail: 16hxliang3@stu.edu.cn')
+    call append(line('.')+3, '# Created Time: '.strftime('%c'))
+    call append(line('.')+4, '#########################################################################')
+    call append(line('.')+5, '#!/bin/bash')
     call append(line('.')+6, '')
   else
     call setline(1, '/*************************************************************************')
