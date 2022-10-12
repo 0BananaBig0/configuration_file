@@ -107,7 +107,7 @@ sudo modprobe e1000e #test the driver. If correct, nothing happen.
 lsmod #check if it had been loaded.
 service network restart #restart network
 ```
-Note: If you update your kernel, maybe you need to reinstall it. More detailed information, you can read its README file. But we can use its wifi. Its wifi ip is 172.22.174.43
+Note: If you update your kernel, maybe you need to reinstall it. More detailed information, you can read its README file. But we can use its wifi. Its wifi ip is 172.22.174.43. Gcc version > 7.0
 
 # 2,Change the mount point of /home (Only when we create a user in /home-local, it works)
 ```
