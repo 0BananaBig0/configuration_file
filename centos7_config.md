@@ -1201,3 +1201,12 @@ cd /cadtools/Xilinx/2022.1/Vivado/2022.1/data/xicom/cable_drivers/lin64/install_
 sudo ./install_drivers 
 ```
 安装完成后需要重新插拔JTAG。
+
+# 47 compile git
+```
+cd ~/Downloads/program
+sudo yum install docbook2X xmlto asciidoc
+git clone https://github.91chi.fun//https://github.com/git/git.git
+cd git
+sudo make prefix=/cadtools/optional_program/git238 install install-doc install-html install-info
+```
