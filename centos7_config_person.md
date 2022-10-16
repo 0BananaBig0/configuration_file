@@ -316,6 +316,7 @@ git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
 git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
 git config --global protocol.https.allow always
+git config --global push.default "current"
 ```
 
 # (17)install ttf fonts and font manage tool
