@@ -80,6 +80,8 @@
    * [(5) add the content of id_rsa.github to your github accout.](#5-add-the-content-of-id_rsagithub-to-your-github-accout)
 * [45 服务器开启后再接入显示器无信号需要重启的解决方法：](#45-服务器开启后再接入显示器无信号需要重启的解决方法)
 * [46 服务器的Vivado无法识别fpga板子的解决方法：](#46-服务器的vivado无法识别fpga板子的解决方法)
+* [47 compile git](#47-compile-git)
+* [48 close pulseaudio](#48-close-pulseaudio)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1210,4 +1212,20 @@ sudo yum install docbook2X xmlto asciidoc
 git clone https://github.91chi.fun//https://github.com/git/git.git
 cd git
 sudo make prefix=/cadtools/optional_program/git238 install install-doc install-html install-info
+```
+
+# 48 close pulseaudio
+Our servers have no such module.
+```
+sudo vim /etc/pulse/client.conf
+```
+Add the following content to the client.conf
+```
+autospawn = no
+```
+Reboot our servers \
+If we want to use it, execute the following command
+```
+systemctl --user start pulseaudio.socket
+systemctl --user start pulseaudio.service
 ```
