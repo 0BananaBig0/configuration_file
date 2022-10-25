@@ -18,48 +18,48 @@
 * [12,install python3,pip and some python3 tools](#12install-python3pip-and-some-python3-tools)
 * [13,compile and install gdb, configure .gdbinit](#13compile-and-install-gdb-configure-gdbinit)
 * [14,compile and install valgrind](#14compile-and-install-valgrind)
-* [15,install ripgrep(command:rg)to replace grep](#15install-ripgrepcommandrgto-replace-grep)
+* [15 compile git](#15-compile-git)
 * [16,install ttf fonts and font manage tool](#16install-ttf-fonts-and-font-manage-tool)
 * [17,compile and installl vim and neovim](#17compile-and-installl-vim-and-neovim)
 * [18,install rust and some new command tools](#18install-rust-and-some-new-command-tools)
 * [19,install go，goneovim](#19install-gogoneovim)
-   * [install go language](#install-go-language)
-   * [replace the morror source of go:](#replace-the-morror-source-of-go)
-   * [install goneovim](#install-goneovim)
-   * [install configuration files](#install-configuration-files)
+    * [install go language](#install-go-language)
+    * [replace the morror source of go:](#replace-the-morror-source-of-go)
+    * [install goneovim](#install-goneovim)
+    * [install configuration files](#install-configuration-files)
 * [20,install and configure vncserver and cockpit](#20install-and-configure-vncserver-and-cockpit)
-   * [install vncserver](#install-vncserver)
-   * [如果用户无法登录vnc，开启防火墙端口](#如果用户无法登录vnc开启防火墙端口)
-   * [对于普通用户，先使用ssh登录自己的账户，再执行以下命令](#对于普通用户先使用ssh登录自己的账户再执行以下命令)
-   * [关闭vnc的屏保](#关闭vnc的屏保)
-   * [解决centos下非root用户频繁出现Authentication is required to set](#解决centos下非root用户频繁出现authentication-is-required-to-set)
-   * [解决没有root权限的普通用户使用vnc提示:](#解决没有root权限的普通用户使用vnc提示)
-   * [install cockpit](#install-cockpit)
+    * [install vncserver](#install-vncserver)
+    * [如果用户无法登录vnc，开启防火墙端口](#如果用户无法登录vnc开启防火墙端口)
+    * [对于普通用户，先使用ssh登录自己的账户，再执行以下命令](#对于普通用户先使用ssh登录自己的账户再执行以下命令)
+    * [关闭vnc的屏保](#关闭vnc的屏保)
+    * [解决centos下非root用户频繁出现Authentication is required to set](#解决centos下非root用户频繁出现authentication-is-required-to-set)
+    * [解决没有root权限的普通用户使用vnc提示:](#解决没有root权限的普通用户使用vnc提示)
+    * [install cockpit](#install-cockpit)
 * [21,编译minisat缺少静态库，提示:](#21编译minisat缺少静态库提示)
 * [22,64位系统执行32位程序报错:缺少相关32位程序的库](#2264位系统执行32位程序报错缺少相关32位程序的库)
 * [23,安装7z解压软件](#23安装7z解压软件)
 * [24,安装sublime text最新版](#24安装sublime-text最新版)
 * [25,解决hds和vsim字体缺失问题](#25解决hds和vsim字体缺失问题)
 * [26,安装cudnn和tensorrt](#26安装cudnn和tensorrt)
-   * [install cudnn](#install-cudnn)
-   * [install tensorrt](#install-tensorrt)
+    * [install cudnn](#install-cudnn)
+    * [install tensorrt](#install-tensorrt)
 * [27,安装opencl和clinfo，这个和cuda提供的有点不同](#27安装opencl和clinfo这个和cuda提供的有点不同)
-   * [安装opencl](#安装opencl)
-   * [安装clinfo](#安装clinfo)
+    * [安装opencl](#安装opencl)
+    * [安装clinfo](#安装clinfo)
 * [28,安装opencv4](#28安装opencv4)
-   * [由于某些未知力量的原因，可能会导致opencv4某些模块下载失败，要多次进行cmake，但是这样太过费时，所以可以使用代理解决，这里以常见的失败模块IPPICV为例子](#由于某些未知力量的原因可能会导致opencv4某些模块下载失败要多次进行cmake但是这样太过费时所以可以使用代理解决这里以常见的失败模块ippicv为例子)
-   * [由于某些未知力量，face_landmark_model.dat可能会下载失败，解决办法:](#由于某些未知力量face_landmark_modeldat可能会下载失败解决办法)
+    * [由于某些未知力量的原因，可能会导致opencv4某些模块下载失败，要多次进行cmake，但是这样太过费时，所以可以使用代理解决，这里以常见的失败模块IPPICV为例子](#由于某些未知力量的原因可能会导致opencv4某些模块下载失败要多次进行cmake但是这样太过费时所以可以使用代理解决这里以常见的失败模块ippicv为例子)
+    * [由于某些未知力量，face_landmark_model.dat可能会下载失败，解决办法:](#由于某些未知力量face_landmark_modeldat可能会下载失败解决办法)
 * [29,markdown(缩写为md)文件转docx或pdf工具](#29markdown缩写为md文件转docx或pdf工具)
 * [30,ale找不到头文件的解决办法：](#30ale找不到头文件的解决办法)
-   * [对于cmake和catkin:](#对于cmake和catkin)
-   * [对于make:](#对于make)
-      * [Installation](#installation)
-      * [Usage](#usage)
+    * [对于cmake和catkin:](#对于cmake和catkin)
+    * [对于make:](#对于make)
+        * [Installation](#installation)
+        * [Usage](#usage)
 * [31,安装bazel和svlangserver和verible](#31安装bazel和svlangserver和verible)
-   * [Install bazel](#install-bazel)
-   * [Install svlangserver](#install-svlangserver)
+    * [Install bazel](#install-bazel)
+    * [Install svlangserver](#install-svlangserver)
 * [32,编译安装verilator](#32编译安装verilator)
-   * [解决verilog找不到模块问题,ale使用iverilog,verilator](#解决verilog找不到模块问题ale使用iverilogverilator)
+    * [解决verilog找不到模块问题,ale使用iverilog,verilator](#解决verilog找不到模块问题ale使用iverilogverilator)
 * [33,更改权限，方便用户进来复制文件](#33更改权限方便用户进来复制文件)
 * [34,安装virtual box6.1](#34安装virtual-box61)
 * [35,解决nfs挂载硬盘普通用户没有访问权限问题](#35解决nfs挂载硬盘普通用户没有访问权限问题)
@@ -73,15 +73,14 @@
 * [43,add shell environment variables](#43add-shell-environment-variables)
 * [compile duf to replace df](#compile-duf-to-replace-df)
 * [44,configure multiple ssh keys](#44configure-multiple-ssh-keys)
-   * [(1) execute the following commands.](#1-execute-the-following-commands)
-   * [(2) add the following content to config file.](#2-add-the-following-content-to-config-file)
-   * [(3) execute the following commands.](#3-execute-the-following-commands)
-   * [(4) add the content of id_rsa.gitee to your gitee accout.](#4-add-the-content-of-id_rsagitee-to-your-gitee-accout)
-   * [(5) add the content of id_rsa.github to your github accout.](#5-add-the-content-of-id_rsagithub-to-your-github-accout)
+    * [(1) execute the following commands.](#1-execute-the-following-commands)
+    * [(2) add the following content to config file.](#2-add-the-following-content-to-config-file)
+    * [(3) execute the following commands.](#3-execute-the-following-commands)
+    * [(4) add the content of id_rsa.gitee to your gitee accout.](#4-add-the-content-of-id_rsagitee-to-your-gitee-accout)
+    * [(5) add the content of id_rsa.github to your github accout.](#5-add-the-content-of-id_rsagithub-to-your-github-accout)
 * [45 服务器开启后再接入显示器无信号需要重启的解决方法：](#45-服务器开启后再接入显示器无信号需要重启的解决方法)
 * [46 服务器的Vivado无法识别fpga板子的解决方法：](#46-服务器的vivado无法识别fpga板子的解决方法)
-* [47 compile git](#47-compile-git)
-* [48 close pulseaudio](#48-close-pulseaudio)
+* [47 close pulseaudio](#47-close-pulseaudio)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -418,13 +417,13 @@ sudo update-alternatives --install /usr/bin/valgrind-di-server valgrind-di-serve
 sudo update-alternatives --install /usr/bin/valgrind-listener valgrind-listener /usr/local/bin/valgrind-listener 3
 ```
 
-# 15,install ripgrep(command:rg)to replace grep
-(以后可以用cargo install ripgrep代替下面的步骤,不过要先完成步骤18)
+# 15 compile git
 ```
-sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-sudo yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo
-sudo yum update
-sudo yum install ripgrep -y
+cd ~/Downloads/program
+sudo yum install docbook2X xmlto asciidoc
+git clone https://github.91chi.fun//https://github.com/git/git.git
+cd git
+sudo make prefix=/cadtools/optional_program/git238 install install-doc install-html install-info
 ```
 
 # 16,install ttf fonts and font manage tool
@@ -1205,16 +1204,7 @@ sudo ./install_drivers
 ```
 安装完成后需要重新插拔JTAG。
 
-# 47 compile git
-```
-cd ~/Downloads/program
-sudo yum install docbook2X xmlto asciidoc
-git clone https://github.91chi.fun//https://github.com/git/git.git
-cd git
-sudo make prefix=/cadtools/optional_program/git238 install install-doc install-html install-info
-```
-
-# 48 close pulseaudio
+# 47 close pulseaudio
 Our servers have no such module.
 ```
 sudo vim /etc/pulse/client.conf
