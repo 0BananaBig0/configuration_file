@@ -884,4 +884,3 @@ inoremap <silent><C-CR> <ESC>o
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
 
-

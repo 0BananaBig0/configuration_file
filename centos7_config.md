@@ -13,7 +13,7 @@
 * [7,Synchronization time](#7synchronization-time)
 * [8,Complie and install LLVM13](#8complie-and-install-llvm13)
 * [9,install zsh,omz,zinit,ksh](#9install-zshomzzinitksh)
-* [10,install fce4,neovim剪贴板,terminator,rlwrap,doxygen](#10install-fce4neovim剪贴板terminatorrlwrapdoxygen)
+* [10,install fce4,terminator,rlwrap,doxygen](#10install-fce4terminatorrlwrapdoxygen)
 * [11,install nvidia driver and cuda](#11install-nvidia-driver-and-cuda)
 * [12,install python3,pip and some python3 tools](#12install-python3pip-and-some-python3-tools)
 * [13,compile and install gdb, configure .gdbinit](#13compile-and-install-gdb-configure-gdbinit)
@@ -271,7 +271,7 @@ sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools
 sh -c "$(curl -fsSL https://git.io/zinit-install)"
 ```
 
-# 10,install fce4,neovim剪贴板,terminator,rlwrap,doxygen
+# 10,install fce4,terminator,rlwrap,doxygen
 ```
 sudo yum groupinstall Xfce -y
 sudo systemctl disable gdm
@@ -513,11 +513,14 @@ source /opt/rh/devtoolset-9/enable
 git clone https://github.91chi.fun//https://github.com/neovim/neovim
 cd neovim
 git checkout stable
+sudo yum install rh-python38 xclip
+sudo ln -s /opt/rh/rh-python38/root/usr/bin/python3.8 /usr/bin/
 sudo yum -y install ninja-build libtool autoconf automake cmake3 gcc gcc-c++ make pkgconfig unzip patch gettext curl
 make CMAKE_BUILD_TYPE=Release #repeat until success
 sudo make install
 sudo su
-python3 -m pip install neovim
+sudo python3.8 -m pip install neovim
+npm install -g neovim
 exit
 ```
 （5）分别为vim和neovim安装vim-plug(根用户和其它用户需要自己执行，这里我已为celab106_z2min执行) 
