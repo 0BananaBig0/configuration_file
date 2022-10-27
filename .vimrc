@@ -314,7 +314,8 @@ function Lazy_On_Plugin_Configuration()
                              \ :silent call plug#load('vim-fugitive')<CR>
                              \ :silent call plug#load('vim-gitgutter')<CR>
                              \ :set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>
-                             \ :set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
+                             \ :set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}<CR>
+                             \ :set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
                              \ :silent normal! ``<CR>
   let g:fugitive_no_maps = 1
   let g:gitgutter_map_keys = 0
@@ -933,4 +934,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
