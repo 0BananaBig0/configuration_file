@@ -28,7 +28,7 @@
       "--header-insertion=never",
       "--inlay-hints"
    ],
-   "coc.preferences.rootPatterns": [
+   "workspace.rootPatterns": [
       ".git",
       ".hg",
       ".projections.json",
