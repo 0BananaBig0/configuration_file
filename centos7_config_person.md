@@ -59,6 +59,7 @@ mkdir ~/.config/nvim -p
 ln -s ~/.vimrc ~/.config/nvim/init.vim
 ln -s ~/.vim/coc-settings.json ~/.config/nvim/
 mkdir ~/Downloads/program/ -p
+npm config set registry https://registry.npm.taobao.org/
 cp /home/hxliang/Downloads/program/goneovim-linux/ ~/Downloads/program/ -r
 gvim
 ```
