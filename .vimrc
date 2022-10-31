@@ -213,9 +213,9 @@ function Lazy_On_Plugin_Configuration()
   nmap <silent><Localleader>ek <plug>(coc-diagnostic-prev-error)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
-           \ 'coc-dictionary', 'coc-clangd', 'coc-yaml',
+           \ 'coc-dictionary', 'coc-yaml', 'coc-cmake',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright',
-           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-cmake']
+           \ 'coc-markdownlint', 'coc-json', 'coc-css']
 
 
 

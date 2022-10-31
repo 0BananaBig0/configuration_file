@@ -19,15 +19,34 @@
             "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
             "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
          }
+      },
+      "clangd": {
+         "command": "clangd",
+         "rootPatterns": [
+            "compile_flags.txt",
+            "compile_commands.json",
+            ".git"
+         ],
+         "filetypes": [
+            "c",
+            "cc",
+            "cpp",
+            "c++",
+            "objc",
+            "objcpp",
+            "opencl"
+         ],
+         "args": [
+            "--background-index",
+            "--completion-style=detailed",
+            "--header-insertion=never",
+            "--inlay-hints"
+         ],
+         "disabledFeatures": [
+            "diagnostics"
+         ]
       }
    },
-   "clangd.disableDiagnostics": true,
-   "clangd.arguments": [
-      "--background-index",
-      "--completion-style=detailed",
-      "--header-insertion=never",
-      "--inlay-hints"
-   ],
    "workspace.rootPatterns": [
       ".git",
       ".hg",
