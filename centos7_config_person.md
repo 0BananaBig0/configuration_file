@@ -2,14 +2,14 @@
 
 * [Note:](#note)
 * [(1) Configure vim/gvim/nvim/gnvim](#1-configure-vimgvimnvimgnvim)
-   * [1,login your account](#1login-your-account)
-   * [2,execute the following commands until it successes](#2execute-the-following-commands-until-it-successes)
-   * [3,copy configuration file from hxliang and add some configurations](#3copy-configuration-file-from-hxliang-and-add-some-configurations)
-   * [4,add the following content to your .bashrc or .zshrc](#4add-the-following-content-to-your-bashrc-or-zshrc)
-   * [5,open vim/gvim/gnvim/nvim and execute the following command:](#5open-vimgvimgnvimnvim-and-execute-the-following-command)
-   * [6,install some dependencies](#6install-some-dependencies)
-   * [7,modify .vimrc](#7modify-vimrc)
-   * [8,if you not want to use my recommended plugin. You can just do the following command](#8if-you-not-want-to-use-my-recommended-plugin-you-can-just-do-the-following-command)
+    * [1,login your account](#1login-your-account)
+    * [2,execute the following commands until it successes](#2execute-the-following-commands-until-it-successes)
+    * [3,copy configuration file from hxliang and add some configurations](#3copy-configuration-file-from-hxliang-and-add-some-configurations)
+    * [4,add the following content to your .bashrc or .zshrc](#4add-the-following-content-to-your-bashrc-or-zshrc)
+    * [5,open vim/gvim/gnvim/nvim and execute the following command:](#5open-vimgvimgnvimnvim-and-execute-the-following-command)
+    * [6,install some dependencies](#6install-some-dependencies)
+    * [7,modify .vimrc](#7modify-vimrc)
+    * [8,if you not want to use my recommended plugin. You can just do the following command](#8if-you-not-want-to-use-my-recommended-plugin-you-can-just-do-the-following-command)
 * [(2)use some new command tools to replace old command tools](#2use-some-new-command-tools-to-replace-old-command-tools)
 * [(3)add some tools](#3add-some-tools)
 * [(4)close screensaver](#4close-screensaver)
@@ -19,16 +19,16 @@
 * [(8)自己启动自己的vnc](#8自己启动自己的vnc)
 * [(9)永久切换git版本](#9永久切换git版本)
 * [(10),默认浏览器和终端不需要vpn快速链接github](#10默认浏览器和终端不需要vpn快速链接github)
-   * [也可以使用github代理](#也可以使用github代理)
+    * [也可以使用github代理](#也可以使用github代理)
 * [(11)configure gdb](#11configure-gdb)
 * [(12)use zinit, omz and zsh](#12use-zinit-omz-and-zsh)
 * [(13)add new dynamic library](#13add-new-dynamic-library)
 * [(14)configure multiple ssh keys](#14configure-multiple-ssh-keys)
-   * [1,execute the following commands.](#1execute-the-following-commands)
-   * [2,add the following content to config file.](#2add-the-following-content-to-config-file)
-   * [3,execute the following commands.](#3execute-the-following-commands)
-   * [4,add the content of id_rsa.gitee to your gitee accout.](#4add-the-content-of-id_rsagitee-to-your-gitee-accout)
-   * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
+    * [1,execute the following commands.](#1execute-the-following-commands)
+    * [2,add the following content to config file.](#2add-the-following-content-to-config-file)
+    * [3,execute the following commands.](#3execute-the-following-commands)
+    * [4,add the content of id_rsa.gitee to your gitee accout.](#4add-the-content-of-id_rsagitee-to-your-gitee-accout)
+    * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
 * [(15)服务器的Vivado无法识别fpga板子的解决方法：](#15服务器的vivado无法识别fpga板子的解决方法)
 * [(16)configure your git](#16configure-your-git)
 * [(17)install ttf fonts and font manage tool](#17install-ttf-fonts-and-font-manage-tool)
@@ -84,7 +84,7 @@ alias gnvim='~/Downloads/program/goneovim-linux/goneovim -p'
    - coc.nvim may have the same problem like iamcco/markdown-preview.nvim, you can do the same thing to solve it. -->
 ## 5,open vim/gvim/gnvim/nvim and execute the following command:
 ```
-CocInstall coc-word coc-markdownlint coc-vimlsp coc-dictionary coc-tag coc-cmake coc-sh coc-css coc-json coc-pyright coc-yaml coc-clangd coc-snippets 
+CocInstall coc-word coc-markdownlint coc-vimlsp coc-dictionary coc-tag coc-cmake coc-sh coc-css coc-json coc-pyright coc-yaml coc-snippets 
 ```
 (第一个补全选项要么直接按enter要么按了tab选择好后直接继续打代码。)
 如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱.
