@@ -31,7 +31,7 @@
 * [12,vim/gvim更换python版本支持或更换vim/gvim版本](#12vimgvim更换python版本支持或更换vimgvim版本)
 * [13,安装llvm](#13安装llvm)
     * [添加llvm源](#添加llvm源)
-* [14,ale找不到头文件的解决办法：](#14ale找不到头文件的解决办法)
+* [14,coc-nvim找不到头文件的解决办法：](#14coc-nvim找不到头文件的解决办法)
     * [对于cmake和catkin:](#对于cmake和catkin)
     * [对于make:](#对于make)
         * [Installation](#installation)
@@ -73,7 +73,7 @@
 * [41,安装bazel和svlangserver和verible](#41安装bazel和svlangserver和verible)
     * [Install bazel](#install-bazel)
     * [Install svlangserver](#install-svlangserver)
-* [42,解决verilog找不到模块问题,ale使用iverilog,verilator](#42解决verilog找不到模块问题ale使用iverilogverilator)
+* [42,解决verilog找不到模块问题,coc-nvim使用iverilog,verilator](#42解决verilog找不到模块问题coc-nvim使用iverilogverilator)
 * [43,C/C++/python debug工具以及配置.gdbinit](#43ccpython-debug工具以及配置gdbinit)
     * [configure gdb](#configure-gdb)
 * [44,如何卸载XDM](#44如何卸载xdm)
@@ -628,13 +628,13 @@ sudo update-alternatives --config clang-tidy-diff
 sudo apt install *clang*13* *llvm*13*
 ```
 
-# 14,ale找不到头文件的解决办法：
+# 14,coc-nvim找不到头文件的解决办法：
 ## 对于cmake和catkin:
 (1)把set(CMAKE_EXPORT_COMPILE_COMMANDS 1)添加到在CMakeList.txt的project语句下面然后编译,再把生成的compile_commands.json复制到工程目录；\
 (2)把build的compile_commands.json复制到工程目录；\
 (3)自己写compile_commands.json \
 (4)catkin_make -DCMAKE_EXPORT_COMPILE_COMMANDS=YES \
-(5)建立compile_commands.json硬链接/ 软连接,也可以修改.vimrc的g:ale_c_build_dir_names \
+(5)建立compile_commands.json硬链接/ 软连接 \
 (6)写compile_flags.txt \
 ## 对于make:
 为基于GNUmake的构建系统生成Clang的JSON编译数据库文件的工具。\
@@ -1110,7 +1110,7 @@ https://github.com/chipsalliance/verible  \
 看bazel官网,看imc-trading/svlangserver的github,看chipsalliance/verible的github\
 注意gcc的版本，如果切换了gcc的版本再编译会出现bug，需要删除~/.cache/bazel里面对应的文件夹重新编译才行。
 
-# 42,解决verilog找不到模块问题,ale使用iverilog,verilator
+# 42,解决verilog找不到模块问题,coc-nvim使用iverilog,verilator
 使用语法
 ```
 `include "xxx.v"
