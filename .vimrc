@@ -1,19 +1,19 @@
 "If you want to use my .vimrc, make sure your vim version is bigger than 8.1.1564
 "If you use neovim, make sure its versio is bigger than 0.5.0
 "There some depedencies you should have:
-"(1)*llvm* and *clang* , make sure their versions are bigger than 10.0,ale and coc will need them
+"(1)*llvm* and *clang* , make sure their versions are bigger than 10.0 coc will need them
 "(2)nodejs and yarn, make sure nodejs version is bigger than 12.12. coc will need them
 "Also,markdown-preview.nvim needs yarn.
 "(3)universial ctags, git clone https://github.com/universal-ctags/ctags.git
 "(4)gnu global(gtags), https://ftp.gnu.org/pub/gnu/global/
 "(5)the (3) (4) and gen_tags.vim may not be needed if you only write c/c++ and python,
-"because coc and ale can support the function so that we can jump to the
+"because coc can support the function so that we can jump to the
 "definition and reference without tags by LSP（Language Server Protocol）and better than tags.
 "(6)compiledb,python3 -m pip install compiledb. It can support compile_commands.json for clangd if
 "you use make to manage your project. If you use cmake, add set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 "to your CMakeLists.txt, that can support compile_commands.json. After the
 "compile_commands.json created, you should copy it or link it so that we can
-"find it in your root of your projece.Also you can modify the value of g:ale_c_build_dir_names in your .vimrc
+"find it in your root of your projece.
 "(7)vimplug,https://github.com/junegunn/vim-plug,this can help you manage your plugin of vim
 "(8)if you use python, you also need to execute the following commands:
 "python3 -m pip install pysnooper ipdb pylint yapf futures isort pyright
@@ -27,10 +27,11 @@
 "if your write the verilog. https://github.com/chipsalliance/verible
 "(11)install ripgrep,if you want to use 'leaderf rg' command in .vimrc . https://github.com/BurntSushi/ripgrep
 "(12)if your vim tell you that it can't find some models, you can do that
-"first, ale use iverilog or verilator check the verilog syntax
+"first, coc.nvim use iverilog or verilator check the verilog syntax
 "last,at the top of your verilog file add the following statement:
 "`include "/path/to/xxx.v"
-"ps:xxx.v must include those models which had been told that vim misses by ale
+"ps:xxx.v must include those models which had been told that vim misses by
+"coc.nvim
 "If you want to know what functions my vimrc have you should scan the .vimrc.
 "If you want to know the shortcut key, search 'map ' in the .vimrc . Or use
 ":map in normal mode
@@ -69,7 +70,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
 Plug 'luochen1990/rainbow' " 彩虹括号
 Plug 'nathanaelkane/vim-indent-guides' " 缩进显示
-Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件  build from source code by using yarn: https://yarnpkg.com
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件 动态检测语法插件,可鼠标停留显示信息
 Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}  " 文件目录插件
 Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}  " 标签窗口列表插件
 Plug 'MattesGroeger/vim-bookmarks',{'on':['BookmarkToggle','BookmarkShowAll','BookmarkAnnotate']} " 书签插件，用于写代码注解等等
@@ -89,7 +90,6 @@ Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
 Plug '0BananaBig0/verilog_indent',{'on':[]} " verilog indent file
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown实时预览插件
 Plug 'godlygeek/tabular', {'on': []} " markdown表格插件
-Plug 'dense-analysis/ale',{'on':[]}  " 动态检测语法插件,可鼠标停留显示信息
 Plug 'liuchengxu/vim-which-key', { 'on': [] } " vim快捷键管理和提示插件
 Plug 'mzlogin/vim-markdown-toc',{'on':[]} " markdown目录构建插件
 Plug 'preservim/nerdcommenter', {'on':[]} " nerdcommenter快速注释插件
@@ -167,7 +167,6 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     exec 'CocStart'
     augroup Lazy_Call_Plugin
-      autocmd FileType c,cpp,python,verilog,opencl,vim silent call plug#load('ale')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
       autocmd FileType c,cpp,cmake,opencl silent call Format_C_CPP_CMAKE()
@@ -207,10 +206,12 @@ function Lazy_On_Plugin_Configuration()
   nnoremap <silent>[c :silent call CocAction('jumpDeclaration', 'tabe')<CR>
   nnoremap <silent>[i :silent call CocAction('jumpImplementation', 'tabe')<CR>
   nnoremap <silent>[r :silent call CocAction('jumpReferences', 'tabe')<CR>
-  nmap <silent><Localleader>j <plug>(coc-diagnostic-next)
-  nmap <silent><Localleader>k <plug>(coc-diagnostic-prev)
-  nmap <silent><Localleader>ej <plug>(coc-diagnostic-next-error)
-  nmap <silent><Localleader>ek <plug>(coc-diagnostic-prev-error)
+  nmap <silent>[j <Plug>(coc-diagnostic-next)
+  nmap <silent>[k <Plug>(coc-diagnostic-prev)
+  nmap <silent><Localleader>j <Plug>(coc-diagnostic-next-error)
+  nmap <silent><Localleader>k <Plug>(coc-diagnostic-prev-error)
+  nnoremap <silent>[t :silent call CocAction('diagnosticToggleBuffer')<CR>
+  nmap <silent>[l <Plug>(coc-diagnostic-info)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake',
@@ -457,7 +458,6 @@ function Lazy_On_Plugin_Configuration()
     autocmd FileType verilog,json vmap <silent><F7> <Plug>(coc-format-selected)
     autocmd FileType markdown nmap <silent><F7> <Plug>(coc-codeaction)
     autocmd FileType markdown vmap <silent><F7> <Plug>(coc-codeaction-selected)
-    autocmd FileType python nnoremap <silent><F7> :ALEFix<CR>
   augroup END
 endfunction
 function Format_C_CPP_CMAKE()
@@ -548,71 +548,6 @@ autocmd FileType markdown nmap <silent><Localleader><F2> <Plug>MarkdownPreview
 
 
 function Lazy_Plugin_Configuration()
-  " ale setting
-  let g:ale_enabled = 0
-  " On leaving insert mode, check the file
-  let g:ale_lint_on_insert_leave = 1
-  " When this option is set to `1`, highlights will be set for problems.
-  let g:ale_set_highlights = 1
-  " 自定义error和warning图标
-  let g:ale_sign_error = '✗'
-  let g:ale_sign_warning = '⚡'
-  " 显示Linter名称,出错或警告等相关信息
-  let g:ale_echo_msg_error_str = 'E'
-  let g:ale_echo_msg_warning_str = 'W'
-  let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-  " 打开文件时进行检查
-  let g:ale_lint_on_enter = 0
-  " 普通模式下，[k前往上一个错误或警告，[j前往下一个错误或警告
-  nmap <silent>[k <Plug>(ale_previous_wrap)
-  nmap <silent>[j <Plug>(ale_next_wrap)
-  " [t触发或关闭语法检查syntax change
-  nnoremap <silent>[t :ALEToggle<CR>
-  " [l查看错误或警告的详细信息
-  nnoremap <silent>[l :ALEDetail<CR>
-  " 使用cc对c和c++进行语法检查，对python使用pylint进行语法检查
-  " 因为clangtidy和clangcheck仅在文件打开和保存时运行，所以由它们
-  " 产生的警告或者错误标记只有通过保存文件来消除.谨慎选择语法检测器，
-  " 性能不好的语法检测器会导致ale和vim-which-key造成冲突，导致写入或
-  " 退出插入模式后会卡顿，例如旧版iverilog
-  let g:ale_linters = {
-  \   'python': ['pylint'],
-  \   'verilog':['verilator'],
-  \}
-  let g:ale_linter_aliases = {'opencl': 'cpp'}
-  " disable the plist generation.
-  let g:ale_c_clangcheck_options = '-extra-arg -Xanalyzer -extra-arg -analyzer-output=text'
-  let g:ale_cpp_clangcheck_options = g:ale_c_clangcheck_options
-  let g:ale_c_clangtidy_executable = ''
-  let g:ale_cpp_clangtidy_executable = g:ale_c_clangtidy_executable
-  let g:ale_c_cc_executable = ''
-  let g:ale_cpp_cc_executable = g:ale_c_cc_executable
-  " set python3 to be default python
-  let g:ale_python_executable = 'python3'
-  let g:ale_python_pylint_use_global = 1
-  " 使coc和ale可以同时工作,01不同时工作，10同时工作
-  let g:ale_disable_lsp = 0
-  let g:ale_lsp_suggestions = 1
-  let g:ale_fixers = {
-              \ 'python': ['yapf', 'isort'],
-              \ }
-  " configure ale complete
-  let g:ale_completion_enabled = 0
-  let g:ale_completion_delay = 0
-  let g:ale_completion_max_suggestions = 6
-  set completeopt=menu,menuone,preview,noselect,noinsert
-  function! SmartInsertCompletion() abort
-    " Use the default CTRL-N in completion menus
-    if pumvisible()
-      return "\<C-n>"
-    endif
-    " Exit and re-enter insert mode, and use insert completion
-    return "\<C-c>a\<C-n>"
-  endfunction
-  inoremap <silent> <C-n> <C-R>=SmartInsertCompletion()<CR>
-
-
-
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=1
   nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
@@ -849,7 +784,7 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd FileType c,cpp,python,sh,verilog silent call Complie_Command()
 function Complie_Command()
-  " 按F2编译运行,因为ale在退出插入模式后会自动检测语法，所以编译后运行可能会自动退出结果界面
+  " 按F2编译运行
   if &filetype==?'cpp'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
                                       \ g++ % -o E%<.exe -g -lboost_program_options -lOpenCL
@@ -935,5 +870,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
 

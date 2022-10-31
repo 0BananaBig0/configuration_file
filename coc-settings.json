@@ -41,9 +41,6 @@
             "--completion-style=detailed",
             "--header-insertion=never",
             "--inlay-hints"
-         ],
-         "disabledFeatures": [
-            "diagnostics"
          ]
       }
    },
@@ -56,22 +53,21 @@
       ".root"
    ],
    "coc.preferences.jumpCommand": "edit",
-   "diagnostic.enable": true,
-   "diagnostic.displayByAle": false,
-   "diagnostic.messageTarget": "echo",
+   "diagnostic.enable": false,
    "diagnostic.errorSign": "✗ ",
-   "diagnostic.warningSign": "⚡",
+   "diagnostic.messageTarget": "echo",
    "diagnostic.virtualText": true,
+   "diagnostic.warningSign": "⚡",
+   "markdownlint.onChange": false,
    "markdownlint.onOpen": false,
    "markdownlint.onSave": false,
-   "markdownlint.onChange": false,
    "pyright.disableDiagnostics": true,
-   "suggest.selection": "recentlyUsedByPrefix",
+   "signature.target": "echo",
    "suggest.autoTrigger": "none",
+   "suggest.detailField": "preview",
    "suggest.maxCompleteItemCount": 9,
    "suggest.noselect": true,
-   "suggest.triggerAfterInsertEnter": true,
-   "suggest.detailField": "preview",
+   "suggest.selection": "recentlyUsedByPrefix",
    "suggest.snippetIndicator": "",
-   "signature.target": "echo"
+   "suggest.triggerAfterInsertEnter": true
 }

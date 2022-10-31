@@ -50,7 +50,7 @@
     * [由于某些未知力量的原因，可能会导致opencv4某些模块下载失败，要多次进行cmake，但是这样太过费时，所以可以使用代理解决，这里以常见的失败模块IPPICV为例子](#由于某些未知力量的原因可能会导致opencv4某些模块下载失败要多次进行cmake但是这样太过费时所以可以使用代理解决这里以常见的失败模块ippicv为例子)
     * [由于某些未知力量，face_landmark_model.dat可能会下载失败，解决办法:](#由于某些未知力量face_landmark_modeldat可能会下载失败解决办法)
 * [29,markdown(缩写为md)文件转docx或pdf工具](#29markdown缩写为md文件转docx或pdf工具)
-* [30,ale找不到头文件的解决办法：](#30ale找不到头文件的解决办法)
+* [30,coc.nvim找不到头文件的解决办法：](#30cocnvim找不到头文件的解决办法)
     * [对于cmake和catkin:](#对于cmake和catkin)
     * [对于make:](#对于make)
         * [Installation](#installation)
@@ -59,7 +59,7 @@
     * [Install bazel](#install-bazel)
     * [Install svlangserver](#install-svlangserver)
 * [32,编译安装verilator](#32编译安装verilator)
-    * [解决verilog找不到模块问题,ale使用iverilog,verilator](#解决verilog找不到模块问题ale使用iverilogverilator)
+    * [解决verilog找不到模块问题,coc.nvim使用iverilog,verilator](#解决verilog找不到模块问题cocnvim使用iverilogverilator)
 * [33,更改权限，方便用户进来复制文件](#33更改权限方便用户进来复制文件)
 * [34,安装virtual box6.1](#34安装virtual-box61)
 * [35,解决nfs挂载硬盘普通用户没有访问权限问题](#35解决nfs挂载硬盘普通用户没有访问权限问题)
@@ -929,13 +929,13 @@ pandoc linux.md --latex-engine=xelatex  -o linux.pdf
 pandoc linux.md -o linux.pdf
 ```
 
-# 30,ale找不到头文件的解决办法：
+# 30,coc.nvim找不到头文件的解决办法：
 ## 对于cmake和catkin:
 (1)把set(CMAKE_EXPORT_COMPILE_COMMANDS 1)添加到在CMakeList.txt的project语句下面然后编译,再把生成的compile_commands.json复制到工程目录；\
 (2)把build的compile_commands.json复制到工程目录；\
 (3)自己写compile_commands.json \
 (4)catkin_make -DCMAKE_EXPORT_COMPILE_COMMANDS=YES \
-(5)建立compile_commands.json硬链接/ 软连接,也可以修改.vimrc的g:ale_c_build_dir_names \
+(5)建立compile_commands.json硬链接/ 软连接 \
 (6)写compile_flags.txt \
 ## 对于make:
 为基于GNUmake的构建系统生成Clang的JSON编译数据库文件的工具。\
@@ -1024,7 +1024,7 @@ make
 make test
 sudo make install
 ```
-## 解决verilog找不到模块问题,ale使用iverilog,verilator
+## 解决verilog找不到模块问题,coc.nvim使用iverilog,verilator
 使用语法
 ```
 `include "xxx.v"
