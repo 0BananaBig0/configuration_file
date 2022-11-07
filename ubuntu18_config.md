@@ -315,9 +315,6 @@ sudo ln -s /usr/bin/vim /usr/bin/vi
 ## (3) compile and install neovim
 ```
 sudo apt install python3.8 -y
-sudo su
-python3.8 -m pip install neovim # if we use dpkg to install it, it requires the version of python >=3.7
-exit
 sudo apt install xclip -y
 sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen -y
 cd ~/Downloads/program
@@ -326,8 +323,11 @@ cd neovim
 git checkout stable
 make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=/usr #repeat until success
 sudo make install
-sudo npm install -g neovim
-sudo gem install neovim
+sudo su
+npm install -g neovim
+gem install neovim
+python3.8 -m pip install neovim
+exit
 ```
 ## (4)建立符号链接
 使nvim和vim共享配置,注意在判断文件类型哪里nvim不允许==两边参数存在空格,vim和nvim的set配置也不许=左右两边的参数存在空格,但是let的语法允许
