@@ -521,7 +521,10 @@ make CMAKE_BUILD_TYPE=Release #repeat until success
 sudo make install
 sudo su
 sudo python3.8 -m pip install neovim
-npm install -g neovim
+sudo npm install -g neovim
+gem sources -r https://rubygems.org/ -a https://gems.ruby-china.com/
+sudo gem sources -r https://rubygems.org/ -a https://gems.ruby-china.com/
+#sudo gem install neovim
 exit
 ```
 （5）分别为vim和neovim安装vim-plug(根用户和其它用户需要自己执行，这里我已为celab106_z2min执行) 
