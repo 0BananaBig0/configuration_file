@@ -322,13 +322,11 @@ exit
 sudo apt install xclip -y
 sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl doxygen -y
 cd ~/Downloads/program
-wget https://github.91chi.fun//https://github.com//neovim/neovim/releases/download/v0.7.2/nvim-linux64.deb
-sudo dpkg -i nvim-linux64.deb
-# git clone https://github.91chi.fun//https://github.com/neovim/neovim.git
-# cd neovim
-# git checkout stable
-# make CMAKE_BUILD_TYPE=Release #repeat until success
-# sudo make install
+git clone https://github.91chi.fun//https://github.com/neovim/neovim.git
+cd neovim
+git checkout stable
+make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=/usr #repeat until success
+sudo make install
 ```
 ## (4)建立符号链接
 使nvim和vim共享配置,注意在判断文件类型哪里nvim不允许==两边参数存在空格,vim和nvim的set配置也不许=左右两边的参数存在空格,但是let的语法允许
@@ -382,8 +380,8 @@ gdm3.css修改后
 ```
 登录界面主题目录务必放在/usr/share/plymouth/themes/(自ubuntu16后登录界面主题不再在/var文件夹里面,所以下载旧版主题时,请别直接安装。如果直接安装会导致桌面字体显示产生bug—每次开机或重启自动变小。)。\
 使用apt安装的安装的软件有：calibre(记得修改library的位置到.config/calibre/calibre_library中),nfs-common,clinfo,gnome-tweaks,smplayer, firefox,terminator,p7zip-full,rename,kazam(记得调录制麦克风以及喇叭声音的大小,降噪操作请看第47点),gtkwave,doxygen,graphviz,remmina*(注：remmina的桌面快捷方式需要先用文本编辑器打开把—connect U%删掉才能正常使用),图片编辑器gimp,goldendict(先查看第36条内容再安装) \
-源码编译安装的软件: gnu global,universal-ctags,verilator,iverilog\
-deb包安装的软件：dingding,百度云,腾讯会议\
+源码编译安装的软件: gnu global,universal-ctags,verilator,iverilog,vim,lua\
+deb包安装的软件：dingding,百度云,腾讯会议, 欧路词典，每日英语听力，easyconnect,master-pdf,网易云,nvim,tencentmeeting,wps,zhumuintl,vscode\
 ##安装ctags:
 ```
 sudo apt install -y libncurses5-dev autogen automake libjansson-dev
