@@ -718,10 +718,10 @@ func SetTitle()
     call append(line('.')+5, '')
   endif
   if &filetype==?'cpp'
-    call append(line('.')+6, '#include<iostream>')
+    call append(line('.')+6, '#include <iostream>')
     call setline(line('.')+8, '')
   elseif &filetype==?'c'
-    call append(line('.')+6, '#include<stdio.h>')
+    call append(line('.')+6, '#include <stdio.h>')
     call setline(line('.')+8, '')
   elseif &filetype==?'verilog'
     call append(line('.')+6,'module ')
