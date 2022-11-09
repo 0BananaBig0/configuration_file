@@ -70,6 +70,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
 Plug 'luochen1990/rainbow' " 彩虹括号
 Plug 'nathanaelkane/vim-indent-guides' " 缩进显示
+Plug 'liuchengxu/vim-which-key', { 'on': [] } " vim快捷键管理和提示插件
 Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件 动态检测语法插件,可鼠标停留显示信息
 Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}  " 文件目录插件
 Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}  " 标签窗口列表插件
@@ -90,7 +91,6 @@ Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
 Plug '0BananaBig0/verilog_indent',{'on':[]} " verilog indent file
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown实时预览插件
 Plug 'godlygeek/tabular', {'on': []} " markdown表格插件
-Plug 'liuchengxu/vim-which-key', { 'on': [] } " vim快捷键管理和提示插件
 Plug 'mzlogin/vim-markdown-toc',{'on':[]} " markdown目录构建插件
 Plug 'preservim/nerdcommenter', {'on':[]} " nerdcommenter快速注释插件
 Plug 'skywind3000/asyncrun.vim',{'on':[]} " 异步执行shell命令插件，如果需要打开新终端，请去github看skywind3000/asyncrun.extra插件
@@ -165,6 +165,7 @@ let g:indent_guides_default_mapping = 0
 " After 333ms, call the coc.nvim,delay the coc startup,vim-plug lazy load
 let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
+    silent call plug#load('vim-which-key')
     exec 'CocStart'
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
@@ -173,12 +174,20 @@ function! CocTimerStart(timer)
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
-    silent call plug#load('vim-which-key')
     silent call plug#load('nerdcommenter')
     silent call plug#load('asyncrun.vim')
 endfunction
 silent call timer_start(333,'CocTimerStart',{'repeat':1})
 function Lazy_On_Plugin_Configuration()
+  " vim-which-key setting
+  let g:which_key_fallback_to_native_key=1
+  nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
+  nnoremap <silent><Localleader> :WhichKey '<Localleader>'<CR>
+  nnoremap <silent>[ :WhichKey '['<CR>
+  nnoremap <silent>] :WhichKey ']'<CR>
+
+
+
   " Use tab for trigger completion with characters ahead and navigate.
   " After we select the word we needn't press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
@@ -548,15 +557,6 @@ autocmd FileType markdown nmap <silent><Localleader><F2> <Plug>MarkdownPreview
 
 
 function Lazy_Plugin_Configuration()
-  " vim-which-key setting
-  let g:which_key_fallback_to_native_key=1
-  nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
-  nnoremap <silent><Localleader> :WhichKey '<Localleader>'<CR>
-  nnoremap <silent>[ :WhichKey '['<CR>
-  nnoremap <silent>] :WhichKey ']'<CR>
-
-
-
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode
