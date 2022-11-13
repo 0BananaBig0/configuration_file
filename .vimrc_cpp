@@ -636,6 +636,7 @@ set novisualbell " 不要闪烁
 set cmdheight=2
 " 显示行号
 set number
+set relativenumber
 " merge signcolumn and number column into one
 set signcolumn=number
 " Uncomment the following to have Vim jump to the last position when reopening a file
@@ -820,4 +821,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
