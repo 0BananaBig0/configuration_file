@@ -81,6 +81,7 @@
 * [45 服务器开启后再接入显示器无信号需要重启的解决方法：](#45-服务器开启后再接入显示器无信号需要重启的解决方法)
 * [46 服务器的Vivado无法识别fpga板子的解决方法：](#46-服务器的vivado无法识别fpga板子的解决方法)
 * [47 close pulseaudio](#47-close-pulseaudio)
+* [48 install wps](#48-install-wps)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1224,4 +1225,9 @@ If we want to use it, execute the following command
 ```
 systemctl --user start pulseaudio.socket
 systemctl --user start pulseaudio.service
+```
+# 48 install wps
+```
+cd ~/Downloads/program
+sudo rpm -ivh wps-office-11.1.0.11664-1.x86_64.rpm
 ```
