@@ -195,8 +195,8 @@ sudo yum install -y git rh-git227
 ```
 #add the following content to your .bashrc or .zshrc
 ```
-if [ -f "/opt/rh/devtoolset-7/enable" ]; then
-  source /opt/rh/devtoolset-7/enable #or scl enable devtoolset-7 bash #only for .bashrc 
+if [ -f "/opt/rh/rh-git227/enable" ]; then
+  source /opt/rh/rh-git227/enable
 fi
 ```
 #execute the following command
@@ -1235,9 +1235,15 @@ sudo rpm -ivh wps-office-11.1.0.11664-1.x86_64.rpm
 
 # 49 configure perl LSP
 ```
-sudo yum install libdb4-cxx.x86_64 cpan
+sudo yum install libdb4-cxx.x86_64 cpan rh-perl530
 sudo su
 cpan YAML #sudo
 cpan Perl::LanguageServer #sudo
 exit
+```
+```
+#add the following content to your .bashrc or .zshrc
+if [ -f "/opt/rh/rh-perl530/enable" ]; then
+  source /opt/rh/rh-perl530/enable #or scl enable rh-perl530 bash #only for .bashrc 
+fi
 ```
