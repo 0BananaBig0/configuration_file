@@ -1237,6 +1237,7 @@ sudo rpm -ivh wps-office-11.1.0.11664-1.x86_64.rpm
 ```
 sudo yum install libdb4-cxx.x86_64 cpan
 sudo su
+cpan YAML #sudo
 cpan Perl::LanguageServer #sudo
 exit
 ```
