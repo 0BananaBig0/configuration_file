@@ -82,6 +82,7 @@
 * [46 服务器的Vivado无法识别fpga板子的解决方法：](#46-服务器的vivado无法识别fpga板子的解决方法)
 * [47 close pulseaudio](#47-close-pulseaudio)
 * [48 install wps](#48-install-wps)
+* [49 configure perl LSP](#49-configure-perl-lsp)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1230,4 +1231,12 @@ systemctl --user start pulseaudio.service
 ```
 cd ~/Downloads/program
 sudo rpm -ivh wps-office-11.1.0.11664-1.x86_64.rpm
+```
+
+# 49 configure perl LSP
+```
+sudo yum install libdb4-cxx.x86_64 cpan
+sudo su
+cpan Perl::LanguageServer #sudo
+exit
 ```
