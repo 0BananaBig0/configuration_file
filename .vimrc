@@ -224,7 +224,7 @@ function Lazy_On_Plugin_Configuration()
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake',
-           \ 'coc-vimlsp', 'coc-sh', 'coc-pyright',
+           \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl',
            \ 'coc-markdownlint', 'coc-json', 'coc-css']
 
 
@@ -463,10 +463,9 @@ function Lazy_On_Plugin_Configuration()
 
   " autoformat setting
   augroup Lazy_Call_Format
-    autocmd FileType verilog,json nmap <silent><F7> <Plug>(coc-format)
-    autocmd FileType verilog,json vmap <silent><F7> <Plug>(coc-format-selected)
-    autocmd FileType markdown nmap <silent><F7> <Plug>(coc-codeaction)
-    autocmd FileType markdown vmap <silent><F7> <Plug>(coc-codeaction-selected)
+    autocmd FileType verilog,json,perl nmap <silent><F7> <Plug>(coc-format)
+    autocmd FileType verilog,json,perl xmap <silent><F7> <Plug>(coc-format-selected)
+    autocmd FileType verilog,json,c,cpp,opencl,perl nmap <silent>[<F7> <Plug>(coc-fix-current)
   augroup END
 endfunction
 function Format_C_CPP_CMAKE()
@@ -871,3 +870,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
