@@ -782,7 +782,7 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 键盘命令
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType c,cpp,python,sh,verilog silent call Complie_Command()
+autocmd FileType c,cpp,python,sh,verilog,perl silent call Complie_Command()
 function Complie_Command()
   " 按F2编译运行
   if &filetype==?'cpp'
@@ -807,6 +807,8 @@ function Complie_Command()
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
                                       \ iverilog *.v -o %<.vcd
                                       \ && vvp %<.vcd <CR>
+  elseif &filetype==?'perl'
+    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 perl % <CR>
   endif
 endfunction
 " Toggle Menu and Toolbar菜单栏和工具栏
@@ -870,4 +872,5 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
 
