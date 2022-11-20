@@ -171,9 +171,9 @@ function! CocTimerStart(timer)
       autocmd FileType markdown silent call plug#load('tabular')
       autocmd FileType c,cpp,cmake,opencl silent call Format_C_CPP_CMAKE()
     augroup END
-    silent call plug#load('vim-which-key')
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
+    silent call plug#load('vim-which-key')
     silent call plug#load('nerdcommenter')
     silent call plug#load('asyncrun.vim')
 endfunction
