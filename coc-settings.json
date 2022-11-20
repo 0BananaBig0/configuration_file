@@ -1,25 +1,5 @@
 {
    "languageserver": {
-      "svlangserver": {
-         "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
-         "filetypes": [
-            "systemverilog",
-            "vhdl",
-            "verilog"
-         ],
-         "settings": {
-            "systemverilog.includeIndexing": [
-               "**/*.{v,sv,svh}"
-            ],
-            "systemverilog.excludeIndexing": [
-               "test/**/*.sv*"
-            ],
-            "systemverilog.defines": [],
-            "systemverilog.disableLinting": true,
-            "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
-            "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
-         }
-      },
       "clangd": {
          "command": "clangd",
          "rootPatterns": [
@@ -42,6 +22,26 @@
             "--header-insertion=never",
             "--inlay-hints"
          ]
+      },
+      "svlangserver": {
+         "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
+         "filetypes": [
+            "systemverilog",
+            "vhdl",
+            "verilog"
+         ],
+         "settings": {
+            "systemverilog.includeIndexing": [
+               "**/*.{v,sv,svh}"
+            ],
+            "systemverilog.excludeIndexing": [
+               "test/**/*.sv*"
+            ],
+            "systemverilog.defines": [],
+            "systemverilog.disableLinting": true,
+            "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
+            "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
+         }
       }
    },
    "workspace.rootPatterns": [
