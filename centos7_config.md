@@ -180,12 +180,14 @@ fi
 系统永久更换gcc版本
 ```
 sudo su
-vim /etc/profile 
+vim /etc/profile /etc/bashrc
 #在这个文件添加后会导致omz的ZSH_CACHE_DIRECTORY环境变量切换出现问题。
 ```
-在这个文件添加如下内容
+在这两个文件添加如下内容
 ```
-source /opt/rh/devtoolset-9/enable #or scl enable devtoolset-9 bash #only for .bashrc 
+if [ -f "/opt/rh/devtoolset-9/enable" ]; then
+  source /opt/rh/devtoolset-9/enable #or scl enable devtoolset-9 bash #only for .bashrc 
+fi
 ```
 
 # 6,install different verisons and config git
@@ -212,11 +214,13 @@ git config --global diff.tool gvimdiff
 系统永久更换git版本
 ```
 sudo su
-vim /etc/profile
+vim /etc/profile /etc/bashrc
 ```
-在这个文件添加如下内容
+在这两个文件添加如下内容
 ```
-source /opt/rh/rh-git227/enable #temporary, if want to make it to become permanent, add it to your .zshrc or .bashrc
+if [ -f "/opt/rh/rh-git227/enable" ]; then
+  source /opt/rh/rh-git227/enable
+fi
 ```
 
 # 7,Synchronization time
@@ -1229,7 +1233,7 @@ systemctl --user start pulseaudio.service
 
 # 48 configure perl LSP
 ```
-sudo yum install libdb4-cxx.x86_64 cpan rh-perl530
+sudo yum install libdb4-cxx.x86_64 cpan rh-perl530*
 sudo su
 cpan YAML #sudo
 cpan Perl::LanguageServer #sudo
@@ -1239,6 +1243,17 @@ exit
 ```
 ```
 #add the following content to your .bashrc or .zshrc
+if [ -f "/opt/rh/rh-perl530/enable" ]; then
+  source /opt/rh/rh-perl530/enable #or scl enable rh-perl530 bash #only for .bashrc 
+fi
+```
+系统永久更换perl版本
+```
+sudo su
+vim /etc/profile /etc/bashrc
+```
+在这两个文件添加如下内容
+```
 if [ -f "/opt/rh/rh-perl530/enable" ]; then
   source /opt/rh/rh-perl530/enable #or scl enable rh-perl530 bash #only for .bashrc 
 fi
