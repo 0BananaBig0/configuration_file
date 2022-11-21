@@ -1233,6 +1233,8 @@ sudo yum install libdb4-cxx.x86_64 cpan rh-perl530
 sudo su
 cpan YAML #sudo
 cpan Perl::LanguageServer #sudo
+cpan Excel::Writer::XLSX
+cpan install CPAN
 exit
 ```
 ```

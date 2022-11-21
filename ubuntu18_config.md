@@ -1772,5 +1772,7 @@ virt-manager
 sudo apt install libdb-dev
 sudo su
 cpan Perl::LanguageServer #sudo
+cpan Excel::Writer::XLSX
+cpan install CPAN
 exit
 ```
