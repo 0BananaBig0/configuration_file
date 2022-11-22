@@ -1774,5 +1774,6 @@ sudo su
 cpan Perl::LanguageServer #sudo
 cpan Excel::Writer::XLSX
 cpan install CPAN
+cpan Spreadsheet::Read Spreadsheet::Write
 exit
 ```
