@@ -1240,8 +1240,8 @@ cpan Perl::LanguageServer #sudo
 cpan Excel::Writer::XLSX
 cpan install CPAN
 cpan App::cpanminus
-cpan Spreadsheet::ParseExcel Spreadsheet::XLSX
-cpanm --uninstall Spreadsheet::Read Spreadsheet::Write
+cpan Spreadsheet::ParseExcel Spreadsheet::ParseXLSX
+cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
 exit
 ```
 ```
