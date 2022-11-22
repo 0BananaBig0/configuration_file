@@ -1772,10 +1772,10 @@ virt-manager
 sudo apt install libdb-dev
 sudo su
 cpan Perl::LanguageServer #sudo
-cpan Excel::Writer::XLSX
 cpan install CPAN
 cpan App::cpanminus
-cpan Spreadsheet::ParseExcel Spreadsheet::ParseXLSX
+cpan Spreadsheet::ParseExcel Spreadsheet::WriteExcel #for xls
+cpan Excel::Writer::XLSX Spreadsheet::ParseXLSX #for xlsx
 cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
 exit
 ```
