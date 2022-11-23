@@ -169,7 +169,7 @@ function! CocTimerStart(timer)
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-      autocmd FileType c,cpp,cmake,opencl silent call Format_C_CPP_CMAKE()
+      autocmd FileType c,cpp,cmake,opencl,perl silent call NEOFORMAT()
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
@@ -463,12 +463,11 @@ function Lazy_On_Plugin_Configuration()
 
   " autoformat setting
   augroup Lazy_Call_Format
-    autocmd FileType verilog,json,perl nmap <silent><F7> <Plug>(coc-format)
-    autocmd FileType verilog,json,perl xmap <silent><F7> <Plug>(coc-format-selected)
-    autocmd FileType verilog,json,c,cpp,opencl,perl nmap <silent>[<F7> <Plug>(coc-fix-current)
+    autocmd FileType verilog,json nmap <silent><F7> <Plug>(coc-format)
+    autocmd FileType verilog,json xmap <silent><F7> <Plug>(coc-format-selected)
   augroup END
 endfunction
-function Format_C_CPP_CMAKE()
+function NEOFORMAT()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
@@ -518,6 +517,12 @@ function Format_C_CPP_CMAKE()
             \ SpaceBeforeRangeBasedForLoopColon: false,
             \ BitFieldColonSpacing: After,
             \ TabWidth: 3}"'],
+            \ 'stdin': 1,
+            \ }
+  let g:neoformat_perl_perltidy = {
+            \ 'exe': 'perltidy',
+            \ 'args': ['-i=3'],
+            \ 'stdin': 1,
             \ }
   let g:neoformat_c_clangformat = g:neoformat_cpp_clangformat
   let g:neoformat_opencl_clangformat = g:neoformat_cpp_clangformat
@@ -872,5 +877,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
-
