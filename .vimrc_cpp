@@ -733,7 +733,7 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 键盘命令
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType c,cpp,python,sh,verilog silent call Complie_Command()
+autocmd FileType,BufLeave c,cpp,python,sh,verilog silent call Complie_Command()
 function Complie_Command()
   " 按F2编译运行
   if &filetype==?'cpp'
