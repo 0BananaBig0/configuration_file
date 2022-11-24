@@ -793,8 +793,8 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 键盘命令
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType,BufLeave c,cpp,python,sh,verilog,perl silent call Complie_Command()
-function Complie_Command()
+autocmd FileType,BufLeave c,cpp,python,sh,verilog,perl silent call Compile_Command()
+function Compile_Command()
   " 按F2编译运行
   if &filetype==?'cpp'
     nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
@@ -841,14 +841,14 @@ nnoremap <silent><Localleader>t :tabnew<CR>
 " alt+n跳到第n个tab，0<n<10
 function! TabPos_ActivateBuffer(num)
     let s:count = a:num
-    exe 'tabfirst'
-    exe 'tabnext' s:count
+    exec 'tabfirst'
+    exec 'tabnext' s:count
 endfunction
 function! TabPos_Initialize()
 for i in range(1, 9)
-        exe 'noremap <silent><M-' . i . '> :silent call TabPos_ActivateBuffer(' . i . ')<CR>'
+        exec 'noremap <silent><M-' . i . '> :silent call TabPos_ActivateBuffer(' . i . ')<CR>'
     endfor
-    exe 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
+    exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
 if has('nvim')
   autocmd UIEnter * silent call TabPos_Initialize()
