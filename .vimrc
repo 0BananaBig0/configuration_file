@@ -169,7 +169,7 @@ function! CocTimerStart(timer)
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-      autocmd FileType c,cpp,cmake,opencl,perl,verilog silent call NEOFORMAT()
+      autocmd FileType c,cpp,cmake,opencl,perl,verilog silent call Neoformat_Lazy_Setting()
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
@@ -178,7 +178,7 @@ function! CocTimerStart(timer)
     silent call plug#load('asyncrun.vim')
 endfunction
 silent call timer_start(333,'CocTimerStart',{'repeat':1})
-function Lazy_On_Plugin_Configuration()
+function! Lazy_On_Plugin_Configuration()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=1
   nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
@@ -414,7 +414,7 @@ function Lazy_On_Plugin_Configuration()
     23wincmd _
     nunmenu WinBar
   endfunction
-  function s:SetUpTerminal()
+  function! s:SetUpTerminal()
     call win_gotoid( g:vimspector_session_windows.terminal )
     3wincmd |
   endfunction
@@ -467,7 +467,7 @@ function Lazy_On_Plugin_Configuration()
     autocmd FileType json xmap <silent><F7> <Plug>(coc-format-selected)
   augroup END
 endfunction
-function NEOFORMAT()
+function! Neoformat_Lazy_Setting()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
@@ -560,7 +560,7 @@ autocmd FileType markdown nmap <silent><Localleader><F2> <Plug>MarkdownPreview
 
 
 
-function Lazy_Plugin_Configuration()
+function! Lazy_Plugin_Configuration()
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode
@@ -793,33 +793,36 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 键盘命令
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType,BufLeave c,cpp,python,sh,verilog,perl silent call Compile_Command()
-function Compile_Command()
-  " 按F2编译运行
+autocmd FileType c,cpp,python,sh,verilog,perl nnoremap <silent><Localleader><F2> :silent call Compile_And_Excute()<CR>
+autocmd FileType c,cpp,python,sh,verilog,perl nnoremap <silent><Leader><F2> :silent call Compile_Command()<CR>
+function! Compile_And_Excute()
   if &filetype==?'cpp'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
-                                      \ g++ % -o E%<.exe -g -lboost_program_options -lOpenCL
-                                      \ && ./E%<.exe <CR>
-    nnoremap <silent><Leader><F2> :AsyncRun! -save=1
-                                 \ g++ % -o E%<.exe -g -lboost_program_options -lOpenCL<CR>
-    nnoremap <silent><Localleader><Leader> :w<CR>:AsyncRun! -save=1 make<CR>
+    exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
   elseif &filetype==?'c'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
-                                      \ gcc % -o E%<.exe -g -lOpenCL
-                                      \ && ./E%<.exe <CR>
-    nnoremap <silent><Leader><F2> :AsyncRun! -save=1
-                                      \ gcc % -o E%<.exe -g -lOpenCL<CR>
-    nnoremap <silent><Localleader><Leader> :w<CR>:AsyncRun! -save=1 make<CR>
+    exec ':AsyncRun! -save=1 gcc % -o E%<.exe -g -lOpenCL && ./E%<.exe'
   elseif &filetype==?'python'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 python3 % <CR>
+    exec ':AsyncRun! -save=1 python3 %'
   elseif &filetype==?'sh'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 ./% <CR>
+    exec ':AsyncRun! -save=1 ./%'
   elseif &filetype==?'verilog'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1
-                                      \ iverilog *.v -o %<.vcd
-                                      \ && vvp %<.vcd <CR>
+    exec ':AsyncRun! -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
   elseif &filetype==?'perl'
-    nnoremap <silent><Localleader><F2> :AsyncRun! -save=1 perl % <CR>
+    exec ':AsyncRun! -save=1 perl %'
+  endif
+endfunction
+function! Compile_Command()
+  if &filetype==?'cpp'
+    exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL'
+  elseif &filetype==?'c'
+    exec ':AsyncRun! -save=1 gcc % -o E%<.exe -g -lOpenCL'
+  elseif &filetype==?'python'
+    exec ':AsyncRun! -save=1 python3 %'
+  elseif &filetype==?'sh'
+    exec ':AsyncRun! -save=1 ./%'
+  elseif &filetype==?'verilog'
+    exec ':AsyncRun! -save=1 iverilog *.v -o %<.vcd'
+  elseif &filetype==?'perl'
+    exec ':AsyncRun! -save=1 perl %'
   endif
 endfunction
 " Toggle Menu and Toolbar菜单栏和工具栏
@@ -883,4 +886,3 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
