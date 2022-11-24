@@ -752,17 +752,23 @@ set incsearch
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 新文件标题
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl exec ':call SetTitle()'
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl,*.pl exec ':call SetTitle()'
 func SetTitle()
-  if &filetype==?'sh'
+  if &filetype==?'sh' || &filetype==?'perl'
     call setline(1,'#########################################################################')
     call append(line('.'), '# File Name: '.expand('%'))
     call append(line('.')+1, '# Author: 16hxliang3')
     call append(line('.')+2, '# mail: 16hxliang3@stu.edu.cn')
     call append(line('.')+3, '# Created Time: '.strftime('%c'))
     call append(line('.')+4, '#########################################################################')
-    call append(line('.')+5, '#!/bin/bash')
-    call append(line('.')+6, '')
+    if &filetype==?'sh'
+       call append(line('.')+5, '#!/bin/bash')
+    else
+       call append(line('.')+5, '#!/bin/perl')
+       call append(line('.')+6, 'use strict;')
+       call append(line('.')+7, 'use warnings;')
+    endif
+    call append(line('.')+8, '')
   else
     call setline(1, '/*************************************************************************')
     call append(line('.'), '  > File Name: '.expand('%'))
@@ -877,3 +883,4 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
