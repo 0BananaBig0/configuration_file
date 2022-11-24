@@ -24,6 +24,10 @@
          ]
       },
       "svlangserver": {
+         "command": "svlangserver",
+         "rootPatterns": [
+            ".git"
+         ],
          "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
          "filetypes": [
             "systemverilog",
@@ -38,7 +42,6 @@
                "test/**/*.sv*"
             ],
             "systemverilog.defines": [],
-            "systemverilog.disableLinting": true,
             "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
             "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
          }
@@ -61,7 +64,6 @@
    "markdownlint.onChange": false,
    "markdownlint.onOpen": false,
    "markdownlint.onSave": false,
-   "pyright.disableDiagnostics": true,
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.detailField": "preview",
