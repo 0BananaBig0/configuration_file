@@ -721,7 +721,7 @@ set incsearch
 " 新文件标题
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup Local_Autocmd_Group
-  autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl,*.pl exec ':call SetTitle()'
+  autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl
            \ nnoremap <silent><Localleader><F2>
            \ :silent call Compile_And_Excute()<CR>
@@ -738,11 +738,11 @@ augroup Local_Autocmd_Group
   endif
 augroup END
 func SetTitle()
-  if &filetype==?'sh' || &filetype==?'perl'
+  if &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
     call setline(1,'#########################################################################')
     call append(line('.'), '# File Name: '.expand('%'))
-    call append(line('.')+1, '# Author: 16hxliang3')
-    call append(line('.')+2, '# mail: 16hxliang3@stu.edu.cn')
+    call append(line('.')+1, '# Author: LiangHuaxiao')
+    call append(line('.')+2, '# mail: 1184903633@qq.com')
     call append(line('.')+3, '# Created Time: '.strftime('%c'))
     call append(line('.')+4, '#########################################################################')
     if &filetype==?'sh'
@@ -756,8 +756,8 @@ func SetTitle()
   else
     call setline(1, '/*************************************************************************')
     call append(line('.'), '  > File Name: '.expand('%'))
-    call append(line('.')+1, '  > Author: 16hxliang3')
-    call append(line('.')+2, '  > Mail: 16hxliang3@stu.edu.cn ')
+    call append(line('.')+1, '  > Author: LiangHuaxiao')
+    call append(line('.')+2, '  > Mail: 1184903633@qq.com')
     call append(line('.')+3, '  > Created Time: '.strftime('%c'))
     call append(line('.')+4, ' ************************************************************************/')
     call append(line('.')+5, '')
