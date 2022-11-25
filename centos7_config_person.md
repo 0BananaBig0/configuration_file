@@ -51,7 +51,7 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 ## 3,copy configuration file from hxliang and add some configurations
 ```
 cd ~
-cp /home/hxliang/.vimrc_cpp ~/.vimrc
+cp /home/hxliang/.vimrc ~/.vimrc
 cp /home/hxliang/.vim/.vimspectorjson ~/.vim -r
 cp /home/hxliang/.vim/coc-settings.json ~/.vim
 cp /home/hxliang/.config/goneovim ~/.config/ -r
@@ -74,18 +74,14 @@ If Updating plugin failes, you may need to go to the ~/.vim/plugged/the_name_of_
 # the gui of neovim
 alias gnvim='~/Downloads/program/goneovim-linux/goneovim -p'
 ```
-<!-- ## 5,open vim/gvim/gnvim/nvim and execute the following command:
-   - ```
-   - PlugInstall
-   - ```
-   - If you can success in downloading the plugin, retry it until all plugin has been downloaded.\
-   - Maybe iamcco/markdown-preview.nvim will have some problem, when you open md file and press key F2, you have to uninstall
-   - iamcco/markdown-preview.nvim and download it again. If it downloaded failed, close vim/gvim/nvim and open vim/gvim/nvim againg then download it again.Redo it until it can download successfully.\
-   - coc.nvim may have the same problem like iamcco/markdown-preview.nvim, you can do the same thing to solve it. -->
 ## 5,open vim/gvim/gnvim/nvim and execute the following command:
 ```
-CocInstall coc-word coc-markdownlint coc-vimlsp coc-dictionary coc-tag coc-cmake coc-sh coc-css coc-json coc-pyright coc-yaml coc-snippets 
+PlugInstall
 ```
+If you can success in downloading the plugin, retry it until all plugin has been downloaded.\
+Maybe iamcco/markdown-preview.nvim will have some problem, when you open md file and press key F2, you have to uninstall
+iamcco/markdown-preview.nvim and download it again. If it downloaded failed, close vim/gvim/nvim and open vim/gvim/nvim againg then download it again.Redo it until it can download successfully.\
+coc.nvim may have the same problem like iamcco/markdown-preview.nvim, you can do the same thing to solve it.
 (第一个补全选项要么直接按enter要么按了tab选择好后直接继续打代码。)
 如果想添加coc的补全拥有机械学习能力请参考coc-tabnine,缺点：耗内存和GPU,可能要钱.
 ## 6,install some dependencies
