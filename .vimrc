@@ -106,37 +106,6 @@ set guicursor+=a:blinkon0
 nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
                            \ :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 23<CR>
                            \ :IndentGuidesDisable<CR>
-autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
-function! Show_Current_Module()
-  let module_line = search('module','bnWz')
-  let module_name = getline(module_line)
-  let module_end_poisition = strridx(module_name,'(')
-  if(module_end_poisition > 0)
-    let module_name = strpart(module_name,0,module_end_poisition)
-  endif
-  let module_name = strpart(module_name,stridx(module_name,'module')+7)
-  while(strpart(module_name, 0 , 1) ==? ' ')
-    let module_name = strpart(module_name,1)
-  endwhile
-  echo 'module -->' module_name
-endfunction
-autocmd FileType c,cpp nnoremap <silent><Leader>` :call Show_Nearest_Class_Or_Struct()<CR>
-function! Show_Nearest_Class_Or_Struct()
-  let class_line = search('\n'.'class','bnWz')
-  let struct_line = search('\n'.'struct','bnWz')
-  if(class_line > struct_line)
-    let nearest_name = getline(class_line+1)
-  elseif(class_line < struct_line)
-    let nearest_name = getline(struct_line+1)
-  else
-    let nearest_name = 'No class/struct can be find.'
-  endif
-  let nearest_end_poisition = strridx(nearest_name,'{')
-  if(nearest_end_poisition > 0)
-    let nearest_name = strpart(nearest_name,0,nearest_end_poisition)
-  endif
-  echo nearest_name
-endfunction
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
@@ -752,7 +721,23 @@ set incsearch
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 新文件标题
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl,*.pl exec ':call SetTitle()'
+augroup Local_Autocmd_Group
+  autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl,*.pl exec ':call SetTitle()'
+  autocmd FileType c,cpp,python,sh,verilog,perl,tcl
+           \ nnoremap <silent><Localleader><F2>
+           \ :silent call Compile_And_Excute()<CR>
+  autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
+           \ :silent call Compile_Command()<CR>
+  autocmd FileType vim nnoremap <silent><Localleader><F2>
+           \ :source ~/.vimrc<CR>
+  autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
+  autocmd FileType c,cpp nnoremap <silent><Leader>` :call Show_Nearest_Class_Or_Struct()<CR>
+  if has('nvim')
+    autocmd UIEnter * silent call TabPos_Initialize()
+  else
+    autocmd GUIEnter * silent call TabPos_Initialize()
+  endif
+augroup END
 func SetTitle()
   if &filetype==?'sh' || &filetype==?'perl'
     call setline(1,'#########################################################################')
@@ -793,9 +778,7 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 键盘命令
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType c,cpp,python,sh,verilog,perl nnoremap <silent><Localleader><F2> :silent call Compile_And_Excute()<CR>
-autocmd FileType c,cpp,python,sh,verilog,perl nnoremap <silent><Leader><F2> :silent call Compile_Command()<CR>
-function! Compile_And_Excute()
+function Compile_And_Excute()
   if &filetype==?'cpp'
     exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
   elseif &filetype==?'c'
@@ -808,6 +791,8 @@ function! Compile_And_Excute()
     exec ':AsyncRun! -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
   elseif &filetype==?'perl'
     exec ':AsyncRun! -save=1 perl %'
+  elseif &filetype==?'tcl'
+    exec ':AsyncRun! -save=1 tclsh %'
   endif
 endfunction
 function! Compile_Command()
@@ -815,15 +800,50 @@ function! Compile_Command()
     exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL'
   elseif &filetype==?'c'
     exec ':AsyncRun! -save=1 gcc % -o E%<.exe -g -lOpenCL'
-  elseif &filetype==?'python'
-    exec ':AsyncRun! -save=1 python3 %'
-  elseif &filetype==?'sh'
-    exec ':AsyncRun! -save=1 ./%'
   elseif &filetype==?'verilog'
     exec ':AsyncRun! -save=1 iverilog *.v -o %<.vcd'
-  elseif &filetype==?'perl'
-    exec ':AsyncRun! -save=1 perl %'
   endif
+endfunction
+function! Show_Current_Module()
+  let module_line = search('module','bnWz')
+  let module_name = getline(module_line)
+  let module_end_poisition = strridx(module_name,'(')
+  if(module_end_poisition > 0)
+    let module_name = strpart(module_name,0,module_end_poisition)
+  endif
+  let module_name = strpart(module_name,stridx(module_name,'module')+7)
+  while(strpart(module_name, 0 , 1) ==? ' ')
+    let module_name = strpart(module_name,1)
+  endwhile
+  echo 'module -->' module_name
+endfunction
+function! Show_Nearest_Class_Or_Struct()
+  let class_line = search('\n'.'class','bnWz')
+  let struct_line = search('\n'.'struct','bnWz')
+  if(class_line > struct_line)
+    let nearest_name = getline(class_line+1)
+  elseif(class_line < struct_line)
+    let nearest_name = getline(struct_line+1)
+  else
+    let nearest_name = 'No class/struct can be find.'
+  endif
+  let nearest_end_poisition = strridx(nearest_name,'{')
+  if(nearest_end_poisition > 0)
+    let nearest_name = strpart(nearest_name,0,nearest_end_poisition)
+  endif
+  echo nearest_name
+endfunction
+" alt+n跳到第n个tab，0<n<10
+function! TabPos_ActivateBuffer(num)
+    let s:count = a:num
+    exec 'tabfirst'
+    exec 'tabnext' s:count
+endfunction
+function! TabPos_Initialize()
+for i in range(1, 9)
+        exec 'noremap <silent><M-' . i . '> :silent call TabPos_ActivateBuffer(' . i . ')<CR>'
+    endfor
+    exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
 " Toggle Menu and Toolbar菜单栏和工具栏
 if has('gui_running')
@@ -841,23 +861,6 @@ if has('gui_running')
   endfunction
 endif
 nnoremap <silent><Localleader>t :tabnew<CR>
-" alt+n跳到第n个tab，0<n<10
-function! TabPos_ActivateBuffer(num)
-    let s:count = a:num
-    exec 'tabfirst'
-    exec 'tabnext' s:count
-endfunction
-function! TabPos_Initialize()
-for i in range(1, 9)
-        exec 'noremap <silent><M-' . i . '> :silent call TabPos_ActivateBuffer(' . i . ')<CR>'
-    endfor
-    exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
-endfunction
-if has('nvim')
-  autocmd UIEnter * silent call TabPos_Initialize()
-else
-  autocmd GUIEnter * silent call TabPos_Initialize()
-endif
 nnoremap <silent><Localleader>b :silent call Close_and_Back_Tab()<CR>
 function! Close_and_Back_Tab()
   exec 'tabp'
@@ -886,3 +889,5 @@ inoremap <silent><C-CR> <ESC>o
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
+
