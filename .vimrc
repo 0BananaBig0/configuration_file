@@ -747,11 +747,11 @@ func SetTitle()
     call append(line('.')+4, '#########################################################################')
     if &filetype==?'sh'
        call append(line('.')+5, '#!/bin/bash')
-    else
+    elseif
        call append(line('.')+5, '#!/bin/perl')
        call append(line('.')+6, 'use strict;')
        call append(line('.')+7, 'use warnings;')
-    endif
+    endif &filetype==?'perl'
     call append(line('.')+8, '')
   else
     call setline(1, '/*************************************************************************')
