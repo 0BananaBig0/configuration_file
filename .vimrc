@@ -762,7 +762,7 @@ function! SetTitle()
     call append(line('$'), ' ************************************************************************/')
     call append(line('$'), '')
   endif
-  if &filetype==?'cpp' && expand('%')==?'cpp'
+  if &filetype==?'cpp' && expand('%:e')==?'cpp'
     call append(line('$'), '#include <iostream>')
     call append(line('$'), '')
   elseif &filetype==?'c'
