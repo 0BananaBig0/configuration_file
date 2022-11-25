@@ -721,7 +721,7 @@ set incsearch
 " 新文件标题
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup Local_Autocmd_Group
-  autocmd BufNewFile *.cpp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
+  autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl
            \ nnoremap <silent><Localleader><F2>
            \ :silent call Compile_And_Excute()<CR>
@@ -737,39 +737,39 @@ augroup Local_Autocmd_Group
     autocmd GUIEnter * silent call TabPos_Initialize()
   endif
 augroup END
-func SetTitle()
+function! SetTitle()
   if &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
     call setline(1,'#########################################################################')
-    call append(line('.'), '# File Name: '.expand('%'))
-    call append(line('.')+1, '# Author: LiangHuaxiao')
-    call append(line('.')+2, '# mail: 1184903633@qq.com')
-    call append(line('.')+3, '# Created Time: '.strftime('%c'))
-    call append(line('.')+4, '#########################################################################')
+    call append(line('$'), '# File Name: '.expand('%'))
+    call append(line('$'), '# Author: LiangHuaxiao')
+    call append(line('$'), '# mail: 1184903633@qq.com')
+    call append(line('$'), '# Created Time: '.strftime('%c'))
+    call append(line('$'), '#########################################################################')
     if &filetype==?'sh'
-       call append(line('.')+5, '#!/bin/bash')
-    elseif
-       call append(line('.')+5, '#!/bin/perl')
-       call append(line('.')+6, 'use strict;')
-       call append(line('.')+7, 'use warnings;')
-    endif &filetype==?'perl'
-    call append(line('.')+8, '')
+      call append(line('$'), '#!/bin/bash')
+    elseif &filetype==?'perl'
+      call append(line('$'), '#!/bin/perl')
+      call append(line('$'), 'use strict;')
+      call append(line('$'), 'use warnings;')
+    endif
+    call append(line('$'), '')
   else
     call setline(1, '/*************************************************************************')
-    call append(line('.'), '  > File Name: '.expand('%'))
-    call append(line('.')+1, '  > Author: LiangHuaxiao')
-    call append(line('.')+2, '  > Mail: 1184903633@qq.com')
-    call append(line('.')+3, '  > Created Time: '.strftime('%c'))
-    call append(line('.')+4, ' ************************************************************************/')
-    call append(line('.')+5, '')
+    call append(line('$'), '  > File Name: '.expand('%'))
+    call append(line('$'), '  > Author: LiangHuaxiao')
+    call append(line('$'), '  > Mail: 1184903633@qq.com')
+    call append(line('$'), '  > Created Time: '.strftime('%c'))
+    call append(line('$'), ' ************************************************************************/')
+    call append(line('$'), '')
   endif
-  if &filetype==?'cpp'
-    call append(line('.')+6, '#include <iostream>')
-    call setline(line('.')+8, '')
+  if &filetype==?'cpp' && expand('%')==?'cpp'
+    call append(line('$'), '#include <iostream>')
+    call append(line('$'), '')
   elseif &filetype==?'c'
-    call append(line('.')+6, '#include <stdio.h>')
-    call setline(line('.')+8, '')
+    call append(line('$'), '#include <stdio.h>')
+    call append(line('$'), '')
   elseif &filetype==?'verilog'
-    call append(line('.')+6,'module ')
+    call append(line('$'),'module ')
   endif
   " 新建文件后，自动定位到文件末尾
   exec 'silent normal! G'
