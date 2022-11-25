@@ -138,7 +138,11 @@ function! CocTimerStart(timer)
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
+    augroup END
+    augroup Lazy_Call_Format
       autocmd FileType c,cpp,cmake,opencl,perl,verilog silent call Neoformat_Lazy_Setting()
+      autocmd FileType json nmap <silent><F7> <Plug>(coc-format)
+      autocmd FileType json xmap <silent><F7> <Plug>(coc-format-selected)
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
@@ -427,15 +431,10 @@ function! Lazy_On_Plugin_Configuration()
   let g:Lf_PreviewResult = {'Rg': 1 }
   let g:Lf_ShortcutB = '<Leader>fb'
   let g:Lf_ShortcutF = '<Leader>ff'
-
-
-
-  " autoformat setting
-  augroup Lazy_Call_Format
-    autocmd FileType json nmap <silent><F7> <Plug>(coc-format)
-    autocmd FileType json xmap <silent><F7> <Plug>(coc-format-selected)
-  augroup END
 endfunction
+
+
+
 function! Neoformat_Lazy_Setting()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
   let g:neoformat_cpp_clangformat = {
@@ -883,11 +882,8 @@ function! Delete_Trailling_Space()
   exec 'silent :%s/\s\+$//e'
   exec 'silent normal! ``'
 endfunction
-" Ctrl-Enter新建行和当前行格式保持一致,normal模式下仅对注释类型有效
-nnoremap <silent><C-CR> o<ESC>
-inoremap <silent><C-CR> <ESC>o
+" Ctrl-Enter在普通模式下像插入模式一样使用回车
+nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
-
