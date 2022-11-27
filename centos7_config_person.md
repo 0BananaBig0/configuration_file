@@ -128,7 +128,7 @@ httpie replaces replaces curl and wget, command: http/https
 #cppman can help you know about c/c++ function
 #you-get can download some videos from bilibili.com
 #sphinx transform rst file to html file
-python3 -m pip install cppman you-get sphinx sphinx-rtd-theme
+python3 -m pip install cppman you-get sphinx sphinx-rtd-theme gdbgui
 ```
 
 # (4)close screensaver
