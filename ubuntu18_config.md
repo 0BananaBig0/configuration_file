@@ -47,7 +47,7 @@
 * [23,尽量使用openjdk,因为cuda默认使用openjdk](#23尽量使用openjdk因为cuda默认使用openjdk)
 * [23,gvim or matlab启动时xxx/canberra-gtk-module打开失败:](#23gvim-or-matlab启动时xxxcanberra-gtk-module打开失败)
 * [24,解决安装后ubuntu18.04后出现Unable to download updates from extensions.gnome.org的问题](#24解决安装后ubuntu1804后出现unable-to-download-updates-from-extensionsgnomeorg的问题)
-* [25,安装文泉驿和DroidSansMono字体](#25安装文泉驿和droidsansmono字体)
+* [25,安装文泉驿和Nerd字体](#25安装文泉驿和nerd字体)
     * [安装文泉驿#本人已不再用文泉驿字体](#安装文泉驿本人已不再用文泉驿字体)
     * [安装,DejaVuSansMonoFantasqueSansMono Nerd Font,UbuntuMono Nerd,InconsolataLGC字体](#安装dejavusansmonofantasquesansmono-nerd-fontubuntumono-nerdinconsolatalgc字体)
 * [26,创建smb服务](#26创建smb服务)
@@ -805,7 +805,7 @@ sudo apt update
 sudo apt install gnome-shell-extensions
 ```
 
-# 25,安装文泉驿和DroidSansMono字体
+# 25,安装文泉驿和Nerd字体
 ##安装文泉驿#本人已不再用文泉驿字体
 ```
 sudo apt install fonts-wqy*
@@ -817,11 +817,10 @@ sudo apt install fonts-wqy*
 sudo apt install font-manager
 #去https://www.nerdfonts.com/font-downloads下载DejaVuSansMono,FantasqueSansMono,UbuntuMono,InconsolataLGC字体
 #解压DejaVuSansMono,FantasqueSansMono Nerd Font,UbuntuMono,InconsolataLGC字体并进入解压出来的文件夹
-font-manager
-#点击+选中所有文件
-sudo su
-font-manager
-#点击+选中所有文件
+sudo cp DejaVuSansMono/ FantasqueSansMono InconsolataLGC /usr/share/fonts -r
+sudo chown root:root DejaVuSansMono FantasqueSansMono InconsolataLGC -R
+sudo chmod 755 DejaVuSansMono FantasqueSansMono InconsolataLGC -R
+sudo fc-cache -fv
 ```
 
 # 26,创建smb服务
