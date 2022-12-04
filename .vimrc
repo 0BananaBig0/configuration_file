@@ -138,8 +138,6 @@ function! CocTimerStart(timer)
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-    augroup END
-    augroup Lazy_Call_Format
       autocmd FileType c,cpp,cmake,opencl,perl,verilog silent call Neoformat_Lazy_Setting()
       autocmd FileType json nmap <silent><F7> <Plug>(coc-format)
       autocmd FileType json xmap <silent><F7> <Plug>(coc-format-selected)
@@ -769,7 +767,6 @@ function! SetTitle()
   elseif &filetype==?'verilog'
     call append(line('$'),'module ')
   endif
-  " 新建文件后，自动定位到文件末尾
   exec 'silent normal! G'
 endfunc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
