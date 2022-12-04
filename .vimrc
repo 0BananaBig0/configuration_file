@@ -524,7 +524,6 @@ let g:python_highlight_file_headers_as_comments = 1
 
 " markdown-preview.nvim setting
 let g:mkdp_browser = '/usr/bin/firefox'
-autocmd FileType markdown nmap <silent><Localleader><F2> <Plug>MarkdownPreview
 
 
 
@@ -722,15 +721,14 @@ set incsearch
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup Local_Autocmd_Group
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
-  autocmd FileType c,cpp,python,sh,verilog,perl,tcl
+  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown
            \ nnoremap <silent><Localleader><F2>
-           \ :silent call Compile_And_Excute()<CR>
+           \ :call Compile_And_Excute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
-           \ :silent call Compile_Command()<CR>
+           \ :call Compile_Command()<CR>
   autocmd FileType vim nnoremap <silent><Localleader><F2>
            \ :source ~/.vimrc<CR>
-  autocmd FileType verilog nnoremap <silent><Leader>` :call Show_Current_Module()<CR>
-  autocmd FileType c,cpp nnoremap <silent><Leader>` :call Show_Nearest_Class_Or_Struct()<CR>
+  autocmd FileType c,cpp,verilog nnoremap <silent><Leader>` :call Call_Show_Nearest_Function()<CR>
   if has('nvim')
     autocmd UIEnter * silent call TabPos_Initialize()
   else
@@ -792,6 +790,8 @@ function Compile_And_Excute()
     exec ':AsyncRun! -save=1 perl %'
   elseif &filetype==?'tcl'
     exec ':AsyncRun! -save=1 tclsh %'
+  elseif &filetype==?'markdown'
+    exec ':MarkdownPreview'
   endif
 endfunction
 function! Compile_Command()
@@ -831,6 +831,13 @@ function! Show_Nearest_Class_Or_Struct()
     let nearest_name = strpart(nearest_name,0,nearest_end_poisition)
   endif
   echo nearest_name
+endfunction
+function! Call_Show_Nearest_Function()
+  if &filetype==?'cpp' || &filetype==?'c'
+     call Show_Nearest_Class_Or_Struct()
+  elseif &filetype==?'verilog'
+     call Show_Current_Module()
+  endif
 endfunction
 " alt+n跳到第n个tab，0<n<10
 function! TabPos_ActivateBuffer(num)
