@@ -1106,6 +1106,11 @@ sudo npm install -g @imc-trading/svlangserver
 https://github.com/chipsalliance/verible  \
 看bazel官网,看imc-trading/svlangserver的github,看chipsalliance/verible的github\
 注意gcc的版本，如果切换了gcc的版本再编译会出现bug，需要删除~/.cache/bazel里面对应的文件夹重新编译才行。
+```
+bazel build -c opt //...
+bazel test -c opt //... --test_verbose_timeout_warnings
+bazel run -c opt :install -- -s /usr/local/bin
+```
 
 # 42,解决verilog找不到模块问题,coc-nvim使用iverilog,verilator
 使用语法
@@ -1410,6 +1415,7 @@ doxywizard
 ## ipad通过airplay投屏到ubuntu18
 [Uxplay](https://github.com/FDH2/UxPlay)
 ```
+git clone https://github.91chi.fun//https://github.com/FDH2/UxPlay.git
 sudo apt-get install libssl-dev libplist-dev libavahi-compat-libdnssd-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-libav gstreamer1.0-plugins-bad
 sudo apt-get install libx11-dev #(for the "ZOOMFIX" X11_display name fix for screen-sharing with e.g., ZOOM)
 sudo apt remove gstreamer1.0-vaapi #NVIDIA系列显卡如果不卸载这个会出现花屏问题,不过goodnote不会有这个问题。在没有NVIDIA显卡的情况下,因特尔的核显可以下载用来做硬件加速
