@@ -20,10 +20,7 @@
 "(9)python3 -m pip install pygments vim-vint cmakelang
 "(10)if you want to use my coc-settings.json, you can copy it from
 "/home/hxliang/.vim to /home/you/.vim. And there are some dependencies you
-"should have:first,run the following command in your vim :CocInstall coc-tag coc-cmake coc-sh coc-markdownlint
-"coc-css coc-json coc-pyright coc-yaml coc-cl coc-clangd coc-dictionary coc-snippets coc-vimlsp coc-word;
-"second,run the following command in your terminal:python3 -m pip install hdl-checker ,if you write the verilog;
-"last, install verilator,verible and sudo npm install -g @imc-trading/svlangserver
+"should have: install verilator,verible and sudo npm install -g @imc-trading/svlangserver
 "if your write the verilog. https://github.com/chipsalliance/verible
 "(11)install ripgrep,if you want to use 'leaderf rg' command in .vimrc . https://github.com/BurntSushi/ripgrep
 "(12)if your vim tell you that it can't find some models, you can do that
