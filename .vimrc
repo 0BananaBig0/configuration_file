@@ -185,7 +185,6 @@ function! Lazy_On_Plugin_Configuration()
   nnoremap <silent>[d :silent call CocAction('jumpDefinition', 'tabe')<CR>
   nnoremap <silent>[c :silent call CocAction('jumpDeclaration', 'tabe')<CR>
   nnoremap <silent>[i :silent call CocAction('jumpImplementation', 'tabe')<CR>
-  nnoremap <silent>[r :silent call CocAction('jumpReferences', 'tabe')<CR>
   nmap <silent>[j <Plug>(coc-diagnostic-next)
   nmap <silent>[k <Plug>(coc-diagnostic-prev)
   nmap <silent><Localleader>j <Plug>(coc-diagnostic-next-error)
@@ -217,7 +216,6 @@ function! Lazy_On_Plugin_Configuration()
   " Vista setting, Vista toggle
   nnoremap <silent><Leader>vt :Vista!!<CR>
   let g:vista_default_executive = 'coc'
-  " 有部分字体不支持vista的特殊符号即特殊符号显示乱码，因此需要禁用特殊符号，1启用，0禁用
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
   let g:vista_cursor_delay = 0
@@ -714,9 +712,7 @@ set ignorecase
 set smartcase
 set hlsearch
 set incsearch
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 新文件标题
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 augroup Local_Autocmd_Group
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown
@@ -769,10 +765,7 @@ function! SetTitle()
   endif
   exec 'silent normal! G'
 endfunc
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 键盘命令
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function Compile_And_Excute()
+function! Compile_And_Excute()
   if &filetype==?'cpp'
     exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
   elseif &filetype==?'c'
