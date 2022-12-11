@@ -46,12 +46,16 @@
 
 
 
-set nocompatible  " 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
-" 侦测文件类型
-set t_Co=256             " 开启256色支持
-set updatetime=33   " 不少插件的信息更新都会需要这个时间
-set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1 " 打开文件时进行解码的猜测列表
-set encoding=utf-8 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
+" 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+set nocompatible
+" 开启256色支持
+set t_Co=256
+" 不少插件的信息更新都会需要这个时间
+set updatetime=33
+" 打开文件时进行解码的猜测列表
+set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
+" 把当前文件转换为当前系统编码进行处理，这里为utf-8
+set encoding=utf-8
 scriptencoding utf-8
 " 禁止生成临时文件
 set nobackup
@@ -64,34 +68,62 @@ let g:maplocalleader = ' '
 
 let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
 call plug#begin('~/.vim/plugged')
-Plug 'dracula/vim', { 'as': 'dracula' } " vim theme
-Plug 'luochen1990/rainbow' " 彩虹括号
-Plug 'nathanaelkane/vim-indent-guides' " 缩进显示
-Plug 'neoclide/coc.nvim', {'branch': 'release'} " 补全插件 动态检测语法插件,可鼠标停留显示信息
-Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}  " 文件目录插件
-Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}  " 标签窗口列表插件
-Plug 'MattesGroeger/vim-bookmarks',{'on':['BookmarkToggle','BookmarkShowAll','BookmarkAnnotate']} " 书签插件，用于写代码注解等等
-Plug '0BananaBig0/fcitx.vim',{'branch':'fcitx4','on':[]} " Esc退出变回英文输入法，进入insert模式切换为原来的输入法
-Plug 'lfv89/vim-interestingwords',{'on':[]} " Multiple highlights
-Plug 'tpope/vim-fugitive',{'on':[]} " Git command
-Plug 'airblade/vim-gitgutter',{'on':[]} " Git status show
-Plug 'puremourning/vimspector',{'on':[]} " c/cpp debug
-Plug 'jsfaint/gen_tags.vim', {'on':['GenGTAGS','GenCtags','ClearGTAGS','ClearGtags']} " 异步生成tags插件，命令是GenGTAGS,GenCtags，存储在~/.cache/tags_dir中
-Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}  " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
-Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']} " LeaderF extension for navigate the marks.
-Plug 'sbdchd/neoformat',{'on':['Neoformat']} " 代码格式化插件
-Plug 'brgmnn/vim-opencl', {'on':[]} " highlight opencl 2.0 syntax
-Plug 'bfrg/vim-cpp-modern', {'on':[]}  " 高亮c++类模板等插件
-Plug 'vim-python/python-syntax', {'on':[]} " python 语法高亮插件
-Plug 'taketwo/vim-ros',{'on':[]} " roslaunch语法高亮
-Plug '0BananaBig0/verilog_indent',{'on':[]} " verilog indent file
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} " markdown实时预览插件
-Plug 'godlygeek/tabular', {'on': []} " markdown表格插件
-Plug 'liuchengxu/vim-which-key', { 'on': [] } " vim快捷键管理和提示插件
-Plug 'mzlogin/vim-markdown-toc',{'on':[]} " markdown目录构建插件
-Plug 'preservim/nerdcommenter', {'on':[]} " nerdcommenter快速注释插件
-Plug 'skywind3000/asyncrun.vim',{'on':[]} " 异步执行shell命令插件，如果需要打开新终端，请去github看skywind3000/asyncrun.extra插件
-Plug 'skywind3000/vim-quickui' " 菜单栏插件
+" vim theme
+Plug 'dracula/vim', { 'as': 'dracula' }
+" 彩虹括号
+Plug 'luochen1990/rainbow'
+" 缩进显示
+Plug 'nathanaelkane/vim-indent-guides'
+" 补全插件 动态检测语法插件,可鼠标停留显示信息
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" 文件目录插件
+Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}
+" 标签窗口列表插件
+Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}
+" 书签插件，用于写代码注解等等
+Plug 'MattesGroeger/vim-bookmarks',{'on':['BookmarkToggle','BookmarkShowAll','BookmarkAnnotate']}
+" Esc退出变回英文输入法，进入insert模式切换为原来的输入法
+Plug '0BananaBig0/fcitx.vim',{'branch':'fcitx4','on':[]}
+" Multiple highlights
+Plug 'lfv89/vim-interestingwords',{'on':[]}
+" Git command
+Plug 'tpope/vim-fugitive',{'on':[]}
+" Git status show
+Plug 'airblade/vim-gitgutter',{'on':[]}
+" c/cpp debug
+Plug 'puremourning/vimspector',{'on':[]}
+" 异步生成tags插件，命令是GenGTAGS,GenCtags，存储在~/.cache/tags_dir中
+Plug 'jsfaint/gen_tags.vim', {'on':['GenGTAGS','GenCtags','ClearGTAGS','ClearGtags']}
+" 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
+Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
+" LeaderF extension for navigate the marks
+Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
+" 代码格式化插件
+Plug 'sbdchd/neoformat',{'on':['Neoformat']}
+" highlight opencl 2.0 syntax
+Plug 'brgmnn/vim-opencl', {'on':[]}
+" 高亮c++类模板等插件
+Plug 'bfrg/vim-cpp-modern', {'on':[]}
+" python 语法高亮插件
+Plug 'vim-python/python-syntax', {'on':[]}
+" roslaunch语法高亮
+Plug 'taketwo/vim-ros',{'on':[]}
+" verilog indent file
+Plug '0BananaBig0/verilog_indent',{'on':[]}
+" markdown实时预览插件
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+" markdown表格插件
+Plug 'godlygeek/tabular', {'on': []}
+" vim快捷键管理和提示插件
+Plug 'liuchengxu/vim-which-key', { 'on': [] }
+" markdown目录构建插件
+Plug 'mzlogin/vim-markdown-toc',{'on':[]}
+" nerdcommenter快速注释插件
+Plug 'preservim/nerdcommenter', {'on':[]}
+" 异步执行shell命令插件，如果需要打开新终端，请去github看skywind3000/asyncrun.extra插件
+Plug 'skywind3000/asyncrun.vim',{'on':[]}
+" 菜单栏插件
+Plug 'skywind3000/vim-quickui'
 call plug#end()
 
 
@@ -618,39 +650,36 @@ if has('gui_running')
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 19   " 设置字体
     set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 21   " 设置字体
   endif
-  set lines=60 columns=80    " 设定窗口大小
-  set guioptions-=r " 隐藏滚动栏
-  set guitablabel=%t " tab只显示文件名不显示标签
+  " 设定窗口大小
+  set lines=60 columns=80
+  " 隐藏滚动栏
+  set guioptions-=r
+  " tab只显示文件名不显示标签
+  set guitablabel=%t
 endif
 set shortmess+=c
 set showcmd
 set foldmethod=manual
-" \ 打印空格
-" [FORMAT=%{&fenc}-%{&ff}]显示正在编辑的文件的编码和所在类系统类型
-" [TYPE=%Y]正在编辑的文件类型
-" [POS=%l,%v,%L][%p%%]当前光标所在位置，显示为行数，列数,总行数和百分比
-" [ASCII=%b]当前光标下的ascii十进制数值
-" [HEX=0x%B]当前光标下的ascii十六进制数值
-" %m如果缓冲区已修改则表示为[+]，%M显示结果没有[]
-" %r如果缓冲区为只读则显示为[RO]，%R显示结果没有[]
-" %=左对齐和右对齐项目之间的分割点
-" [%F%w]正在编辑的绝对路径/文件名，%f为相对路径
-" [%{strftime(\"%d/%m/%y-%H:%M\")}]日/月/年-时:分
-" %<状态行过长，在何处换行，缺省则是在开头
 set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
 set statusline+=%=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
-set laststatus=2    " 当窗口多于一个时显示状态行(1),总是显示状态行(2)
-set ttimeoutlen=0        " 设置<ESC>键响应时间
-set timeoutlen=666 " setting keymapping timeout
-set virtualedit=block,onemore   " 允许光标出现在最后一个字符的后面
-set ruler                   " 总是显示光标位置
-set cursorline              " 突出显示当前行
-set novisualbell " 不要闪烁
+" 当窗口多于一个时显示状态行(1),总是显示状态行(2)
+set laststatus=2
+" 设置<ESC>键响应时间
+set ttimeoutlen=0
+" setting keymapping timeout
+set timeoutlen=666
+" 允许光标出现在最后一个字符的后面
+set virtualedit=block,onemore
+" 总是显示光标位置
+set ruler
+" 突出显示当前行
+set cursorline
+" 不要闪烁
+set novisualbell
 " 命令行（在状态行下）的高度，默认为1，这里是2
 set cmdheight=2
 " 显示行号
 set number
-set relativenumber
 " merge signcolumn and number column into one
 set signcolumn=number
 " Uncomment the following to have Vim jump to the last position when reopening a file
@@ -709,7 +738,6 @@ set ignorecase
 set smartcase
 set hlsearch
 set incsearch
-
 augroup Local_Autocmd_Group
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown
@@ -863,7 +891,7 @@ nnoremap <silent><Localleader>q :q<CR>
 nnoremap <silent><Localleader>w :w<CR>
 nnoremap <silent><Localleader><F4> :%retab!<CR>
 " 比较文件
-nnoremap <Localleader><F5> :vert diffsplit 
+nnoremap <Localleader><F5> :vert diffsplit
 nnoremap <silent><Localleader><F6> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec 'silent normal! m`'
