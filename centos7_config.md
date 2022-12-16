@@ -180,7 +180,7 @@ fi
 系统永久更换gcc版本
 ```
 sudo su
-vim /etc/profile /etc/bashrc /etc/X11/xinit
+vim /etc/profile /etc/bashrc /etc/X11/xinit/xinitrc
 #在这个文件添加后会导致omz的ZSH_CACHE_DIRECTORY环境变量切换出现问题。
 ```
 在这两个文件添加如下内容
@@ -214,7 +214,7 @@ git config --global diff.tool gvimdiff
 系统永久更换git版本
 ```
 sudo su
-vim /etc/profile /etc/bashrc /etc/X11/xinit
+vim /etc/profile /etc/bashrc /etc/X11/xinit/xinitrc
 ```
 在这两个文件添加如下内容
 ```
@@ -1253,7 +1253,7 @@ fi
 系统永久更换perl版本
 ```
 sudo su
-vim /etc/profile /etc/bashrc /etc/X11/xinit
+vim /etc/profile /etc/bashrc /etc/X11/xinit/xinitrc
 ```
 在这两个文件添加如下内容
 ```
