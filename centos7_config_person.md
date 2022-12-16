@@ -31,7 +31,8 @@
     * [5,add the content of id_rsa.github to your github accout.](#5add-the-content-of-id_rsagithub-to-your-github-accout)
 * [(15)服务器的Vivado无法识别fpga板子的解决方法：](#15服务器的vivado无法识别fpga板子的解决方法)
 * [(16)configure your git](#16configure-your-git)
-* [(17)install ttf fonts and font manage tool](#17install-ttf-fonts-and-font-manage-tool)
+* [(17)install fonts for ourselves](#17install-fonts-for-ourselves)
+* [(18)solve the problem which results in vnc work abnormally](#18solve-the-problem-which-results-in-vnc-work-abnormally)
 
 <!-- vim-markdown-toc -->
 #Note:
@@ -316,7 +317,7 @@ git config --global protocol.https.allow always
 git config --global push.default "current"
 ```
 
-# (17)install ttf fonts and font manage tool
+# (17)install fonts for ourselves
 ```
 #去https://www.nerdfonts.com/font-downloads下载自己喜欢的字体，以DejaVuSansMono,FantasqueSansMono,InconsolataLGC字体为例
 unzip DejaVuSansMono.zip FantasqueSansMono.zip InconsolataLGC.zip #解压文件
@@ -325,4 +326,13 @@ cd ~/.fonts
 cp -r ~/Downloads/program/font/FantasqueSansMono ~/Downloads/program/font/DejaVuSansMono ~/Downloads/program/font/InconsolataLGC .
 chmod 755 DejaVuSansMono FantasqueSansMono InconsolataLGC -R
 fc-cache -fv
+```
+
+# (18)solve the problem which results in vnc work abnormally
+```
+cp /home/lylai/.vnc ~ -r
+vncserver -kill :端口号
+cd ~/.vnc
+rm *.pid *.log
+vncserver :端口号
 ```
