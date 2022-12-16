@@ -133,6 +133,7 @@
 * [77 configure perl LSP](#77-configure-perl-lsp)
 * [78 configure fcitx](#78-configure-fcitx)
 * [79 install YaHeiConsolas](#79-install-yaheiconsolas)
+* [80 install brave browser](#80-install-brave-browser)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1805,4 +1806,13 @@ sudo mv YaHeiConsolas /usr/share/fonts
 sudo chown root:root /usr/share/fonts/YaHeiConsolas
 sudo chmod 755 /usr/share/fonts/YaHeiConsolas -R
 sudo fc-cache -f -v
+```
+
+# 80 install brave browser
+```
+sudo apt install curl
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+sudo apt update
+sudo apt install brave-browser
 ```
