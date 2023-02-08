@@ -768,6 +768,8 @@ function! SetTitle()
       call append(line('$'), '#!/bin/perl')
       call append(line('$'), 'use strict;')
       call append(line('$'), 'use warnings;')
+    elseif &filetype==?'tcl'
+      call append(line('$'), '#!/usr/bin/tclsh')
     endif
     call append(line('$'), '')
   else
