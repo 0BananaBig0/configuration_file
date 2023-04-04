@@ -206,6 +206,7 @@ git config --global user.name "0BananaBig0"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
+#23年后下面这个梯子不知为啥挂掉了，请别执行下面这条命令，除非你尝试过梯子复活了
 git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
 git config --global protocol.https.allow always
 git config --global push.default "current"
@@ -312,7 +313,7 @@ exit
 python3 -m pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
 python3 -m pip install pysnooper ipdb
 python3 -m pip install compiledb #(a tool for you to create a compile_commands.json if you use make to manage your c/c++ project)
-python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright gdbgui
+python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright
 python3 -m pip install cppman you-get sphinx sphinx-rtd-theme
 # use httpie to replace replace curl and wget
 python3 -m pip install httpie # command: http/https
@@ -363,7 +364,7 @@ mv /opt/rh/devtoolset-9/root/usr/bin/gdb-add-index-9 /opt/rh/devtoolset-9/root/u
 configure .gdbinit
 ```
 cd ~/Downloads/program
-git clone https://github.91chi.fun//https://github.com/hugsy/gef.git
+git clone https://github.com/hugsy/gef.git
 python3 -m pip install keystone-engine unicorn capstone ropper
 gvim ~/.gdbinit #add the following content
 ```
@@ -427,7 +428,7 @@ sudo update-alternatives --install /usr/bin/valgrind-listener valgrind-listener 
 ```
 cd ~/Downloads/program
 sudo yum install docbook2X xmlto asciidoc
-git clone https://github.91chi.fun//https://github.com/git/git.git
+git clone https://github.com/git/git.git
 cd git
 sudo make prefix=/cadtools/optional_program/git238 install install-doc install-html install-info
 ```
@@ -486,7 +487,7 @@ perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
 perl-ExtUtils-Embed libX* ncurses-devel gtk2-devel \
 gpm gpm-libs gpm-devel
 cd ~/Downloads/program
-git clone https://github.91chi.fun//https://github.com/vim/vim.git
+git clone https://github.com/vim/vim.git
 cd vim
 source /opt/rh/devtoolset-9/enable
 ./configure --with-features=huge \
@@ -516,7 +517,7 @@ sudo make install
 ```
 cd ~/Downloads/program
 source /opt/rh/devtoolset-9/enable
-git clone https://github.91chi.fun//https://github.com/neovim/neovim
+git clone https://github.com/neovim/neovim
 cd neovim
 git checkout stable
 sudo yum install rh-python38 xclip
@@ -682,8 +683,9 @@ go to [configuration_files](https://github.com/0BananaBig0/configuration_file) t
 ssh -X root@10.34.24.11
 yum install tigervnc-server
 gvim /etc/systemd/system/vncserver@:3.service # for port 3
+gvim /etc/systemd/system/vncserver@:3.timer # for port 3
 ```
-add the following content for user hxliang
+add the following content for user hxliang to vncserver@:3.service
 ```
 # The vncserver service unit file
 #
@@ -733,6 +735,11 @@ ExecStop=-/usr/bin/vncserver -kill %i
 
 [Install]
 WantedBy=multi-user.target
+```
+add the following content for user hxliang to vncserver@:3.time
+```
+[Timer]
+OnBootSec=30sec
 ```
 execute the following commands
 ```
@@ -1022,7 +1029,7 @@ bazel run -c opt :install -- -s /usr/local/bin
 source /opt/rh/devtoolset-9/enable
 cd ~/Downloads/program
 sudo yum -y install git perl python3 make ccache numactl autoconf flex flex-devel bison bison-devel
-git clone https://github.91chi.fun//https://github.com/verilator/verilator.git
+git clone https://github.com/verilator/verilator.git
 cd verilator
 unset VERILATOR_ROOT
 git checkout stable
@@ -1144,7 +1151,7 @@ CPLUS_INCLUDE_PATH: include
 
 # compile duf to replace df
 ```
-git clone https://github.91chi.fun//https://github.com/muesli/duf.git
+git clone https://github.com/muesli/duf.git
 cd duf
 go build
 go install
@@ -1255,7 +1262,7 @@ fi
 sudo su
 vim /etc/profile /etc/bashrc /etc/X11/xinit/xinitrc
 ```
-在这两个文件添加如下内容
+在这三个文件添加如下内容
 ```
 if [ -f "/opt/rh/rh-perl530/enable" ]; then
   source /opt/rh/rh-perl530/enable #or scl enable rh-perl530 bash #only for .bashrc 

@@ -90,7 +90,7 @@ coc.nvim may have the same problem like iamcco/markdown-preview.nvim, you can do
 python3 -m pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
 python3 -m pip install pysnooper ipdb
 python3 -m pip install compiledb #(a tool for you to create a compile_commands.json if you use make to manage your c/c++ project, think about bear which has the same function as compiledb)
-python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright gdbgui
+python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright
 ```
 ## 7,modify .vimrc
 use "YourAccount" to replace "hxliang" in .vimrc
@@ -129,7 +129,7 @@ httpie replaces replaces curl and wget, command: http/https
 #cppman can help you know about c/c++ function
 #you-get can download some videos from bilibili.com
 #sphinx transform rst file to html file
-python3 -m pip install cppman you-get sphinx sphinx-rtd-theme gdbgui
+python3 -m pip install cppman you-get sphinx sphinx-rtd-theme
 ```
 
 # (4)close screensaver
@@ -217,7 +217,7 @@ fi
 # (11)configure gdb
 ```
 cd ~/Downloads/program
-git clone https://github.91chi.fun//https://github.com/hugsy/gef.git
+git clone https://github.com/hugsy/gef.git
 python3 -m pip install keystone-engine unicorn capstone ropper
 cp /home/hxliang/.gdbinit ~
 cp /home/hxliang/.gdbgef ~ #only use for gdb command line.
@@ -312,9 +312,12 @@ git config --global user.name "YourName"
 git config --global user.email "YourEmail(NotUseSchoolEmailWhichWillBeExpiredAfterYourGraduation)"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
-git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
+git config --global url."https://github.com/".insteadOf "https://github.com/"
 git config --global protocol.https.allow always
 git config --global push.default "current"
+git config --global diff.tool gvimdiff
+#23年后下面这个梯子不知为啥挂掉了，请别执行下面这条命令，除非你尝试过梯子复活了
+git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
 ```
 
 # (17)install fonts for ourselves
