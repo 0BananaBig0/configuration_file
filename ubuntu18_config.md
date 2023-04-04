@@ -1831,3 +1831,15 @@ echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=
 sudo apt update
 sudo apt install brave-browser
 ```
+
+# 81 install zotero
+Download zotero from it official website to ~/Download/program
+```
+x Zotero-6.0.23_linux-x86_64.tar.bz2
+sudo mkdir /opt/zotero
+sudo mv Zotero_linux-x86_64/* /opt/zotero
+cd /opt/zotero
+sudo ./set_launcher_icon
+ln -s /opt/zotero/zotero.desktop ~/.local/share/applications/zotero.desktop
+sudo ln -s /opt/zotero/zotero /usr/bin/zotero
+```
