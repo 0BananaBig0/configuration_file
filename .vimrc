@@ -66,7 +66,7 @@ let g:maplocalleader = ' '
 
 
 
-let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
+" let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
 call plug#begin('~/.vim/plugged')
 " vim theme
 Plug 'dracula/vim', { 'as': 'dracula' }
