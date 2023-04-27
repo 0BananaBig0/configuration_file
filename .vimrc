@@ -167,9 +167,7 @@ function! CocTimerStart(timer)
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-      autocmd FileType c,cpp,cmake,opencl,perl,verilog silent call Neoformat_Lazy_Setting()
-      autocmd FileType json nmap <silent><F7> <Plug>(coc-format)
-      autocmd FileType json xmap <silent><F7> <Plug>(coc-format-selected)
+      autocmd FileType c,cpp,cmake,opencl,perl,verilog,json silent call Neoformat_Lazy_Setting()
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()

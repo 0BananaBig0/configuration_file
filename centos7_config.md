@@ -82,6 +82,7 @@
 * [46 服务器的Vivado无法识别fpga板子的解决方法：](#46-服务器的vivado无法识别fpga板子的解决方法)
 * [47 close pulseaudio](#47-close-pulseaudio)
 * [48 configure perl LSP](#48-configure-perl-lsp)
+* [49 install a json formatter](#49-install-a-json-formatter)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1267,4 +1268,9 @@ vim /etc/profile /etc/bashrc /etc/X11/xinit/xinitrc
 if [ -f "/opt/rh/rh-perl530/enable" ]; then
   source /opt/rh/rh-perl530/enable #or scl enable rh-perl530 bash #only for .bashrc 
 fi
+```
+
+# 49 install a json formatter
+```
+sudo npm install -g js-beautify
 ```
