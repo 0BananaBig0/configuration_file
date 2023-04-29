@@ -311,12 +311,11 @@ git config --global user.name "YourName"
 git config --global user.email "YourEmail(NotUseSchoolEmailWhichWillBeExpiredAfterYourGraduation)"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
-git config --global url."https://github.com/".insteadOf "https://github.com/"
 git config --global protocol.https.allow always
 git config --global push.default "current"
 git config --global diff.tool gvimdiff
 #23年后下面这个梯子不知为啥挂掉了，请别执行下面这条命令，除非你尝试过梯子复活了
-git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
+#git config --global url."https://github.91chi.fun//https://github.com/".insteadOf "https://github.com/"
 ```
 
 # (17)install fonts for ourselves
