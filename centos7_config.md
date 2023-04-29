@@ -82,6 +82,7 @@
 * [47 close pulseaudio](#47-close-pulseaudio)
 * [48 configure perl LSP](#48-configure-perl-lsp)
 * [49 install a json formatter](#49-install-a-json-formatter)
+* [50 use neovim as a backend of vscode](#50-use-neovim-as-a-backend-of-vscode)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -570,8 +571,6 @@ sudo update-alternatives --install /usr/bin/xxd xxd /usr/local/bin/xxd 3
 ```
 cd ~/.config
 mkdir nvim
-ln -s /home-local/celab106_z2mini/.vim/coc-settings.json /home-local/celab106_z2mini/.config/nvim/coc-settings.json
-ln -s /home-local/celab106_z2mini/.vimrc /home-local/celab106_z2mini/.config/nvim/init.vim     
 ```
 
 # 18,install rust and some new command tools
@@ -1246,4 +1245,21 @@ fi
 # 49 install a json formatter
 ```
 sudo npm install -g js-beautify
+```
+
+# 50 use neovim as a backend of vscode
+（1）在vscode插件中心或扩展中心下载VSCode Neovim插件。 \
+（2）打开Linux终端，执行命令mkdir ~/.config/nvim -p命令，
+接着执行gvim ~/.config/nvim/init.vim命令，并将如下内容添加到init.vim文件中：
+```
+if exists('g:vscode')
+    " VSCode extension
+else
+    " ordinary neovim
+endif
+```
+最后执行gvim ~/.config/Code/User/settings.json命令，并将如下内容添加到settings.json文件的{}里面：
+```
+   "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
+   "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
 ```

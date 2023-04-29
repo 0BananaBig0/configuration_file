@@ -353,6 +353,12 @@ function! Lazy_On_Plugin_Configuration()
     else
       let root_location = strpart(root_location,0,strridx(root_location,'/.git'))
     endif
+    let root_vscode = root_location.'/.vscode/launch.json'
+    if !filereadable(root_vscode)
+      call mkdir(root_location.'/.vscode', 'p', 0755)
+      let cpp_json_content = readfile($HOME.'/.vim/.vimspectorjson/.vscode/launch.json')
+      call writefile(cpp_json_content,root_vscode,'s')
+    endif
     let root_location = root_location.'/.vimspector.json'
     if !filereadable(root_location)
       let cpp_json_content = readfile($HOME.'/.vim/.vimspectorjson/cpp.json')
@@ -909,3 +915,5 @@ nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
+

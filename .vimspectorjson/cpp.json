@@ -11,7 +11,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${workspaceRoot}/.exe",
-        "args": [],
+        "args": ["","",""],
         "cwd": "${workspaceRoot}",
         "environment": [],
         "externalConsole": true,
