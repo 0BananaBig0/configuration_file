@@ -89,7 +89,6 @@ coc.nvim may have the same problem like iamcco/markdown-preview.nvim, you can do
 ```
 python3 -m pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
 python3 -m pip install pysnooper ipdb
-python3 -m pip install compiledb #(a tool for you to create a compile_commands.json if you use make to manage your c/c++ project, think about bear which has the same function as compiledb)
 python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright
 ```
 ## 7,modify .vimrc

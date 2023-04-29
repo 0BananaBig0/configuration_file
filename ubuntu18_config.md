@@ -35,7 +35,6 @@
     * [对于cmake和catkin:](#对于cmake和catkin)
     * [对于make:](#对于make)
         * [Installation](#installation)
-        * [Usage](#usage)
 * [15,解决双系统ubuntu没有挂载硬盘写入权限的方法：如果win10那边提示要修复硬盘,不用管,否则ubuntu会没有读写权限。](#15解决双系统ubuntu没有挂载硬盘写入权限的方法如果win10那边提示要修复硬盘不用管否则ubuntu会没有读写权限)
 * [16,更换python的方法和安装debug工具](#16更换python的方法和安装debug工具)
 * [17,关闭dash-to-panel的hot-corners的方法：鼠标左上角](#17关闭dash-to-panel的hot-corners的方法鼠标左上角)
@@ -642,45 +641,19 @@ sudo apt install *clang*13* *llvm*13*
 (5)建立compile_commands.json硬链接/ 软连接 \
 (6)写compile_flags.txt \
 ## 对于make:
-为基于GNUmake的构建系统生成Clang的JSON编译数据库文件的工具。\
-它主要针对non-cmake(cmake已经生成了编译数据库)的大型代码库。受YCM-Generator和Bear这样的项目的启发,但是速度更快(主要是大型项目),因为在大多数情况下,它不需要一个干净的构建(如前面提到的工具那样)来生成编译数据库文件,为了实现这一点,它使用make选项,比如-n/--dry-run和-k/--keep-going来提取编译命令。而且,与YCM-generator'sfake-toolchanin方法相比,cross-compiling更友好。\
+有三种工具可以辅助基于GNUmake的构建系统生成Clang的JSON编译数据库文件的工具。\
+分别为compiledb，YCM-Generator和Bear。本系统主要使用的bear。
 ### Installation
 ```
-python3 -m pip install compiledb # think abot bear which has the same function as compiledb
-```
-支持Python2.x和3.x(目前,仅在2.7和3.6版本中测试) \
-例如,对于bash完成支持,可以将sh-completion/compiledb.bash文件的内容添加到.bashrc文件中。 \
-ZSH即将完成：\
-### Usage
-compiledb提供了一个makepython包装器脚本,除了执行makebuild命令外,它还更新与该构建相对应的JSON编译数据库文件,从而产生一个类似于Bear的command-line接口。\
-要使用compiledb的“make wrapper”脚本生成compile_commands.json文件,请执行Makefile targetall：
-```
- compiledb make
-```
-compiledb将make子命令后传递的所有选项/参数转发给gnumake,因此可以使用core/main.mk作为主makefile(-f标志)生成compile_commands.json,从build目录(-C标志)开始构建：
-```
- compiledb make -f core/main.mk -C build
-```
-默认情况下,compiledb make生成编译数据库并运行请求的实际构建命令(充当make包装器),可以使用-n或--no-build选项跳过构建步骤。
-```
- compiledb -n make
-```
-compiledbbase命令被设计成可以用来解析来自任意文本文件(或stdin)的编译命令,假设它有一个构建日志(理想情况下使用make -Bnwk命令生成),并生成相应的JSON编译数据库。\
-例如,要从build-log.txt文件生成编译数据库,请使用以下命令。
-```
- compiledb --parse build-log.txt
-```
-或其等效物：
-```
- compiledb < build-log.txt
-```
-甚至可以通过管道make的输出并将编译数据库打印到标准输出：
-```
- make -Bnwk | compiledb -o-
-```
-默认情况下,compiledb以“参数”列表格式生成一个JSON编译数据库。使用--command-style标志也支持“命令”字符串格式：
-```
- compiledb --command-style make
+sudo python3 -m pip install lit # Bear 依赖
+git clone https://github.com/rizsotto/Bear.git
+cd Bear
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu -DENABLE_MULTILIB=ON -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
+make all -j8
+#make check
+sudo make install
 ```
 
 # 15,解决双系统ubuntu没有挂载硬盘写入权限的方法：如果win10那边提示要修复硬盘,不用管,否则ubuntu会没有读写权限。

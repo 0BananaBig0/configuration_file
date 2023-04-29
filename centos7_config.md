@@ -54,7 +54,6 @@
     * [对于cmake和catkin:](#对于cmake和catkin)
     * [对于make:](#对于make)
         * [Installation](#installation)
-        * [Usage](#usage)
 * [31,安装bazel和svlangserver和verible](#31安装bazel和svlangserver和verible)
     * [Install bazel](#install-bazel)
     * [Install svlangserver](#install-svlangserver)
@@ -163,6 +162,7 @@ sudo yum install -y cmake3 devtoolset-9* cmake3-gui
 sudo yum install -y devtoolset-7 devtoolset-11*
 sudo yum remove cmake
 sudo update-alternatives --install /usr/bin/cmake cmake /usr/bin/cmake3 3
+sudo update-alternatives --install /usr/bin/ctest ctest /usr/bin/ctest3 3
 sudo update-alternatives --install /usr/bin/cmake-gui cmake-gui /usr/bin/cmake3-gui 3
 #add the following content to your .bashrc or .zshrc
 #for gcc-7 g++-7
@@ -313,7 +313,6 @@ python3 -m pip config set global.index-url https://mirrors.cloud.tencent.com/pyp
 exit
 python3 -m pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
 python3 -m pip install pysnooper ipdb
-python3 -m pip install compiledb #(a tool for you to create a compile_commands.json if you use make to manage your c/c++ project)
 python3 -m pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright
 python3 -m pip install cppman you-get sphinx sphinx-rtd-theme
 # use httpie to replace replace curl and wget
@@ -954,47 +953,21 @@ pandoc linux.md -o linux.pdf
 (5)建立compile_commands.json硬链接/ 软连接 \
 (6)写compile_flags.txt \
 ## 对于make:
-为基于GNUmake的构建系统生成Clang的JSON编译数据库文件的工具。\
-它主要针对non-cmake(cmake已经生成了编译数据库)的大型代码库。受YCM-Generator和Bear这样的项目的启发,但是速度更快(主要是大型项目),因为在大多数情况下,它不需要一个干净的构建(如前面提到的工具那样)来生成编译数据库文件,为了实现这一点,它使用make选项,比如-n/--dry-run和-k/--keep-going来提取编译命令。而且,与YCM-generator'sfake-toolchanin方法相比,cross-compiling更友好。\
+有三种工具可以辅助基于GNUmake的构建系统生成Clang的JSON编译数据库文件的工具。\
+分别为compiledb，YCM-Generator和Bear。本系统主要使用的bear。\
+最新版本的 Bear 要求 C++17，而且还有类似 gRPC 的依赖，装起来太麻烦了，所以这里选择了老一点的 2.4.4 编译安装。
 ### Installation
 ```
-sudo su
-python3 -m pip install compiledb # think about bear which has the same function as compiledb
-exit
-```
-支持Python2.x和3.x(目前,仅在2.7和3.6版本中测试) \
-例如,对于bash完成支持,可以将sh-completion/compiledb.bash文件的内容添加到.bashrc文件中。 \
-ZSH即将完成：\
-### Usage 
-compiledb提供了一个makepython包装器脚本,除了执行makebuild命令外,它还更新与该构建相对应的JSON编译数据库文件,从而产生一个类似于Bear的command-line接口。\
-要使用compiledb的“make wrapper”脚本生成compile_commands.json文件,请执行Makefile targetall： 
-```
- compiledb make
-```
-compiledb将make子命令后传递的所有选项/参数转发给gnumake,因此可以使用core/main.mk作为主makefile(-f标志)生成compile_commands.json,从build目录(-C标志)开始构建：
-```
- compiledb make -f core/main.mk -C build
-```
-默认情况下,compiledb make生成编译数据库并运行请求的实际构建命令(充当make包装器),可以使用-n或--no-build选项跳过构建步骤。
-```
- compiledb -n make
-```
-compiledbbase命令被设计成可以用来解析来自任意文本文件(或stdin)的编译命令,假设它有一个构建日志(理想情况下使用make -Bnwk命令生成),并生成相应的JSON编译数据库。\
-例如,要从build-log.txt文件生成编译数据库,请使用以下命令。
-```
- compiledb --parse build-log.txt
-```
-或其等效物：
-```
- compiledb < build-log.txt
-```
-甚至可以通过管道make的输出并将编译数据库打印到标准输出：
-```
- make -Bnwk | compiledb -o-
-```
-默认情况下,compiledb以“参数”列表格式生成一个JSON编译数据库。使用--command-style标志也支持“命令”字符串格式：
-```
- compiledb --command-style make
+sudo python3 -m pip install lit # Bear 依赖
+git clone https://github.com/rizsotto/Bear.git
+cd Bear
+git checkout 2.4.4
+mkdir build
+cd build
+cmake ..
+make all
+#make check
+sudo make install
 ```
 
 # 31,安装bazel和svlangserver和verible
