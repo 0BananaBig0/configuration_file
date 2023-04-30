@@ -742,7 +742,7 @@ function! SetTitle()
   if &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
     call setline(1,'#########################################################################')
     call append(line('$'), '# File Name: '.expand('%'))
-    call append(line('$'), '# Author: LiangHuaxiao')
+    call append(line('$'), '# Author: Huaxiao Liang')
     call append(line('$'), '# mail: 1184903633@qq.com')
     call append(line('$'), '# Created Time: '.strftime('%c'))
     call append(line('$'), '#########################################################################')
