@@ -4,26 +4,21 @@
 "(1)*llvm* and *clang* , make sure their versions are bigger than 10.0 coc will need them
 "(2)nodejs and yarn, make sure nodejs version is bigger than 12.12. coc will need them
 "Also,markdown-preview.nvim needs yarn.
-"(3)universial ctags, git clone https://github.com/universal-ctags/ctags.git
-"(4)gnu global(gtags), https://ftp.gnu.org/pub/gnu/global/
-"(5)the (3) (4) and gen_tags.vim may not be needed if you only write c/c++ and python,
-"because coc can support the function so that we can jump to the
-"definition and reference without tags by LSP（Language Server Protocol）and better than tags.
-"(6)compiledb,python3 -m pip install compiledb. It can support compile_commands.json for clangd if
-"you use make to manage your project. If you use cmake, add set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+"(3)bear. It can support compile_commands.json for clangd if you use make to manage your project.
+"If you use cmake, add set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 "to your CMakeLists.txt, that can support compile_commands.json. After the
 "compile_commands.json created, you should copy it or link it so that we can
 "find it in your root of your projece.
-"(7)vimplug,https://github.com/junegunn/vim-plug,this can help you manage your plugin of vim
-"(8)if you use python, you also need to execute the following commands:
+"(4)vimplug,https://github.com/junegunn/vim-plug,this can help you manage your plugin of vim
+"(5)if you use python, you also need to execute the following commands:
 "python3 -m pip install pysnooper ipdb pylint yapf futures isort pyright
-"(9)python3 -m pip install pygments vim-vint cmakelang
-"(10)if you want to use my coc-settings.json, you can copy it from
+"(6)python3 -m pip install pygments vim-vint cmakelang
+"(7)if you want to use my coc-settings.json, you can copy it from
 "/home/hxliang/.vim to /home/you/.vim. And there are some dependencies you
 "should have: install verilator,verible and sudo npm install -g @imc-trading/svlangserver
 "if your write the verilog. https://github.com/chipsalliance/verible
-"(11)install ripgrep,if you want to use 'leaderf rg' command in .vimrc . https://github.com/BurntSushi/ripgrep
-"(12)if your vim tell you that it can't find some models, you can do that
+"(8)install ripgrep,if you want to use 'leaderf rg' command in .vimrc . https://github.com/BurntSushi/ripgrep
+"(9)if your vim tell you that it can't find some models, you can do that
 "first, coc.nvim use iverilog or verilator check the verilog syntax
 "last,at the top of your verilog file add the following statement:
 "`include "/path/to/xxx.v"
@@ -41,7 +36,6 @@
 "for example,if you want to use ls command,you can type the  :!ls  in the vim normal mode
 "or correct your vim commands you type
 "vimplug:  PlugInstall PlugUpdate PlugUpgrade
-"gen_tags: GenCtags GenGTAGS ClearCtags ClearGTAGS
 "leaderf: LeaderfFunction
 
 
@@ -92,8 +86,6 @@ Plug 'tpope/vim-fugitive',{'on':[]}
 Plug 'airblade/vim-gitgutter',{'on':[]}
 " c/cpp debug
 Plug 'puremourning/vimspector',{'on':[]}
-" 异步生成tags插件，命令是GenGTAGS,GenCtags，存储在~/.cache/tags_dir中
-Plug 'jsfaint/gen_tags.vim', {'on':['GenGTAGS','GenCtags','ClearGTAGS','ClearGtags']}
 " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
 " LeaderF extension for navigate the marks
@@ -425,18 +417,6 @@ function! Lazy_On_Plugin_Configuration()
     autocmd User VimspectorUICreated call s:SetUpUI()
     autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
   augroup END
-
-
-
-  " gen_tags setting
-  if (&filetype==?'cpp')||(&filetype==?'c')
-    let g:gen_tags#ctags_opts = ['--c++-kinds=+pxzl', '--c-kinds=+pxzl']
-    let g:gen_tags#gtags_opts = ['-c', '--verbose']
-  endif
-  let g:gen_tags#ctags_auto_update = 0
-  let g:gen_tags#gtags_auto_update = 0
-  let $GTAGSCONF='/usr/local/share/gtags/gtags.conf'
-  let $GTAGSLABEL = 'native-pygments'
 
 
 
