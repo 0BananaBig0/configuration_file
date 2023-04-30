@@ -32,7 +32,8 @@
    "C_Cpp.codeAnalysis.runAutomatically": false,
    "C_Cpp.formatting": "Disabled",
    "C_Cpp.debugger.useBacktickCommandSubstitution": true,
-   "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
+   "OpenCL.server.enable": false,
+   "vscode-neovim.neovimExecutablePaths.darwin": "/usr/bin/nvim",
    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
    "editor.minimap.enabled": false
 }
