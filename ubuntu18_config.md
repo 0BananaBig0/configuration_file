@@ -644,15 +644,7 @@ sudo apt install *clang*13* *llvm*13*
 分别为compiledb，YCM-Generator和Bear。本系统主要使用的bear。
 ### Installation
 ```
-sudo python3 -m pip install lit # Bear 依赖
-git clone https://github.com/rizsotto/Bear.git
-cd Bear
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_LIBDIR=lib/x86_64-linux-gnu -DENABLE_MULTILIB=ON -DENABLE_UNIT_TESTS=ON -DENABLE_FUNC_TESTS=ON ..
-make all -j8
-#make check
-sudo make install
+sudo apt install bear
 ```
 
 # 15,解决双系统ubuntu没有挂载硬盘写入权限的方法：如果win10那边提示要修复硬盘,不用管,否则ubuntu会没有读写权限。
