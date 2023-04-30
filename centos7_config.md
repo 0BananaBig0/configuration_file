@@ -204,7 +204,7 @@ fi
 ```
 #execute the following command
 ```
-git config --global user.name "0BananaBig0"
+git config --global user.name "Huaxiao Liang"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
