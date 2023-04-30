@@ -1,5 +1,28 @@
 {
    "languageserver": {
+      "clangd": {
+         "command": "clangd",
+         "rootPatterns": [
+            "compile_flags.txt",
+            "compile_commands.json",
+            ".git"
+         ],
+         "filetypes": [
+            "c",
+            "cc",
+            "cpp",
+            "c++",
+            "objc",
+            "objcpp",
+            "opencl"
+         ],
+         "args": [
+            "--background-index",
+            "--completion-style=detailed",
+            "--header-insertion=never",
+            "--inlay-hints"
+         ]
+      },
       "svlangserver": {
          "command": "svlangserver",
          "rootPatterns": [
@@ -31,12 +54,6 @@
       ".project",
       ".svn",
       ".root"
-   ],
-   "clangd.arguments": [
-      "--background-index",
-      "--completion-style=detailed",
-      "--header-insertion=never",
-      "--inlay-hints"
    ],
    "coc.preferences.jumpCommand": "edit",
    "diagnostic.enable": false,

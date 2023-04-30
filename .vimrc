@@ -220,7 +220,7 @@ function! Lazy_On_Plugin_Configuration()
   nmap <silent>[l <Plug>(coc-diagnostic-info)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
-           \ 'coc-dictionary', 'coc-yaml', 'coc-cmake',
+           \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl',
            \ 'coc-markdownlint', 'coc-json', 'coc-css']
 
