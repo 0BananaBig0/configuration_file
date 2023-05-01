@@ -460,62 +460,7 @@ function! Neoformat_Lazy_Setting()
   endfunction
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
-            \ 'args': ['-style="{
-            \ BasedOnStyle: LLVM,
-            \ AccessModifierOffset: 0,
-            \ AlignArrayOfStructures: Left,
-            \ AlignConsecutiveMacros: AcrossEmptyLinesAndComments,
-            \ AlignConsecutiveBitFields: AcrossEmptyLinesAndComments,
-            \ AlignEscapedNewlines: Left,
-            \ AlignOperands: AlignAfterOperator,
-            \ AllowShortEnumsOnASingleLine: false,
-            \ AttributeMacros: ["__kernel", "__global", "__write_only", "__read_only"],
-            \ BreakBeforeBraces: Custom,
-            \ BraceWrapping:
-            \ {
-            \   AfterCaseLabel: false,
-            \   AfterClass: false,
-            \   AfterControlStatement: Never,
-            \   AfterEnum: false,
-            \   AfterFunction: false,
-            \   AfterNamespace: false,
-            \   AfterObjCDeclaration: false,
-            \   AfterStruct: false,
-            \   AfterUnion: false,
-            \   AfterExternBlock: false,
-            \   BeforeCatch: false,
-            \   BeforeElse: false,
-            \   BeforeLambdaBody: false,
-            \   BeforeWhile: false,
-            \   IndentBraces: false,
-            \   SplitEmptyFunction: false,
-            \   SplitEmptyRecord: false,
-            \   SplitEmptyNamespace: false
-            \ },
-            \ BreakInheritanceList: AfterComma,
-            \ BreakConstructorInitializers: AfterColon,
-            \ ConstructorInitializerIndentWidth: 3,
-            \ ContinuationIndentWidth: 3,
-            \ IndentAccessModifiers: true,
-            \ IndentCaseLabels: true,
-            \ IndentWidth: 3,
-            \ ObjCBlockIndentWidth: 3,
-            \ SpaceAfterTemplateKeyword: false,
-            \ SpaceBeforeParens: Never,
-            \ SpaceBeforeRangeBasedForLoopColon: false,
-            \ BitFieldColonSpacing: After,
-            \ TabWidth: 3,
-            \ PointerAlignment: Left,
-            \ ReferenceAlignment: Left,
-            \ ReflowComments: false,
-            \ SortIncludes: Never,
-            \ SortJavaStaticImport: Before,
-            \ SortUsingDeclarations: false,
-            \ SpacesBeforeTrailingComments: 3,
-            \ SpacesInAngles: Always,
-            \ SpacesInConditionalStatement: true,
-            \ SpacesInParentheses: true
-            \ }"'],
+            \ 'args': ['-style=file'],
             \ 'stdin': 1,
             \ }
   let g:neoformat_perl_perltidy = {
@@ -918,3 +863,4 @@ nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+
