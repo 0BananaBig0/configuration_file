@@ -336,7 +336,7 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vimspector setting
-  function! Cpp_Workspace_Configuration()
+  function! Cpp_Debug_Configuration()
     let cpp_workspace_root = finddir('.git', '.;')
     if (strlen(cpp_workspace_root) == 0)
       let cpp_workspace_root = expand('%:p:h')
@@ -375,7 +375,7 @@ function! Lazy_On_Plugin_Configuration()
   nnoremap <silent>]<F5> :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 19<CR>
                        \ :silent call plug#load('vimspector')<CR>
                        \ :call vimspector#Launch()<CR>
-  nnoremap <silent><Leader><F5> :silent call Cpp_Workspace_Configuration()<CR>
+  nnoremap <silent><Leader><F5> :silent call Cpp_Debug_Configuration()<CR>
   nmap <silent><F6> <Plug>VimspectorStepOver
   nmap <silent><C-F6> <Plug>VimspectorStepInto
   nmap <silent><S-F6> <Plug>VimspectorStepOut
