@@ -450,6 +450,14 @@ endfunction
 
 function! Neoformat_Lazy_Setting()
   " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
+  function! Cpp_Format_Configuration()
+    let cpp_workspace_root = Cpp_Workspace_Root()
+    let clang_format = cpp_workspace_root.'/.clang-format'
+    if !filereadable(clang_format)
+      let clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
+      call writefile(clang_format_content,clang_format,'s')
+    endif
+  endfunction
   let g:neoformat_cpp_clangformat = {
             \ 'exe': 'clang-format',
             \ 'args': ['-style="{
@@ -522,6 +530,7 @@ function! Neoformat_Lazy_Setting()
   let g:neoformat_enabled_opencl = ['clangformat']
   let g:neoformat_enabled_cmake = ['cmakeformat']
   noremap <silent><F7> :Neoformat<CR>
+  noremap <silent><Leader><F7> :silent call Cpp_Format_Configuration()<CR>
   let g:neoformat_only_msg_on_error = 1
   let g:neoformat_basic_format_retab = 1
 endfunction
@@ -909,5 +918,3 @@ nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
-
