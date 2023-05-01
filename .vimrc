@@ -336,7 +336,7 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vimspector setting
-  function! Cpp_Debug_Configuration()
+  function! Cpp_Workspace_Root()
     let cpp_workspace_root = finddir('.git', '.;')
     if (strlen(cpp_workspace_root) == 0)
       let cpp_workspace_root = expand('%:p:h')
@@ -345,6 +345,10 @@ function! Lazy_On_Plugin_Configuration()
     else
       let cpp_workspace_root = strpart(cpp_workspace_root,0,strridx(cpp_workspace_root,'/.git'))
     endif
+    return cpp_workspace_root
+  endfunction
+  function! Cpp_Debug_Configuration()
+    let cpp_workspace_root = Cpp_Workspace_Root()
     let launch_json = cpp_workspace_root.'/.vscode/launch.json'
     if !filereadable(launch_json)
       call mkdir(cpp_workspace_root.'/.vscode', 'p', 0755)
