@@ -337,26 +337,26 @@ function! Lazy_On_Plugin_Configuration()
 
   " vimspector setting
   function! Cpp_Workspace_Configuration()
-    let root_location = finddir('.git', '.;')
-    if (strlen(root_location) == 0)
-      let root_location = expand('%:p:h')
-    elseif (root_location ==? '.git')
-      let root_location = '.'
+    let cpp_workspace_root = finddir('.git', '.;')
+    if (strlen(cpp_workspace_root) == 0)
+      let cpp_workspace_root = expand('%:p:h')
+    elseif (cpp_workspace_root ==? '.git')
+      let cpp_workspace_root = '.'
     else
-      let root_location = strpart(root_location,0,strridx(root_location,'/.git'))
+      let cpp_workspace_root = strpart(cpp_workspace_root,0,strridx(cpp_workspace_root,'/.git'))
     endif
-    let root_vscode = root_location.'/.vscode/launch.json'
-    if !filereadable(root_vscode)
-      call mkdir(root_location.'/.vscode', 'p', 0755)
-      let cpp_json_content = readfile($HOME.'/.vim/.vimspectorjson/.vscode/launch.json')
-      call writefile(cpp_json_content,root_vscode,'s')
+    let launch_json = cpp_workspace_root.'/.vscode/launch.json'
+    if !filereadable(launch_json)
+      call mkdir(cpp_workspace_root.'/.vscode', 'p', 0755)
+      let launch_json_content = readfile($HOME.'/.vim/.c_cpp/.vscode/launch.json')
+      call writefile(launch_json_content,launch_json,'s')
     endif
-    let root_location = root_location.'/.vimspector.json'
-    if !filereadable(root_location)
-      let cpp_json_content = readfile($HOME.'/.vim/.vimspectorjson/cpp.json')
-      call writefile(cpp_json_content,root_location,'s')
+    let vimspector_json = cpp_workspace_root.'/.vimspector.json'
+    if !filereadable(vimspector_json)
+      let cpp_json_content = readfile($HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json')
+      call writefile(cpp_json_content,vimspector_json,'s')
     endif
-      exec 'tabe ' . root_location
+      exec 'tabe ' . vimspector_json
   endfunction
   nmap <silent><F2> <Plug>VimspectorContinue
   nnoremap <silent><S-F2> :VimspectorReset<CR>
