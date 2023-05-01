@@ -457,7 +457,6 @@ function! Neoformat_Lazy_Setting()
             \ AlignEscapedNewlines: Left,
             \ AlignOperands: AlignAfterOperator,
             \ AllowShortEnumsOnASingleLine: false,
-            \ AlwaysBreakTemplateDeclarations: Yes,
             \ AttributeMacros: ["__kernel", "__global", "__write_only", "__read_only"],
             \ BreakBeforeBraces: Custom,
             \ BraceWrapping:
@@ -493,7 +492,18 @@ function! Neoformat_Lazy_Setting()
             \ SpaceBeforeParens: Never,
             \ SpaceBeforeRangeBasedForLoopColon: false,
             \ BitFieldColonSpacing: After,
-            \ TabWidth: 3}"'],
+            \ TabWidth: 3,
+            \ PointerAlignment: Left,
+            \ ReferenceAlignment: Left,
+            \ ReflowComments: false,
+            \ SortIncludes: Never,
+            \ SortJavaStaticImport: Before,
+            \ SortUsingDeclarations: false,
+            \ SpacesBeforeTrailingComments: 3,
+            \ SpacesInAngles: Always,
+            \ SpacesInConditionalStatement: true,
+            \ SpacesInParentheses: true
+            \ }"'],
             \ 'stdin': 1,
             \ }
   let g:neoformat_perl_perltidy = {
