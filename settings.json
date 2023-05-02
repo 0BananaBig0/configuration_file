@@ -30,10 +30,13 @@
    "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,
    "C_Cpp.renameRequiresIdentifier": false,
    "C_Cpp.codeAnalysis.runAutomatically": false,
-   "C_Cpp.formatting": "Disabled",
+   "C_Cpp.formatting": "disabled",
    "C_Cpp.debugger.useBacktickCommandSubstitution": true,
+   "C_Cpp.clang_format_sortIncludes": false,
+   "C_Cpp.codeAnalysis.clangTidy.codeAction.showClear": "None",
    "OpenCL.server.enable": false,
    "vscode-neovim.neovimExecutablePaths.darwin": "/usr/bin/nvim",
    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
-   "editor.minimap.enabled": false
+   "editor.minimap.enabled": false,
+   "git.enableSmartCommit": true
 }
