@@ -90,8 +90,6 @@ Plug 'puremourning/vimspector',{'on':[]}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
-" 代码格式化插件
-Plug 'sbdchd/neoformat',{'on':['Neoformat']}
 " highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'on':[]}
 " 高亮c++类模板等插件
@@ -159,7 +157,6 @@ function! CocTimerStart(timer)
     augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
-      autocmd FileType c,cpp,cmake,opencl,perl,verilog,json silent call Neoformat_Lazy_Setting()
     augroup END
     silent call Lazy_On_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
@@ -215,6 +212,28 @@ function! Lazy_On_Plugin_Configuration()
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl',
            \ 'coc-markdownlint', 'coc-json', 'coc-css']
+  function! Cpp_Workspace_Root()
+    let cpp_workspace_root = finddir('.git', '.;')
+    if (strlen(cpp_workspace_root) == 0)
+      let cpp_workspace_root = expand('%:p:h')
+    elseif (cpp_workspace_root ==? '.git')
+      let cpp_workspace_root = '.'
+    else
+      let cpp_workspace_root = strpart(cpp_workspace_root,0,strridx(cpp_workspace_root,'/.git'))
+    endif
+    return cpp_workspace_root
+  endfunction
+  function! Cpp_Format_Configuration()
+    let cpp_workspace_root = Cpp_Workspace_Root()
+    let clang_format = cpp_workspace_root.'/.clang-format'
+    if !filereadable(clang_format)
+      let clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
+      call writefile(clang_format_content,clang_format,'s')
+    endif
+  endfunction
+  noremap <silent><Leader><F7> :silent call Cpp_Format_Configuration()<CR>
+  nmap <F7>  <Plug>(coc-format)
+  xmap <F7>  <Plug>(coc-format-selected)
 
 
 
@@ -336,17 +355,6 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vimspector setting
-  function! Cpp_Workspace_Root()
-    let cpp_workspace_root = finddir('.git', '.;')
-    if (strlen(cpp_workspace_root) == 0)
-      let cpp_workspace_root = expand('%:p:h')
-    elseif (cpp_workspace_root ==? '.git')
-      let cpp_workspace_root = '.'
-    else
-      let cpp_workspace_root = strpart(cpp_workspace_root,0,strridx(cpp_workspace_root,'/.git'))
-    endif
-    return cpp_workspace_root
-  endfunction
   function! Cpp_Debug_Configuration()
     let cpp_workspace_root = Cpp_Workspace_Root()
     let launch_json = cpp_workspace_root.'/.vscode/launch.json'
@@ -444,40 +452,6 @@ function! Lazy_On_Plugin_Configuration()
   let g:Lf_PreviewResult = {'Rg': 1 }
   let g:Lf_ShortcutB = '<Leader>fb'
   let g:Lf_ShortcutF = '<Leader>ff'
-endfunction
-
-
-
-function! Neoformat_Lazy_Setting()
-  " 默认调用软件为clang-format, style options:LLVM, GNU, Google, Chromium, Microsoft, Mozilla, WebKit
-  function! Cpp_Format_Configuration()
-    let cpp_workspace_root = Cpp_Workspace_Root()
-    let clang_format = cpp_workspace_root.'/.clang-format'
-    if !filereadable(clang_format)
-      let clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
-      call writefile(clang_format_content,clang_format,'s')
-    endif
-  endfunction
-  let g:neoformat_cpp_clangformat = {
-            \ 'exe': 'clang-format',
-            \ 'args': ['-style=file'],
-            \ 'stdin': 1,
-            \ }
-  let g:neoformat_perl_perltidy = {
-            \ 'exe': 'perltidy',
-            \ 'args': ['-i=3'],
-            \ 'stdin': 1,
-            \ }
-  let g:neoformat_c_clangformat = g:neoformat_cpp_clangformat
-  let g:neoformat_opencl_clangformat = g:neoformat_cpp_clangformat
-  let g:neoformat_enabled_cpp = ['clangformat']
-  let g:neoformat_enabled_c = ['clangformat']
-  let g:neoformat_enabled_opencl = ['clangformat']
-  let g:neoformat_enabled_cmake = ['cmakeformat']
-  noremap <silent><F7> :Neoformat<CR>
-  noremap <silent><Leader><F7> :silent call Cpp_Format_Configuration()<CR>
-  let g:neoformat_only_msg_on_error = 1
-  let g:neoformat_basic_format_retab = 1
 endfunction
 
 
@@ -863,4 +837,3 @@ nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
