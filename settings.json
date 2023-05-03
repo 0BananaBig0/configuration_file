@@ -10,7 +10,7 @@
       "--completion-parse=auto",
       "--completion-style=detailed",
       "--enable-config",
-      "--fallback-style=Webkit",
+      "--fallback-style=none",
       "--function-arg-placeholders=true",
       "--header-insertion-decorators",
       "--pch-storage=memory",
