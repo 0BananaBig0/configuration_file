@@ -100,12 +100,12 @@ Plug 'vim-python/python-syntax', {'on':[]}
 Plug 'taketwo/vim-ros',{'on':[]}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent',{'on':[]}
-" markdown实时预览插件
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
-" markdown表格插件
-Plug 'godlygeek/tabular', {'on': []}
 " vim快捷键管理和提示插件
 Plug 'liuchengxu/vim-which-key', { 'on': [] }
+" markdown实时预览插件
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'on': []}
+" markdown表格插件
+Plug 'godlygeek/tabular', {'on': []}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc',{'on':[]}
 " nerdcommenter快速注释插件
@@ -155,6 +155,7 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     exec 'CocStart'
     augroup Lazy_Call_Plugin
+      autocmd FileType markdown silent call plug#load('markdown-preview.nvim')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
     augroup END
@@ -473,12 +474,12 @@ let g:python_highlight_file_headers_as_comments = 1
 
 
 
-" markdown-preview.nvim setting
-let g:mkdp_browser = '/usr/bin/firefox'
-
-
-
 function! Lazy_Plugin_Configuration()
+   " markdown-preview.nvim setting
+   let g:mkdp_browser = '/usr/bin/firefox'
+
+
+
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode

@@ -136,6 +136,7 @@
 * [81 install zotero](#81-install-zotero)
 * [82 install a json formatter](#82-install-a-json-formatter)
 * [83 use neovim as a backend of vscode](#83-use-neovim-as-a-backend-of-vscode)
+* [83 latexmk](#83-latexmk)
 
 <!-- vim-markdown-toc -->
 最先换源和安装好所有需要的ppa源和deb源(cuda,tensorrt),接着优先安装gcc,g++,jdk,zsh,zinit,llvm,更换默认pip为pip3,使用pip下载pylint.现在ubuntu安装不同的包都会在/bin或/usr/bin或/usr/local/bin等那些地方安装可执行文件并带有版本号,使用时要么输入有版本号的命令,要么使用update-alternatives来管理符号链接.可去到bin文件夹ls xxx*来看有多少个版本的xxx软件。\
@@ -1830,4 +1831,10 @@ endif
 ```
    "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
+```
+
+
+# 83 latexmk
+```
+sudo apt install latexmk
 ```

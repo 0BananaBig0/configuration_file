@@ -83,6 +83,7 @@
 * [48 configure perl LSP](#48-configure-perl-lsp)
 * [49 install a json formatter](#49-install-a-json-formatter)
 * [50 use neovim as a backend of vscode](#50-use-neovim-as-a-backend-of-vscode)
+* [51 latexmk](#51-latexmk)
 
 <!-- vim-markdown-toc -->
 # NOTE
@@ -1262,4 +1263,9 @@ endif
 ```
    "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
+```
+
+# 51 latexmk
+```
+sudo yum install latexmk
 ```
