@@ -123,7 +123,7 @@ colorscheme dracula
 set guicursor=c-i:ver33-Cursor
 set guicursor+=a:blinkon0
 nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
-                           \ :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 23<CR>
+                           \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                            \ :IndentGuidesDisable<CR>
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -385,7 +385,7 @@ function! Lazy_On_Plugin_Configuration()
   nnoremap <silent>]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
   nnoremap <silent>]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   nnoremap <silent><F5> :silent call plug#load('vimspector')<CR>
-  nnoremap <silent>]<F5> :set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 19<CR>
+  nnoremap <silent>]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
                        \ :silent call plug#load('vimspector')<CR>
                        \ :call vimspector#Launch()<CR>
   nnoremap <silent><Leader><F5> :silent call Cpp_Debug_Configuration()<CR>
@@ -574,8 +574,8 @@ endfunction
 if has('gui_running')
   if !has('nvim')
     " set guifont=Monospace\ 18   " 设置字体
-    " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ 19   " 设置字体
-    set guifont=FantasqueSansMono\ Nerd\ Font\ Mono\ 21   " 设置字体
+    " set guifont=DejaVuSansM\ Nerd\ Font\ Mono\ 19   " 设置字体
+    set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
   endif
   " 设定窗口大小
   set lines=60 columns=80
