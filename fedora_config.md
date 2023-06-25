@@ -4,6 +4,8 @@ sudo dnf install -y vim npm nodejs
 sudo dnf install -y gvim
 sudo dnf install -y vim-X11
 sudo dnf install -y clang-tools-extra clang
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 systemctl set-default  graphical.target 
 sudo reboot
 sudo dnf install -y zsh
@@ -17,6 +19,8 @@ wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
 sh install.sh
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
 cp ~/Documents/configuration_file/.vimrc ~
+cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
+cp ~/Documents/configuration_file/coc-settings.json ~/.vim
 cp ~/Documents/configuration_file/.zshrc ~
 cp ~/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 sudo dnf install -y sqlite
