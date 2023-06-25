@@ -787,9 +787,10 @@ sudo apt install fonts-wqy*
 sudo apt install font-manager
 #去https://www.nerdfonts.com/font-downloads下载DejaVuSansMono,FantasqueSansMono,UbuntuMono,InconsolataLGC字体
 #解压DejaVuSansMono,FantasqueSansMono Nerd Font,UbuntuMono,InconsolataLGC字体并进入解压出来的文件夹
-sudo cp DejaVuSansMono/ FantasqueSansMono InconsolataLGC /usr/share/fonts -r
-sudo chown root:root DejaVuSansMono FantasqueSansMono InconsolataLGC -R
-sudo chmod 755 DejaVuSansMono FantasqueSansMono InconsolataLGC -R
+sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts -r
+cd /usr/share/fonts
+sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
+sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
 ```
 

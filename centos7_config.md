@@ -528,7 +528,7 @@ sudo yum -y install ninja-build libtool autoconf automake cmake3 gcc gcc-c++ mak
 make CMAKE_BUILD_TYPE=Release #repeat until success
 sudo make install
 sudo su
-python3.8 -m pip install neovim
+python -m pip install neovim
 npm install -g neovim
 gem sources -r https://rubygems.org/ -a https://gems.ruby-china.com/
 #sudo gem install neovim
