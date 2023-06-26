@@ -49,3 +49,10 @@ sudo dnf install -y p7zip.x86_64 p7zip-plugins.x86_64
 sudo dnf install -y opencl-headers.noarch
 sudo dnf install ocl-icd-devel ocl-icd.x86_64 -y
 sudo dnf install -y clinfo
+git config --global user.name "Huaxiao Liang"
+git config --global user.email "1184903633@qq.com"
+git config --global alias.logline "log --graph --abbrev-commit"
+git config --global core.editor gvim
+git config --global protocol.https.allow always
+git config --global push.default "current"
+git config --global diff.tool gvimdiff

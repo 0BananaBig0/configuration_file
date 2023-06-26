@@ -1009,7 +1009,7 @@ unset VERILATOR_ROOT
 git checkout stable
 autoconf
 ./configure
-make
+make -j16
 make test
 sudo make install
 ```
