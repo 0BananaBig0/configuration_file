@@ -21,7 +21,7 @@ bash -c "$(curl --fail --show-error --silent --location https://raw.githubuserco
 cp ~/Documents/configuration_file/.vimrc ~
 cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
 cp ~/Documents/configuration_file/coc-settings.json ~/.vim
-cp ~/Documents/configuration_file/.zshrc ~
+#cp ~/Documents/configuration_file/.zshrc ~
 cp ~/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 sudo dnf install -y sqlite
 sudo reboot
@@ -48,7 +48,7 @@ sudo npm install -g neovim
 sudo dnf install -y p7zip.x86_64 p7zip-plugins.x86_64
 sudo dnf install -y opencl-headers.noarch
 sudo dnf install ocl-icd-devel ocl-icd.x86_64 -y
-sudo dnf install -y clinfo
+sudo dnf install -y clinfo boost-devel tcl-devel
 git config --global user.name "Huaxiao Liang"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
@@ -56,3 +56,7 @@ git config --global core.editor gvim
 git config --global protocol.https.allow always
 git config --global push.default "current"
 git config --global diff.tool gvimdiff
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
+sudo dnf update
+sudo dnf install code
