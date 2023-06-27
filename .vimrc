@@ -212,7 +212,7 @@ function! Lazy_On_Plugin_Configuration()
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl',
-           \ 'coc-markdownlint', 'coc-json', 'coc-css']
+           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
   function! Cpp_Workspace_Root()
     let cpp_workspace_root = finddir('.git', '.;')
     if (strlen(cpp_workspace_root) == 0)

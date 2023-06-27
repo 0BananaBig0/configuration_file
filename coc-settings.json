@@ -44,6 +44,7 @@
    "diagnostic.messageTarget": "echo",
    "diagnostic.virtualText": true,
    "diagnostic.warningSign": "⚡",
+   "inlayHint.enable": false,
    "markdownlint.onChange": false,
    "markdownlint.onOpen": false,
    "markdownlint.onSave": false,
