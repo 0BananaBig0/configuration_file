@@ -38,5 +38,9 @@
    "vscode-neovim.neovimExecutablePaths.darwin": "/usr/bin/nvim",
    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
    "editor.minimap.enabled": false,
-   "git.enableSmartCommit": true
+   "git.enableSmartCommit": true,
+   "[python]": {
+      "editor.formatOnType": true
+   }
 }
+
