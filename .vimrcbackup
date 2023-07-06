@@ -62,39 +62,15 @@ let g:maplocalleader = ' '
 
 " let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
 call plug#begin('~/.vim/plugged')
-" vim theme, No_Lazy
+" vim theme
 Plug 'dracula/vim', { 'as': 'dracula' }
 " 彩虹括号
 Plug 'luochen1990/rainbow'
 " 缩进显示
 Plug 'nathanaelkane/vim-indent-guides'
-" highlight opencl 2.0 syntax
-Plug 'brgmnn/vim-opencl', {'for':[]}
-" 高亮c++类模板等插件
-Plug 'bfrg/vim-cpp-modern', {'for':[]}
-" python 语法高亮插件
-Plug 'vim-python/python-syntax', {'for':[]}
-" roslaunch语法高亮
-Plug 'taketwo/vim-ros',{'for':[]}
-" verilog indent file
-Plug '0BananaBig0/verilog_indent',{'for':[]}
-" markdown实时预览插件, Lazy_For
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'on': []}
-" markdown目录构建插件
-Plug 'mzlogin/vim-markdown-toc',{'for':[]}
-" markdown表格插件
-Plug 'godlygeek/tabular', {'on': []}
-" vim快捷键管理和提示插件, Layz
-Plug 'liuchengxu/vim-which-key', { 'on': [] }
-" 补全插件,动态检测语法插件,可鼠标停留显示信息
+" 补全插件 动态检测语法插件,可鼠标停留显示信息
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" nerdcommenter快速注释插件
-Plug 'preservim/nerdcommenter', {'on':[]}
-" 异步执行shell命令插件
-Plug 'skywind3000/asyncrun.vim',{'on':[]}
-" 菜单栏插件, Only Lazy Configuration, but classifed into Lazy
-Plug 'skywind3000/vim-quickui'
-" 文件目录插件, Lazy_On
+" 文件目录插件
 Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}
 " 标签窗口列表插件
 Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}
@@ -114,16 +90,31 @@ Plug 'puremourning/vimspector',{'on':[]}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
+" highlight opencl 2.0 syntax
+Plug 'brgmnn/vim-opencl', {'on':[]}
+" 高亮c++类模板等插件
+Plug 'bfrg/vim-cpp-modern', {'on':[]}
+" python 语法高亮插件
+Plug 'vim-python/python-syntax', {'on':[]}
+" roslaunch语法高亮
+Plug 'taketwo/vim-ros',{'on':[]}
+" verilog indent file
+Plug '0BananaBig0/verilog_indent',{'on':[]}
+" vim快捷键管理和提示插件
+Plug 'liuchengxu/vim-which-key', { 'on': [] }
+" markdown实时预览插件
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'on': []}
+" markdown表格插件
+Plug 'godlygeek/tabular', {'on': []}
+" markdown目录构建插件
+Plug 'mzlogin/vim-markdown-toc',{'on':[]}
+" nerdcommenter快速注释插件
+Plug 'preservim/nerdcommenter', {'on':[]}
+" 异步执行shell命令插件，如果需要打开新终端，请去github看skywind3000/asyncrun.extra插件
+Plug 'skywind3000/asyncrun.vim',{'on':[]}
+" 菜单栏插件
+Plug 'skywind3000/vim-quickui'
 call plug#end()
-" 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
-augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
-  autocmd FileType cpp,c,opencl silent call plug#load('vim-cpp-modern')
-  autocmd FileType python silent call plug#load('python-syntax')
-  autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
-  autocmd BufRead *.launch silent call plug#load('vim-ros')
-  autocmd FileType verilog silent call plug#load('verilog_indent')
-augroup END
 
 
 
@@ -134,6 +125,15 @@ set guicursor+=a:blinkon0
 nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
                            \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                            \ :IndentGuidesDisable<CR>
+" 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
+augroup Call_Highlight_Plugin
+  autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
+  autocmd FileType cpp,c,opencl silent call plug#load('vim-cpp-modern')
+  autocmd FileType python silent call plug#load('python-syntax')
+  autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
+  autocmd BufRead *.launch silent call plug#load('vim-ros')
+  autocmd FileType verilog silent call plug#load('verilog_indent')
+augroup END
 
 
 
@@ -149,60 +149,24 @@ let g:indent_guides_default_mapping = 0
 
 
 
-" vim-cpp-modern
-let g:cpp_attributes_highlight = 1
-let g:cpp_member_highlight = 1
-let g:cpp_simple_highlight = 1
-
-
-
-" python-syntax setting
-let g:python_highlight_builtins = 1
-let g:python_highlight_string_formatting = 1
-let g:python_highlight_func_calls = 1
-let g:python_highlight_class_vars = 1
-let g:python_highlight_operators = 1
-let g:python_highlight_file_headers_as_comments = 1
-
-
-
-" After 333ms, call the coc.nvim, markdown-preview and so on
+" coc setting
+" After 333ms, call the coc.nvim,delay the coc startup,vim-plug lazy load
 let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
-    augroup Call_Lazy_For_Plugin
+    exec 'CocStart'
+    augroup Lazy_Call_Plugin
       autocmd FileType markdown silent call plug#load('markdown-preview.nvim')
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
     augroup END
+    silent call Lazy_On_Plugin_Configuration()
+    silent call Lazy_Plugin_Configuration()
     silent call plug#load('vim-which-key')
-    exec 'CocStart'
     silent call plug#load('nerdcommenter')
     silent call plug#load('asyncrun.vim')
-    silent call Lazy_For_Plugin_Configuration()
-    silent call Lazy_Plugin_Configuration()
-    silent call Lazy_On_Plugin_Configuration()
 endfunction
 silent call timer_start(333,'CocTimerStart',{'repeat':1})
-
-
-
-function! Lazy_For_Plugin_Configuration()
-   " markdown-preview.nvim setting
-   let g:mkdp_browser = '/usr/bin/firefox'
-
-
-
-  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
-  " at the top, mark the last line of the menu and delete the space line.
-  " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <silent><Leader>gm ggO<ESC>:GenTocGFM<CR>m`ggdd
-  nnoremap <silent><Leader>um :UpdateToc<CR>
-  let g:vmt_auto_update_on_save = 0
-endfunction
-
-
-
-function! Lazy_Plugin_Configuration()
+function! Lazy_On_Plugin_Configuration()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=1
   nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
@@ -212,7 +176,6 @@ function! Lazy_Plugin_Configuration()
 
 
 
-  " coc setting
   " Use tab for trigger completion with characters ahead and navigate.
   " After we select the word we needn't press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
@@ -275,86 +238,6 @@ function! Lazy_Plugin_Configuration()
 
 
 
-  " nerdcommenter插件快速注释
-  let g:NERDSpaceDelims            = 1      " 在注释符号后加一个空格
-  let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
-  let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
-  let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
-  let g:NERDCommentEmptyLines      = 1      " 允许空行注释
-  let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
-  let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
-  let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
-  let g:NERDCustomDelimiters = { 'opencl': { 'left': '//' } } " use // to comment cl source codes.
-  map <silent><F3> <plug>NERDCommenterComment
-  map <silent><S-F3> <plug>NERDCommenterUncomment
-
-
-
-  " asyncrun setting,自动打开 quickfix window ，高度为 6
-  let g:asyncrun_open = 6
-  let g:asyncrun_bell = 1
-  nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
-  nnoremap <Localleader><F8> :AsyncRun! 
-
-
-
-  " vim-quickui setting
-  " clear all the menus
-  call quickui#menu#reset()
-  " install a 'File' menu, use [text, command] to represent an item.
-  call quickui#menu#install('&File', [
-              \ [ "&New File\tCtrl+n", 'echo 0' ],
-              \ [ "&Open File\t(F3)", 'echo 1' ],
-              \ [ '&Close', 'echo 2' ],
-              \ [ '--', '' ],
-              \ [ '&Save\tCtrl+s', 'echo 3'],
-              \ [ 'Save &As', 'echo 4' ],
-              \ [ 'Save All', 'echo 5' ],
-              \ [ '--', '' ],
-              \ [ "E&xit\tAlt+x", 'echo 6' ],
-              \ ])
-  " items containing tips, tips will display in the cmdline
-  call quickui#menu#install('&Edit', [
-              \ [ '&Copy', 'echo 1', 'help 1' ],
-              \ [ '&Paste', 'echo 2', 'help 2' ],
-              \ [ '&Find', 'echo 3', 'help 3' ],
-              \ ])
-  " script inside %{...} will be evaluated and expanded in the string
-  call quickui#menu#install('&Option', [
-        \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
-        \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
-        \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
-        \ ])
-  " register HELP menu with weight 10000
-  call quickui#menu#install('H&elp', [
-        \ ['&Cheatsheet', 'help index', ''],
-        \ ['T&ips', 'help tips', ''],
-        \ ['--',''],
-        \ ['&Tutorial', 'help tutor', ''],
-        \ ['&Quick Reference', 'help quickref', ''],
-        \ ['&Summary', 'help summary', ''],
-        \ ], 10000)
-  " enable to display tips in the cmdline
-  let g:quickui_show_tip = 1
-  " color scheme for the menu plugin,five color schemes we can choose default is
-  " borland,another four are gruvbox, solarized,papercol dark and papercol light
-  if has('gui_running')
-    let g:quickui_color_scheme = 'papercol light'
-  else
-    let g:quickui_color_scheme = 'papercol dark'
-  endif
-  " hit \qm to open menu
-  noremap <silent><Leader>qm :call quickui#menu#open()<CR>
-  " hit \qb to switch buffer
-  noremap <silent><Leader>qb :call quickui#tools#list_buffer('e')<CR>
-  " hit \qt to preview tags
-  noremap <silent><Leader>qt :call quickui#tools#preview_tag('')<CR>
-endfunction
-
-
-
-
-function! Lazy_On_Plugin_Configuration()
   " NERDTree Setting, \nt打开目录,\nf从编辑区回到目录
   nnoremap <silent><Leader>nt :NERDTreeToggle<CR>
   let g:NERDTreeFileExtensionHighlightFullName = 1
@@ -571,6 +454,119 @@ function! Lazy_On_Plugin_Configuration()
   let g:Lf_ShortcutB = '<Leader>fb'
   let g:Lf_ShortcutF = '<Leader>ff'
 endfunction
+
+
+
+" vim-cpp-modern
+let g:cpp_attributes_highlight = 1
+let g:cpp_member_highlight = 1
+let g:cpp_simple_highlight = 1
+
+
+
+" python-syntax setting
+let g:python_highlight_builtins = 1
+let g:python_highlight_string_formatting = 1
+let g:python_highlight_func_calls = 1
+let g:python_highlight_class_vars = 1
+let g:python_highlight_operators = 1
+let g:python_highlight_file_headers_as_comments = 1
+
+
+
+function! Lazy_Plugin_Configuration()
+   " markdown-preview.nvim setting
+   let g:mkdp_browser = '/usr/bin/firefox'
+
+
+
+  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
+  " at the top, mark the last line of the menu and delete the space line.
+  " If you want to go to the last line of the menu, you can press `` in normal mode
+  nnoremap <silent><Leader>gm ggO<ESC>:GenTocGFM<CR>m`ggdd
+  nnoremap <silent><Leader>um :UpdateToc<CR>
+  let g:vmt_auto_update_on_save = 0
+
+
+
+  " nerdcommenter插件快速注释
+  let g:NERDSpaceDelims            = 1      " 在注释符号后加一个空格
+  let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
+  let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
+  let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
+  let g:NERDCommentEmptyLines      = 1      " 允许空行注释
+  let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
+  let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
+  let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
+  let g:NERDCustomDelimiters = { 'opencl': { 'left': '//' } } " use // to comment cl source codes.
+  map <silent><F3> <plug>NERDCommenterComment
+  map <silent><S-F3> <plug>NERDCommenterUncomment
+
+
+
+  " asyncrun setting,自动打开 quickfix window ，高度为 6
+  let g:asyncrun_open = 6
+  let g:asyncrun_bell = 1
+  nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
+  nnoremap <Localleader><F8> :AsyncRun! 
+
+
+
+  " vim-quickui setting
+  " clear all the menus
+  call quickui#menu#reset()
+  " install a 'File' menu, use [text, command] to represent an item.
+  call quickui#menu#install('&File', [
+              \ [ "&New File\tCtrl+n", 'echo 0' ],
+              \ [ "&Open File\t(F3)", 'echo 1' ],
+              \ [ '&Close', 'echo 2' ],
+              \ [ '--', '' ],
+              \ [ '&Save\tCtrl+s', 'echo 3'],
+              \ [ 'Save &As', 'echo 4' ],
+              \ [ 'Save All', 'echo 5' ],
+              \ [ '--', '' ],
+              \ [ "E&xit\tAlt+x", 'echo 6' ],
+              \ ])
+  " items containing tips, tips will display in the cmdline
+  call quickui#menu#install('&Edit', [
+              \ [ '&Copy', 'echo 1', 'help 1' ],
+              \ [ '&Paste', 'echo 2', 'help 2' ],
+              \ [ '&Find', 'echo 3', 'help 3' ],
+              \ ])
+  " script inside %{...} will be evaluated and expanded in the string
+  call quickui#menu#install('&Option', [
+        \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
+        \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
+        \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
+        \ ])
+  " register HELP menu with weight 10000
+  call quickui#menu#install('H&elp', [
+        \ ['&Cheatsheet', 'help index', ''],
+        \ ['T&ips', 'help tips', ''],
+        \ ['--',''],
+        \ ['&Tutorial', 'help tutor', ''],
+        \ ['&Quick Reference', 'help quickref', ''],
+        \ ['&Summary', 'help summary', ''],
+        \ ], 10000)
+  " enable to display tips in the cmdline
+  let g:quickui_show_tip = 1
+  " color scheme for the menu plugin,five color schemes we can choose default is
+  " borland,another four are gruvbox, solarized,papercol dark and papercol light
+  if has('gui_running')
+    let g:quickui_color_scheme = 'papercol light'
+  else
+    let g:quickui_color_scheme = 'papercol dark'
+  endif
+  " hit \qm to open menu
+  noremap <silent><Leader>qm :call quickui#menu#open()<CR>
+  " hit \qb to switch buffer
+  noremap <silent><Leader>qb :call quickui#tools#list_buffer('e')<CR>
+  " hit \qt to preview tags
+  noremap <silent><Leader>qt :call quickui#tools#preview_tag('')<CR>
+endfunction
+
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 显示相关和实用设置
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -842,5 +838,3 @@ nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
-
