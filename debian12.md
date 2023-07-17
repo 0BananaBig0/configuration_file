@@ -59,4 +59,11 @@ mkdir -p ~/Downloads/debian-program
 cd ~/Downloads/debian-program
 wget https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
 sudo apt install --fix-broken -y
-
+cd ~/Downloads/debian-program
+wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
+x bison-3.3.tar.gz
+sudo apt install m4
+cd bison-3.3
+./configuration
+make
+sudo make install
