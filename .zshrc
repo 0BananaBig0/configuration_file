@@ -1,5 +1,6 @@
+# regular match*
+setopt no_nomatch
 DISABLE_MAGIC_FUNCTIONS=true
-
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -75,7 +76,6 @@ ZSH_THEME="ys_modified"
 # plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
-setopt no_nomatch
 
 # User configuration
 
@@ -102,8 +102,6 @@ setopt no_nomatch
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-# *
-setopt no_nomatch
 #comment out the code, otherwise, the gvim will have some problems.
 # export XMODIFIERS="@im=fcitx"
 # export GTK_IM_MODULE=fcitx

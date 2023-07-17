@@ -33,7 +33,7 @@ cd /usr/share/fonts\
 sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
-sudo apt install -y fd-find procs exa zoxide ripgrep bat hyperfine duf httpie
+sudo apt install -y fd-find exa zoxide ripgrep bat hyperfine duf httpie
 sudo apt install -y cargo
 cargo install du-dust bottom procs#not do for root
 sudo apt install -y python3 python3-pip pipx
@@ -58,5 +58,5 @@ exit
 mkdir -p ~/Downloads/debian-program
 cd ~/Downloads/debian-program
 wget https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
-sudo apt install --fix-broken
+sudo apt install --fix-broken -y
 
