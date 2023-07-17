@@ -35,7 +35,7 @@ sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
 sudo apt install -y fd-find exa zoxide ripgrep bat hyperfine duf httpie
 sudo apt install -y cargo
-cargo install du-dust bottom procs#not do for root
+cargo install du-dust bottom@0.6.0 procs@0.13.0#not do for root
 sudo apt install -y python3 python3-pip pipx
 pip install pysnooper ipdb --break-system-packages
 pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright --break-system-packages
