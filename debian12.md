@@ -43,7 +43,7 @@ pip install cppman you-get sphinx sphinx-rtd-theme --break-system-packages
 sudo apt install -y neovim xclip
 pip install neovim --break-system-packages
 sudo npm install -g neovim
-sudo apt install -y opencl-headers ocl-icd-dev ocl-icd-opencl-dev
+sudo apt install -y opencl-headers ocl-icd-dev ocl-icd-opencl-dev pocl-opencl-icd
 sudo apt install -y clinfo libboost-all-dev tcl-dev
 sudo apt install perl libdb-dev
 sudo su
