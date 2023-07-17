@@ -1,3 +1,7 @@
+# no need mount on disk in wsl2 and install nvidia-driver
+ln -s /mnt/d/Users/11849/Documents
+ln -s /mnt/d/Users/11849/Videos
+ln -s /mnt/d/Users/11849/Downloads
 sudo apt install -y make cmake valgrind gcc g++
 sudo apt install -y vim npm nodejs vim-gtk3
 sudo apt install -y clang clangd clang-format clang-tidy
