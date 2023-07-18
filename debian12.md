@@ -67,3 +67,5 @@ cd bison-3.3
 ./configuration
 make
 sudo make install
+# Fix an error of ping
+sudo setcap cap_net_raw+p /bin/ping
