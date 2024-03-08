@@ -69,3 +69,5 @@ make
 sudo make install
 # Fix an error of ping
 sudo setcap cap_net_raw+p /bin/ping
+sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files 
+sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
