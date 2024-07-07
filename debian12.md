@@ -72,3 +72,4 @@ sudo setcap cap_net_raw+p /bin/ping
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files 
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo apt install firefox-esr -y
+if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
