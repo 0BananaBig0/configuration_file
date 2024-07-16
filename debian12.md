@@ -24,9 +24,9 @@ cp ~/Documents/configuration_file/coc-settings.json ~/.vim
 cp ~/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 sudo reboot
 cd ~/Downloads
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/DejaVuSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FantasqueSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/UbuntuMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/DejaVuSansMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/FantasqueSansMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/UbuntuMono.zip
 x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
 sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
 cd /usr/share/fonts\
