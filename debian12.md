@@ -91,3 +91,4 @@ sudo vim /etc/xrdp/startwm.sh
 #exec /bin/sh /etc/X11/Xsession 
 # xfce 
 startxfce4 
+sudo /etc/init.d/xrdp start 
