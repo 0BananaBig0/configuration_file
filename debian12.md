@@ -73,3 +73,21 @@ sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from 
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo apt install firefox-esr -y
 if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
+sudo apt install dbus-x11 xfce4 xfce4-goodies xrdp
+# 先备份配置 
+sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.backup 
+# 修改配置文件 
+## 设置 xrdp 的默认服务端口为 3390，即微软远程桌面协议惹默认端口 
+sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini 
+## 修改 位/像素（bpp） 
+sudo sed -i 's/max_bpp=32/#max_bpp=32\nmax_bpp=128/g' /etc/xrdp/xrdp.ini 
+sudo sed -i 's/xserverbpp=24/#xserverbpp=24\nxserverbpp=128/g' /etc/xrdp/xrdp.ini
+$ 指定 x windows system 启动使用我们安装的 xfce4
+echo xfce4-session > ~/.xsession 
+# 修改 xrdp 的窗口管理器的启动脚本 
+sudo vim /etc/xrdp/startwm.sh 
+## 注释掉最后两行（test 和 exec 开头），并添加 
+#test -x /etc/X11/Xsession && exec /etc/X11/Xsession 
+#exec /bin/sh /etc/X11/Xsession 
+# xfce 
+startxfce4 
