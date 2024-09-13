@@ -305,7 +305,7 @@ function! Lazy_Plugin_Configuration()
   let g:asyncrun_open = 6
   let g:asyncrun_bell = 1
   nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
-  nnoremap <Localleader><F8> :AsyncRun! 
+  nnoremap <Localleader><F8> :AsyncRun!<Space>
 
 
 
