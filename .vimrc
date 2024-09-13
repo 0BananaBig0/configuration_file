@@ -272,6 +272,17 @@ function! Lazy_Plugin_Configuration()
   noremap <silent><Leader><F7> :silent call Cpp_Format_Configuration()<CR>
   nmap <F7>  <Plug>(coc-format)
   xmap <F7>  <Plug>(coc-format-selected)
+  " Use K to show documentation in preview window
+  function! ShowDocumentation()
+    if CocAction('hasProvider', 'hover')
+      call CocActionAsync('doHover')
+    else
+      call feedkeys('K', 'in')
+    endif
+  endfunction
+  nnoremap <silent> K :call ShowDocumentation()<CR>
+  " Highlight the symbol and its references when holding the cursor
+  autocmd CursorHold * silent call CocActionAsync('highlight')
 
 
 
@@ -831,16 +842,15 @@ function! Delete_Blank_Line()
   exec 'silent :g/^\s*$/d'
   exec 'silent normal! ``'
 endfunction
-nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space()<CR>
-function! Delete_Trailling_Space()
+nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_and_CapM()<CR>
+function! Delete_Trailling_Space_and_CapM()
   exec 'silent normal! m`'
   exec 'silent :%s/\s\+$//e'
   exec 'silent normal! ``'
+  exec 'silent :%s///g'
 endfunction
 " Ctrl-Enter在普通模式下像插入模式一样使用回车
 nnoremap <silent><C-CR> i<CR><ESC>
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-
-
