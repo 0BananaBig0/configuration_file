@@ -849,8 +849,12 @@ function! Delete_Trailling_Space_and_CapM()
   exec 'silent normal! ``'
   exec 'silent :%s///g'
 endfunction
-" Ctrl-Enter在普通模式下像插入模式一样使用回车
+" Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <silent><C-CR> i<CR><ESC>
+nnoremap <silent><C-Space> i<Space><ESC>l
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+" Alt-h/l use h/i in the insert mode like in the normal mode
+inoremap <silent><M-h> <ESC>hi
+inoremap <silent><M-l> <ESC>la
