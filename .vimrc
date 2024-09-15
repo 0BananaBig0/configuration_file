@@ -79,7 +79,7 @@ Plug 'taketwo/vim-ros',{'for':[]}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent',{'for':[]}
 " markdown实时预览插件, Lazy_For
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'on': []}
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' , 'on': [] }
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc',{'for':[]}
 " markdown表格插件
