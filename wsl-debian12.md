@@ -1,11 +1,31 @@
+mv ~/etc/apt/sources.list ~/etc/apt/sources.list.backup
+vi ~/etc/apt/sources.list
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+
+deb http://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+deb-src http://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+apt update -y
+apt install apt-transport-https ca-certificates
+apt update -y && sudo apt upgrade -y
+apt install zsh -y
+useradd -m Banana -s /bin/zsh
+usermod -aG sudo Banana
 # no need mount on disk in wsl2 and install nvidia-driver
 ln -s /mnt/d/Users/11849/Documents
 ln -s /mnt/d/Users/11849/Videos
 ln -s /mnt/d/Users/11849/Downloads
+ln -s /mnt/d/Users/11849/Desktop WDesktop
 sudo apt install -y make cmake valgrind gcc g++
 sudo apt install -y vim npm nodejs vim-gtk3
 sudo apt install -y clang clangd clang-format clang-tidy
-sudo apt install -y zsh bear git curl wget p7zip-full
+sudo apt install -y bear git curl wget p7zip-full
 git config --global user.name "Huaxiao Liang"
 git config --global user.email "1184903633@qq.com"
 git config --global alias.logline "log --graph --abbrev-commit"
@@ -13,16 +33,13 @@ git config --global core.editor gvim
 git config --global protocol.https.allow always
 git config --global push.default "current"
 git config --global diff.tool gvimdiff
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
 sh install.sh
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
-cp ~/Documents/configuration_file/.vimrc ~
-cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
-cp ~/Documents/configuration_file/coc-settings.json ~/.vim
 cp ~/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
-sudo reboot
+cp ~/Documents/configuration_file/.zshrc ~
+rm install.sh
+exit
 cd ~/Downloads
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/DejaVuSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/FantasqueSansMono.zip
@@ -35,13 +52,22 @@ sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
 sudo apt install -y fd-find exa zoxide ripgrep bat hyperfine duf httpie
 sudo apt install -y cargo
-cargo install du-dust bottom@0.6.0 procs@0.13.0#not do for root
+cargo install du-dust bottom procs --locked#not do for root
 sudo apt install -y python3 python3-pip pipx
-pip install pysnooper ipdb --break-system-packages
-pip install pylint yapf futures isort pygments cmake_format vim-vint cmakelang pyright --break-system-packages
-pip install cppman you-get sphinx sphinx-rtd-theme --break-system-packages
+pipx install ipdb pylint yapf pygments cmakelang pyright
+pipx install cppman you-get sphinx
+pipx install sphinx-rtd-theme --include-deps
 sudo apt install -y neovim xclip
-pip install neovim --break-system-packages
+pip install pysnooper futures neovim --break-system-packages
+mkdir ~/.config/nvim
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+cp ~/Documents/configuration_file/.vimrc ~
+cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
+cp ~/Documents/configuration_file/coc-settings.json ~/.vim
+ln -s ~/.vimrc ~/.config/nvim/init.vim
 sudo npm install -g neovim
 sudo apt install -y opencl-headers ocl-icd-dev ocl-icd-opencl-dev pocl-opencl-icd
 sudo apt install -y clinfo libboost-all-dev tcl-dev
@@ -72,7 +98,7 @@ sudo setcap cap_net_raw+p /bin/ping
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files 
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo apt install firefox-esr -y
-if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
+# if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
 sudo apt install dbus-x11 xfce4 xfce4-goodies xrdp
 # 先备份配置 
 sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.backup 
