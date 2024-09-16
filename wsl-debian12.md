@@ -1,5 +1,6 @@
-mv ~/etc/apt/sources.list ~/etc/apt/sources.list.backup
-vi ~/etc/apt/sources.list
+sudo su
+mv /etc/apt/sources.list /etc/apt/sources.list.backup
+vi /etc/apt/sources.list
 deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
 deb-src http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
 
@@ -13,16 +14,17 @@ deb http://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main c
 deb-src http://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
 apt update -y
 apt install apt-transport-https ca-certificates
-apt update -y && sudo apt upgrade -y
+apt update -y && apt upgrade -y
 apt install zsh -y
-useradd -m Banana -s /bin/zsh
-usermod -aG sudo Banana
+vi /etc/apt/sources.list # modify http to https
+apt update
 # no need mount on disk in wsl2 and install nvidia-driver
 ln -s /mnt/d/Users/11849/Documents
 ln -s /mnt/d/Users/11849/Videos
 ln -s /mnt/d/Users/11849/Downloads
 ln -s /mnt/d/Users/11849/Desktop WDesktop
 sudo apt install -y make cmake valgrind gcc g++
+sudo apt remove vim-common -y
 sudo apt install -y vim npm nodejs vim-gtk3
 sudo apt install -y clang clangd clang-format clang-tidy
 sudo apt install -y bear git curl wget p7zip-full
@@ -50,16 +52,23 @@ cd /usr/share/fonts\
 sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
-sudo apt install -y fd-find exa zoxide ripgrep bat hyperfine duf httpie
-sudo apt install -y cargo
-cargo install du-dust bottom procs --locked#not do for root
+sudo apt install -y cargo rustc
 sudo apt install -y python3 python3-pip pipx
-pipx install ipdb pylint yapf pygments cmakelang pyright
-pipx install cppman you-get sphinx
-pipx install sphinx-rtd-theme --include-deps
 sudo apt install -y neovim xclip
-pip install pysnooper futures neovim --break-system-packages
-mkdir ~/.config/nvim
+sudo apt install -y fd-find exa zoxide ripgrep bat hyperfine duf httpie
+cargo install du-dust@0.8.6 bottom@0.6.3 procs@0.13.0 --locked #not do for root
+pipx install ipdb
+pipx install pylint
+pipx install yapf
+pipx install pygments
+pipx install cmakelang
+pipx install pyright
+pipx install cppman
+pipx install you-get
+pipx install sphinx
+pipx install sphinx-rtd-theme --include-deps
+pip install pysnooper futures neovim --break-system-packages #not do for root
+mkdir ~/.config/nvim -p
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
@@ -72,49 +81,54 @@ sudo npm install -g neovim
 sudo apt install -y opencl-headers ocl-icd-dev ocl-icd-opencl-dev pocl-opencl-icd
 sudo apt install -y clinfo libboost-all-dev tcl-dev
 sudo apt install perl libdb-dev
-sudo su
-cpan YAML #sudo
-cpan Perl::LanguageServer #sudo
-cpan install CPAN
-cpan App::cpanminus
-cpan Spreadsheet::ParseExcel Spreadsheet::WriteExcel #for xls
-cpan Excel::Writer::XLSX #for xlsx
-#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
-exit
-mkdir -p ~/Downloads/debian-program
-cd ~/Downloads/debian-program
-wget https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+cd ~
+wget https://vscode.download.prss.microsoft.com/dbazure/download/stable/38c31bc77e0dd6ae88a4e9cc93428cc27a56ba40/code_1.93.1-1726079302_amd64.deb
+sudo dpkg -i code_*.deb
+rm code_*.deb
 sudo apt install --fix-broken -y
-cd ~/Downloads/debian-program
+cd ~
 wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
 x bison-3.3.tar.gz
 sudo apt install m4
 cd bison-3.3
-./configuration
+./configure
 make
 sudo make install
+cd ~
+sudo rm bison* -r
 # Fix an error of ping
 sudo setcap cap_net_raw+p /bin/ping
-sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files 
+sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo apt install firefox-esr -y
 # if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
-sudo apt install dbus-x11 xfce4 xfce4-goodies xrdp
-# 先备份配置 
-sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.backup 
-# 修改配置文件 
-## 设置 xrdp 的默认服务端口为 3390，即微软远程桌面协议惹默认端口 
-sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini 
-## 修改 位/像素（bpp） 
-sudo sed -i 's/max_bpp=32/#max_bpp=32\nmax_bpp=128/g' /etc/xrdp/xrdp.ini 
+sudo apt install dbus-x11 xfce4 xfce4-goodies xrdp flex -y
+# 先备份配置
+sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.backup
+# 修改配置文件
+## 设置 xrdp 的默认服务端口为 3390，即微软远程桌面协议惹默认端口
+sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
+## 修改 位/像素（bpp）
+sudo sed -i 's/max_bpp=32/#max_bpp=32\nmax_bpp=128/g' /etc/xrdp/xrdp.ini
 sudo sed -i 's/xserverbpp=24/#xserverbpp=24\nxserverbpp=128/g' /etc/xrdp/xrdp.ini
 $ 指定 x windows system 启动使用我们安装的 xfce4
-echo xfce4-session > ~/.xsession 
-# 修改 xrdp 的窗口管理器的启动脚本 
-sudo vim /etc/xrdp/startwm.sh 
-## 注释掉最后两行（test 和 exec 开头），并添加 
-#test -x /etc/X11/Xsession && exec /etc/X11/Xsession 
-#exec /bin/sh /etc/X11/Xsession 
-# xfce 
-startxfce4 
-sudo /etc/init.d/xrdp start 
+echo xfce4-session > ~/.xsession
+# 修改 xrdp 的窗口管理器的启动脚本
+sudo vim /etc/xrdp/startwm.sh
+## 注释掉最后两行（test 和 exec 开头），并添加
+#test -x /etc/X11/Xsession && exec /etc/X11/Xsession
+#exec /bin/sh /etc/X11/Xsession
+# xfce
+startxfce4
+
+sudo /etc/init.d/xrdp start
+cp ~/Documents/configuration_file/.gdbinit ~
+cp ~/Documents/configuration_file/settings.json ~/.config/Code/User
+
+sudo cpan YAML CPAN::DistnameInfo
+sudo cpan Perl::LanguageServer
+sudo cpan install CPAN
+sudo cpan App::cpanminus
+sudo cpan Spreadsheet::ParseExcel Spreadsheet::WriteExcel #for xls
+sudo cpan Excel::Writer::XLSX #for xlsx
+#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
