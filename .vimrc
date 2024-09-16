@@ -588,7 +588,7 @@ endfunction
 " 会使vim看起来不友好的命令
 if has('gui_running')
   if !has('nvim')
-    " set guifont=Monospace\ 18   " 设置字体
+    " set guifont=UbuntuMono\ Nerd\ Font\ Mono\ 19   " 设置字体
     " set guifont=DejaVuSansM\ Nerd\ Font\ Mono\ 19   " 设置字体
     set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
   endif
