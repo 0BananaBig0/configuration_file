@@ -1,0 +1,5 @@
+[wsl2]
+swap=0 # 关闭swap
+memory=32G #自定义wsl内存大小，根据自己机器调整
+[network]
+generateResolvConf = false # 解决域名解析失败的问题
