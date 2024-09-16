@@ -16,7 +16,7 @@ apt update -y
 apt install apt-transport-https ca-certificates
 apt update -y && apt upgrade -y
 apt install zsh -y
-vi /etc/apt/sources.list # modify http to https
+sudo sed -i 's/http/https/g' /etc/apt/sources.list # modify http to https
 apt update
 # no need mount on disk in wsl2 and install nvidia-driver
 ln -s /mnt/d/Users/11849/Documents
@@ -125,7 +125,17 @@ sudo /etc/init.d/xrdp start
 cp ~/Documents/configuration_file/.gdbinit ~
 cp ~/Documents/configuration_file/settings.json ~/.config/Code/User
 
+echo -e "[boot]\nsystemd=true" | sudo tee -a /etc/wsl.conf
+cd /usr/lib/wsl
+sudo mkdir lib2
+sudo ln -s lib/* lib2
+sudo sed -i 's/usr\/lib\/wsl\/lib/usr\/lib\/wsl\/lib2/g' /etc/ld.so.conf.d/ld.wsl.conf
+echo -e "[automount]\nldconfig=false" | sudo tee -a /etc/wsl.conf
+
 sudo cpan YAML CPAN::DistnameInfo
+sudo apt install libanyevent-perl libclass-refresh-perl libcompiler-lexer-perl \
+libdata-dump-perl libio-aio-perl libjson-perl libmoose-perl libpadwalker-perl \
+libscalar-list-utils-perl libcoro-perl -y
 sudo cpan Perl::LanguageServer
 sudo cpan install CPAN
 sudo cpan App::cpanminus
