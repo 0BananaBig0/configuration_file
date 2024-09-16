@@ -187,18 +187,3 @@ zinit light 0BananaBig0/ubuntu18_zsh_configure
 # use>
 # export ROS_HOSTNAME=192.168.3.3
 # export ROS_MASTER_URI=http://${ROS_HOSTNAME}:11311
-
-PATH="$HOME/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="$HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="$HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"$HOME/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=$HOME/perl5"; export PERL_MM_OPT;
-# 启动xrdp服务
-if [ -z "$(pgrep xrdp-sesman)" ]
-then
-     echo "1230" | sudo -S /etc/init.d/xrdp start
-     if [ $? -ne 0 ]
-     then
-             echo "failed to start xrdp service!"
-     fi
-fi
