@@ -142,3 +142,6 @@ sudo cpan App::cpanminus
 sudo cpan Spreadsheet::ParseExcel Spreadsheet::WriteExcel #for xls
 sudo cpan Excel::Writer::XLSX #for xlsx
 #cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
+
+# Do not install libglfw3-wayland; it is an alternative to libglfw3.
+sudo apt install libglfw3 libglfw3-dev libglfw3-doc
