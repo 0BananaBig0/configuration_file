@@ -26,7 +26,6 @@
    "C_Cpp.configurationWarnings": "disabled",
    "C_Cpp.errorSquiggles": "disabled",
    "C_Cpp.intelliSenseEngine": "disabled",
-   "C_Cpp.configurationWarnings": "disabled",
    "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,
    "C_Cpp.renameRequiresIdentifier": false,
    "C_Cpp.codeAnalysis.runAutomatically": false,
@@ -42,7 +41,12 @@
    "[python]": {
       "editor.formatOnType": true
    },
-   "editor.fontSize": 21,
-   "editor.fontFamily": "'FantasqueSansM Nerd Font Mono', 'DejaVuSansM Nerd Font Mono', 'UbuntuMono Nerd Font Mono'"
+   "editor.fontSize": 33,
+   "editor.fontFamily": "'FantasqueSansM Nerd Font Mono', 'DejaVuSansM Nerd Font Mono', 'UbuntuMono Nerd Font Mono'",
+   "debug.console.fontSize": 26,
+   "scm.inputFontSize": 26,
+   "terminal.integrated.fontSize": 26,
+   "chat.editor.fontSize": 26,
+   "markdown.preview.fontSize": 21
 }
 
