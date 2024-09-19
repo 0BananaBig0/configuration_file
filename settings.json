@@ -41,12 +41,13 @@
    "[python]": {
       "editor.formatOnType": true
    },
-   "editor.fontSize": 33,
+   "editor.fontSize": 20,
    "editor.fontFamily": "'FantasqueSansM Nerd Font Mono', 'DejaVuSansM Nerd Font Mono', 'UbuntuMono Nerd Font Mono'",
-   "debug.console.fontSize": 26,
-   "scm.inputFontSize": 26,
-   "terminal.integrated.fontSize": 26,
-   "chat.editor.fontSize": 26,
-   "markdown.preview.fontSize": 21
+   "debug.console.fontSize": 0,
+   "scm.inputFontSize": 0,
+   "terminal.integrated.fontSize": 0,
+   "chat.editor.fontSize": 0,
+   "markdown.preview.fontSize": 18,
+   "window.zoomLevel": 1.5
 }
 
