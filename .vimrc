@@ -128,9 +128,6 @@ augroup END
 
 
 colorscheme dracula
-" 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
-set guicursor=c-i:ver33-Cursor
-set guicursor+=a:blinkon0
 nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
                            \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                            \ :IndentGuidesDisable<CR>
@@ -591,13 +588,16 @@ if has('gui_running')
     " set guifont=UbuntuMono\ Nerd\ Font\ Mono\ 19   " 设置字体
     " set guifont=DejaVuSansM\ Nerd\ Font\ Mono\ 19   " 设置字体
     set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
+    " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
+    set guicursor=c-i:ver33-Cursor
+    set guicursor+=a:blinkon0
+    " 设定窗口大小
+    set lines=60 columns=80
+    " 隐藏滚动栏
+    set guioptions-=r
+    " tab只显示文件名不显示标签
+    set guitablabel=%t
   endif
-  " 设定窗口大小
-  set lines=60 columns=80
-  " 隐藏滚动栏
-  set guioptions-=r
-  " tab只显示文件名不显示标签
-  set guitablabel=%t
 endif
 set shortmess+=c
 set showcmd
@@ -616,7 +616,7 @@ set virtualedit=block,onemore
 set ruler
 " 突出显示当前行
 set cursorline
-" 不要闪烁
+" no bell
 set novisualbell
 " 命令行（在状态行下）的高度，默认为1，这里是2
 set cmdheight=2
