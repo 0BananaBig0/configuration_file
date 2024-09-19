@@ -145,3 +145,12 @@ sudo cpan Excel::Writer::XLSX #for xlsx
 
 # Do not install libglfw3-wayland; it is an alternative to libglfw3.
 sudo apt install libglfw3 libglfw3-dev libglfw3-doc
+
+sudo apt remove neovim --purge
+sudo apt autoremove --purge
+wget https://githubfast.com/neovim/neovim-releases/releases/download/v0.10.1/nvim-linux64.deb
+sudo dpkg -i nvim-linux64.deb
+sudo apt install python3-neovim
+sudo cpanm -n Neovim::Ext
+sudo apt install ruby-dev
+sudo gem install neovim
