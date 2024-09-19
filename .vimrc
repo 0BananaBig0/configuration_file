@@ -658,8 +658,8 @@ set viminfo+=!
 set iskeyword+=_,$,@,%,#,-
 " 增强模式中的命令行自动完成/补全操作
 set wildmode=list:longest
-" 使回格键（backspace）正常处理indent, eol, start等
-set backspace=3
+" 使回格键（backspace）正常处理indent, eol, nostop等
+set backspace=indent,eol,nostop
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l,[,]
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
