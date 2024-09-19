@@ -43,6 +43,7 @@
    "terminal.integrated.fontSize": 0,
    "chat.editor.fontSize": 0,
    "markdown.preview.fontSize": 18,
-   "window.zoomLevel": 1.5
+   "window.zoomLevel": 1.5,
+   "editor.cursorBlinking": "solid"
 }
 
