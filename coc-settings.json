@@ -33,10 +33,17 @@
       ".root"
    ],
    "clangd.arguments": [
+      "--all-scopes-completion",
       "--background-index",
-      "--completion-style=detailed",
+      "--clang-tidy",
       "--header-insertion=never",
-      "--inlay-hints"
+      "--completion-style=detailed",
+      "--enable-config",
+      "--function-arg-placeholders=true",
+      "--fallback-style=none",
+      "--header-insertion-decorators",
+      "--pch-storage=memory",
+      "--pretty"
    ],
    "coc.preferences.jumpCommand": "edit",
    "diagnostic.enable": false,
