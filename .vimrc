@@ -521,10 +521,17 @@ function! Lazy_On_Plugin_Configuration()
   nmap <silent>]<S-F7> <Plug>VimspectorDownFrame
   nnoremap <silent>]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
   nnoremap <silent><C-1> :call win_gotoid( g:vimspector_session_windows.variables )<CR>
+  inoremap <silent><C-1> <ESC>:call win_gotoid( g:vimspector_session_windows.variables )<CR>
   nnoremap <silent><C-3> :call win_gotoid( g:vimspector_session_windows.code )<CR>
+  inoremap <silent><C-3> <ESC>:call win_gotoid( g:vimspector_session_windows.code )<CR>
   nnoremap <silent><C-4> :call win_gotoid( g:vimspector_session_windows.terminal )<CR>
-  nnoremap <silent><C-7> :call win_gotoid( g:vimspector_session_windows.watches )<CR>
-  nnoremap <silent><C-9> :VimspectorShowOutput Console<CR>
+  inoremap <silent><C-4> <ESC>:call win_gotoid( g:vimspector_session_windows.terminal )<CR>
+  nnoremap <silent><C-5> :call win_gotoid( g:vimspector_session_windows.watches )<CR>
+  inoremap <silent><C-5> <ESC>:call win_gotoid( g:vimspector_session_windows.watches )<CR>
+  nnoremap <silent><C-7> :call win_gotoid( g:vimspector_session_windows.stack_trace )<CR>
+  inoremap <silent><C-7> <ESC>:call win_gotoid( g:vimspector_session_windows.stack_trace )<CR>
+  nnoremap <silent><C-8> :VimspectorShowOutput Console<CR>
+  inoremap <silent><C-8> <ESC>:VimspectorShowOutput Console<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -533,26 +540,27 @@ function! Lazy_On_Plugin_Configuration()
   sign define vimspectorPCBP          text=●>  texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentThread text=>   texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
-  function! s:SetUpUI() abort
-    call win_execute( g:vimspector_session_windows.stack_trace, 'q' )
-    call win_gotoid( g:vimspector_session_windows.watches )
-    nunmenu WinBar
-    call win_gotoid( g:vimspector_session_windows.variables )
-    23wincmd _
-    nunmenu WinBar
-    let g:vimspector_bottombar_height = 15
-    call win_gotoid( g:vimspector_session_windows.code )
-    103wincmd |
-    23wincmd _
-    nunmenu WinBar
-  endfunction
   function! s:SetUpTerminal()
     call win_gotoid( g:vimspector_session_windows.terminal )
-    3wincmd |
+    wincmd L
+    12wincmd |
+    call win_gotoid( g:vimspector_session_windows.variables )
+    nunmenu WinBar
+    30wincmd |
+    wincmd _
+    call win_gotoid( g:vimspector_session_windows.watches )
+    nunmenu WinBar
+    16wincmd _
+    call win_gotoid( g:vimspector_session_windows.stack_trace )
+    3wincmd _
+    call win_gotoid( g:vimspector_session_windows.code )
+    nunmenu WinBar
+    wincmd _
+    call win_gotoid( g:vimspector_session_windows.output )
+    9wincmd _
   endfunction
   augroup VimspectorCustom
     autocmd!
-    autocmd User VimspectorUICreated call s:SetUpUI()
     autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
   augroup END
 
