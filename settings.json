@@ -10,7 +10,8 @@
       "--fallback-style=none",
       "--header-insertion-decorators",
       "--pch-storage=memory",
-      "--pretty"
+      "--pretty",
+      "--j=12"
    ],
    "C_Cpp.codeFolding": "disabled",
    "C_Cpp.suggestSnippets": false,

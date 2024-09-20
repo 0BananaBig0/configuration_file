@@ -43,7 +43,8 @@
       "--fallback-style=none",
       "--header-insertion-decorators",
       "--pch-storage=memory",
-      "--pretty"
+      "--pretty",
+      "--j=12"
    ],
    "coc.preferences.jumpCommand": "edit",
    "diagnostic.enable": false,
