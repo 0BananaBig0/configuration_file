@@ -26,7 +26,6 @@ ln -s /mnt/d/Users/11849/Desktop WDesktop
 sudo apt install -y make cmake valgrind gcc g++
 sudo apt remove vim-common -y
 sudo apt install -y vim npm nodejs vim-gtk3
-sudo apt install -y clang clangd clang-format clang-tidy
 sudo apt install -y bear git curl wget p7zip-full
 git config --global user.name "Huaxiao Liang"
 git config --global user.email "1184903633@qq.com"
@@ -155,3 +154,35 @@ sudo apt install python3-neovim -y
 sudo cpanm -n Neovim::Ext
 sudo apt install ruby-dev -y
 sudo gem install neovim
+
+sudo apt purge -y clang* llvm*
+sudo apt update
+sudo apt autoremove --purge
+sudo apt install *clang*16* *llvm*16*
+sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 160
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 160
+sudo update-alternatives --install /usr/bin/clang-apply-replacements clang-apply-replacements /usr/bin/clang-apply-replacements-16 160
+sudo update-alternatives --install /usr/bin/clang-change-namespace clang-change-namespace /usr/bin/clang-change-namespace-16 160
+sudo update-alternatives --install /usr/bin/clang-check clang-check /usr/bin/clang-check-16 160
+sudo update-alternatives --install /usr/bin/clang-cl clang-cl /usr/bin/clang-cl-16 160
+sudo update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-16 160
+sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-16 160
+sudo update-alternatives --install /usr/bin/clang-doc clang-doc /usr/bin/clang-doc-16 160
+sudo update-alternatives --install /usr/bin/clang-extdef-mapping clang-extdef-mapping /usr/bin/clang-extdef-mapping-16 160
+sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-16 160
+sudo update-alternatives --install /usr/bin/clang-format-diff clang-format-diff /usr/bin/clang-format-diff-16 160
+sudo update-alternatives --install /usr/bin/clang-include-cleaner clang-include-cleaner /usr/bin/clang-include-cleaner-16 160
+sudo update-alternatives --install /usr/bin/clang-include-fixer clang-include-fixer /usr/bin/clang-include-fixer-16 160
+sudo update-alternatives --install /usr/bin/clang-linker-wrapper clang-linker-wrapper /usr/bin/clang-linker-wrapper-16 160
+sudo update-alternatives --install /usr/bin/clang-move clang-move /usr/bin/clang-move-16 160
+sudo update-alternatives --install /usr/bin/clang-offload-bundler clang-offload-bundler /usr/bin/clang-offload-bundler-16 160
+sudo update-alternatives --install /usr/bin/clang-offload-packager clang-offload-packager /usr/bin/clang-offload-packager-16 160
+sudo update-alternatives --install /usr/bin/clang-pseudo clang-pseudo /usr/bin/clang-pseudo-16 160
+sudo update-alternatives --install /usr/bin/clang-query clang-query /usr/bin/clang-query-16 160
+sudo update-alternatives --install /usr/bin/clang-refactor clang-refactor /usr/bin/clang-refactor-16 160
+sudo update-alternatives --install /usr/bin/clang-rename clang-rename /usr/bin/clang-rename-16 160
+sudo update-alternatives --install /usr/bin/clang-reorder-fields clang-reorder-fields /usr/bin/clang-reorder-fields-16 160
+sudo update-alternatives --install /usr/bin/clang-repl clang-repl /usr/bin/clang-repl-16 160
+sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps /usr/bin/clang-scan-deps-16 160
+sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-16 160
+sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr/bin/clang-tidy-diff-16.py 160
