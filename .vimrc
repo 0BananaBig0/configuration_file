@@ -592,20 +592,31 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 会使vim看起来不友好的命令
 if has('gui_running')
-  if !has('nvim')
-    " set guifont=UbuntuMono\ Nerd\ Font\ Mono\ 19   " 设置字体
-    " set guifont=DejaVuSansM\ Nerd\ Font\ Mono\ 19   " 设置字体
-    set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
-    " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
-    set guicursor=c-i:ver33-Cursor
-    set guicursor+=a:blinkon0
-    " 设定窗口大小
-    set lines=60 columns=80
-    " 隐藏滚动栏
-    set guioptions-=r
-    " tab只显示文件名不显示标签
-    set guitablabel=%t
-  endif
+  " set guifont=UbuntuMono\ Nerd\ Font\ Mono\ 19   " 设置字体
+  " set guifont=DejaVuSansM\ Nerd\ Font\ Mono\ 19   " 设置字体
+  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
+  " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
+  set guicursor=c-i:ver33-Cursor
+  set guicursor+=a:blinkon0
+  " 设定窗口大小
+  set lines=60 columns=80
+  " 隐藏滚动栏
+  set guioptions-=r
+  " tab只显示文件名不显示标签
+  set guitablabel=%t
+  " Toggle Menu and Toolbar菜单栏和工具栏
+  set guioptions-=m
+  set guioptions-=T
+  nnoremap <silent><Localleader>m :silent call MENU_TOOGLE()<CR>
+  function! MENU_TOOGLE()
+    if &guioptions=~#'T'
+      set guioptions-=T
+      set guioptions-=m
+    else
+      set guioptions+=T
+      set guioptions+=m
+    endif
+  endfunction
 endif
 set shortmess+=c
 set showcmd
@@ -818,21 +829,6 @@ for i in range(1, 9)
     endfor
     exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
-" Toggle Menu and Toolbar菜单栏和工具栏
-if has('gui_running')
-  set guioptions-=m
-  set guioptions-=T
-  nnoremap <silent><Localleader>m :silent call MENU_TOOGLE()<CR>
-  function! MENU_TOOGLE()
-    if &guioptions=~#'T'
-      set guioptions-=T
-      set guioptions-=m
-    else
-      set guioptions+=T
-      set guioptions+=m
-    endif
-  endfunction
-endif
 nnoremap <silent><Localleader>t :tabnew<CR>
 nnoremap <silent><Localleader>b :silent call Close_and_Back_Tab()<CR>
 function! Close_and_Back_Tab()
@@ -866,3 +862,5 @@ inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
 " Alt-h/l use h/i in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
+
+
