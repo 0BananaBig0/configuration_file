@@ -755,30 +755,30 @@ function! SetTitle()
 endfunc
 function! Compile_And_Excute()
   if &filetype==?'cpp'
-    exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
+    exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
   elseif &filetype==?'c'
-    exec ':AsyncRun! -save=1 gcc % -o E%<.exe -g -lOpenCL && ./E%<.exe'
+    exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -lOpenCL && ./E%<.exe'
   elseif &filetype==?'python'
-    exec ':AsyncRun! -save=1 python3 %'
+    exec ':AsyncRun! -strip -save=1 python3 %'
   elseif &filetype==?'sh'
-    exec ':AsyncRun! -save=1 ./%'
+    exec ':AsyncRun! -strip -save=1 ./%'
   elseif &filetype==?'verilog'
-    exec ':AsyncRun! -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
+    exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
   elseif &filetype==?'perl'
-    exec ':AsyncRun! -save=1 perl %'
+    exec ':AsyncRun! -strip -save=1 perl %'
   elseif &filetype==?'tcl'
-    exec ':AsyncRun! -save=1 tclsh %'
+    exec ':AsyncRun! -strip -save=1 tclsh %'
   elseif &filetype==?'markdown'
     exec ':MarkdownPreview'
   endif
 endfunction
 function! Compile_Command()
   if &filetype==?'cpp'
-    exec ':AsyncRun! -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL'
+    exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL'
   elseif &filetype==?'c'
-    exec ':AsyncRun! -save=1 gcc % -o E%<.exe -g -lOpenCL'
+    exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -lOpenCL'
   elseif &filetype==?'verilog'
-    exec ':AsyncRun! -save=1 iverilog *.v -o %<.vcd'
+    exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd'
   endif
 endfunction
 function! Show_Current_Module()
