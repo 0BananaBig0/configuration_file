@@ -497,13 +497,13 @@ function! Lazy_On_Plugin_Configuration()
       exec 'tabe ' . vimspector_json
   endfunction
   nmap <silent><F2> <Plug>VimspectorContinue
-  nnoremap <silent><S-F2> :VimspectorReset<CR>
-  nnoremap <silent>]<F2> :call vimspector#Restart()<CR>
-  nmap <silent>]<C-F2> <Plug>VimspectorPause
+  nnoremap <silent><S-F2> :call vimspector#Restart()<CR>
+  nmap <silent>]<F2> <Plug>VimspectorRunToCursor
   nmap <silent>]<S-F2> <Plug>VimspectorStop
+  nnoremap <silent>]<M-F2> :VimspectorReset<CR>
+  nmap <silent>]<C-F2> <Plug>VimspectorPause
   nmap <silent>]<F3> <Plug>VimspectorBalloonEval
   xmap <silent>]<F3> <Plug>VimspectorBalloonEval
-  nmap <silent>]<S-F3> <Plug>VimspectorRunToCursor
   nmap <silent><F4> <Plug>VimspectorToggleBreakpoint
   nnoremap <silent><S-F4> :call vimspector#ClearBreakpoints()<CR>
   nmap <silent>]<F4> <Plug>VimspectorToggleConditionalBreakpoint
