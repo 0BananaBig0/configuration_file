@@ -697,14 +697,15 @@ augroup Local_Autocmd_Group
 augroup END
 " 缩进
 set autoindent
-set smartindent "
+set smartindent
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
 function! SetIndent()
-  if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'python'
+  if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'opencl'
            \  || &filetype==?'sh' || &filetype==?'verilog'
            \  || &filetype==?'perl' || &filetype==?'tcl'
            \  || &filetype==?'json' || &filetype==?'java'
+           \  || &filetype==?'python'
     set tabstop=3     " Tab键的显示宽度
     set softtabstop=3 " 按下Tab键时输入的宽度
     set shiftwidth=3  " 设置自动缩进时的缩进长度
@@ -866,4 +867,3 @@ inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
 " Alt-h/l use h/i in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
-
