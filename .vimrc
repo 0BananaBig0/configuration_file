@@ -84,10 +84,10 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' 
 Plug 'mzlogin/vim-markdown-toc',{'for':[]}
 " markdown表格插件
 Plug 'godlygeek/tabular', {'for': []}
-" vim快捷键管理和提示插件, Layz
-Plug 'liuchengxu/vim-which-key', { 'on': [] }
-" 补全插件,动态检测语法插件,可鼠标停留显示信息
+" 补全插件,动态检测语法插件,可鼠标停留显示信息, Layz
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" vim快捷键管理和提示插件
+Plug 'liuchengxu/vim-which-key', { 'on': [] }
 " nerdcommenter快速注释插件
 Plug 'preservim/nerdcommenter', {'on':[]}
 " 异步执行shell命令插件
