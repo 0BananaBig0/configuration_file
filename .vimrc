@@ -79,11 +79,11 @@ Plug 'taketwo/vim-ros',{'for':[]}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent',{'for':[]}
 " markdown实时预览插件, Lazy_For
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' , 'on': [] }
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' , 'for': [] }
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc',{'for':[]}
 " markdown表格插件
-Plug 'godlygeek/tabular', {'on': []}
+Plug 'godlygeek/tabular', {'for': []}
 " vim快捷键管理和提示插件, Layz
 Plug 'liuchengxu/vim-which-key', { 'on': [] }
 " 补全插件,动态检测语法插件,可鼠标停留显示信息
@@ -163,7 +163,7 @@ let g:python_highlight_file_headers_as_comments = 1
 
 
 
-" After 333ms, call the coc.nvim, markdown-preview and so on
+" After 33ms, call the coc.nvim, markdown-preview and so on
 let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     augroup Call_Lazy_For_Plugin
@@ -171,15 +171,15 @@ function! CocTimerStart(timer)
       autocmd FileType markdown silent call plug#load('vim-markdown-toc')
       autocmd FileType markdown silent call plug#load('tabular')
     augroup END
-    silent call plug#load('vim-which-key')
     exec 'CocStart'
+    silent call plug#load('vim-which-key')
     silent call plug#load('nerdcommenter')
     silent call plug#load('asyncrun.vim')
     silent call Lazy_For_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
     silent call Lazy_On_Plugin_Configuration()
 endfunction
-silent call timer_start(333,'CocTimerStart',{'repeat':1})
+silent call timer_start(33,'CocTimerStart',{'repeat':1})
 
 
 
