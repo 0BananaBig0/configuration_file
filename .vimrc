@@ -275,6 +275,7 @@ function! Lazy_Plugin_Configuration()
   nnoremap <silent> K :call ShowDocumentation()<CR>
   " Highlight the symbol and its references when holding the cursor
   autocmd CursorHold * silent call CocActionAsync('highlight')
+  hi my_helight guifg='White' guibg='Black'
 
 
 
@@ -865,3 +866,4 @@ inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
 " Alt-h/l use h/i in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
+

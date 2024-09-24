@@ -47,6 +47,7 @@
       "--j=12"
    ],
    "coc.preferences.jumpCommand": "edit",
+   "dialog.floatHighlight": "my_helight",
    "diagnostic.enable": false,
    "diagnostic.errorSign": "✗ ",
    "diagnostic.messageTarget": "echo",
