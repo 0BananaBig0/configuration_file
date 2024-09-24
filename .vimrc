@@ -852,7 +852,7 @@ nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_and_CapM(
 function! Delete_Trailling_Space_and_CapM()
   exec 'silent normal! m`'
   exec 'silent :%s/\s\+$//e'
-  exec 'silent :%s///e'
+  exec 'silent :%s/$//e'
   exec 'silent normal! ``'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
