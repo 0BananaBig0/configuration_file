@@ -703,6 +703,7 @@ function! SetIndent()
   if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'python'
            \  || &filetype==?'sh' || &filetype==?'verilog'
            \  || &filetype==?'perl' || &filetype==?'tcl'
+           \  || &filetype==?'json' || &filetype==?'java'
     set tabstop=3     " Tab键的显示宽度
     set softtabstop=3 " 按下Tab键时输入的宽度
     set shiftwidth=3  " 设置自动缩进时的缩进长度
