@@ -637,14 +637,6 @@ set number
 set signcolumn=number
 " Uncomment the following to have Vim jump to the last position when reopening a file
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-" Tab键的显示宽度
-set tabstop=3
-" 按下Tab键时输入的宽度
-set softtabstop=3
-" 把Tab字符用空格代替，和tabstop相关
-set expandtab
-" 设置自动缩进时的缩进长度
-set shiftwidth=3
 " 设置当文件被改动时自动载入
 set autoread
 " 共享剪贴板
@@ -655,10 +647,6 @@ set magic
 set belloff=all
 " 在处理未保存或只读文件的时候，弹出确认
 set confirm
-" 缩进
-set autoindent
-autocmd FileType c,cpp set cindent " 设置使用C/C++语言的自动缩进方式
-set smartindent "
 " 历史记录数
 set history=3333
 " 行内替换
@@ -692,6 +680,7 @@ set smartcase
 set hlsearch
 set incsearch
 augroup Local_Autocmd_Group
+  autocmd BufEnter * silent call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown
            \ nnoremap <silent><Localleader><F2>
@@ -705,6 +694,27 @@ augroup Local_Autocmd_Group
     autocmd GUIEnter * silent call TabPos_Initialize()
   endif
 augroup END
+" 缩进
+set autoindent
+set smartindent "
+" 把Tab字符用空格代替，和tabstop相关
+set expandtab
+function! SetIndent()
+  if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'python'
+           \  || &filetype==?'sh' || &filetype==?'verilog'
+           \  || &filetype==?'perl' || &filetype==?'tcl'
+    set tabstop=3     " Tab键的显示宽度
+    set softtabstop=3 " 按下Tab键时输入的宽度
+    set shiftwidth=3  " 设置自动缩进时的缩进长度
+    if &filetype==?'c' || &filetype==?'cpp'
+      set cindent     " 设置使用C/C++语言的自动缩进方式
+    endif
+  else
+    set tabstop=2
+    set softtabstop=2
+    set shiftwidth=2
+  endif
+endfunction
 function! SetTitle()
   if &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
     call setline(1,'#########################################################################')
@@ -742,7 +752,7 @@ function! SetTitle()
     call append(line('$'),'module ')
   endif
   exec 'silent normal! G'
-endfunc
+endfunction
 function! Compile_And_Excute()
   if &filetype==?'cpp'
     exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
@@ -842,7 +852,7 @@ nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_and_CapM(
 function! Delete_Trailling_Space_and_CapM()
   exec 'silent normal! m`'
   exec 'silent :%s/\s\+$//e'
-  exec 'silent :%s///e'
+  exec 'silent :%s///e'
   exec 'silent normal! ``'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
