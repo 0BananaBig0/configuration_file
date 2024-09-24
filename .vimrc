@@ -79,8 +79,7 @@ Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent', {'for': []}
 " markdown实时预览插件
-Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': ['markdown']}
-" Plug 'instant-markdown/vim-instant-markdown', {'for': 'markdown', 'do': 'yarn install'}
+Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': 'markdown'}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': 'markdown'}
 " markdown表格插件
@@ -180,8 +179,8 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 function! Markdown_Plugin_Configuration()
-   " markdown-preview.nvim setting
-   let g:mkdp_browser = '/usr/bin/firefox'
+  " markdown-preview.nvim setting
+  let g:mkdp_browser = '/usr/bin/firefox'
 
 
 
