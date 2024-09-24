@@ -706,8 +706,6 @@ augroup Local_Autocmd_Group
            \ :call Compile_And_Excute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
            \ :call Compile_Command()<CR>
-  autocmd FileType vim nnoremap <silent><Localleader><F2>
-           \ :source ~/.vimrc<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader>` :call Call_Show_Nearest_Function()<CR>
   if has('nvim')
     autocmd UIEnter * silent call TabPos_Initialize()
@@ -770,6 +768,8 @@ function! Compile_And_Excute()
     exec ':AsyncRun! -strip -save=1 tclsh %'
   elseif &filetype==?'markdown'
     exec ':MarkdownPreview'
+  elseif &filetype==?'vim'
+    exec ':source ~/.vimrc'
   endif
 endfunction
 function! Compile_Command()
