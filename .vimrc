@@ -554,10 +554,7 @@ function! Lazy_On_Plugin_Configuration()
     call win_gotoid( g:vimspector_session_windows.output )
     9wincmd _
   endfunction
-  augroup VimspectorCustom
-    autocmd!
-    autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
-  augroup END
+  autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
 
 
 
