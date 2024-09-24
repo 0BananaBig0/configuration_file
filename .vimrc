@@ -63,57 +63,58 @@ let g:maplocalleader = ' '
 " let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
 call plug#begin('~/.vim/plugged')
 " vim theme, No_Lazy
-Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'dracula/vim', {'as': 'dracula'}
 " 彩虹括号
 Plug 'luochen1990/rainbow'
 " 缩进显示
 Plug 'nathanaelkane/vim-indent-guides'
 " highlight opencl 2.0 syntax
-Plug 'brgmnn/vim-opencl', {'for':[]}
+Plug 'brgmnn/vim-opencl', {'for': []}
 " 高亮c++类模板等插件
-Plug 'bfrg/vim-cpp-modern', {'for':[]}
+Plug 'bfrg/vim-cpp-modern', {'for': []}
 " python 语法高亮插件
-Plug 'vim-python/python-syntax', {'for':[]}
+Plug 'vim-python/python-syntax', {'for': []}
 " roslaunch语法高亮
-Plug 'taketwo/vim-ros',{'for':[]}
+Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
-Plug '0BananaBig0/verilog_indent',{'for':[]}
+Plug '0BananaBig0/verilog_indent', {'for': []}
 " markdown实时预览插件
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' , 'for': ['markdown'] }
+Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': ['markdown']}
+" Plug 'instant-markdown/vim-instant-markdown', {'for': 'markdown', 'do': 'yarn install'}
 " markdown目录构建插件
-Plug 'mzlogin/vim-markdown-toc',{'for':['markdown']}
+Plug 'mzlogin/vim-markdown-toc', {'for': 'markdown'}
 " markdown表格插件
-Plug 'godlygeek/tabular', {'for': ['markdown']}
-" 补全插件,动态检测语法插件,可鼠标停留显示信息, Layz
+Plug 'godlygeek/tabular', {'for': 'markdown'}
+" 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Layz
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " vim快捷键管理和提示插件
-Plug 'liuchengxu/vim-which-key', { 'on': [] }
+Plug 'liuchengxu/vim-which-key', {'on': []}
 " nerdcommenter快速注释插件
-Plug 'preservim/nerdcommenter', {'on':[]}
+Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件
-Plug 'skywind3000/asyncrun.vim',{'on':[]}
+Plug 'skywind3000/asyncrun.vim', {'on': []}
 " 菜单栏插件, Only Lazy Configuration, but classifed into Lazy
 Plug 'skywind3000/vim-quickui'
 " 文件目录插件, Lazy_On
-Plug 'preservim/nerdtree',{'on': 'NERDTreeToggle'}
+Plug 'preservim/nerdtree', {'on': 'NERDTreeToggle'}
 " 标签窗口列表插件
-Plug 'liuchengxu/vista.vim',{'on':'Vista!!'}
+Plug 'liuchengxu/vista.vim', {'on': 'Vista!!'}
 " 书签插件，用于写代码注解等等
-Plug 'MattesGroeger/vim-bookmarks',{'on':['BookmarkToggle','BookmarkShowAll','BookmarkAnnotate']}
+Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
 " Esc退出变回英文输入法，进入insert模式切换为原来的输入法
-Plug '0BananaBig0/fcitx.vim',{'branch':'fcitx4','on':[]}
+Plug '0BananaBig0/fcitx.vim', {'branch': 'fcitx4', 'on': []}
 " Multiple highlights
-Plug 'lfv89/vim-interestingwords',{'on':[]}
+Plug 'lfv89/vim-interestingwords', {'on': []}
 " Git command
-Plug 'tpope/vim-fugitive',{'on':[]}
+Plug 'tpope/vim-fugitive', {'on': []}
 " Git status show
-Plug 'airblade/vim-gitgutter',{'on':[]}
+Plug 'airblade/vim-gitgutter', {'on': []}
 " c/cpp debug
-Plug 'puremourning/vimspector',{'on':[]}
+Plug 'puremourning/vimspector', {'on': []}
 " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
-Plug 'Yggdroot/LeaderF', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
+Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 " LeaderF extension for navigate the marks
-Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf','LeaderfFunction','LeaderfBuffer','LeaderfFile']}
+Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -288,7 +289,7 @@ function! Lazy_Plugin_Configuration()
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
   let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
-  let g:NERDCustomDelimiters = { 'opencl': { 'left': '//' } } " use // to comment cl source codes.
+  let g:NERDCustomDelimiters = {'opencl': {'left': '//'}} " use // to comment cl source codes.
   map <silent><F3> <plug>NERDCommenterComment
   map <silent><S-F3> <plug>NERDCommenterUncomment
 
@@ -563,7 +564,7 @@ function! Lazy_On_Plugin_Configuration()
   " ctrl+j/k上下选择显示查找结果，ctrl+上/下键上下移动被显示的查找结果的内容
   let g:Lf_GtagsAutoGenerate = 0
   let g:Lf_Gtagslabel = 'native-pygments'
-  let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
+  let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
   let g:Lf_RootMarkers = ['.root', '.svn', '.git', '.hg', '.project']
   let g:Lf_WorkingDirectoryMode = 'Ac'
   let g:Lf_CacheDirectory = expand('~/.vim/cache')
@@ -576,7 +577,7 @@ function! Lazy_On_Plugin_Configuration()
       \ ]
   let g:Lf_PreviewInPopup = 1
   " open the preview window automatically
-  let g:Lf_PreviewResult = {'Rg': 1 }
+  let g:Lf_PreviewResult = {'Rg': 1}
   let g:Lf_ShortcutB = '<Leader>fb'
   let g:Lf_ShortcutF = '<Leader>ff'
 endfunction
