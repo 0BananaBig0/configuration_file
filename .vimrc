@@ -187,8 +187,8 @@ function! Markdown_Plugin_Configuration()
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <silent><Leader>gm ggO<ESC>:GenTocGFM<CR>m`ggdd
-  nnoremap <silent><Leader>um :UpdateToc<CR>
+  nnoremap <silent><Leader>mg ggO<ESC>:GenTocGFM<CR>m`ggdd
+  nnoremap <silent><Leader>mu :UpdateToc<CR>
   let g:vmt_auto_update_on_save = 0
 endfunction
 
@@ -449,7 +449,7 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
-  nnoremap <silent><Localleader>h :silent call plug#load('vim-interestingwords')<CR>
+  nnoremap <silent><Leader>h :silent call plug#load('vim-interestingwords')<CR>
   let g:interestingWordsRandomiseColors = 1
 
 
