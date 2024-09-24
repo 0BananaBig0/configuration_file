@@ -76,7 +76,31 @@ cp ~/Documents/configuration_file/.vimrc ~
 cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
 cp ~/Documents/configuration_file/coc-settings.json ~/.vim
 ln -s ~/.vimrc ~/.config/nvim/init.vim
-sudo npm install -g neovim
+npm config set coc.nvim:registry https://registry.npmmirror.com
+sudo npm config set coc.nvim:registry https://registry.npmmirror.com -g
+npm config set registry https://registry.npmmirror.com/ && \
+npm cache clean --force
+sudo npm config set registry https://registry.npmmirror.com/ && \
+sudo npm cache clean --force
+sudo npm install -g neovim yarn
+yarn config set registry https://registry.npmmirror.com/ --global  && \
+yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
+yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
+yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global  && \
+yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global  && \
+yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global  && \
+yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
+yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
+yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
+sudo yarn config set registry https://registry.npmmirror.com/ --global  && \
+sudo yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
+sudo yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
+sudo yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global  && \
+sudo yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global  && \
+sudo yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global  && \
+sudo yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
+sudo yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
+sudo yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
 sudo apt install -y opencl-headers ocl-icd-dev ocl-icd-opencl-dev pocl-opencl-icd
 sudo apt install -y clinfo libboost-all-dev tcl-dev
 sudo apt install perl libdb-dev
