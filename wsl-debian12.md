@@ -188,3 +188,4 @@ sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang
 sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr/bin/clang-tidy-diff-16.py 160
 
 sudo ln /mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe /usr/bin/msedge -s
+sudo apt install pandoc texlive-xetex texlive-luatex pandoc-citeproc-preamble texlive-pstricks -y
