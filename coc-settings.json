@@ -54,9 +54,6 @@
    "diagnostic.virtualText": true,
    "diagnostic.warningSign": "⚡",
    "inlayHint.enable": false,
-   "markdownlint.onChange": false,
-   "markdownlint.onOpen": false,
-   "markdownlint.onSave": false,
    "perl.p::ls.enable": true,
    "perl.p::ls.logLevel": 2,
    "perl.p::ls.logFile": "/home/banana/.coc-perl.log",
@@ -69,3 +66,4 @@
    "suggest.snippetIndicator": "",
    "suggest.triggerAfterInsertEnter": true
 }
+

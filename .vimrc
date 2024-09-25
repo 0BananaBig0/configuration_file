@@ -79,9 +79,9 @@ Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent', {'for': []}
 " markdown实时预览插件
-" Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': 'markdown'}
-" Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
-Plug 'instant-markdown/vim-instant-markdown', {'on': 'InstantMarkdownPreview', 'do': 'yarn install'}
+" Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': []}
+" Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': []}
+Plug 'instant-markdown/vim-instant-markdown', {'for': [], 'do': 'yarn install'}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': 'markdown'}
 " markdown表格插件
@@ -181,8 +181,22 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 function! Markdown_Plugin_Configuration()
+  let g:markdown_preview_status = 0
+  " coc-markmap, coc-markdownlint setting
+  " Watch workflow from the whole file
+  nnoremap <silent><Leader>mm :CocCommand markmap.watch<CR>
+  " Create markmap html file from the whole file
+  nnoremap <silent><Leader>mh :CocCommand markmap.create --offline<CR>
+  " Create markmap html file from the selected lines
+  vnoremap <silent><Leader>mh <Plug>(coc-markmap-create-v)
+  nnoremap <silent><Leader>mf :CocCommand markdownlint.fixAll<CR>
+  nnoremap <silent><Leader>ma <Plug>(coc-codeaction)
+  nnoremap <silent><Leader>ml <Plug>(coc-codeaction-line)
+
+
+
   " markdown-preview.nvim setting
-  let g:mkdp_browser = '/usr/bin/firefox'
+  " let g:mkdp_browser = '/usr/bin/firefox'
 
 
 
@@ -248,7 +262,7 @@ function! Lazy_Plugin_Configuration()
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
-           \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl',
+           \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
   function! Cpp_Workspace_Root()
     let cpp_workspace_root = finddir('.git', '.;')
@@ -780,8 +794,7 @@ function! Compile_And_Excute()
   elseif &filetype==?'tcl'
     exec ':AsyncRun! -strip -save=1 tclsh %'
   elseif &filetype==?'markdown'
-    " exec ':MarkdownPreview'
-    exec ':InstantMarkdownPreview'
+    call Markdown_Preview_Toogle()
   elseif &filetype==?'vim'
     exec ':source ~/.vimrc'
   endif
@@ -794,6 +807,30 @@ function! Compile_Command()
   elseif &filetype==?'verilog'
     exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd'
   endif
+endfunction
+function! Markdown_Preview_Toogle()
+  if(g:markdown_preview_status ==? 0)
+    let g:markdown_preview_status = 1
+    silent call plug#load('vim-instant-markdown')
+  endif
+  if(g:markdown_preview_status ==? 1)
+    let g:markdown_preview_status = 2
+    exec ':InstantMarkdownPreview'
+  else
+    let g:markdown_preview_status = 1
+    exec '::InstantMarkdownStop'
+  endif
+  " if(g:markdown_preview_status ==?)
+  "   let g:markdown_preview_status = 1
+  "   silent call plug#load('markdown-preview.nvim')
+  " endif
+  " if(g:markdown_preview_status ==? 1)
+  "   let g:markdown_preview_status = 2
+  "   exec ':MarkdownPreview'
+  " else
+  "   let g:markdown_preview_status = 1
+  "   exec ':MarkdownPreviewStop'
+  " endif
 endfunction
 function! Show_Current_Module()
   let module_line = search('module','bnWz')
@@ -876,3 +913,4 @@ inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
 " Alt-h/l use h/i in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
+
