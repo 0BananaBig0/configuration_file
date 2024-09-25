@@ -1,0 +1,23 @@
+{
+	"name": "Vimium C",
+	"@time": "9/25/2024, 9:28:17 AM",
+	"time": 1727227697503,
+	"environment": {
+		"extension": "1.99.997",
+		"platform": "win",
+		"firefox": 130
+	},
+	"keyLayout": 2,
+	"userDefinedCss": [
+		".LH{color:black;",
+		"    border:0px;",
+		"    border-radius:3px;",
+		"    box-shadow:0 0px 0px;",
+		"    box-sizing:border-box;",
+		"    overflow:hidden;",
+		"    padding:0px 0px 0px;",
+		"    position:absolute}",
+		""
+	],
+	"vimSync": true
+}
