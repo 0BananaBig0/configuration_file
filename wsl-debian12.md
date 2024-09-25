@@ -34,6 +34,7 @@ git config --global core.editor gvim
 git config --global protocol.https.allow always
 git config --global push.default "current"
 git config --global diff.tool gvimdiff
+git config --global url."https://githubfast.com/".insteadOf "https://github.com/"
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
 sh install.sh
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
@@ -213,3 +214,4 @@ sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr
 
 sudo ln /mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe /usr/bin/msedge -s
 sudo apt install pandoc texlive-xetex texlive-luatex pandoc-citeproc-preamble texlive-pstricks -y
+sudo npm -g install instant-markdown-d@next

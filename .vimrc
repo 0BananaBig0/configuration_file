@@ -60,7 +60,7 @@ let g:maplocalleader = ' '
 
 
 
-" let g:plug_url_format = 'https://git::@github.91chi.fun//https://github.com/%s.git'
+let g:plug_url_format = 'https://githubfast.com/%s.git'
 call plug#begin('~/.vim/plugged')
 " vim theme, No_Lazy
 Plug 'dracula/vim', {'as': 'dracula'}
@@ -79,7 +79,9 @@ Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent', {'for': []}
 " markdown实时预览插件
-Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': 'markdown'}
+" Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': 'markdown'}
+" Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'instant-markdown/vim-instant-markdown', {'on': 'InstantMarkdownPreview', 'do': 'yarn install'}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': 'markdown'}
 " markdown表格插件
@@ -181,6 +183,12 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 function! Markdown_Plugin_Configuration()
   " markdown-preview.nvim setting
   let g:mkdp_browser = '/usr/bin/firefox'
+
+
+
+  " vim-instant-markdown setting
+  let g:instant_markdown_autostart = 0
+  let g:instant_markdown_theme = 'dark'
 
 
 
@@ -772,7 +780,8 @@ function! Compile_And_Excute()
   elseif &filetype==?'tcl'
     exec ':AsyncRun! -strip -save=1 tclsh %'
   elseif &filetype==?'markdown'
-    exec ':MarkdownPreview'
+    " exec ':MarkdownPreview'
+    exec ':InstantMarkdownPreview'
   elseif &filetype==?'vim'
     exec ':source ~/.vimrc'
   endif
