@@ -78,7 +78,7 @@ cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
 cp ~/Documents/configuration_file/coc-settings.json ~/.vim
 ln -s ~/.vimrc ~/.config/nvim/init.vim
 npm config set coc.nvim:registry https://registry.npmmirror.com
-sudo npm config set coc.nvim:registry https://registry.npmmirror.com -g
+sudo npm config set coc.nvim:registry https://registry.npmmirror.com
 npm config set registry https://registry.npmmirror.com/ && \
 npm cache clean --force
 sudo npm config set registry https://registry.npmmirror.com/ && \
