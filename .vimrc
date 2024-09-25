@@ -186,7 +186,8 @@ function! Markdown_Plugin_Configuration()
   " Watch workflow from the whole file
   nnoremap <silent><Leader>mm :CocCommand markmap.watch<CR>
   " Create markmap html file from the whole file
-  nnoremap <silent><Leader>mh :CocCommand markmap.create --offline<CR>
+  nnoremap <silent><Leader>mc :CocCommand markmap.create --offline<CR>
+  nnoremap <silent><Leader>mh <Plug>(coc-markmap-create)
   " Create markmap html file from the selected lines
   vnoremap <silent><Leader>mh <Plug>(coc-markmap-create-v)
   nnoremap <silent><Leader>mf :CocCommand markdownlint.fixAll<CR>
@@ -913,4 +914,3 @@ inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
 " Alt-h/l use h/i in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
-
