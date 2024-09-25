@@ -888,20 +888,20 @@ function! Close_and_Back_Tab()
 endfunction
 nnoremap <silent><Localleader>q :q<CR>
 nnoremap <silent><Localleader>w :w<CR>
-nnoremap <silent><Localleader><F4> :%retab!<CR>
 " 比较文件
-nnoremap <Localleader><F5> :vert diffsplit
-nnoremap <silent><Localleader><F6> :silent call Delete_Blank_Line()<CR>
+nnoremap <Localleader><F4> :vert diffsplit
+nnoremap <silent><Localleader><F5> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec 'silent normal! m`'
   exec 'silent :g/^\s*$/d'
   exec 'silent normal! ``'
 endfunction
-nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_and_CapM()<CR>
-function! Delete_Trailling_Space_and_CapM()
+nnoremap <silent><Localleader><F6> :silent call Delete_Trailling_Space_CapM_And_Retab<CR>
+function! Delete_Trailling_Space_CapM_And_Retab()
   exec 'silent normal! m`'
   exec 'silent :%s/\s\+$//e'
   exec 'silent :%s/$//e'
+  exec 'silent :%retab!'
   exec 'silent normal! ``'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
