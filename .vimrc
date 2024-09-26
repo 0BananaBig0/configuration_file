@@ -897,7 +897,7 @@ function! Delete_Blank_Line()
   exec 'silent :g/^\s*$/d'
   exec 'silent normal! ``'
 endfunction
-nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_CapM_And_Retab<CR>
+nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
 function! Delete_Trailling_Space_CapM_And_Retab()
   exec 'silent normal! m`'
   exec 'silent :%s/\s\+$//e'
