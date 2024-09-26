@@ -899,11 +899,11 @@ function! Delete_Blank_Line()
 endfunction
 nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
 function! Delete_Trailling_Space_CapM_And_Retab()
-  exec 'silent normal! m`'
+  exec 'silent normal! mc'
   exec 'silent :%s/\s\+$//e'
   exec 'silent :%s/$//e'
   exec 'silent :%retab!'
-  exec 'silent normal! ``'
+  exec 'silent normal! `c'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <silent><C-CR> i<CR><ESC>
