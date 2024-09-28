@@ -259,7 +259,7 @@ function! Lazy_Plugin_Configuration()
   nnoremap <silent>[t :silent call CocAction('diagnosticToggleBuffer')<CR>
   nmap <silent>[l <Plug>(coc-diagnostic-info)
   nmap <silent>[a <Plug>(coc-codeaction)
-  nmap <silent>[o <Plug>(coc-codeaction-line)
+  nmap <silent>[b <Plug>(coc-codeaction-line)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
