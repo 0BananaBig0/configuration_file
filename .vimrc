@@ -191,8 +191,6 @@ function! Markdown_Plugin_Configuration()
   " Create markmap html file from the selected lines
   vnoremap <silent><Leader>mh <Plug>(coc-markmap-create-v)
   nnoremap <silent><Leader>mf :CocCommand markdownlint.fixAll<CR>
-  nnoremap <silent><Leader>ma <Plug>(coc-codeaction)
-  nnoremap <silent><Leader>ml <Plug>(coc-codeaction-line)
 
 
 
@@ -260,6 +258,8 @@ function! Lazy_Plugin_Configuration()
   nmap <silent><Localleader>k <Plug>(coc-diagnostic-prev-error)
   nnoremap <silent>[t :silent call CocAction('diagnosticToggleBuffer')<CR>
   nmap <silent>[l <Plug>(coc-diagnostic-info)
+  nmap <silent>[a <Plug>(coc-codeaction)
+  nmap <silent>[o <Plug>(coc-codeaction-line)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
