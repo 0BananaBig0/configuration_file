@@ -916,6 +916,8 @@ nnoremap <silent><C-Space> i<Space><ESC>l
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> o<ESC>g$d0
 inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
-" Alt-h/l use h/i in the insert mode like in the normal mode
+" Alt-h/l/p/P use h/i/p/P in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
+inoremap <silent><M-p> <ESC>lpi
+inoremap <silent><M-S-p> <ESC>lPi
