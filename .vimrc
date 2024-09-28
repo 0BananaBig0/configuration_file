@@ -272,19 +272,24 @@ function! Lazy_Plugin_Configuration()
     elseif (cpp_workspace_root ==? '.git')
       let cpp_workspace_root = '.'
     else
-      let cpp_workspace_root = strpart(cpp_workspace_root,0,strridx(cpp_workspace_root,'/.git'))
+      let cpp_workspace_root = strpart(cpp_workspace_root, 0, strridx(cpp_workspace_root,'/.git'))
     endif
     return cpp_workspace_root
   endfunction
-  function! Cpp_Format_Configuration()
+  function! Clang_Tool_Configuration()
     let cpp_workspace_root = Cpp_Workspace_Root()
     let clang_format = cpp_workspace_root.'/.clang-format'
+    let clang_tidy = cpp_workspace_root.'/.clang-tidy'
     if !filereadable(clang_format)
       let clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
-      call writefile(clang_format_content,clang_format,'s')
+      call writefile(clang_format_content, clang_format, 's')
+    endif
+    if !filereadable(clang_tidy)
+      let clang_tidy_content = readfile($HOME.'/.vim/.c_cpp/.clang-tidy')
+      call writefile(clang_tidy_content, clang_tidy, 's')
     endif
   endfunction
-  noremap <silent><Leader><F7> :silent call Cpp_Format_Configuration()<CR>
+  noremap <silent><Leader><F7> :silent call Clang_Tool_Configuration()<CR>
   nmap <F7>  <Plug>(coc-format)
   xmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
@@ -422,34 +427,34 @@ function! Lazy_On_Plugin_Configuration()
     if location ==? '.git'
       " current directory is workspace or current file path has .git directory
       let path_to_pro = getcwd()
-    elseif strlen(strpart(location,0,1)) == 1
+    elseif strlen(strpart(location, 0, 1)) == 1
       " can find .git, but current directory not has .git
-      let path_to_pro = strpart(location,0,strridx(location,'/.git'))
+      let path_to_pro = strpart(location, 0, strridx(location, '/.git'))
     endif
     if len(location) > 0
-      if strpart(path_to_pro,0,1)!=?'/'
+      if strpart(path_to_pro, 0, 1)!=?'/'
         let path_to_pro='/'.path_to_pro
       endif
-      let pro_dir = strpart(path_to_pro,strridx(path_to_pro,'/'))
-      let pro_to_file = strpart(cur_file_path,stridx(cur_file_path,pro_dir)+strlen(pro_dir))
+      let pro_dir = strpart(path_to_pro, strridx(path_to_pro, '/'))
+      let pro_to_file = strpart(cur_file_path, stridx(cur_file_path, pro_dir)+strlen(pro_dir))
       let location = simplify(location.'/.vim-bookmarks'.pro_to_file)
     else
       " the bookmarks of the root and common user both are saved in the same directory
-      if strpart(cur_file_path,0,5) ==? '/root'
+      if strpart(cur_file_path, 0, 5) ==? '/root'
         let pro_to_file = cur_file_path
-      elseif strpart($SUDO_USER,0,1) ==? ''
-        let pro_to_file = strpart(cur_file_path,strlen($HOME))
+      elseif strpart($SUDO_USER, 0, 1) ==? ''
+        let pro_to_file = strpart(cur_file_path, strlen($HOME))
       else
-        let pro_to_file = strpart(cur_file_path,strlen('/home/'.$SUDO_USER))
+        let pro_to_file = strpart(cur_file_path, strlen('/home/'.$SUDO_USER))
       endif
-      if strpart($SUDO_USER,0,1) ==? ''
+      if strpart($SUDO_USER, 0, 1) ==? ''
         let location = $HOME.'/.vim/.vim-bookmarks'.pro_to_file
       else
         let location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'.pro_to_file
       endif
     endif
     if !isdirectory(location)
-      call mkdir(location,'p')
+      call mkdir(location, 'p')
     endif
       return simplify(location.'/'.expand('%:t').'.'.bookmarkextension)
   endfunction
@@ -506,12 +511,12 @@ function! Lazy_On_Plugin_Configuration()
     if !filereadable(launch_json)
       call mkdir(cpp_workspace_root.'/.vscode', 'p', 0755)
       let launch_json_content = readfile($HOME.'/.vim/.c_cpp/.vscode/launch.json')
-      call writefile(launch_json_content,launch_json,'s')
+      call writefile(launch_json_content, launch_json, 's')
     endif
     let vimspector_json = cpp_workspace_root.'/.vimspector.json'
     if !filereadable(vimspector_json)
       let cpp_json_content = readfile($HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json')
-      call writefile(cpp_json_content,vimspector_json,'s')
+      call writefile(cpp_json_content, vimspector_json, 's')
     endif
       exec 'tabe ' . vimspector_json
   endfunction
@@ -834,21 +839,21 @@ function! Markdown_Preview_Toogle()
   " endif
 endfunction
 function! Show_Current_Module()
-  let module_line = search('module','bnWz')
+  let module_line = search('module', 'bnWz')
   let module_name = getline(module_line)
-  let module_end_poisition = strridx(module_name,'(')
+  let module_end_poisition = strridx(module_name, '(')
   if(module_end_poisition > 0)
-    let module_name = strpart(module_name,0,module_end_poisition)
+    let module_name = strpart(module_name, 0, module_end_poisition)
   endif
-  let module_name = strpart(module_name,stridx(module_name,'module')+7)
+  let module_name = strpart(module_name, stridx(module_name, 'module')+7)
   while(strpart(module_name, 0 , 1) ==? ' ')
-    let module_name = strpart(module_name,1)
+    let module_name = strpart(module_name, 1)
   endwhile
   echo 'module -->' module_name
 endfunction
 function! Show_Nearest_Class_Or_Struct()
-  let class_line = search('\n'.'class','bnWz')
-  let struct_line = search('\n'.'struct','bnWz')
+  let class_line = search('\n'.'class', 'bnWz')
+  let struct_line = search('\n'.'struct', 'bnWz')
   if(class_line > struct_line)
     let nearest_name = getline(class_line+1)
   elseif(class_line < struct_line)
@@ -856,9 +861,9 @@ function! Show_Nearest_Class_Or_Struct()
   else
     let nearest_name = 'No class/struct can be find.'
   endif
-  let nearest_end_poisition = strridx(nearest_name,'{')
+  let nearest_end_poisition = strridx(nearest_name, '{')
   if(nearest_end_poisition > 0)
-    let nearest_name = strpart(nearest_name,0,nearest_end_poisition)
+    let nearest_name = strpart(nearest_name, 0, nearest_end_poisition)
   endif
   echo nearest_name
 endfunction
