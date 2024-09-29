@@ -784,7 +784,7 @@ function! SetTitle()
   endif
   exec 'silent normal! G'
 endfunction
-if !exists("Compile_And_Excute")  
+if !exists("Compile_And_Excute")
   function! Compile_And_Excute()
     if &filetype==?'cpp'
       exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
