@@ -25,9 +25,16 @@ Checks:   '-*,
            bugprone-integer-division,
            bugprone-macro-parentheses,
            bugprone-macro-repeated-side-effects,
+           bugprone-misplaced-operator-in-strlen-in-alloc,
            bugprone-misplaced-widening-cast,
            bugprone-multi-level-implicit-pointer-conversion,
+           bugprone-undefined-memory-manipulation,
            bugprone-undelegated-constructor,
+           bugprone-unhandled-exception-at-new,
+           bugprone-unhandled-self-assignment,
+           bugprone-unused-return-value,
+           bugprone-use-after-move,
+           bugprone-virtual-near-miss,
            misc-unconventional-assign-operator,
            misc-unused-parameters'
 WarningsAsErrors: ''
@@ -46,7 +53,6 @@ CheckOptions:
   google-readability-function-size.StatementThreshold: '800'
   google-readability-namespace-comments.ShortNamespaceLines: '10'
   google-readability-namespace-comments.SpacesBeforeComments: '3'
-  llvm-qualified-auto.AddConstToQualified: 'false'
   llvm-else-after-return.WarnOnConditionVariables: 'true'
   llvm-else-after-return.WarnOnUnfixable: 'false'
   readability-braces-around-statements.ShortStatementLines: '0'
