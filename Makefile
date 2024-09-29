@@ -18,7 +18,7 @@ INCLUDES = -I/usr/include/tcl \
 # DEBUG = -g
 DEBUG =
 
-CC_FLAGS = ${DEBUG} -fPIC -Wall -std=c++17 \
+CC_FLAGS = ${DEBUG} -fPIC -Wall -Wextra -std=c++17 \
 					-Wno-error=deprecated-declarations
 
 # list of object files

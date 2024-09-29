@@ -787,9 +787,9 @@ endfunction
 if !exists("Compile_And_Excute")
   function! Compile_And_Excute()
     if &filetype==?'cpp'
-      exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
+      exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -Wall -Wextra -lboost_program_options -lOpenCL && ./E%<.exe'
     elseif &filetype==?'c'
-      exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -lOpenCL && ./E%<.exe'
+      exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -Wall -Wextra -lOpenCL && ./E%<.exe'
     elseif &filetype==?'python'
       exec ':AsyncRun! -strip -save=1 python3 %'
     elseif &filetype==?'sh'
@@ -809,9 +809,9 @@ if !exists("Compile_And_Excute")
 endif
 function! Compile_Command()
   if &filetype==?'cpp'
-    exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL'
+    exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -Wall -Wextra -lboost_program_options -lOpenCL'
   elseif &filetype==?'c'
-    exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -lOpenCL'
+    exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -Wall -Wextra -lOpenCL'
   elseif &filetype==?'verilog'
     exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd'
   endif
