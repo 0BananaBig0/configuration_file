@@ -1,21 +1,5 @@
 ---
 Checks:   '-*,
-           clang-analyzer-*,
-           clang-analyzer-core.*,
-           clang-analyzer-cplusplus.*,
-           clang-diagnostic-*,
-           cppcoreguidelines-narrowing-conversions,
-           modernize-use-bool-literals,
-           modernize-use-equals-default,
-           modernize-use-nullptr,
-           modernize-use-override,
-           modernize-redundant-void-arg,
-           google-explicit-constructor,
-           google-readability-casting,
-           readability-braces-around-statements,
-           readability-identifier-naming,
-           readability-non-const-parameter,
-           cert-dcl21-cpp,
            bugprone-bool-pointer-implicit-conversion,
            bugprone-branch-clone,
            bugprone-dangling-handle,
@@ -35,8 +19,25 @@ Checks:   '-*,
            bugprone-unused-return-value,
            bugprone-use-after-move,
            bugprone-virtual-near-miss,
+           cert-dcl21-cpp,
+           clang-analyzer-*,
+           clang-analyzer-core.*,
+           clang-analyzer-cplusplus.*,
+           clang-diagnostic-*,
+           cppcoreguidelines-narrowing-conversions,
+           cppcoreguidelines-rvalue-reference-param-not-moved,
+           google-explicit-constructor,
+           google-readability-casting,
            misc-unconventional-assign-operator,
-           misc-unused-parameters'
+           misc-unused-parameters,
+           modernize-use-bool-literals,
+           modernize-use-equals-default,
+           modernize-use-nullptr,
+           modernize-use-override,
+           modernize-redundant-void-arg,
+           readability-braces-around-statements,
+           readability-identifier-naming,
+           readability-non-const-parameter'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
@@ -51,7 +52,6 @@ CheckOptions:
   cppcoreguidelines-narrowing-conversions.PedanticMode: 'true'
   google-readability-braces-around-statements.ShortStatementLines: '1'
   google-readability-function-size.StatementThreshold: '800'
-  google-readability-namespace-comments.ShortNamespaceLines: '10'
   google-readability-namespace-comments.SpacesBeforeComments: '3'
   llvm-else-after-return.WarnOnConditionVariables: 'true'
   llvm-else-after-return.WarnOnUnfixable: 'false'
