@@ -711,7 +711,7 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd BufEnter * silent call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
-  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown
+  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
            \ nnoremap <silent><Localleader><F2>
            \ :call Compile_And_Excute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
@@ -784,27 +784,29 @@ function! SetTitle()
   endif
   exec 'silent normal! G'
 endfunction
-function! Compile_And_Excute()
-  if &filetype==?'cpp'
-    exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
-  elseif &filetype==?'c'
-    exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -lOpenCL && ./E%<.exe'
-  elseif &filetype==?'python'
-    exec ':AsyncRun! -strip -save=1 python3 %'
-  elseif &filetype==?'sh'
-    exec ':AsyncRun! -strip -save=1 ./%'
-  elseif &filetype==?'verilog'
-    exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
-  elseif &filetype==?'perl'
-    exec ':AsyncRun! -strip -save=1 perl %'
-  elseif &filetype==?'tcl'
-    exec ':AsyncRun! -strip -save=1 tclsh %'
-  elseif &filetype==?'markdown'
-    call Markdown_Preview_Toogle()
-  elseif &filetype==?'vim'
-    exec ':source ~/.vimrc'
-  endif
-endfunction
+if !exists("Compile_And_Excute")  
+  function! Compile_And_Excute()
+    if &filetype==?'cpp'
+      exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL && ./E%<.exe'
+    elseif &filetype==?'c'
+      exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -lOpenCL && ./E%<.exe'
+    elseif &filetype==?'python'
+      exec ':AsyncRun! -strip -save=1 python3 %'
+    elseif &filetype==?'sh'
+      exec ':AsyncRun! -strip -save=1 ./%'
+    elseif &filetype==?'verilog'
+      exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
+    elseif &filetype==?'perl'
+      exec ':AsyncRun! -strip -save=1 perl %'
+    elseif &filetype==?'tcl'
+      exec ':AsyncRun! -strip -save=1 tclsh %'
+    elseif &filetype==?'markdown'
+      call Markdown_Preview_Toogle()
+    elseif &filetype==?'vim'
+      exec ':source ~/.vimrc'
+    endif
+  endfunction
+endif
 function! Compile_Command()
   if &filetype==?'cpp'
     exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -lboost_program_options -lOpenCL'
@@ -914,13 +916,11 @@ endfunction
 nnoremap <silent><C-CR> i<CR><ESC>
 nnoremap <silent><C-Space> i<Space><ESC>l
 " Alt-Enter新建空行
-nnoremap <silent><M-CR> o<ESC>g$d0
-inoremap <silent><M-CR> <ESC>o<ESC>g$d0i
+nnoremap <silent><M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
+inoremap <silent><M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>
 " Alt-h/l/p/P/u use h/i/p/P/u in the insert mode like in the normal mode
 inoremap <silent><M-h> <ESC>hi
 inoremap <silent><M-l> <ESC>la
 inoremap <silent><M-p> <ESC>lpi
 inoremap <silent><M-S-p> <ESC>lPi
 inoremap <silent><M-u> <ESC>ui
-
-
