@@ -1,4 +1,5 @@
 ---
+# Statement: Now, bugprone-use-after-move not works as what it's designed.
 Checks:   '-*,
            bugprone-bool-pointer-implicit-conversion,
            bugprone-branch-clone,
@@ -52,9 +53,11 @@ CheckOptions:
   cppcoreguidelines-narrowing-conversions.PedanticMode: 'true'
   google-readability-braces-around-statements.ShortStatementLines: '1'
   google-readability-function-size.StatementThreshold: '800'
+  google-readability-namespace-comments.ShortNamespaceLines: '10'
   google-readability-namespace-comments.SpacesBeforeComments: '3'
   llvm-else-after-return.WarnOnConditionVariables: 'true'
   llvm-else-after-return.WarnOnUnfixable: 'false'
+  llvm-qualified-auto.AddConstToQualified: 'false'
   readability-braces-around-statements.ShortStatementLines: '0'
   readability-identifier-naming.ClassCase: 'CamelCase'
   readability-identifier-naming.ClassConstantCase: 'camelBack'
@@ -77,3 +80,4 @@ CheckOptions:
   readability-identifier-naming.StructCase: 'CamelCase'
   readability-identifier-naming.TypedefCase: 'CamelCase'
 ...
+
