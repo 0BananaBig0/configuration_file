@@ -26,6 +26,7 @@ Checks:   '-*,
            clang-analyzer-cplusplus.*,
            clang-diagnostic-*,
            cppcoreguidelines-narrowing-conversions,
+           cppcoreguidelines-owning-memory,
            cppcoreguidelines-rvalue-reference-param-not-moved,
            google-explicit-constructor,
            google-readability-casting,
@@ -80,4 +81,3 @@ CheckOptions:
   readability-identifier-naming.StructCase: 'CamelCase'
   readability-identifier-naming.TypedefCase: 'CamelCase'
 ...
-
