@@ -918,9 +918,12 @@ nnoremap <silent><C-Space> i<Space><ESC>l
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
 inoremap <silent><M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>
-" Alt-h/l/p/P/u use h/i/p/P/u in the insert mode like in the normal mode
-inoremap <silent><M-h> <ESC>hi
-inoremap <silent><M-l> <ESC>la
-inoremap <silent><M-p> <ESC>lpi
-inoremap <silent><M-S-p> <ESC>lPi
-inoremap <silent><M-u> <ESC>ui
+" Alt-h/j/k/l/p/P/u use h/j/k/l/p/P/u in the insert mode like in the normal mode
+inoremap <silent><M-h> <C-o>h
+inoremap <silent><M-j> <C-o>j
+inoremap <silent><M-k> <C-o>k
+inoremap <silent><M-l> <C-o>l
+inoremap <silent><M-p> <C-o>p
+inoremap <silent><M-S-p> <C-o>P
+inoremap <silent><M-u> <C-o>u
+inoremap <silent><M-r> <C-o><C-r>
