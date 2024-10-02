@@ -913,8 +913,33 @@ function! Delete_Trailling_Space_CapM_And_Retab()
   exec 'silent normal! `c'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
-nnoremap <silent><C-CR> i<CR><ESC>
+nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
 nnoremap <silent><C-Space> i<Space><ESC>l
+function! InsertEnterInNormalMode()
+    " 1. 获取当前光标所在位置的行数
+    let current_line = line('.')
+    let new_line = current_line + 1
+    " 2. 获取 `current_line` 中的缩进空格数，并存储在 `current_indent_number` 中
+    let current_indent_number = indent(current_line)
+    " 3. 生成 n 个空格
+    let current_indent = repeat(' ', current_indent_number)
+    " 4. 进入插入模式，输入回车，然后返回正常模式
+    " feedkeys() is an asynchronous function that causes some issues.
+    " call feedkeys("i\<CR>\<ESC>", 'n')
+    execute "normal! i\<CR>\<ESC>"
+    let new_column = col('.') + 1
+    " 5. 如果 `new_line` 行为空或只有空格, 给 `new_line` 行插入 `current_indent`
+    if getline(new_line) =~ '^\s*$'
+        call setline(new_line, current_indent)
+        let new_column = current_indent_number + 1
+    endif
+    " 6. 如果 `current_line` 行为空或只有空格，则清除 `current_line` 行的空格
+    if getline(current_line) =~ '^\s*$'
+        call setline(current_line, '')
+    endif
+    " 7. 去到 `new_line` 行的column列
+      call setpos('.', [0, new_line, new_column, 0])
+endfunction
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
 inoremap <silent><M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>
@@ -931,3 +956,4 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>a
 inoremap <silent><M-S-i> <C-o>i
+
