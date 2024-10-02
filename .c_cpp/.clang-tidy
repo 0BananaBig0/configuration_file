@@ -1,5 +1,8 @@
 ---
-# Statement: Now, bugprone-use-after-move not works as what it's designed.
+# Statement: The warning for bugprone-use-after-move is not functioning as intended.
+# cppcoreguidelines-owning-memory: Avoid using it, as some systems require the GSL library to be built
+# from its own source. Additionally, there is some confusion between two GSL libraries: one designed
+# by Microsoft for memory management, while the other is utilized for scientific computation.
 Checks:   '-*,
            bugprone-bool-pointer-implicit-conversion,
            bugprone-branch-clone,
@@ -13,6 +16,7 @@ Checks:   '-*,
            bugprone-misplaced-operator-in-strlen-in-alloc,
            bugprone-misplaced-widening-cast,
            bugprone-multi-level-implicit-pointer-conversion,
+           bugprone-multiple-new-in-one-expression,
            bugprone-undefined-memory-manipulation,
            bugprone-undelegated-constructor,
            bugprone-unhandled-exception-at-new,
@@ -26,10 +30,10 @@ Checks:   '-*,
            clang-analyzer-cplusplus.*,
            clang-diagnostic-*,
            cppcoreguidelines-narrowing-conversions,
-           cppcoreguidelines-owning-memory,
            cppcoreguidelines-rvalue-reference-param-not-moved,
            google-explicit-constructor,
            google-readability-casting,
+           misc-new-delete-overloads,
            misc-unconventional-assign-operator,
            misc-unused-parameters,
            modernize-use-bool-literals,
@@ -53,7 +57,6 @@ CheckOptions:
   cppcoreguidelines-narrowing-conversions.WarnOnEquivalentBitWidth: 'true'
   cppcoreguidelines-narrowing-conversions.PedanticMode: 'true'
   google-readability-braces-around-statements.ShortStatementLines: '1'
-  google-readability-function-size.StatementThreshold: '800'
   google-readability-namespace-comments.ShortNamespaceLines: '10'
   google-readability-namespace-comments.SpacesBeforeComments: '3'
   llvm-else-after-return.WarnOnConditionVariables: 'true'
