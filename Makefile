@@ -43,4 +43,4 @@ all: $(EXES)
 
 clean:
 	@echo "Cleaning up ......"
-	-rm -rf *.exe # - prefix for ignoring errors
+	@-rm -rf *.exe *.o *.i *.s *.a *.so # - prefix for ignoring errors
