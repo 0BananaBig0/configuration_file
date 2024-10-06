@@ -937,7 +937,7 @@ function! InsertEnterInNormalMode()
     if getline(current_line) =~ '^\s*$'
         call setline(current_line, '')
     endif
-    " 7. 去到 `new_line` 行的column列
+    " 7. 去到 `new_line` 行的new_column列
       call setpos('.', [0, new_line, new_column, 0])
 endfunction
 " Alt-Enter新建空行
@@ -948,12 +948,12 @@ inoremap <silent><M-h> <C-o>h
 inoremap <silent><M-j> <C-o>j
 inoremap <silent><M-k> <C-o>k
 inoremap <silent><M-l> <C-o>l
-inoremap <silent><M-p> <C-o>p
-inoremap <silent><M-S-p> <C-o>P
+inoremap <silent><M-p> <ESC>pa
+inoremap <silent><M-S-p> <ESC>Pa
 inoremap <silent><M-u> <C-o>u
 inoremap <silent><M-r> <C-o><C-r>
 inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
-inoremap <silent><M-S-a> <C-o>a
-inoremap <silent><M-S-i> <C-o>i
+inoremap <silent><M-S-a> <C-o>A
+inoremap <silent><M-S-i> <C-o>I
 
