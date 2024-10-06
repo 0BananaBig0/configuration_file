@@ -261,7 +261,7 @@ function! Lazy_Plugin_Configuration()
   nmap <silent>[a <Plug>(coc-codeaction)
   nmap <silent>[b <Plug>(coc-codeaction-line)
   let g:coc_filetype_map = {'opencl': 'cpp'}
-  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets',
+  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets', 'coc-prettier',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
