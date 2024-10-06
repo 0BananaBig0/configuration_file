@@ -1,12 +1,12 @@
 <!-- vim-markdown-toc GFM -->
 
 * [FromGccToCPP](#fromgcctocpp)
-  * [g++ Compiler and Linker:](#g-compiler-and-linker)
+  * [g++ Compiler and Linker](#g-compiler-and-linker)
   * [The difference between gcc and g++](#the-difference-between-gcc-and-g)
-    * [1) Language:](#1-language)
-    * [2) Linking:](#2-linking)
-    * [3) Header File Handling:](#3-header-file-handling)
-  * [How to compile one cpp file.](#how-to-compile-one-cpp-file)
+    * [1) Language](#1-language)
+    * [2) Linking](#2-linking)
+    * [3) Header File Handling](#3-header-file-handling)
+  * [How to compile one cpp file](#how-to-compile-one-cpp-file)
     * [1) g++ Main.cpp](#1-g-maincpp)
     * [2) g++ Main.cpp -o Main.exe](#2-g-maincpp--o-mainexe)
     * [3) g++ -E Main.cpp -o Main.i](#3-g--e-maincpp--o-maini)
@@ -32,7 +32,7 @@
 
 # FromGccToCPP
 
-## g++ Compiler and Linker:
+## g++ Compiler and Linker
 
 1. Header File / Preprocess Statement: The compiler will copy and paste them into the object CPP file.
 2. CPP File: The compiler translates the CPP files into assembly code and then into machine code without
@@ -45,24 +45,24 @@
 
 ## The difference between gcc and g++
 
-### 1) Language:
+### 1) Language
 
 1. gcc: Primarily the GNU C Compiler, but it can also compile C++ files if passed the appropriate flags.
    It defaults to treating source files as C code unless you specify C++.
 2. g++: A specialized driver for C++ compilation. It automatically links the C++ standard library and
    handles C++-specific extensions.
 
-### 2) Linking:
+### 2) Linking
 
 1. gcc: When compiling C++ files with gcc, you must manually link the C++ standard library (e.g., -lstdc++).
 2. g++: Automatically links the C++ standard library without needing extra flags.
 
-### 3) Header File Handling:
+### 3) Header File Handling
 
-1.gcc: When used with C, gcc processes headers as C-specific (using .h headers for the most part).
-2.g++: Treats headers as C++ files and supports C++ header files (like <iostream> instead of <stdio.h>).
+1. gcc: When used with C, gcc processes headers as C-specific (using .h headers for the most part).
+2. g++: Treats headers as C++ files and supports C++ header files (like `<iostream>` instead of `<stdio.h>`).
 
-## How to compile one cpp file.
+## How to compile one cpp file
 
 Source files: Main.cpp
 
@@ -221,10 +221,10 @@ g++ Main.cpp -L. -Wl,-Bstatic -lFun -Wl,-Bdynamic -o Main.exe
 ```
 
 2. -Wl,-Bstatic: Instructs the linker (ld) to search for static libraries (.a files).
-   3.-Wl,-Bdynamic: Reverts the linker back to dynamic libraries, in case you are linking other dynamic libraries afterward.
-3. Situation: A static library has the same name as a dynamic library in the same folder.
-4. Usage: Create both a static library and a dynamic library. They have the same name. Link the static library explicitly.
-5. Output: Fun.o, libFun.a, libFun.so, Main.exe
+3. -Wl,-Bdynamic: Reverts the linker back to dynamic libraries, in case you are linking other dynamic libraries afterward.
+4. Situation: A static library has the same name as a dynamic library in the same folder.
+5. Usage: Create both a static library and a dynamic library. They have the same name. Link the static library explicitly.
+6. Output: Fun.o, libFun.a, libFun.so, Main.exe
 
 ### 7) How to link a dynamic library explicitly
 
