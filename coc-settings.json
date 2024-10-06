@@ -57,6 +57,7 @@
    "perl.p::ls.enable": true,
    "perl.p::ls.logLevel": 2,
    "perl.p::ls.logFile": "/home/banana/.coc-perl.log",
+   "prettier.formatterPriority": -1,
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.detailField": "preview",
@@ -66,4 +67,3 @@
    "suggest.snippetIndicator": "",
    "suggest.triggerAfterInsertEnter": true
 }
-
