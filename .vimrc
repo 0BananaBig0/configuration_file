@@ -709,7 +709,7 @@ set smartcase
 set hlsearch
 set incsearch
 augroup Local_Autocmd_Group
-  autocmd BufEnter * silent call SetIndent()
+  autocmd FileType * silent call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
            \ nnoremap <silent><Localleader><F2>
