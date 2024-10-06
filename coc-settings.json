@@ -54,16 +54,20 @@
    "diagnostic.virtualText": true,
    "diagnostic.warningSign": "⚡",
    "inlayHint.enable": false,
+   "markdownlint.config": {
+      "line_length": false
+   },
    "perl.p::ls.enable": true,
    "perl.p::ls.logLevel": 2,
    "perl.p::ls.logFile": "/home/banana/.coc-perl.log",
    "prettier.formatterPriority": -1,
+   "prettier.printWidth": 100,
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.detailField": "preview",
-   "suggest.maxCompleteItemCount": 9,
+   "suggest.maxCompleteItemCount": 12,
    "suggest.noselect": true,
    "suggest.selection": "recentlyUsedByPrefix",
-   "suggest.snippetIndicator": "",
+   "suggest.snippetIndicator": "~",
    "suggest.triggerAfterInsertEnter": true
 }
