@@ -1,93 +1,96 @@
 <!-- vim-markdown-toc GFM -->
 
-* [FromGccToCPP](#fromgcctocpp)
-  * [`g++` Compiler and Linker](#g-compiler-and-linker)
-      * [1. Header File / Preprocess Statement](#1-header-file--preprocess-statement)
-      * [2. CPP File](#2-cpp-file)
-      * [3. OBJ File / Machine Code File](#3-obj-file--machine-code-file)
-  * [The difference between `gcc` and `g++`](#the-difference-between-gcc-and-g)
-    * [1) Language](#1-language)
-      * [1. `gcc`](#1-gcc)
-      * [2. `g++`](#2-g)
-    * [2) Linking](#2-linking)
-      * [1. `gcc`](#1-gcc-1)
-      * [2. `g++`](#2-g-1)
-    * [3) Header File Handling](#3-header-file-handling)
-      * [1. `gcc`](#1-gcc-2)
-      * [2. `g++`](#2-g-2)
-  * [How to compile one cpp file](#how-to-compile-one-cpp-file)
-    * [Source files](#source-files)
-    * [1) `g++ Main.cpp`](#1-g-maincpp)
-      * [1. Usage](#1-usage)
-      * [2. Output](#2-output)
-    * [2) `g++ Main.cpp -o Main.exe`](#2-g-maincpp--o-mainexe)
-      * [1. Usage](#1-usage-1)
-      * [2. Output](#2-output-1)
-    * [3) `g++ -E Main.cpp -o Main.i`](#3-g--e-maincpp--o-maini)
-      * [1. Usage](#1-usage-2)
-      * [2. Output](#2-output-2)
-    * [4) `g++ -S Main.i`](#4-g--s-maini)
-      * [1. Usage](#1-usage-3)
-      * [2. Output](#2-output-3)
-    * [5) `g++ -S Main.cpp`](#5-g--s-maincpp)
-      * [1. Usage](#1-usage-4)
-      * [2. Output](#2-output-4)
-    * [6) `g++ -c Main.s`](#6-g--c-mains)
-      * [1. Usage](#1-usage-5)
-      * [2. Output](#2-output-5)
-    * [7) `g++ -c Main.cpp`](#7-g--c-maincpp)
-      * [1. Usage](#1-usage-6)
-      * [2. Output](#2-output-6)
-    * [8) `g++ Main.o -o Main.exe`](#8-g-maino--o-mainexe)
-      * [1. Usage](#1-usage-7)
-      * [2. Output](#2-output-7)
-    * [9) `g++ -On Main.cpp -o Main.exe`](#9-g--on-maincpp--o-mainexe)
-      * [1. Usage](#1-usage-8)
-      * [2. Output](#2-output-8)
-  * [How to compile multiple cpp files](#how-to-compile-multiple-cpp-files)
-    * [Source files](#source-files-1)
-    * [1) Compile all files in one command](#1-compile-all-files-in-one-command)
-      * [1. Code](#1-code)
-      * [2. Usage](#2-usage)
-      * [3. Output](#3-output)
-      * [4. Alternative: If all files are in one folder](#4-alternative-if-all-files-are-in-one-folder)
-    * [2) Compile all files separately and then link them together](#2-compile-all-files-separately-and-then-link-them-together)
-      * [1. Code](#1-code-1)
-      * [2. Usage](#2-usage-1)
-      * [3. Output](#3-output-1)
-  * [How to compile and link a library](#how-to-compile-and-link-a-library)
-    * [Source files](#source-files-2)
-    * [1) Setup paths of header files](#1-setup-paths-of-header-files)
-      * [1. Code](#1-code-2)
-    * [2) How to link multiple static libraries](#2-how-to-link-multiple-static-libraries)
-      * [1. Code](#1-code-3)
-    * [3) How to create a static library](#3-how-to-create-a-static-library)
-      * [1. Code](#1-code-4)
-      * [2. Usage](#2-usage-2)
-      * [3. Output](#3-output-2)
-    * [4) How to link multiple dynamic libraries](#4-how-to-link-multiple-dynamic-libraries)
-      * [1. Code](#1-code-5)
-    * [5) How to create a dynamic library](#5-how-to-create-a-dynamic-library)
-      * [1. Code](#1-code-6)
-      * [2. Usage](#2-usage-3)
-      * [3. Output](#3-output-3)
-    * [6) How to link a static library explicitly](#6-how-to-link-a-static-library-explicitly)
-      * [1. Code](#1-code-7)
-      * [2. -Wl,-Bstatic](#2--wl-bstatic)
-      * [3. -Wl,-Bdynamic](#3--wl-bdynamic)
-      * [4. Situation](#4-situation)
-      * [5. Usage](#5-usage)
-      * [6. Output](#6-output)
-    * [7) How to link a dynamic library explicitly](#7-how-to-link-a-dynamic-library-explicitly)
-      * [1. Code](#1-code-8)
-      * [2. Situation](#2-situation)
-      * [3. Usage](#3-usage)
-      * [4. Output](#4-output)
-      * [5. Special Notes](#5-special-notes)
-  * [`make` and Makefile](#make-and-makefile)
-      * [1. `make`](#1-make)
-      * [2. Makefile](#2-makefile)
-    * [1) How `make` process Makefile](#1-how-make-process-makefile)
+- [FromGccToCPP](#fromgcctocpp)
+  - [`g++` Compiler and Linker](#g-compiler-and-linker)
+    - [1. Header File / Preprocess Statement](#1-header-file--preprocess-statement)
+    - [2. CPP File](#2-cpp-file)
+    - [3. OBJ File / Machine Code File](#3-obj-file--machine-code-file)
+  - [The difference between `gcc` and `g++`](#the-difference-between-gcc-and-g)
+    - [1) Language](#1-language)
+      - [1. `gcc`](#1-gcc)
+      - [2. `g++`](#2-g)
+    - [2) Linking](#2-linking)
+      - [1. `gcc`](#1-gcc-1)
+      - [2. `g++`](#2-g-1)
+    - [3) Header File Handling](#3-header-file-handling)
+      - [1. `gcc`](#1-gcc-2)
+      - [2. `g++`](#2-g-2)
+  - [How to compile one cpp file](#how-to-compile-one-cpp-file)
+    - [Source files](#source-files)
+    - [1) `g++ Main.cpp`](#1-g-maincpp)
+      - [1. Usage](#1-usage)
+      - [2. Output](#2-output)
+    - [2) `g++ Main.cpp -o Main.exe`](#2-g-maincpp--o-mainexe)
+      - [1. Usage](#1-usage-1)
+      - [2. Output](#2-output-1)
+    - [3) `g++ -E Main.cpp -o Main.i`](#3-g--e-maincpp--o-maini)
+      - [1. Usage](#1-usage-2)
+      - [2. Output](#2-output-2)
+    - [4) `g++ -S Main.i`](#4-g--s-maini)
+      - [1. Usage](#1-usage-3)
+      - [2. Output](#2-output-3)
+    - [5) `g++ -S Main.cpp`](#5-g--s-maincpp)
+      - [1. Usage](#1-usage-4)
+      - [2. Output](#2-output-4)
+    - [6) `g++ -c Main.s`](#6-g--c-mains)
+      - [1. Usage](#1-usage-5)
+      - [2. Output](#2-output-5)
+    - [7) `g++ -c Main.cpp`](#7-g--c-maincpp)
+      - [1. Usage](#1-usage-6)
+      - [2. Output](#2-output-6)
+    - [8) `g++ Main.o -o Main.exe`](#8-g-maino--o-mainexe)
+      - [1. Usage](#1-usage-7)
+      - [2. Output](#2-output-7)
+    - [9) `g++ -On Main.cpp -o Main.exe`](#9-g--on-maincpp--o-mainexe)
+      - [1. Usage](#1-usage-8)
+      - [2. Output](#2-output-8)
+  - [How to compile multiple cpp files](#how-to-compile-multiple-cpp-files)
+    - [Source files](#source-files-1)
+    - [1) Compile all files in one command](#1-compile-all-files-in-one-command)
+      - [1. Code](#1-code)
+      - [2. Usage](#2-usage)
+      - [3. Output](#3-output)
+      - [4. Alternative: If all files are in one folder](#4-alternative-if-all-files-are-in-one-folder)
+    - [2) Compile all files separately and then link them together](#2-compile-all-files-separately-and-then-link-them-together)
+      - [1. Code](#1-code-1)
+      - [2. Usage](#2-usage-1)
+      - [3. Output](#3-output-1)
+  - [How to compile and link a library](#how-to-compile-and-link-a-library)
+    - [Source files](#source-files-2)
+    - [1) Setup paths of header files](#1-setup-paths-of-header-files)
+      - [1. Code](#1-code-2)
+    - [2) How to link multiple static libraries](#2-how-to-link-multiple-static-libraries)
+      - [1. Code](#1-code-3)
+    - [3) How to create a static library](#3-how-to-create-a-static-library)
+      - [1. Code](#1-code-4)
+      - [2. Usage](#2-usage-2)
+      - [3. Output](#3-output-2)
+    - [4) How to link multiple dynamic libraries](#4-how-to-link-multiple-dynamic-libraries)
+      - [1. Code](#1-code-5)
+    - [5) How to create a dynamic library](#5-how-to-create-a-dynamic-library)
+      - [1. Code](#1-code-6)
+      - [2. Usage](#2-usage-3)
+      - [3. Output](#3-output-3)
+    - [6) How to link a static library explicitly](#6-how-to-link-a-static-library-explicitly)
+      - [1. Code](#1-code-7)
+      - [2. -Wl,-Bstatic](#2--wl-bstatic)
+      - [3. -Wl,-Bdynamic](#3--wl-bdynamic)
+      - [4. Situation](#4-situation)
+      - [5. Usage](#5-usage)
+      - [6. Output](#6-output)
+    - [7) How to link a dynamic library explicitly](#7-how-to-link-a-dynamic-library-explicitly)
+      - [1. Code](#1-code-8)
+      - [2. Situation](#2-situation)
+      - [3. Usage](#3-usage)
+      - [4. Output](#4-output)
+      - [5. Special Notes](#5-special-notes)
+  - [`make` and Makefile](#make-and-makefile)
+    - [1. `make`](#1-make)
+    - [2. Makefile](#2-makefile)
+    - [Basic Rule of Makefile](#basic-rule-of-makefile)
+    - [How `make` processes Makefile](#how-make-processes-makefile)
+      - [1) Prerequisite](#1-prerequisite)
+      - [2) Step](#2-step)
 
 <!-- vim-markdown-toc -->
 
@@ -441,7 +444,7 @@ g++ Main.cpp -L. -lFun -o Main.exe
 
 #### 5. Special Notes
 
-1. g++ links a dynamic library by default.
+1. `g++` links a dynamic library by default.
 
 ## `make` and Makefile
 
@@ -457,4 +460,56 @@ g++ Main.cpp -L. -lFun -o Main.exe
    perform other tasks related to building the project. These rules may include shell commands as well
    as custom commands defined within the Makefile syntax.
 
-### 1) How `make` process Makefile
+### Basic Rule of Makefile
+
+#### Code
+
+```Makefile
+target1: dependency set1
+  command set1
+target2: dependency set2
+  command set2
+  ...
+```
+
+#### Explanation
+
+1. A target is a file you want to create. It can be an object file, a `.cpp` file, a `.txt` file,
+   and so on.
+2. A dependency is a file that a target requires during its creation. It can be an object file, a
+   `.cpp` file, a `.txt` file, and so on. Typically, it's unnecessary to explicitly list header files
+   because the compiler can automatically track dependencies between source files and header files.
+3. A command set is a set of rules used to compile all dependency files into a target file.
+
+### How `make` Processes a Makefile
+
+#### 1) Prerequisite
+
+1. Simply type the make command without any suffix or option.
+2. Ensure all source files and the Makefile are in the same folder.
+
+#### 2) Steps
+
+1. Check for a Makefile in the current folder:
+   - (1) If the Makefile does not exist, an error is reported: "No targets specified and no makefile
+     found. Stop.".
+   - (2) If the Makefile is found, proceed to the next step.
+2. Identify the first target: Locate the first target in the Makefile and treat it as the final or
+   default target. For example, in the basic rule of the makefile above, target1 is the first target.
+3. Build the dependency graph: `make` examines the dependencies listed in the Makefile and constructs
+   a dependency graph.
+   - (1) Each target can depend on other files or targets, which are updated recursively if necessary.
+   - (2) Each node in the dependency graph represents a target or file and its associated commands,
+     except for the leaf nodes.
+   - (3) A child node represents a dependency of its parent (a file or target), while leaf nodes
+     represent source or library files.
+   - (4) The root node represents the final target and its command set.
+4. Recursively scan the dependency graph: Traverse the dependency graph in a breadth-first manner,
+   starting from the leaves up to the root. While scanning the tree, check if the file corresponding to
+   the current node exists or if its timestamp is newer than the root's.
+   - (1) If the file exists and its timestamp is not newer than the root’s, continue scanning.
+   - (2) If the file’s timestamp is newer than the root’s, execute the parent node's commands to
+     rebuild it.
+   - (3) If the file does not exist and it's not a leaf, execute its command set and rebuild it.
+   - (4) If the file does not exist and it's a leaf, report an error: "No rule to make target 'xxx',
+     needed by 'yyy'. Stop."
