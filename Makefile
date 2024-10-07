@@ -34,8 +34,7 @@ HEADERS =
 
 # List of all source files except Fun.cpp, FunN.cpp
 SRCS := $(filter-out Fun.cpp FunN.cpp, $(wildcard *.cpp))
-EXES := $(addprefix E,$(SRCS))
-EXES := $(patsubst %.cpp,%.exe,$(EXES))
+EXES := $(patsubst %.cpp,%.exe,$(SRCS))
 
 # Rule to build all executables
 all: $(EXES)
@@ -49,8 +48,8 @@ libFunN.so: FunN.cpp
 	$(CC) -shared -o libFunN.so FunN.o
 
 # Rule to compile other .cpp files directly into executables
-$(EXES): $(SRCS) libFun.so libFunN.so
-	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -L. -lFun -lFunN -o $@
+$(EXES):%.exe:%.cpp $(SRCS) libFun.so libFunN.so
+	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -L. -lFun -lFunN -o E$@
 
 clean:
 	@echo "Cleaning up ......"
