@@ -83,9 +83,7 @@ Plug '0BananaBig0/verilog_indent', {'for': []}
 " Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': []}
 Plug 'instant-markdown/vim-instant-markdown', {'for': [], 'do': 'yarn install'}
 " markdown目录构建插件
-Plug 'mzlogin/vim-markdown-toc', {'for': 'markdown'}
-" markdown表格插件
-Plug 'godlygeek/tabular', {'for': 'markdown'}
+Plug 'mzlogin/vim-markdown-toc', {'for': []}
 " 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Layz
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " vim快捷键管理和提示插件
@@ -208,9 +206,27 @@ function! Markdown_Plugin_Configuration()
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <silent><Leader>mg ggO<ESC>:GenTocGFM<CR>m`ggdd
-  nnoremap <silent><Leader>mu :UpdateToc<CR>
+  nnoremap <silent><Leader>mg :silent call Create_Markdown_Memu()<CR>
+  nnoremap <silent><Leader>mu :silent call Update_Markdown_Memu()<CR>
   let g:vmt_auto_update_on_save = 0
+  let g:vim_markdown_toc_status = 0
+  function! Create_Markdown_Memu()
+    if(g:vim_markdown_toc_status ==? 0)
+      let g:vim_markdown_toc_status = 1
+      silent call plug#load('vim-markdown-toc')
+    endif
+    exec 'silent normal! mc'
+    exec "silent normal! ggO\<ESC>"
+    exec ':GenTocGFM'
+    exec 'silent normal! ggdd`c'
+  endfunction
+  function! Update_Markdown_Memu()
+    if(g:vim_markdown_toc_status ==? 0)
+      let g:vim_markdown_toc_status = 1
+      silent call plug#load('vim-markdown-toc')
+    endif
+    exec ':UpdateToc'
+  endfunction
 endfunction
 
 
@@ -484,13 +500,13 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :silent normal! m`<CR>
+  nnoremap <silent><Leader>git :silent normal! mc<CR>
                              \ :silent call plug#load('vim-fugitive')<CR>
                              \ :silent call plug#load('vim-gitgutter')<CR>
                              \ :set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>
                              \ :set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}<CR>
                              \ :set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
-                             \ :silent normal! ``<CR>
+                             \ :silent normal! `c<CR>
   let g:fugitive_no_maps = 1
   let g:gitgutter_map_keys = 0
   function! GitStatus()
@@ -826,7 +842,7 @@ function! Markdown_Preview_Toogle()
     exec ':InstantMarkdownPreview'
   else
     let g:markdown_preview_status = 1
-    exec '::InstantMarkdownStop'
+    exec ':InstantMarkdownStop'
   endif
   " if(g:markdown_preview_status ==?)
   "   let g:markdown_preview_status = 1
@@ -900,9 +916,9 @@ nnoremap <silent><Localleader>w :w<CR>
 nnoremap <Localleader><F4> :vert diffsplit
 nnoremap <silent><Localleader><F5> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
-  exec 'silent normal! m`'
+  exec 'silent normal! mc'
   exec 'silent :g/^\s*$/d'
-  exec 'silent normal! ``'
+  exec 'silent normal! `c'
 endfunction
 nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
 function! Delete_Trailling_Space_CapM_And_Retab()
@@ -926,7 +942,7 @@ function! InsertEnterInNormalMode()
     " 4. 进入插入模式，输入回车，然后返回正常模式
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
-    execute "normal! i\<CR>\<ESC>"
+    exec "silent normal! i\<CR>\<ESC>"
     let new_column = col('.') + 1
     " 5. 如果 `new_line` 行为空或只有空格, 给 `new_line` 行插入 `current_indent`
     if getline(new_line) =~ '^\s*$'
@@ -956,4 +972,5 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
 
