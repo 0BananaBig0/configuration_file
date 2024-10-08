@@ -1265,6 +1265,8 @@ include $(DEPS)
 
 1. For the default make command, please refer to
    [4) How To Understand The Actual Process of Pattern Rules](#4-how-to-understand-the-actual-process-of-pattern-rules)
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
 
 #### 1) `make -jn`
 
@@ -1272,32 +1274,44 @@ include $(DEPS)
    utilizing multiple CPU cores. The number `n` ( `n ≥ 1` )following `-j` (if provided) specifies
    the maximum number of jobs to run simultaneously. Without a number `n`, make will use a default
    value.
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
 
 #### 2) `make target_name`
 
 1. This command tells `make` to build a specific target named `target_name` as defined in the Makefile.
    If `target_name` has prerequisites, `make` will first build those before building the specified target.
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
 
 #### 3) `make -C a_path`
 
 1. The `-C` option changes the directory to `a_path` before executing the `make` command. This allows
    you to run `make` in a different directory than the current one, where the Makefile is located. If
    no target is specified, `make` will build the default target defined in the Makefile in that directory.
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
 
 #### 4) `make -C a_path target_name`
 
 1. Similar to the previous command, this changes the directory to `a_path` and then builds the specified
    `target_name` defined in the Makefile located in that directory. This allows you to target specific
    builds in different directories.
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
 
 #### 5) `make target_name VAR_NAME1="..." VAR_NAME2="..." ...`
 
 1. This command builds the specified `target_name` while overriding or setting variables `VAR_NAME1`
    and `VAR_NAME2` to the specified values. These variables can be used in the Makefile to customize the
    build process or pass configuration options.
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
 
 #### 6) `make -C a_path target_name VAR_NAME1="..." VAR_NAME2="..." ...`
 
 1. This command combines the previous concepts. It changes the directory to `a_path`, builds the
    specified `target_name`, and overrides or sets the variables `VAR_NAME1` and `VAR_NAME2` for that
    build. This allows for targeted builds in different directories with specific configurations.
+2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
+   is the more commonly used option.
