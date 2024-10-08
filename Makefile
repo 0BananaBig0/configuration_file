@@ -33,23 +33,15 @@ OCL =
 HEADERS =
 
 # List of all source files except Fun.cpp, FunN.cpp
-SRCS := $(filter-out Fun.cpp FunN.cpp, $(wildcard *.cpp))
+SRCS := $(wildcard *.cpp)
 EXES := $(patsubst %.cpp,%.exe,$(SRCS))
 
 # Rule to build all executables
 all: $(EXES)
 
-# Rule to create the shared library from Fun.cpp FunN.cpp
-libFun.so: Fun.cpp
-	$(CC) -c -fPIC Fun.cpp -o Fun.o
-	$(CC) -shared -o libFun.so Fun.o
-libFunN.so: FunN.cpp
-	$(CC) -c -fPIC FunN.cpp -o FunN.o
-	$(CC) -shared -o libFunN.so FunN.o
-
 # Rule to compile other .cpp files directly into executables
-$(EXES):%.exe:%.cpp libFun.so libFunN.so
-	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -L. -lFun -lFunN -o E$@
+$(EXES):%.exe:%.cpp
+	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -o E$@
 
 clean:
 	@echo "Cleaning up ......"
