@@ -18,8 +18,6 @@ TARGET = Main.exe
 DEPS = $(SRCS:.cpp=.d)
 
 # Default target:
-# Replace include $(DEPS)
-all: $(TARGET) $(DEPS)
 # $(TARGET): $(OBJS)
 #		$(CC) -o $@ $^
 $(TARGET): $(OBJS) $(STATIC_LIBS) $(SHARED_LIBS)
@@ -46,6 +44,6 @@ clean:
 	@-rm -rf *.exe *.o *.i *.s *.a *.so *.d # - prefix for ignoring errors
 
 # Include all .d files: inform make to generate all .d files
-# include $(DEPS)
+include $(DEPS)
 
 

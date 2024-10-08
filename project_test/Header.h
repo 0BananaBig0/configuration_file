@@ -1,13 +1,7 @@
 /*************************************************************************
-  > File Name: Main.cpp
+  > File Name: Header.h
   > Author: Huaxiao Liang
   > Mail: 1184903633@qq.com
-  > Created Time: Sun 06 Oct 2024 02:51:12 PM CST
+  > Created Time: Tue 08 Oct 2024 06:58:37 PM CST
  ************************************************************************/
-
-#include "Header.h"
-#include "FunHeader.h"
-int main() {
-   tPrint();
-   ttPrint();
-}
+#include <iostream>
