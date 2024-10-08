@@ -40,8 +40,8 @@ EXES := $(patsubst %.cpp,%.exe,$(SRCS))
 all: $(EXES)
 
 # Rule to compile other .cpp files directly into executables
-$(EXES):%.exe:%.cpp
-	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -o E$@
+$(EXES): %.exe: %.cpp
+	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -o $@
 
 clean:
 	@echo "Cleaning up ......"
