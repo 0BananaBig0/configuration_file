@@ -48,7 +48,7 @@ libFunN.so: FunN.cpp
 	$(CC) -shared -o libFunN.so FunN.o
 
 # Rule to compile other .cpp files directly into executables
-$(EXES):%.exe:%.cpp $(SRCS) libFun.so libFunN.so
+$(EXES):%.exe:%.cpp libFun.so libFunN.so
 	$(CC) $< $(CC_FLAGS) $(LINK_OPTION) $(INCLUDES) -L. -lFun -lFunN -o E$@
 
 clean:
