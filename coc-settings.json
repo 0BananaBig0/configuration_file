@@ -55,13 +55,17 @@
    "diagnostic.warningSign": "⚡",
    "inlayHint.enable": false,
    "markdownlint.config": {
-      "line_length": false
+      "MD013": {
+         "line_length": 100,
+         "ignore_code_blocks": true
+      }
    },
    "perl.p::ls.enable": true,
    "perl.p::ls.logLevel": 2,
    "perl.p::ls.logFile": "/home/banana/.coc-perl.log",
    "prettier.formatterPriority": -1,
    "prettier.printWidth": 100,
+   "prettier.proseWrap": "always",
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.detailField": "preview",
@@ -71,3 +75,5 @@
    "suggest.snippetIndicator": "~",
    "suggest.triggerAfterInsertEnter": true
 }
+
+
