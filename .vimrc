@@ -943,7 +943,10 @@ function! InsertEnterInNormalMode()
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
     exec "silent normal! i\<CR>\<ESC>"
-    let new_column = col('.') + 1
+    let new_column = col('.')
+    if new_column != 1
+      let new_column = new_column + 1
+    endif
     " 5. 如果 `new_line` 行为空或只有空格, 给 `new_line` 行插入 `current_indent`
     if getline(new_line) =~ '^\s*$'
         call setline(new_line, current_indent)
@@ -972,5 +975,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
-
