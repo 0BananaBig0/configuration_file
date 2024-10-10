@@ -193,6 +193,7 @@
       - [4) `make -C a_path target_name`](#4-make--c-a_path-target_name)
       - [5) `make target_name VAR_NAME1="..." VAR_NAME2="..." ...`](#5-make-target_name-var_name1-var_name2-)
       - [6) `make -C a_path target_name VAR_NAME1="..." VAR_NAME2="..." ...`](#6-make--c-a_path-target_name-var_name1-var_name2-)
+    - [How to Manage Libraries or Dependencies Your Project Denpends On](#how-to-manage-libraries-or-dependencies-your-project-denpends-on)
 
 <!-- vim-markdown-toc -->
 
@@ -216,6 +217,47 @@
 1. All OBJ files will be combined into a single file by the linker. The C++ linker can perform
    certain optimizations, although its primary role is focused on linking object files and libraries
    rather than optimizing code.
+
+### 4) Implicit Linking
+
+#### Explanation
+
+1.  Implicit linking, also known as load-time dynamic linking, is when the DLL is linked
+    automatically by the operating system when the program starts. This is the most common way of
+    linking a DLL.
+
+#### Features
+
+1.  Easier, but increases load time and memory usage upfront.
+
+#### How It Works:
+
+1.  You declare and use functions from the DLL in your program as if they are part of your code.
+2.  At compile time, the import library (xxxdll.lib) is linked to the program. This .lib file
+    provides the necessary references to the functions in the DLL.
+3.  When the program starts, the operating system automatically loads the required DLL into memory
+    before the execution begins.
+4.  If the DLL is missing or fails to load, the program will fail to start.
+
+### 5) Explicit Linking
+
+#### Explanation
+
+1.  Explicit linking, also known as run-time dynamic linking, gives the programmer more control. In
+    this method, the DLL is loaded manually by the program at runtime using functions like
+    LoadLibrary() and GetProcAddress(). This allows you to decide when and if a DLL is loaded.
+
+#### Features
+
+1.  More complex, but only loads when needed, can optimize performance
+
+#### How It Works
+
+1.  The program uses the Windows API functions to manually load the DLL and retrieve pointers to its
+    functions.
+2.  The DLL is loaded at any point during program execution (usually when you actually need it).
+3.  If the DLL cannot be loaded, you can handle the error gracefully.
+4.  You do not link the .lib file during compilation because you are loading the DLL dynamically.
 
 ## The difference between `gcc` and `g++`
 
@@ -1332,3 +1374,36 @@ include $(DEPS)
    build. This allows for targeted builds in different directories with specific configurations.
 2. Notes: If you want to use this command in Makefiles, please use `$(MAKE)` instead of `make`. This
    is the more commonly used option.
+
+### How to Manage Libraries or Dependencies Your Project Denpends On
+
+1. Add source code for dependencies: Include the source code of your dependencies in your project
+   and build them from scratch.
+2. Compile into static or dynamic libraries: Compile the dependencies as either static libraries or
+   dynamic libraries, depending on your project's needs.
+3. Link against binaries (if no source code available): If you lack access to the source code, time
+   to set them up, or prefer not to, linking against pre-built binaries is also an option.
+4. Build from source if binaries aren't available: If binaries for your dependencies aren't
+   available, you'll need to download and build their source code from scratch.
+5. Include directories and libraries: Make sure to include the dependencies' header directories and
+   library/link directories. Header directories contain the files required for inclusion in your
+   code, while library directories contain the pre-built binary files for linking. Header files
+   provide declarations, and library files contain definitions that link your code with these
+   binaries.
+6. Static vs dynamic libraries: Linking with static libraries is faster than dynamic libraries
+   because the C++ linker performs optimizations during static linking.
+7. Import libraries (.lib files): xxxdll.lib files contain references to functions and symbols
+   inside xxx.dll files, allowing linking at compile time. These .lib files belong to import
+   libraries.
+8. Use relative paths: When building dependencies from scratch, use relative paths instead of
+   absolute paths to ensure portability.
+9. Header file inclusion: Use angle brackets (<>) to include header files if you’ve specified the
+   paths for the compiler (compiler include paths). Otherwise, use quotes ("") for relative paths.
+   The search order for quoted includes starts with relative paths, followed by the main .cpp files,
+   and finally, the compiler include paths. It’s recommended to use angle brackets for external
+   headers and quotes for project-specific headers. Prefer compiler include paths over relative
+   paths to avoid common errors.
+10. Visual Studio project and solution: In Visual Studio, a project contains the code, resources,
+    and configuration needed to build an executable, library, or component. A solution acts as a
+    container that groups multiple related projects, providing organizational structure for managing
+    them.
