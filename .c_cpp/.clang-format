@@ -195,6 +195,7 @@ SpacesInLineCommentPrefix:
 SpacesInParentheses: true
 SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
+SeparateDefinitionBlocks:  Always
 BitFieldColonSpacing: After
 Standard:        Latest
 StatementAttributeLikeMacros:
