@@ -211,21 +211,22 @@ function! Markdown_Plugin_Configuration()
   let g:vmt_auto_update_on_save = 0
   let g:vim_markdown_toc_status = 0
   function! Create_Markdown_Memu()
+    exec 'silent normal! ms'
     if(g:vim_markdown_toc_status ==? 0)
       let g:vim_markdown_toc_status = 1
       silent call plug#load('vim-markdown-toc')
     endif
-    exec 'silent normal! mc'
     exec "silent normal! ggO\<ESC>"
     exec ':GenTocGFM'
-    exec 'silent normal! ggdd`c'
+    exec 'silent normal! ggdd`s'
   endfunction
   function! Update_Markdown_Memu()
+    exec 'silent normal! ms'
     if(g:vim_markdown_toc_status ==? 0)
       let g:vim_markdown_toc_status = 1
       silent call plug#load('vim-markdown-toc')
     endif
-    exec ':UpdateToc'
+    exec 'silent normal! `s'
   endfunction
 endfunction
 
@@ -517,13 +518,13 @@ function! Lazy_On_Plugin_Configuration()
     nmap <silent><Leader>gp <Plug>(GitGutterPrevHunk)
     nmap <silent><Leader>gn <Plug>(GitGutterNextHunk)
     nmap <silent><Leader>gf <Plug>(GitGutterFold)
-    exec 'silent normal! mc'
+    exec 'silent normal! ms'
     silent call plug#load('vim-fugitive')
     silent call plug#load('vim-gitgutter')
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
-    exec 'silent normal! `c'
+    exec 'silent normal! `s'
   endfunction
   function! GitStatus()
     let [a,m,r] = GitGutterGetHunkSummary()
@@ -928,17 +929,17 @@ nnoremap <silent><Localleader>w :w<CR>
 nnoremap <Localleader><F4> :vert diffsplit
 nnoremap <silent><Localleader><F5> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
-  exec 'silent normal! mc'
+  exec 'silent normal! ms'
   exec 'silent :g/^\s*$/d'
-  exec 'silent normal! `c'
+  exec 'silent normal! `s'
 endfunction
 nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
 function! Delete_Trailling_Space_CapM_And_Retab()
-  exec 'silent normal! mc'
+  exec 'silent normal! ms'
   exec 'silent :%s/\s\+$//e'
   exec 'silent :%s/$//e'
   exec 'silent :%retab!'
-  exec 'silent normal! `c'
+  exec 'silent normal! `s'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
