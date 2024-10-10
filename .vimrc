@@ -494,35 +494,41 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
-  let g:interestingWordsRandomiseColors = 1
-  let g:interestingWordsDefaultMappings = 0
-  nnoremap <silent><Leader>wt :silent call plug#load('vim-interestingwords')<CR>
-  nnoremap <silent><Leader>wh :call InterestingWords('n')<CR>
-  vnoremap <silent><Leader>wh :call InterestingWords('v')<CR>
-  nnoremap <silent><Leader>wH :call UncolorAllWords()<CR>
-  nnoremap <silent>n :call WordNavigation(1)<CR>
-  nnoremap <silent>N :call WordNavigation(0)<CR>
+  nnoremap <silent><Leader>wt :silent call Load_And_Set_Vim_Interestingwords()<CR>
+  function! Load_And_Set_Vim_Interestingwords()
+    let g:interestingWordsRandomiseColors = 1
+    let g:interestingWordsDefaultMappings = 0
+    silent call plug#load('vim-interestingwords')
+    nnoremap <silent><Leader>wh :call InterestingWords('n')<CR>
+    vnoremap <silent><Leader>wh :call InterestingWords('v')<CR>
+    nnoremap <silent><Leader>w<S-h> :call UncolorAllWords()<CR>
+    nnoremap <silent>n :call WordNavigation(1)<CR>
+    nnoremap <silent><S-n> :call WordNavigation(0)<CR>
+  endfunction
 
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :silent normal! mc<CR>
-                             \ :silent call plug#load('vim-fugitive')<CR>
-                             \ :silent call plug#load('vim-gitgutter')<CR>
-                             \ :set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r<CR>
-                             \ :set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}<CR>
-                             \ :set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<<CR>
-                             \ :silent normal! `c<CR>
-  let g:fugitive_no_maps = 1
-  let g:gitgutter_map_keys = 0
+  nnoremap <silent><Leader>git :silent call Load_And_Set_Git_Plugin()<CR>
+  function! Load_And_Set_Git_Plugin()
+    let g:fugitive_no_maps = 1
+    let g:gitgutter_map_keys = 0
+    let g:gitgutter_map_keys = 0
+    nmap <silent><Leader>gp <Plug>(GitGutterPrevHunk)
+    nmap <silent><Leader>gn <Plug>(GitGutterNextHunk)
+    nmap <silent><Leader>gf <Plug>(GitGutterFold)
+    exec 'silent normal! mc'
+    silent call plug#load('vim-fugitive')
+    silent call plug#load('vim-gitgutter')
+    set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
+    set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
+    set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
+    exec 'silent normal! `c'
+  endfunction
   function! GitStatus()
     let [a,m,r] = GitGutterGetHunkSummary()
     return printf('+%d ~%d -%d', a, m, r)
   endfunction
-  let g:gitgutter_map_keys = 0
-  nmap <silent><Leader>gp <Plug>(GitGutterPrevHunk)
-  nmap <silent><Leader>gn <Plug>(GitGutterNextHunk)
-  nmap <silent><Leader>gf <Plug>(GitGutterFold)
 
 
 
