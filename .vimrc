@@ -494,8 +494,14 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
-  nnoremap <silent><Leader>h :silent call plug#load('vim-interestingwords')<CR>
   let g:interestingWordsRandomiseColors = 1
+  let g:interestingWordsDefaultMappings = 0
+  nnoremap <silent><Leader>wt :silent call plug#load('vim-interestingwords')<CR>
+  nnoremap <silent><Leader>wh :call InterestingWords('n')<CR>
+  vnoremap <silent><Leader>wh :call InterestingWords('v')<CR>
+  nnoremap <silent><Leader>wH :call UncolorAllWords()<CR>
+  nnoremap <silent>n :call WordNavigation(1)<CR>
+  nnoremap <silent>N :call WordNavigation(0)<CR>
 
 
 
