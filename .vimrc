@@ -95,9 +95,9 @@ Plug 'skywind3000/asyncrun.vim', {'on': []}
 " 菜单栏插件, Only Lazy Configuration, but classifed into Lazy
 Plug 'skywind3000/vim-quickui'
 " 文件目录插件, Lazy_On
-Plug 'preservim/nerdtree', {'on': 'NERDTreeToggle'}
+Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
-Plug 'liuchengxu/vista.vim', {'on': 'Vista!!'}
+Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
 " 书签插件，用于写代码注解等等
 Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
 " Esc退出变回英文输入法，进入insert模式切换为原来的输入法
@@ -404,8 +404,9 @@ endfunction
 
 
 function! Lazy_On_Plugin_Configuration()
-  " NERDTree Setting, \nt打开目录,\nf从编辑区回到目录
+  " NERDTree Setting
   nnoremap <silent><Leader>nt :NERDTreeToggle<CR>
+  nnoremap <silent><Leader>nc :NERDTreeCWD<CR>
   let g:NERDTreeFileExtensionHighlightFullName = 1
   let g:NERDTreeExactMatchHighlightFullName = 1
   let g:NERDTreePatternMatchHighlightFullName = 1
@@ -418,8 +419,9 @@ function! Lazy_On_Plugin_Configuration()
 
 
 
-  " Vista setting, Vista toggle
+  " Vista setting
   nnoremap <silent><Leader>vt :Vista!!<CR>
+  nnoremap <silent><Leader>vf :Vista focus<CR>
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
@@ -988,3 +990,4 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
