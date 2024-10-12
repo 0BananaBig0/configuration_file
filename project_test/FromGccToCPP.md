@@ -226,7 +226,7 @@
     automatically by the operating system when the program starts. This is the most common way of
     linking a DLL.
 
-#### Features
+#### Characteristics
 
 1.  Easier, but increases load time and memory usage upfront.
 
@@ -247,7 +247,7 @@
     this method, the DLL is loaded manually by the program at runtime using functions like
     LoadLibrary() and GetProcAddress(). This allows you to decide when and if a DLL is loaded.
 
-#### Features
+#### Characteristics
 
 1.  More complex, but only loads when needed, can optimize performance
 
@@ -1264,7 +1264,7 @@ $(TARGET_PATTERN): %.cpp
 
 #### 1) Problem
 
-1. We have discussed the common knowledge regarding custom rules, implicit rules, and pattern rules.
+1. I have introduced the common knowledge regarding custom rules, implicit rules, and pattern rules.
    However, these rules cannot process header files effectively. The make command cannot determine
    which header files the C/C++ files depend on. These dependencies are only identified when the
    compiler processes the C/C++ files, and there isn't a straightforward name-mapping rule.

@@ -16,8 +16,12 @@
    ChatGPT provides an answer, you should verify it and consider whether it is accurate, as ChatGPT
    does not guarantee 100% correctness. You should also read and internalize the results to retain
    the information.
-5. You can also refer to C++ tutorial books, such as `<<C++ Primer Plus>>` and
-   `<<The C++ Programming Language>>`.
+5. You can also refer to C++ tutorial books or websites, such as `<<The C++ Programming Language>>`
+   and `<<C++ Primer Plus>>`, [cppreference](https://en.cppreference.com/) ,
+   [cplusplus](https://cplusplus.com/) and [tutorialspoint](https://www.tutorialspoint.com/) or a
+   command `cppman` in Linux. When reading any tutorial, including this one, **focus on the basic
+   concepts**, their definitions, explanations, and key characteristics, paying particular attention
+   to the bold text, as these concepts often appear in other contexts.
 6. Lastly, it’s important to note that different compilers have slightly different implementations
    of the Standard Template Library (STL). While they provide the same library, there may be minor
    variations in implementation. For instance, in std::vector, if the size exceeds its capacity, it
@@ -30,57 +34,219 @@
 #### General Explanation
 
 1. Introduces **a name and type without allocating storage or providing an implementation**. It
-   merely states that a function, class, struct, variable, instance, or template exists without
-   concerning itself with a definition.
+   merely states that a function, class, struct or variable exists without concerning itself with a
+   definition.
 
 #### Forward Declaration
 
 1.  It is **a declaration** of a class, function, or variable that **informs the compiler of its
     existence without providing the full definition** at that point. It allows the compiler to
     handle references to an entity (e.g., a class or a function) without needing to know all the
-    details at that time. The complete definition is provided later in the code. be instantiated.
+    details at that time. The complete definition is provided later in the code.
+2.  This is typically used to **improve compilation times**, **resolve circular dependencies**, or
+    when the full details of the entity are not yet required.
 
 ### 2) Definition
 
-1.  A definition **provides a body** that implements a function, class, variable, struct, instance,
-    or template. It includes **an actual implementation and allocates storage** for variables or
-    instances.
+1.  A definition **provides a body** that implements a function, class, struct or variable. It
+    includes **an actual value or implementation** and **allocates storage for variables**.
 
-### 3) Parameter
+### 3) Variable, Instance and Object
 
-1.  A parameter is **a variable declared in a function definition**. It serves as a placeholder for
-    the values that will be passed to the function when it is called. Parameters are used to receive
-    input values within the function and specify the type of data the function expects.
+#### Variable
 
-### 4) Argument
+##### Explanation
 
-1.  An argument is **an actual value, structure, instance, pointer, or reference passed to the
-    function** when it is called. Arguments are the specific data supplied to the function's
-    parameters.
+1. A variable is **a named storage location** in memory that **holds a value**. It has a specific
+   type (such as int, float, or a custom class) and is declared in the program to store data that
+   can be accessed and modified.
 
-### 5) Interface
+##### Key Characteristics
 
-1. In C++, the term "interface" does **not have a formal definition** like it does in some other
-   programming languages (like Java). However, in C++, an interface is generally understood to be
-   **a class that defines a set of pure virtual functions**, which means that it declares functions
-   that must be implemented by derived classes but does not provide any implementation of its own.
+1. **A name** (identifier) is required.
+2. **A type** is specified (determining the kind of value it can hold).
+3. It **occupies memory** in the program.
 
-### 6) Pointers and References
+#### Instance
 
-#### Pointers
+##### Explanation
+
+1. An instance is **a concrete occurrence** of **a particular data type**. This term is most
+   commonly used in the context of user-defined types like **classes or structs**. When you create
+   an instance of a class, you're creating an object of that class type.
+
+##### Key Characteristics
+
+1. Refers to **a specific occurrence** of **a class or struct**.
+2. Instances of a class are often **called objects**.
+
+#### Object
+
+##### Explanation
+
+1. An object is **a region of memory** that **has a type, value**, and, **in most cases, a name
+   (optional)**. Every variable in C++ is an object, and every instance of a class is also an
+   object. The term object is **more general** and refers to any instance of a type that occupies
+   memory, whether it’s built-in (like int, double) or user-defined (like a class).
+2. An object is **generally** defined as **an instance** of a data type that **occupies memory** and
+   **has attributes (data members) and behaviors (methods)** when it comes to **user-defined types
+   (classes)**.
+3. For **built-in types** (like int, char, etc.), the term "object" can **also apply**.
+
+##### Key Characteristics
+
+1. **An instance of any type** (built-in or user-defined).
+2. **Occupies memory** and **has a type**.
+3. **May or may not** have **a name** (temporary objects don’t have names).
+4. Includes variables, class instances, dynamically allocated memory, and **temporary values**.
+
+#### Relationships Between the Them
+
+##### Variable
+
+1. A variable is **a named object**. Every variable is an object, but not all objects are variables.
+   A variable always refers to an object, but it also provides a name for it, allowing it to be used
+   and modified in the code.
+
+##### Instance
+
+1. An instance is **a specific object** of **a class or user-defined type**. It represents a
+   concrete realization of that class, holding data and having behaviors defined by the class. When
+   you create an instance of a class, you are creating an object of that class.
+
+##### Object
+
+1. An object is **the most general term**. It refers to **any entity** that **occupies memory** and
+   **has a type**. Objects can be variables, instances of classes, temporary objects, or even
+   dynamically allocated memory that doesn't have a name (like objects created with new).
+
+### 4) Pointer and Reference
+
+#### Pointer
 
 1. In C++, a pointer is **a variable** that **stores the memory address of another variable**.
-   Pointers enable dynamic memory allocation, efficient array handling, and the ability to pass
+2. Pointers enable **dynamic memory allocation**, efficient array handling, and the ability to pass
    large data structures to functions without copying them.
 
 #### Reference
 
 1. In C++, a reference is **an alias for an existing variable**. It allows you to create **another
-   name for a variable** without making a copy of it. References are declared using an ampersand (&)
-   in the declaration.
+   name for a variable** without making a copy of it. References are declared using an ampersand
+   (`&`) in the declaration.
 2. A reference **must be initialized** when it is declared and cannot be changed to refer to another
    variable later.
 3. Unlike pointers, references **cannot be null**. They must always refer to a valid object.
+4. In C++, a reference is defined as a type. However, I believe it is **merely an alias**, not a
+   distinct type, because `auto` cannot deduce a type as a reference without using `&`.
+5. A reference is **neither a variable nor an object**.
+
+### 5) Parameter
+
+1.  A parameter is **a variable declared in a function definition**. It serves as a placeholder for
+    the values that will be passed to the function when it is called.
+2.  Parameters are used to **receive input values** within the function and specify the type of data
+    the function expects.
+
+### 6) Argument
+
+1.  An argument is **an actual value, variable, object or reference passed to the function** when it
+    is called. Arguments are the specific data supplied to the function's parameters.
+
+### 7) Interface
+
+1. In C++, the term "interface" does **not have a formal definition** like it does in some other
+   programming languages (like Java). However, in C++, an interface is generally understood to be
+   **a class** that **defines a set of pure virtual functions**, which means that it declares
+   functions that **must be implemented by derived classes** but does **not provide any
+   implementation of its own**.
+
+### 8) Keyword
+
+1. A keyword in C++ is **a reserved word** that has a predefined meaning in the language and
+   **cannot be used as an identifier** (such as a variable name, function name, etc.). Keywords are
+   part of the C++ syntax and represent fundamental constructs or operations in the language.
+
+### 9) Type Specifier
+
+1. In C++, a type specifier is **used to define the type of a variable, function return value, or
+   object**. Type specifiers tell the compiler what kind of data the variable will hold or the
+   function will return. They are an essential part of variable declarations and type definitions.
+
+### 10) `auto`
+
+#### Explanation and Capabilities
+
+1. In C++, `auto` is **a type specifier** that allows the compiler to **automatically deduce the
+   type** of a variable from its initializer.
+2. This feature, introduced in C++11, is especially useful for **simplifying complex type
+   declarations, avoiding redundancy, and making code more readable**.
+3. `auto` can deduce whether a reference is `const` based on the initializer variable. However, for
+   non-reference types, `auto` only deduces the type without adding `const`. Therefore, if you want
+   variables **deduced with `auto` to be `const`**, you'd better **explicitly specify `const`**.
+4. `auto` can deduce whether a type is a pointer based on the initializer.
+   `auto var_name = ptr_name;` `<=>` `auto* var_name = ptr_name; \\ **Better**` However, if you use
+   `auto` to deduce a type with a pointer as the initializer, you must **specify it explicitly with
+   a star ( `*` )**.
+5. `auto` **cannot deduce** whether a type is **a reference** based on the initializer. Therefore,
+   If you want the type to be deduced as a reference, **specify it explicitly with `&`**.
+   `auto & var_name = ini_name;`
+6. Specifically, if the initializer is **a const char pointer** or **a const char array** (such as a
+   string literal, "xxx"), auto deduces the variable to be **a const char pointer**.
+
+#### Situation and Usage
+
+1. If you **change the return types of your functions or APIs**, `auto` can help us reduce the
+   amount of code that needs to be modified. However, the code will become less readable, and some
+   bugs may occur because the compiler will not tell us where changes are needed to adapt to these
+   new functions. Therefore, you should **avoid using `auto` in this case**.
+2. **Use `auto`** when working with **an iterator**, as it can make the code more readable.
+3. When calling a function whose **return type has a long name**, you can **use `auto`** to make the
+   code more readable.
+
+### 11) `using` and `typedef`
+
+#### `using`
+
+##### Explanation
+
+1. In C++, `using` is **a keyword** and has multiple uses, each serving a different purpose
+   depending on the context. It can be used for **type aliasing**, **namespace introduction (not
+   recommend)**, and **template aliasing**. It offers more flexibility compared to `typedef`,
+   particularly when working with templates.
+
+##### Syntax
+
+```
+using YourTypeName = Type;
+```
+
+##### Usage
+
+1. Syntax Simplicity
+2. Template Aliases
+3. Function Pointer Declaration
+4. Alias for Member Types in Classes
+
+#### `typedef`
+
+##### Explanation
+
+1. In C++, `typedef` is **a keyword** used to **create an alias for a data type**, allowing you to
+   define new names for existing types. This can improve code readability, simplify complex type
+   definitions, and enhance maintainability by making it easier to manage changes in data types
+   throughout your code.
+
+##### Syntax
+
+```
+typedef Type YourTypeName;
+```
+
+##### Usage
+
+1. Syntax Simplicity
+2. Function Pointer Declaration
+3. Alias for Member Types in Classes
 
 ## Some Small Knowledge
 
@@ -89,54 +255,222 @@
 
 ## Memory Partitions
 
-### Stack
+### **Stack**
 
-1. Stores **local** variables and function call information (such as return addresses and
-   parameters). The data stored in the stack is **lost** when it goes **out of scope**.
-2. Follows a Last In, First Out (**LIFO**) structure. Stores data like an actual stack, pushing data
-   into the stack and returning the stack pointer.
-3. Memory **allocation** and **deallocation** happen **automatically** when functions are called and
-   return. Allocating memory for data on the stack requires **only one CPU instruction**.
-4. Its **size** is **predefined** to a default value according to the system and **cannot grow**.
-5. Data stored on the stack are close together in memory, and therefore they can generally **fit
-   onto one CPU cache line**.
-6. **Fewer cache misses**.
+#### Purpose
 
-### Heap (Dynamic Memory)
+1. Stores **local variables** and **function call information** (such as return addresses and
+   parameters).
+2. Data is **lost** when it goes **out of scope**.
 
-1. Used for dynamic memory allocation, which is **managed manually** by the programmer using new and
-   delete.
-2. Allows for variable-sized allocations that persist until explicitly deallocated.
-3. Its **size** is **predefined** to a default value according to the system but **can grow and
-   shrink** as the application progresses.
-4. It maintains **a free list** to check if there is free memory available for the application to
-   use.
-5. If there is **not enough heap memory**, it will ask the system to **allocate more memory**. The
+#### Allocation/Deallocation
+
+1. **Automatically handled** by the compiler.
+2. Memory for local variables is **allocated when a function is called** and **deallocated when the
+   function exits**.
+3. Allocating memory requires **only one CPU instruction**.
+
+#### Lifetime
+
+1. Local variables exist only for **the duration of the function call**.
+
+#### Scope
+
+1. Limited to **the function** where **the variables** are **declared**.
+
+#### Size
+
+1. **Limited size** (typically between **1 MB to 8 MB**, determined by the OS).
+2. Prone to **stack overflow** for deep recursion or large allocations.
+3. The size **cannot grow dynamically**.
+
+#### Structure
+
+1. Follows a **LIFO (Last In, First Out)** structure.
+2. Memory is deallocated in reverse order of allocation.
+3. Stores data like a physical stack, pushing new data and updating the **stack pointer**.
+
+#### Performance
+
+1. **Fast access** due to contiguous memory layout and minimal overhead.
+2. Allocation and deallocation are **faster** than heap operations.
+
+#### Other Characteristics
+
+1. Data is **close together** in memory, **reducing cache misses**.
+2. Fits well into **one CPU cache line** due to the locality of reference.
+
+### **Heap (Dynamic Memory)**
+
+#### Purpose
+
+1. Stores **dynamically allocated objects** created during runtime.
+2. Used when the amount of memory needed is not known in advance.
+
+#### Allocation/Deallocation
+
+1. **Manual allocation** using `new/delete` or `malloc/free`.
+2. Memory needs to be **explicitly deallocated** to avoid **leaks**.
+
+#### Lifetime
+
+1. Exists until **explicitly deallocated** by the programmer.
+2. Remains available even after the function that allocated it exits, as long as the pointer is
+   preserved.
+
+#### Scope
+
+1. **Global scope** if the pointer to allocated memory is retained.
+2. Accessible from **anywhere** in the program through the pointer.
+
+#### Size
+
+1. **Predefined** to a default value according to the system but **can grow and shrink** as the
+   application progresses.
+2. Limited by **system memory** and subject to **fragmentation**.
+3. Large allocations are possible, unlike the stack.
+
+#### Structure
+
+1. **Unstructured** memory, allocated and freed in any order.
+2. Can lead to **fragmentation** if memory is not carefully managed.
+
+#### Performance
+
+1. **Slower** than stack due to non-contiguous memory and overhead of managing free space.
+2. Fragmentation can impact performance over time.
+
+#### Other Characteristics
+
+1. Maintains **a free list** to check if there is free memory available for the application to use.
+2. If there is **not enough heap memory**, it will ask the system to **allocate more memory**. The
    **performance cost** of this allocation is **high**.
-6. **More cache misses**.
+3. **More cache misses**.
 
-### Global/Static Memory
+### Global/Static Memory or Data Segment
 
-1. Stores **global** variables and static variables (declared with the static keyword).
-2. This partition persists for the **entire duration** of the program, from the start to its
-   termination.
+#### Purpose
 
-### Code Segment (Text Segment)
+1. Stores **global, static, and constant variables**.
+2. Retains values throughout the **entire program lifecycle**.
 
-1. Stores the compiled program instructions (the executable code).
-2. This section is usually **read-only** to prevent accidental modification of program instructions.
+#### Allocation/Deallocation
 
-### BSS Segment (Block Started by Symbol)
+1. **Allocated at program startup** and **deallocated at program termination**.
 
-1. Holds **uninitialized global and static variables**, which are initialized to **zero by
-   default**.
-2. Memory is **allocated** but **not explicitly initialized** by the programmer.
+#### Lifetime
 
-### Data Segment
+1. Exists for the **entire duration** of the program.
+2. Retains values across function calls.
 
-1. Stores **initialized global and static variables**.
-2. Unlike the BSS segment, variables here are **explicitly initialized** with a value by the
-   programmer.
+#### Scope
+
+1. **Global scope**: Accessible from any part of the program.
+
+#### Size
+
+1. Depends on the **size and number** of variables.
+2. Limited by the **linker and system memory**.
+
+#### Structure
+
+1. Includes:
+
+   - **Initialized Data Segment**: Stores variables with **explicit initial** values.
+   - **BSS (Uninitialized Data Segment, Block Started by Symbol)**: Stores variables with **no
+     initial** values, which are initialized to **zero by default**.
+
+   - **Character Constant Area**: Stores **string literals** and **constants**.
+
+2. Organized as **a continuous memory block** for static, global and const variables/values.
+
+#### Performance
+
+1. **Fast access** due to fixed memory locations.
+2. Avoids runtime allocation overhead.
+
+#### Other Characteristics
+
+1. **Persistent values** can introduce side effects if not managed properly.
+2. Typically **read-only** for constants to prevent accidental modification.
+
+### Code Segment
+
+#### Purpose
+
+1. Stores **compiled instructions** (machine code) of the program.
+
+#### Allocation/Deallocation
+
+1. **Allocated at program startup** and remains until the program ends.
+2. Managed by the **OS and loader**.
+
+#### Lifetime
+
+1. Exists for the **entire runtime** of the program.
+
+#### Scope
+
+1. Not applicable; **read-only** segment.
+
+#### Size
+
+1. Depends on the **size of the compiled code**.
+2. Limited by **system memory** and linker constraints.
+
+#### Structure
+
+1. A **contiguous block** of machine instructions.
+2. Organized for **sequential execution** by the CPU.
+
+#### Performance
+
+1. **Fast execution** due to CPU caching and sequential access.
+2. Code segment is often **optimized** for cache utilization.
+
+#### Other Characteristics
+
+1. **Read-only** to prevent accidental or malicious modification.
+2. Supports **function-level optimizations** during compilation.
+
+### Memory Mapping Segment
+
+#### Purpose
+
+1. Used for **mapping files or shared libraries** into memory.
+2. Enables efficient access to large files without loading them entirely into RAM.
+
+#### Allocation/Deallocation
+
+1. Managed by the **OS** using functions like `mmap`.
+2. Deallocated when the **file is closed** or the mapping is removed.
+
+#### Lifetime
+
+1. Varies based on **file or library usage**.
+
+#### Scope
+
+1. Accessible globally from **any part** of the program.
+
+#### Size
+
+1. Depends on the **size of the mapped file or library**.
+
+#### Structure
+
+1. Divided into **read-only** and **read-write** segments.
+2. Supports **lazy loading**, where only accessed portions are loaded.
+
+#### Performance
+
+1. **Efficient** for large files as only necessary parts are loaded.
+2. Reduces memory usage compared to loading the entire file.
+
+#### Other Characteristics
+
+1. Enables **shared access** across processes for libraries or files.
+2. Requires **OS-level support** for memory mapping.
 
 ### Memory Partitioning in C++ Program Execution
 
@@ -153,8 +487,8 @@
 
 ### 1) Explanation
 
-1. In C++, a function is a self-contained block of code that performs a specific task. It can take
-   input values, called parameters, process them, and optionally return a result.
+1. In C++, a function is **a self-contained block of code** that **performs a specific task**. It
+   can take input values, called parameters, process them, and optionally return a result.
 
 ### 2) Advantages and Disadvantages
 
@@ -195,7 +529,7 @@
 ### 3) Definition Syntax
 
 ```CPP
-ReturnType functionName( parameter_list ) {
+ReturnType funcName( parameter_list ) {
    // function body
 };
 ```
@@ -203,17 +537,17 @@ ReturnType functionName( parameter_list ) {
 ### 4) Declaration Syntax
 
 ```CPP
-ReturnType functionName( parameter_list );
+ReturnType funcName( parameter_list );
 ```
 
 ### 5) Reference Syntax
 
 ```CPP
-functionName( argument_list );
+funcName( argument_list );
 ```
 
 ```CPP
-ReturnType var_name = functionName( argument_list );
+ReturnType var_name = funcName( argument_list );
 ```
 
 ### 6) How to Pass an Argument to a Function
@@ -285,7 +619,7 @@ int main() {
 }
 ```
 
-##### Features
+##### Characteristics
 
 ###### Summary
 
@@ -344,7 +678,7 @@ int main() {
 
 ###### Notes
 
-1. In cases where performance is very important, we should avoid using virtual functions as much as
+1. In cases where performance is very important, you should avoid using virtual functions as much as
    possible.
 
 #### (3) `override`
@@ -726,9 +1060,11 @@ int main() {
 1. Overwriting is **not a formal term in C++**. However, it is sometimes colloquially used to
    describe a situation where **a function or variable in a derived class replaces or redefines a
    function or variable from a base class**. This serves as a general description rather than a
-   specific C++ concept. Additionally, the term "overwriting" typically refers to **the process of
-   replacing an existing value in memory**. This can occur in various contexts, such as variables,
-   function definitions, or data structures.
+   specific C++ concept. Additionally, the term "overwriting" typically refers to the process of
+   **replacing an existing value in memory**, which includes assigning a new value to an existing
+   variable to replace the old value and writing data to unintended memory locations, often
+   resulting in undefined behavior or memory corruption. This can occur in various contexts, such as
+   variables, function definitions, or data structures.
 
 ##### Example
 
@@ -744,17 +1080,199 @@ class Derived: public Base {
 };
 ```
 
+### 9) Function Pointers
+
+#### Explanation and Usage
+
+1. A function pointer is **a variable** that **stores the address of a function** in C or C++.
+2. It allows you to call a function indirectly through its pointer, enabling dynamic function calls
+   and making it possible to implement callback mechanisms.
+
+#### (1) Declaration and Definition Syntax
+
+```CPP
+   // The implicit conversion occurs.
+   auto func_ptr_name = funcName;
+```
+
+```CPP
+   // This syntax is equivalent to the syntax mentioned above.
+   // The implicit conversion does not occur.
+   auto func_ptr_name = &funcName;
+```
+
+```CPP
+   // This syntax is equivalent to the syntax mentioned above.
+   // The implicit conversion occurs.
+   ReturnType ( *func_ptr_name )( parameter_type_list ) = funcName;
+```
+
+```CPP
+   // This syntax is equivalent to the syntax mentioned above.
+   // The implicit conversion does not occur.
+   ReturnType ( *func_ptr_name )( parameter_type_list ) = &funcName;
+```
+
+#### (2) Declaration and Assignment Syntax
+
+```CPP
+   ReturnType ( *func_ptr_name )( parameter_type_list );
+   // The implicit conversion occurs.
+   func_ptr_name = funcName;
+```
+
+```CPP
+   // This syntax is equivalent to the syntax mentioned above.
+   // The implicit conversion does not occur.
+   ReturnType ( *func_ptr_name )( parameter_type_list );
+   func_ptr_name = &funcName;
+```
+
+#### (2) Syntax for Function Calls Using Function Pointers
+
+```CPP
+   // A function whose return type isn't `void`
+   auto result = func_ptr_name( arguement_list );
+```
+
+```CPP
+   // This syntax is equivalent to the syntax mentioned above.
+   ReturnType result = func_ptr_name( arguement_list );
+```
+
+```CPP
+   // A function whose return type is `void`
+   func_pt_name( arguement_list );
+```
+
+#### (3) Syntax for Function Pinter Declaration Using `typedef`
+
+```CPP
+   typedef ReturnType ( *FuncPtrName )( parameter_types );
+   FuncPtrName func_ptr_name;
+```
+
+#### (4) Syntax for Function Pinter Declaration Using `using`
+
+```CPP
+   using FuncPtrName = ReturnType ( * )( parameter_types );
+   FuncPtrName func_ptr_name;
+```
+
+### 10) Lambda Functions
+
+#### Why Use Lambda Functions
+
+1.  If functionA wants to call functionB **at a particular point**, you could pass a pointer to
+    functionB into functionA. However, using traditional method to implement functionB may be
+    **overkill**, so you should use a lambda instead.
+2.  Some **C++ standard libraries require** function pointers; you can pass a lambda as a pointer to
+    them.
+
+#### Explanation
+
+1. A lambda function in C++ is a way to define **an anonymous inline function** (i.e., a function
+   without a name) directly in your code. It allows you to create small, simple function-like
+   entities inline, making your code more concise and flexible.
+
+#### Syntax
+
+##### Code for Passing It as a Variable
+
+```CPP
+   [capture]( parameters ) -> ReturnType { body };
+```
+
+##### Code for Defining It as a Function
+
+```CPP
+   auto functionName =  [capture]( parameters ) -> ReturnType { body };
+```
+
+#### Explanation
+
+1. capture: Specifies which variables from the surrounding scope are captured by the lambda. This
+   can be done by value (=) or by reference (&).
+2. parameters: The parameters for the lambda function, similar to any regular function.
+3. ReturnType (**optional**): The return type of the lambda. If omitted, C++ will attempt to deduce
+   it automatically.
+4. body: The function body where the logic of the lambda resides.
+
+#### Capture Clause
+
+##### Explanation
+
+1. Capture by value (`=`): Copies the variable and makes it accessible inside the lambda.
+2. Capture by reference (`&`): Allows the lambda to modify the variable in the outer scope.
+3. Default capture: Default capture in a lambda function allows you to specify how variables from
+   the surrounding scope are captured **without explicitly listing each one**. You can set **a
+   default capture mode for all variables**, which **can be overridden for specific variables** if
+   needed.
+
+##### Example 1: Capture Nothing
+
+```CPP
+   auto functionName =  []( parameters ) -> ReturnType { body };
+```
+
+##### Example 2: A Default Capture Mode `[=]` - Capture All Variables by Value
+
+```CPP
+   // A default capture mode[=]: captures all variables by value.
+   auto functionName =  [=]( parameters ) -> ReturnType { body };
+```
+
+##### Example 3: A Default Capture Mode `[&]` - Capture All Variables by Value
+
+```CPP
+   // A default capture mode[&]: captures all variables by value.
+   auto functionName =  [&]( parameters ) -> ReturnType { body };
+```
+
+##### Example 4: Specify Some Variables Captured by Value
+
+```CPP
+   auto functionName =  [var1, var2, ...]( parameters ) -> ReturnType { body };
+```
+
+##### Example 5: Specify Some Variables Captured by Reference
+
+```CPP
+   auto functionName =  [&var1, &var2, ...]( parameters ) -> ReturnType { body };
+```
+
+##### Example 6: Specify Some Variables Captured by Reference and Others by Value
+
+```CPP
+   // In the capture list, the default capture must appear first.
+   auto functionName =  [=, &var1, &var2, ...]( parameters ) -> ReturnType { body };
+```
+
+##### Example 7: Specify Some Variables Captured by Value and Others by Reference
+
+```CPP
+   // In the capture list, the default capture must appear first.
+   auto functionName =  [&, =var1, =var2, ...]( parameters ) -> ReturnType { body };
+```
+
+##### Example 8: Specify Some Variables Captured by Reference and Some by Value
+
+```CPP
+   auto functionName =  [&var1, &var2, ..., varn1, varn2, ...]( parameters ) -> ReturnType { body };
+```
+
 ## enum
 
 ### Explanation
 
-1. In C++, an enum (short for "enumeration") is a user-defined type that consists of a set of named
-   integral constants, providing a way to define a collection of related constants with meaningful
-   names. Enumerations improve code readability by replacing numeric values with descriptive names.
+1. In C++, an enum (short for "enumeration") is **a user-defined type** that consists of **a set
+   of** named integral **constants**, providing a way to define a collection of related constants
+   with meaningful names. Enumerations improve code readability by replacing numeric values with
+   descriptive names.
 
 ### Purpose
 
-1. If we need to represent some states with integers, we can use an enum to group and represent
+1. If you need to represent some states with integers, you can use an enum to group and represent
    them.
 
 ### Examples of Unscoped Enumeration
