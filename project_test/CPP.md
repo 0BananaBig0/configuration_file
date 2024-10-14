@@ -61,7 +61,7 @@
    type (such as int, float, or a custom class) and is declared in the program to store data that
    can be accessed and modified.
 
-##### Key Characteristics
+##### Characteristics
 
 1. **A name** (identifier) is required.
 2. **A type** is specified (determining the kind of value it can hold).
@@ -75,7 +75,7 @@
    commonly used in the context of user-defined types like **classes or structs**. When you create
    an instance of a class, you're creating an object of that class type.
 
-##### Key Characteristics
+##### Characteristics
 
 1. Refers to **a specific occurrence** of **a class or struct**.
 2. Instances of a class are often **called objects**.
@@ -93,7 +93,7 @@
    (classes)**.
 3. For **built-in types** (like int, char, etc.), the term "object" can **also apply**.
 
-##### Key Characteristics
+##### Characteristics
 
 1. **An instance of any type** (built-in or user-defined).
 2. **Occupies memory** and **has a type**.
@@ -598,7 +598,7 @@ auto var_name = initializer;
      `std::pair`, `std::tuple`, and user-defined types with `std::get`) into individual named
      variables.
 
-#### Characteristic
+#### Characteristics
 
 1. Type deduction: The type is **determined at compile time**a.
 2. Copy behavior: auto creates **a copy of the original type** unless specified otherwise (e.g.,
@@ -654,7 +654,7 @@ decltype(expression)
 4. Use `decltype` to deduce return types of functions.
 5. Using with `auto`.
 
-#### Characteristic
+#### Characteristics
 
 1. The inference result is a **reference type** if the expression is an lvalue enclosed in
    parentheses.
@@ -711,7 +711,7 @@ using YourTypeName = Type;
 
 #### Syntax
 
-```
+```CPP
 typedef Type YourTypeName;
 ```
 
@@ -720,6 +720,282 @@ typedef Type YourTypeName;
 1. Syntax simplicity.
 2. Function pointer declaration.
 3. Alias for member types in classes.
+
+## 'const', 'constexpr' and 'static'
+
+### 1) `const`
+
+#### Explanation
+
+1. The `const` keyword in C++ is used to declare variables whose values cannot be changed after
+   their initial assignment. This ensures that the variable remains constant for its lifetime,
+   preventing accidental modifications.
+
+#### Usage
+
+##### (1) Const Variables
+
+###### Syntax
+
+`const Type var_name = value;`
+
+###### Explanation
+
+1. This declares a variable of type `Type` that cannot be reassigned after initialization.
+
+##### (2) Const Pointers
+
+###### Syntax
+
+1. Pointer to constant value: `const Type* ptr_name;`
+2. Constant pointer: `Type* const ptr_name;`
+
+###### Explanation
+
+1. `const Type* pointer_name;` means the value pointed to cannot be altered through this pointer.
+2. `Type* const pointer_name;` means the pointer address itself cannot be changed after it is
+   initialized.
+
+##### (3) Const Member Functions
+
+###### Syntax
+
+```CPP
+ReturnType functionName() const;
+```
+
+###### Explanation
+
+1. Marks a member function that will not modify any member variables of the class or object.
+
+##### (4) Const Function Parameters
+
+###### Syntax
+
+```CPP
+void functionName( const Type param1, ... );
+```
+
+###### Explanation
+
+1. This specifies that the function cannot modify the parameter `param` within its body.
+
+##### (5) Const Return Values
+
+###### Syntax
+
+```CPP
+const ReturnType functionName( ... ) {
+    // Function body
+}
+```
+
+###### Explanation
+
+1. Returning a `const` value from a function indicates that the returned value cannot be modified by
+   the caller.
+2. However, if we assign a `const` return value to a non-const variable, we can modify the variable
+   after the assignment is complete.
+
+##### (6) Const Return Pointers
+
+###### Syntax
+
+```CPP
+const returnType* functionName() {
+    // Function body
+}
+```
+
+###### Explanation
+
+1. A function can return a pointer to a constant value, ensuring that the value being pointed to
+   cannot be modified through the pointer.
+2. If we want to assign a `const` return pointer to a variable, that variable must also be a pointer
+   to `const`.
+
+##### (7) Const Return References
+
+###### Syntax
+
+    ```CPP
+    const returnType& functionName() {
+        // Function body
+    }
+    ```
+
+###### Explanation
+
+1. A function can return a reference to a constant object, allowing efficient access to the object
+   while ensuring it cannot be modified.
+2. If we want to assign a `const` return reference to a variable, that variable must also be a
+   `const` reference.
+
+#### Characteristics
+
+1. Ensures immutability at runtime; the variable’s value cannot change once set.
+2. Enhances code readability; it clearly indicates which variables should not be altered.
+3. Applicable to built-in types, class types, and can also be used with pointers.
+4. Just a promise that we should keep something constant, but we can still break it.
+
+### 2) `constexpr`
+
+#### Explanation
+
+1. The `constexpr` keyword is used to declare variables and functions that can be evaluated at
+   compile-time. This feature allows the compiler to perform calculations and allocate memory for
+   certain constructs even before the program runs.
+
+#### Usage
+
+##### (1) Constexpr Variables
+
+###### Syntax
+
+`constexpr Type var_name = value;`
+
+###### Explanation
+
+1. This declares a variable that must be initialized with a value that can be fully resolved at
+   compile-time.
+
+##### (2) Constexpr Functions
+
+###### Syntax
+
+```CPP
+constexpr ReturnType functionName( parameters ) {
+    // Function body
+}
+
+constexpr ReturnType var_name = functionName( ... );
+```
+
+###### Explanation
+
+1. This declares a function that will be evaluated at compile-time if given compile-time constant
+   arguments.
+
+##### (3) Constexpr Constructors (C++11 and later):
+
+###### Syntax
+
+```CPP
+class ClassType {
+   public:
+      // Initialize member variables at compile-time.
+      constexpr ClassType( ... ): ... {};
+
+   private:
+      ...
+};
+
+constexpr ClassType obj_name( ... );
+```
+
+###### Explanation
+
+1. This syntax defines a `constexpr` constructor that can be used to create instances of the class
+   with constant expressions.
+
+#### Characteristics
+
+1. Enforces that certain values and calculations can be performed at compile-time, leading to
+   significant performance improvements.
+2. Must be assigned values that are determined at compile-time—this typically includes literal types
+   or types with their own `constexpr` functions.
+3. Enhances code readability by indicating that certain computations can be computed during
+   compilation.
+
+### 3) `static`
+
+#### Explanation
+
+1. The `static` keyword in C++ is used to change the storage duration and visibility of variables
+   and functions. It alters how variables are initialized and where they can be accessed.
+
+#### Usage
+
+##### (1) Static Local Variables
+
+###### Syntax
+
+```CPP
+ReturnType functionName() {
+    static Type count = val; // Initialized only once and retains value between calls.
+    ...
+}
+```
+
+###### Explanation
+
+1. When declared inside a function, a static local variable maintains its state between function
+   calls. It is initialized only once and persists until the program ends.
+
+##### (2) Static Class Members
+
+###### Syntax
+
+```CPP
+class ClassType {
+public:
+    static Type staticMember; // Declaration of a static class member.
+};
+
+Type ClassType::staticMember = 0; // Providing definition and initialization for the static member.
+```
+
+###### Explanation
+
+1. Static members of a class belong to the class itself rather than any object instance and can be
+   accessed without an instance..
+2. We should define it outside the class.
+
+##### (3) Static Global Functions
+
+###### Syntax
+
+```CPP
+static ReturnType functionName() {
+    // Function body
+}
+```
+
+###### Explanation
+
+1. This function is limited in visibility to the file where it is defined, which helps to avoid name
+   conflicts across different files.
+
+##### (4) Static Member Function
+
+###### Syntax
+
+```CPP
+class ClassName {
+public:
+    static ReturnType functionName( ... ) {
+        // Function body
+    }
+};
+
+ReturnType var_name = ClassName::functionName( ... );
+```
+
+###### Explanation
+
+1. A static member function in C++ is a function that belongs to the class rather than any specific
+   instance (object) of the class. This means it can be called without creating an instance of the
+   class. Static member functions can only access static data members or other static member
+   functions within the class.
+
+#### Characteristics
+
+1. Static local variables are initialized only once at the start of the program and retain their
+   values across function calls.
+2. Static members of a class are shared across all instances of that class, making them useful for
+   keeping track of information common to all objects.
+3. Static functions cannot be called from outside the file they are defined in, promoting
+   encapsulation and modularity in code organization.
 
 ## Function
 
@@ -1001,7 +1277,7 @@ public:
 ##### Example
 
 ```CPP
-class MyClass {
+class ClassType {
    public:
       static void staticFunction() {   // Static member function
          std::cout << "Static function called." << std::endl;
@@ -1009,7 +1285,7 @@ class MyClass {
 };
 
 int main() {
-   MyClass::staticFunction();   // Call static function without an instance
+   ClassType::staticFunction();   // Call static function without an instance
 }
 ```
 
@@ -1023,19 +1299,19 @@ int main() {
 ##### Example
 
 ```CPP
-class MyClass {
+class ClassType {
    public:
-      explicit MyClass( int x ) { /* constructor */
+      explicit ClassType( int x ) { /* constructor */
       }
 };
 
-void doSomething( MyClass obj ) {
+void doSomething( ClassType obj ) {
    // do something
 }
 
 int main() {
    // doSomething(42);  // Error: no implicit conversion
-   doSomething( MyClass( 42 ) );   // Explicit conversion is required
+   doSomething( ClassType( 42 ) );   // Explicit conversion is required
 }
 ```
 
@@ -1048,23 +1324,23 @@ int main() {
 ##### Example
 
 ```CPP
-class MyClass {
+class ClassType {
    private:
       int _secret;
 
    public:
-      MyClass(): _secret( 42 ) {}
+      ClassType(): _secret( 42 ) {}
 
-      friend void revealSecret( MyClass& obj );   // Friend function declaration
+      friend void revealSecret( ClassType& obj );   // Friend function declaration
 };
 
-void revealSecret( MyClass& obj ) {   // Friend function definition
+void revealSecret( ClassType& obj ) {   // Friend function definition
    std::cout << "Secret: " << obj._secret
              << std::endl;   // Access private member
 }
 
 int main() {
-   MyClass obj;
+   ClassType obj;
    revealSecret( obj );   // Accesses the private member
 }
 ```
@@ -1672,7 +1948,7 @@ Color myColor = Color::Green;
    **contiguous memory** locations. Arrays are used to store **multiple values** in **a single
    variable**, making it easier to manage and manipulate data efficiently.
 
-### Characteristics of Arrays
+### Characteristics
 
 #### 1) Homogeneous Data Types
 
@@ -1690,6 +1966,10 @@ Color myColor = Color::Green;
 1. A raw array in C++ refers to **a traditional C-style array** that is built into the language. It
    is **a fixed-size sequence** of elements of **the same type** and provides very minimal
    functionality compared to containers like `std::array` or `std::vector`.
+
+#### Characteristics
+
+1. The raw array is the **fastest** structure but **not safe** enough..
 2. The **size** of a raw array is **defined at compile time** and **cannot be changed during
    runtime**. This means that once an array is declared, its size is fixed.
 
@@ -1746,7 +2026,7 @@ delete[] arr_ptr;
 
 #### Multidimensional Raw Array ( **Not Recommend** )
 
-#### #Declaration Syntax
+##### Declaration Syntax
 
 ```CPP
 // No initialization, contain garbage values and behave unpredictably.
@@ -1759,20 +2039,18 @@ Type arr_name[size_x][size_y][size_z];
 ```
 
 ```CPP
-// a2d is an array that stores size_x pointers, each of which points to an array that stores size_y values.
-// The above method may result in memory fragmentation and cache misses.
-// Also, in the above a2d, not all members are close together, which will impact performance.
+// `a2d` is an array that stores size_x pointers, each of which points to an array that stores size_y values.
 Type** a2d = new Type*[size_x];
-for( int i = 0; i < size_x; i++ ) {
+for( size_t i = 0; i < size_x; i++ ) {
    a2d[i] = new Type[size_y];
 }
 ```
 
 ```CPP
 Type*** a3d = new Type**[size_x];
-for( int i = 0; i < size_x; i++ ) {
+for( size_t i = 0; i < size_x; i++ ) {
    a3d[i] = new Type*[size_y];
-   for( int j = 0; j < size_y; j++ )
+   for( size_t j = 0; j < size_y; j++ )
       a3d[i][j] = new Type[size_z];
 }
 ```
@@ -1822,15 +2100,15 @@ Type arr_name2[size_x][size_y][size_z] = arr_name1;
 ##### Syntax for Deleting Multidimensional Raw Array Pointers
 
 ```CPP
-for( int i = 0; i < size_x; i++ ) {
+for( size_t i = 0; i < size_x; i++ ) {
    delete[] a2d[i];
 }
 delete[] a2d;
 ```
 
 ```CPP
-for( int i = 0; i < size_x; i++ ) {
-   for( int j = 0; j < size_y; j++ )
+for( size_t i = 0; i < size_x; i++ ) {
+   for( size_t j = 0; j < size_y; j++ )
       delete[] a3d[i][j];
    delete[] a3d[i];
 }
@@ -1843,8 +2121,26 @@ delete[] a3d;
 
 1. `std::array` is **a container** from the C++ Standard Library that provides **a fixed-size
    array**. It is **a template class**, and all syntax applicable to template classes applies to it.
-2. The **size** of a `std::array` is **defined at compile time** and **cannot be changed during
-   runtime**. This means that once an array is declared, its size is fixed.
+
+#### Characteristics
+
+1.  `std::array` is **slower** than the raw array, but `std::array` is **safer** than a raw array.
+2.  `std::array` is used like a raw array but **provides member functions** and allows us to use
+    many standard C++ functions to manage it.
+3.  In debug mode, `std::array` can **help us debug** like bounds checking, thanks to its debug
+    macros and code.
+4.  `std::array` is **a template**. We can use its functions to get its size, but it **doesn't store
+    the size as a value**.
+5.  The **size** of a `std::array` is **defined at compile time** and **cannot be changed during
+    runtime**. This means that once an array is declared, its size is fixed.
+
+#### A Simple Implementation of `std::array`
+
+```CPP
+template< typename T, size_t size > class Array {
+      T _array[size]
+};
+```
 
 #### One-dimensional `std::array`
 
@@ -2016,4 +2312,10 @@ std::array< std::array< std::array< Type, size_z >, size_y >, size_x > arr_name2
    `Type* a2d = new Type[size_x * size_y];` Both examples create a two-dimensional array using a
    one-dimensional array..
 2. When working with actual multidimensional arrays, **performance and memory issues** with pointers
-   can arise depending on how the array is allocated and accessed.
+   can arise depending on how the array is allocated and accessed, as **not all elements** may be
+   **contiguous in memory**. This can lead to problems such as **memory fragmentation** and **cache
+   misses**.
+3. `size_t` is **an unsigned integer type** specifically designed to **represent the size** of
+   objects or array indices. It is widely used to ensure **portability across platforms** and
+   **avoid overflow issues** when working with memory sizes, since it matches the size of the
+   addressable memory range on the system.
