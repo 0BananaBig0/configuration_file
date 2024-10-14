@@ -945,7 +945,7 @@ function! Delete_Trailling_Space_CapM_And_Retab()
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
-nnoremap <silent><C-Space> a<Space><ESC>
+nnoremap <silent><C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
     " 1. 获取当前光标所在位置的行数
     let current_line = line('.')
