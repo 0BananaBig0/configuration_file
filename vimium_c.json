@@ -1,13 +1,19 @@
 {
 	"name": "Vimium C",
-	"@time": "9/25/2024, 9:28:17 AM",
-	"time": 1727227697503,
+	"@time": "10/14/2024, 4:29:38 PM",
+	"time": 1728894578904,
 	"environment": {
-		"extension": "1.99.997",
+		"extension": "1.99.994",
 		"platform": "win",
-		"firefox": 130
+		"chromium": 114
 	},
 	"keyLayout": 2,
+	"keyMappings": [
+		"#!no-check",
+		"mapKey <a-h> J",
+		"mapKey <a-l> K",
+		""
+	],
 	"userDefinedCss": [
 		".LH{color:black;",
 		"    border:0px;",
