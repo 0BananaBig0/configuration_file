@@ -179,7 +179,6 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 function! Markdown_Plugin_Configuration()
-  let g:markdown_preview_status = 0
   " coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
   nnoremap <silent><Leader>mm :CocCommand markmap.watch<CR>
@@ -209,11 +208,9 @@ function! Markdown_Plugin_Configuration()
   nnoremap <silent><Leader>mg :silent call Create_Markdown_Memu()<CR>
   nnoremap <silent><Leader>mu :silent call Update_Markdown_Memu()<CR>
   let g:vmt_auto_update_on_save = 0
-  let g:vim_markdown_toc_status = 0
   function! Create_Markdown_Memu()
     exec 'silent normal! ms'
-    if(g:vim_markdown_toc_status ==? 0)
-      let g:vim_markdown_toc_status = 1
+    if !exists(':GenTocGFM')
       silent call plug#load('vim-markdown-toc')
     endif
     exec "silent normal! ggO\<ESC>"
@@ -222,10 +219,10 @@ function! Markdown_Plugin_Configuration()
   endfunction
   function! Update_Markdown_Memu()
     exec 'silent normal! ms'
-    if(g:vim_markdown_toc_status ==? 0)
-      let g:vim_markdown_toc_status = 1
+    if !exists(':UpdateToc')
       silent call plug#load('vim-markdown-toc')
     endif
+    exec ':UpdateToc'
     exec 'silent normal! `s'
   endfunction
 endfunction
@@ -848,28 +845,18 @@ function! Compile_Command()
   endif
 endfunction
 function! Markdown_Preview_Toogle()
-  if(g:markdown_preview_status ==? 0)
-    let g:markdown_preview_status = 1
+  if !exists(':InstantMarkdownPreview')
     silent call plug#load('vim-instant-markdown')
   endif
-  if(g:markdown_preview_status ==? 1)
-    let g:markdown_preview_status = 2
+  let cmd = 'lsof -i :' . g:instant_markdown_port
+  let result = system(cmd)
+  if empty(result)
     exec ':InstantMarkdownPreview'
+    echo 'Opening a browser! Occupying port' g:instant_markdown_port '.'
   else
-    let g:markdown_preview_status = 1
     exec ':InstantMarkdownStop'
+    echo 'Releasing port' g:instant_markdown_port '.'
   endif
-  " if(g:markdown_preview_status ==?)
-  "   let g:markdown_preview_status = 1
-  "   silent call plug#load('markdown-preview.nvim')
-  " endif
-  " if(g:markdown_preview_status ==? 1)
-  "   let g:markdown_preview_status = 2
-  "   exec ':MarkdownPreview'
-  " else
-  "   let g:markdown_preview_status = 1
-  "   exec ':MarkdownPreviewStop'
-  " endif
 endfunction
 function! Show_Current_Module()
   let module_line = search('module', 'bnWz')
@@ -990,4 +977,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
