@@ -218,12 +218,10 @@ function! Markdown_Plugin_Configuration()
     exec 'silent normal! ggdd`s'
   endfunction
   function! Update_Markdown_Memu()
-    exec 'silent normal! ms'
     if !exists(':UpdateToc')
       silent call plug#load('vim-markdown-toc')
     endif
     exec ':UpdateToc'
-    exec 'silent normal! `s'
   endfunction
 endfunction
 
@@ -979,5 +977,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
-
