@@ -847,12 +847,14 @@ endfunction
 function! Markdown_Preview_Toogle()
   if !exists(':InstantMarkdownPreview')
     silent call plug#load('vim-instant-markdown')
+    let g:instant_markdown_plugin_first_load = 1
   endif
   let cmd = 'lsof -i :' . g:instant_markdown_port
   let result = system(cmd)
-  if empty(result)
+  if empty(result) || (g:instant_markdown_plugin_first_load == 1)
     exec ':InstantMarkdownPreview'
     echo 'Opening a browser! Occupying port' g:instant_markdown_port '.'
+    let g:instant_markdown_plugin_first_load = 0
   else
     exec ':InstantMarkdownStop'
     echo 'Releasing port' g:instant_markdown_port '.'
@@ -977,3 +979,5 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
+
