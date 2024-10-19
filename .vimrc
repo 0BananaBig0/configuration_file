@@ -217,12 +217,12 @@ function! Markdown_Plugin_Configuration()
     exec 'silent normal! ggdd`s'
   endfunction
   function! Update_Markdown_Memu()
-    if !exists(':UpdateToc')
-      silent call plug#load('vim-markdown-toc')
-    endif
     let previous_column = col('.')
     let previous_line = line('.')
     let previous_total_line_count = line('$')
+    if !exists(':UpdateToc')
+      silent call plug#load('vim-markdown-toc')
+    endif
     exec ':UpdateToc'
     let new_line = previous_line + (line('$') - previous_total_line_count)
     call setpos('.', [0, new_line, previous_column, 0])
