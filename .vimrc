@@ -207,6 +207,7 @@ function! Markdown_Plugin_Configuration()
   nnoremap <silent><Leader>mg :silent call Create_Markdown_Memu()<CR>
   nnoremap <silent><Leader>mu :silent call Update_Markdown_Memu()<CR>
   let g:vmt_auto_update_on_save = 0
+  let g:vmt_list_item_char = '-'
   function! Create_Markdown_Memu()
     exec 'silent normal! ms'
     if !exists(':GenTocGFM')
@@ -981,3 +982,5 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
+
