@@ -203,7 +203,6 @@ function! Markdown_Plugin_Configuration()
 
 
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
-  " at the top, mark the last line of the menu and delete the space line.
   " If you want to go to the last line of the menu, you can press `` in normal mode
   nnoremap <silent><Leader>mg :silent call Create_Markdown_Memu()<CR>
   nnoremap <silent><Leader>mu :silent call Update_Markdown_Memu()<CR>
@@ -221,7 +220,12 @@ function! Markdown_Plugin_Configuration()
     if !exists(':UpdateToc')
       silent call plug#load('vim-markdown-toc')
     endif
+    let previous_column = col('.')
+    let previous_line = line('.')
+    let previous_total_line_count = line('$')
     exec ':UpdateToc'
+    let new_line = previous_line + (line('$') - previous_total_line_count)
+    call setpos('.', [0, new_line, previous_column, 0])
   endfunction
 endfunction
 
@@ -239,7 +243,7 @@ function! Lazy_Plugin_Configuration()
 
   " coc setting
   " Use tab for trigger completion with characters ahead and navigate.
-  " After we select the word we needn't press enter key
+  " After we select the word we need press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
   " by other plugin before putting this into your config.
   inoremap <silent><expr> <TAB>
@@ -937,10 +941,10 @@ function! InsertEnterInNormalMode()
     " 1. 获取当前光标所在位置的行数
     let current_line = line('.')
     let new_line = current_line + 1
-    " 2. 获取 `current_line` 中的缩进空格数，并存储在 `current_indent_number` 中
-    let current_indent_number = indent(current_line)
+    " 2. 获取 `current_line` 中的缩进空格数，并存储在 `current_indent_count` 中
+    let current_indent_count = indent(current_line)
     " 3. 生成 n 个空格
-    let current_indent = repeat(' ', current_indent_number)
+    let current_indent = repeat(' ', current_indent_count)
     " 4. 进入插入模式，输入回车，然后返回正常模式
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
@@ -952,7 +956,7 @@ function! InsertEnterInNormalMode()
     " 5. 如果 `new_line` 行为空或只有空格, 给 `new_line` 行插入 `current_indent`
     if getline(new_line) =~ '^\s*$'
         call setline(new_line, current_indent)
-        let new_column = current_indent_number + 1
+        let new_column = current_indent_count + 1
     endif
     " 6. 如果 `current_line` 行为空或只有空格，则清除 `current_line` 行的空格
     if getline(current_line) =~ '^\s*$'
