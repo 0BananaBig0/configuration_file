@@ -197,6 +197,7 @@ function! Markdown_Plugin_Configuration()
   let g:instant_markdown_allow_unsafe_content = 1
   let g:instant_markdown_mathjax = 1
   let g:instant_markdown_mermaid = 1
+  let g:instant_markdown_browser = "msedge"
 
 
 
@@ -980,4 +981,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
