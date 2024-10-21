@@ -172,7 +172,7 @@ sudo apt install libglfw3 libglfw3-dev libglfw3-doc
 
 sudo apt remove neovim --purge -y
 sudo apt autoremove --purge -y
-wget https://githubfast.com/neovim/neovim-releases/releases/download/v0.10.1/nvim-linux64.deb
+wget https://githubfast.com/neovim/neovim-releases/releases/download/v0.10.2/nvim-linux64.deb
 sudo dpkg -i nvim-linux64.deb
 rm nvim-linux64.deb
 sudo apt install python3-neovim -y
