@@ -45,5 +45,11 @@
    "chat.editor.fontSize": 0,
    "markdown.preview.fontSize": 18,
    "window.zoomLevel": 1.5,
-   "editor.cursorBlinking": "solid"
+   "editor.cursorBlinking": "solid",
+   "[markdown]": {
+      "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+   },
+   "extensions.experimental.affinity": {
+      "asvetliakov.vscode-neovim": 1
+   }
 }
