@@ -193,7 +193,7 @@ function! Markdown_Plugin_Configuration()
 
   " vim-instant-markdown setting
   let g:instant_markdown_autostart = 0
-  let g:instant_markdown_theme = 'dark'
+  " let g:instant_markdown_theme = 'dark'
   let g:instant_markdown_allow_unsafe_content = 1
   let g:instant_markdown_mathjax = 1
   let g:instant_markdown_mermaid = 1
