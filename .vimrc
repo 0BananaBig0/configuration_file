@@ -193,7 +193,6 @@ function! Markdown_Plugin_Configuration()
 
   " vim-instant-markdown setting
   let g:instant_markdown_autostart = 0
-  " let g:instant_markdown_theme = 'dark'
   let g:instant_markdown_allow_unsafe_content = 1
   let g:instant_markdown_mathjax = 1
   let g:instant_markdown_mermaid = 1
@@ -276,6 +275,8 @@ function! Lazy_Plugin_Configuration()
   nmap <silent>[l <Plug>(coc-diagnostic-info)
   nmap <silent>[a <Plug>(coc-codeaction)
   nmap <silent>[b <Plug>(coc-codeaction-line)
+  nmap <silent>[s <Plug>(coc-codeaction-selected)
+  xmap <silent>[s <Plug>(coc-codeaction-selected)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets', 'coc-prettier',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
@@ -981,3 +982,5 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
+
