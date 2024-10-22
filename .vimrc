@@ -817,20 +817,33 @@ function! SetTitle()
 endfunction
 if !exists("Compile_And_Excute")
   function! Compile_And_Excute()
-    if &filetype==?'cpp'
-      exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -Wall -Wextra -lboost_program_options -lOpenCL && ./E%<.exe'
-    elseif &filetype==?'c'
-      exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -Wall -Wextra -lOpenCL && ./E%<.exe'
+    let compile_exec = ':AsyncRun! -strip -save=1'
+    if &filetype==?'cpp' || &filetype==?'c'
+      if &filetype==?'cpp'
+        let compile_exec = compile_exec.' g++ % -o %<.exe -g -Wall -Wextra'
+      elseif &filetype==?'c'
+        let compile_exec = compile_exec.' gcc % -o %<.exe -g -Wall -Wextra'
+      endif
+      if !empty(system('ldconfig -p | grep libOpenCL'))
+        let compile_exec = compile_exec.' -lOpenCL'
+      endif
+      if !empty(system('ldconfig -p | grep libboost_program_options'))
+        let compile_exec = compile_exec.' -lboost_program_options'
+      endif
+      if getfsize($HOME.'/.Qt6') != -1
+        let compile_exec = compile_exec.' -lQt6Core'
+      endif
+      exec compile_exec.' && ./%<.exe'
     elseif &filetype==?'python'
-      exec ':AsyncRun! -strip -save=1 python3 %'
+      exec compile_exec.' python3 %'
     elseif &filetype==?'sh'
-      exec ':AsyncRun! -strip -save=1 ./%'
+      exec compile_exec.' ./%'
     elseif &filetype==?'verilog'
-      exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd && vvp %<.vcd'
+      exec compile_exec.' iverilog *.v -o %<.vcd && vvp %<.vcd'
     elseif &filetype==?'perl'
-      exec ':AsyncRun! -strip -save=1 perl %'
+      exec compile_exec.' perl %'
     elseif &filetype==?'tcl'
-      exec ':AsyncRun! -strip -save=1 tclsh %'
+      exec compile_exec.' tclsh %'
     elseif &filetype==?'markdown'
       call Markdown_Preview_Toogle()
     elseif &filetype==?'vim'
@@ -839,12 +852,25 @@ if !exists("Compile_And_Excute")
   endfunction
 endif
 function! Compile_Command()
-  if &filetype==?'cpp'
-    exec ':AsyncRun! -strip -save=1 g++ % -o E%<.exe -g -Wall -Wextra -lboost_program_options -lOpenCL'
-  elseif &filetype==?'c'
-    exec ':AsyncRun! -strip -save=1 gcc % -o E%<.exe -g -Wall -Wextra -lOpenCL'
+  let compile_only = ':AsyncRun! -strip -save=1'
+  if &filetype==?'cpp' || &filetype==?'c'
+    if &filetype==?'cpp'
+      let compile_only = compile_only.' g++ % -o %<.exe -g -Wall -Wextra'
+    elseif &filetype==?'c'
+      let compile_only = compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
+    endif
+    if !empty(system('ldconfig -p | grep libOpenCL'))
+      let compile_only = compile_only.' -lOpenCL'
+    endif
+    if !empty(system('ldconfig -p | grep libboost_program_options'))
+      let compile_only = compile_only.' -lboost_program_options'
+    endif
+    if getfsize($HOME.'/.Qt6') != -1
+      let compile_only = compile_only.' -lQt6Core'
+    endif
+    exec compile_only
   elseif &filetype==?'verilog'
-    exec ':AsyncRun! -strip -save=1 iverilog *.v -o %<.vcd'
+    exec compile_only.' iverilog *.v -o %<.vcd'
   endif
 endfunction
 function! Markdown_Preview_Toogle()
@@ -982,5 +1008,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
-
