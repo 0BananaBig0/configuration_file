@@ -215,3 +215,11 @@ sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr
 sudo ln /mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe /usr/bin/msedge -s
 sudo apt install pandoc texlive-xetex texlive-luatex pandoc-citeproc-preamble texlive-pstricks -y
 sudo npm -g install instant-markdown-d@next
+
+# install qt
+sudo apt-get install build-essential libgl1-mesa-dev libxkbcommon-x11-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-cursor-dev
+mkdir .Qt6_Online_Installer
+cd .Qt6_Online_Installer
+wget https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+chmod a+x qt-unified-linux-x64-online.run
+./qt-unified-linux-x64-online.run
