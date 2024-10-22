@@ -824,16 +824,7 @@ if !exists("Compile_And_Excute")
       elseif &filetype==?'c'
         let compile_exec = compile_exec.' gcc % -o %<.exe -g -Wall -Wextra'
       endif
-      if !empty(system('ldconfig -p | grep libOpenCL'))
-        let compile_exec = compile_exec.' -lOpenCL'
-      endif
-      if !empty(system('ldconfig -p | grep libboost_program_options'))
-        let compile_exec = compile_exec.' -lboost_program_options'
-      endif
-      if getfsize($HOME.'/.Qt6') != -1
-        let compile_exec = compile_exec.' -lQt6Core'
-      endif
-      exec compile_exec.' && ./%<.exe'
+      exec compile_exec.' '.$LDFLAGS.' && ./%<.exe'
     elseif &filetype==?'python'
       exec compile_exec.' python3 %'
     elseif &filetype==?'sh'
@@ -859,16 +850,7 @@ function! Compile_Command()
     elseif &filetype==?'c'
       let compile_only = compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
     endif
-    if !empty(system('ldconfig -p | grep libOpenCL'))
-      let compile_only = compile_only.' -lOpenCL'
-    endif
-    if !empty(system('ldconfig -p | grep libboost_program_options'))
-      let compile_only = compile_only.' -lboost_program_options'
-    endif
-    if getfsize($HOME.'/.Qt6') != -1
-      let compile_only = compile_only.' -lQt6Core'
-    endif
-    exec compile_only
+    exec compile_only.' '.$LDFLAGS.'
   elseif &filetype==?'verilog'
     exec compile_only.' iverilog *.v -o %<.vcd'
   endif
@@ -1008,3 +990,4 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
