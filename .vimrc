@@ -71,7 +71,7 @@ Plug 'nathanaelkane/vim-indent-guides'
 " highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'for': []}
 " 高亮c++类模板等插件
-Plug 'bfrg/vim-cpp-modern', {'for': []}
+Plug 'bfrg/vim-c-cpp-modern', {'for': []}
 " python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': []}
 " roslaunch语法高亮
@@ -118,7 +118,7 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
-  autocmd FileType cpp,c,opencl silent call plug#load('vim-cpp-modern')
+  autocmd FileType cpp,c,opencl silent call plug#load('vim-c-cpp-modern')
   autocmd FileType python silent call plug#load('python-syntax')
   autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
   autocmd BufRead *.launch silent call plug#load('vim-ros')
@@ -146,10 +146,10 @@ let g:indent_guides_default_mapping = 0
 
 
 
-" vim-cpp-modern
+" vim-c-cpp-modern
 let g:cpp_attributes_highlight = 1
 let g:cpp_member_highlight = 1
-let g:cpp_simple_highlight = 1
+let g:cpp_operator_highlight = 1
 
 
 
