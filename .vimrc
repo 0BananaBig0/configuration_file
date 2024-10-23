@@ -976,7 +976,7 @@ function! InsertEnterInNormalMode()
 endfunction
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
-inoremap <silent><M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>
+inoremap <silent><M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>i
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
 inoremap <silent><M-h> <C-o>h
 inoremap <silent><M-j> <C-o>j
