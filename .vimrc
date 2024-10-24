@@ -55,8 +55,6 @@ scriptencoding utf-8
 set nobackup
 set nowritebackup
 set noswapfile
-" 使用localleader映射的快捷键必须出现在let g:maplocalleader = ' '之后
-let g:maplocalleader = ' '
 
 
 
@@ -234,7 +232,7 @@ function! Lazy_Plugin_Configuration()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=1
   nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
-  nnoremap <silent><Localleader> :WhichKey '<Localleader>'<CR>
+  nnoremap <silent><Space> :WhichKey '<Space>'<CR>
   nnoremap <silent>[ :WhichKey '['<CR>
   nnoremap <silent>] :WhichKey ']'<CR>
 
@@ -258,19 +256,19 @@ function! Lazy_Plugin_Configuration()
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
-  nmap <silent><Localleader>d <Plug>(coc-definition)
-  nmap <silent><Localleader>c <Plug>(coc-declaration)
-  nmap <silent><Localleader>i <Plug>(coc-implementation)
-  nmap <silent><Localleader>r <Plug>(coc-references)
-  nmap <silent><Localleader>n <Plug>(coc-rename)
-  nmap <silent><Localleader>f <Plug>(coc-refactor)
+  nmap <silent><Space>d <Plug>(coc-definition)
+  nmap <silent><Space>c <Plug>(coc-declaration)
+  nmap <silent><Space>i <Plug>(coc-implementation)
+  nmap <silent><Space>r <Plug>(coc-references)
+  nmap <silent><Space>n <Plug>(coc-rename)
+  nmap <silent><Space>f <Plug>(coc-refactor)
   nnoremap <silent>[d :silent call CocAction('jumpDefinition', 'tabe')<CR>
   nnoremap <silent>[c :silent call CocAction('jumpDeclaration', 'tabe')<CR>
   nnoremap <silent>[i :silent call CocAction('jumpImplementation', 'tabe')<CR>
   nmap <silent>[j <Plug>(coc-diagnostic-next)
   nmap <silent>[k <Plug>(coc-diagnostic-prev)
-  nmap <silent><Localleader>j <Plug>(coc-diagnostic-next-error)
-  nmap <silent><Localleader>k <Plug>(coc-diagnostic-prev-error)
+  nmap <silent><Space>j <Plug>(coc-diagnostic-next-error)
+  nmap <silent><Space>k <Plug>(coc-diagnostic-prev-error)
   nnoremap <silent>[t :silent call CocAction('diagnosticToggleBuffer')<CR>
   nmap <silent>[l <Plug>(coc-diagnostic-info)
   nmap <silent>[a <Plug>(coc-codeaction)
@@ -343,7 +341,7 @@ function! Lazy_Plugin_Configuration()
   let g:asyncrun_open = 6
   let g:asyncrun_bell = 1
   nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
-  nnoremap <Localleader><F8> :AsyncRun!<Space>
+  nnoremap <Space><F8> :AsyncRun!<Space>
 
 
 
@@ -492,7 +490,7 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " fcitx.nvim setting
-  nnoremap <silent><Leader><Localleader> :silent call plug#load('fcitx.vim')<CR>
+  nnoremap <silent><Leader><Space> :silent call plug#load('fcitx.vim')<CR>
 
 
 
@@ -659,7 +657,7 @@ if has('gui_running')
   " Toggle Menu and Toolbar菜单栏和工具栏
   set guioptions-=m
   set guioptions-=T
-  nnoremap <silent><Localleader>m :silent call MENU_TOOGLE()<CR>
+  nnoremap <silent><Space>m :silent call MENU_TOOGLE()<CR>
   function! MENU_TOOGLE()
     if &guioptions=~#'T'
       set guioptions-=T
@@ -743,7 +741,7 @@ augroup Local_Autocmd_Group
   autocmd FileType * silent call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
-           \ nnoremap <silent><Localleader><F2>
+           \ nnoremap <silent><Space><F2>
            \ :call Compile_And_Excute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
            \ :call Compile_Command()<CR>
@@ -919,23 +917,23 @@ for i in range(1, 9)
     endfor
     exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
-nnoremap <silent><Localleader>t :tabnew<CR>
-nnoremap <silent><Localleader>b :silent call Close_and_Back_Tab()<CR>
+nnoremap <silent><Space>t :tabnew<CR>
+nnoremap <silent><Space>b :silent call Close_and_Back_Tab()<CR>
 function! Close_and_Back_Tab()
   exec 'tabp'
   exec '+tabclose'
 endfunction
-nnoremap <silent><Localleader>q :q<CR>
-nnoremap <silent><Localleader>w :w<CR>
+nnoremap <silent><Space>q :q<CR>
+nnoremap <silent><Space>w :w<CR>
 " 比较文件
-nnoremap <Localleader><F4> :vert diffsplit
-nnoremap <silent><Localleader><F5> :silent call Delete_Blank_Line()<CR>
+nnoremap <Space><F4> :vert diffsplit
+nnoremap <silent><Space><F5> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec 'silent normal! ms'
   exec 'silent :g/^\s*$/d'
   exec 'silent normal! `s'
 endfunction
-nnoremap <silent><Localleader><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
+nnoremap <silent><Space><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
 function! Delete_Trailling_Space_CapM_And_Retab()
   exec 'silent normal! ms'
   exec 'silent :%s/\s\+$//e'
@@ -990,4 +988,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
