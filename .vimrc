@@ -933,12 +933,12 @@ function! Delete_Blank_Line()
   exec 'silent :g/^\s*$/d'
   exec 'silent normal! `s'
 endfunction
-nnoremap <silent><Space><F7> :silent call Delete_Trailling_Space_CapM_And_Retab()<CR>
-function! Delete_Trailling_Space_CapM_And_Retab()
+nnoremap <silent><Space><F7> :silent call Retab_And_Delete_Trailling_Useless_Chars()<CR>
+function! Retab_And_Delete_Trailling_Useless_Chars()
   exec 'silent normal! ms'
+  exec 'silent :%retab!'
   exec 'silent :%s/\s\+$//e'
   exec 'silent :%s/$//e'
-  exec 'silent :%retab!'
   exec 'silent normal! `s'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
