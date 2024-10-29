@@ -848,7 +848,7 @@ function! Compile_Command()
     elseif &filetype==?'c'
       let compile_only = compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
     endif
-    exec compile_only.' '.$LDFLAGS.'
+    exec compile_only.' '.$LDFLAGS
   elseif &filetype==?'verilog'
     exec compile_only.' iverilog *.v -o %<.vcd'
   endif
@@ -930,15 +930,38 @@ nnoremap <Space><F4> :vert diffsplit
 nnoremap <silent><Space><F5> :silent call Delete_Blank_Line()<CR>
 function! Delete_Blank_Line()
   exec 'silent normal! ms'
+  let l:mark_enable = 1
+  let l:new_column = col('.')
+  let l:line_num = line('.')
+  " Find the nearest line which contains at least one non-space character.
+  if getline('.') =~ '^\s*$'
+    let l:mark_enable = 0
+    let l:new_column = 1
+    let l:down_line_num = search('^\s*\S', 'nW')
+    if l:line_num == l:down_line_num
+      let l:up_line_num = search('^\s*\S', 'bnW')
+      if l:line_num == l:up_line_num
+        let l:line_num = 1
+      else
+        let l:line_num = l:up_line_num
+      endif
+    else
+      let l:line_num = l:down_line_num
+    endif
+  endif
   exec 'silent :g/^\s*$/d'
-  exec 'silent normal! `s'
+  if l:mark_enable == 1
+    exec 'silent normal! `s'
+  else
+    call setpos('.', [0, l:line_num, l:new_column, 0])
+  endif
 endfunction
 nnoremap <silent><Space><F7> :silent call Retab_And_Delete_Trailling_Useless_Chars()<CR>
 function! Retab_And_Delete_Trailling_Useless_Chars()
   exec 'silent normal! ms'
   exec 'silent :%retab!'
   exec 'silent :%s/\s\+$//e'
-  exec 'silent :%s/$//e'
+  exec 'silent :%s/\r//e'
   exec 'silent normal! `s'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
