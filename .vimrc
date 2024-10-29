@@ -214,15 +214,15 @@ function! Markdown_Plugin_Configuration()
     exec 'silent normal! ggdd`s'
   endfunction
   function! Update_Markdown_Memu()
-    let previous_column = col('.')
-    let previous_line = line('.')
-    let previous_total_line_count = line('$')
+    let l:previous_column = col('.')
+    let l:previous_line = line('.')
+    let l:previous_total_line_count = line('$')
     if !exists(':UpdateToc')
       silent call plug#load('vim-markdown-toc')
     endif
     exec ':UpdateToc'
-    let new_line = previous_line + (line('$') - previous_total_line_count)
-    call setpos('.', [0, new_line, previous_column, 0])
+    let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
+    call setpos('.', [0, l:new_line, l:previous_column, 0])
   endfunction
 endfunction
 
@@ -281,27 +281,27 @@ function! Lazy_Plugin_Configuration()
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
   function! Cpp_Workspace_Root()
-    let cpp_workspace_root = finddir('.git', '.;')
-    if (strlen(cpp_workspace_root) == 0)
-      let cpp_workspace_root = expand('%:p:h')
-    elseif (cpp_workspace_root ==? '.git')
-      let cpp_workspace_root = '.'
+    let l:cpp_workspace_root = finddir('.git', '.;')
+    if (strlen(l:cpp_workspace_root) == 0)
+      let l:cpp_workspace_root = expand('%:p:h')
+    elseif (l:cpp_workspace_root ==? '.git')
+      let l:cpp_workspace_root = '.'
     else
-      let cpp_workspace_root = strpart(cpp_workspace_root, 0, strridx(cpp_workspace_root,'/.git'))
+      let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strridx(l:cpp_workspace_root,'/.git'))
     endif
-    return cpp_workspace_root
+    return l:cpp_workspace_root
   endfunction
   function! Clang_Tool_Configuration()
-    let cpp_workspace_root = Cpp_Workspace_Root()
-    let clang_format = cpp_workspace_root.'/.clang-format'
-    let clang_tidy = cpp_workspace_root.'/.clang-tidy'
-    if !filereadable(clang_format)
-      let clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
-      call writefile(clang_format_content, clang_format, 's')
+    let l:cpp_workspace_root = Cpp_Workspace_Root()
+    let l:clang_format = l:cpp_workspace_root.'/.clang-format'
+    let l:clang_tidy = l:cpp_workspace_root.'/.clang-tidy'
+    if !filereadable(l:clang_format)
+      let l:clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
+      call writefile(l:clang_format_content, l:clang_format, 's')
     endif
-    if !filereadable(clang_tidy)
-      let clang_tidy_content = readfile($HOME.'/.vim/.c_cpp/.clang-tidy')
-      call writefile(clang_tidy_content, clang_tidy, 's')
+    if !filereadable(l:clang_tidy)
+      let l:clang_tidy_content = readfile($HOME.'/.vim/.c_cpp/.clang-tidy')
+      call writefile(l:clang_tidy_content, l:clang_tidy, 's')
     endif
   endfunction
   noremap <silent><Leader><F7> :silent call Clang_Tool_Configuration()<CR>
@@ -437,43 +437,43 @@ function! Lazy_On_Plugin_Configuration()
   " if .git can be found, otherwise save bookmarks to $HOME/.vim
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
-    let bookmarkextension = 'bookmarks'
-    let cur_file_path = expand('%:p:h')
-    " Look upwards (at parents) for a directory named '.git' begin form cur_file_path
-    let location = finddir('.git', '.;')
-    if location ==? '.git'
+    let l:bookmarkextension = 'bookmarks'
+    let l:cur_file_path = expand('%:p:h')
+    " Look upwards (at parents) for a directory named '.git' begin form l:cur_file_path
+    let l:location = finddir('.git', '.;')
+    if l:location ==? '.git'
       " current directory is workspace or current file path has .git directory
-      let path_to_pro = getcwd()
-    elseif strlen(strpart(location, 0, 1)) == 1
+      let l:path_to_pro = getcwd()
+    elseif strlen(strpart(l:location, 0, 1)) == 1
       " can find .git, but current directory not has .git
-      let path_to_pro = strpart(location, 0, strridx(location, '/.git'))
+      let l:path_to_pro = strpart(l:location, 0, strridx(l:location, '/.git'))
     endif
-    if len(location) > 0
-      if strpart(path_to_pro, 0, 1)!=?'/'
-        let path_to_pro='/'.path_to_pro
+    if len(l:location) > 0
+      if strpart(l:path_to_pro, 0, 1)!=?'/'
+        let l:path_to_pro='/'.l:path_to_pro
       endif
-      let pro_dir = strpart(path_to_pro, strridx(path_to_pro, '/'))
-      let pro_to_file = strpart(cur_file_path, stridx(cur_file_path, pro_dir)+strlen(pro_dir))
-      let location = simplify(location.'/.vim-bookmarks'.pro_to_file)
+      let l:pro_dir = strpart(l:path_to_pro, strridx(l:path_to_pro, '/'))
+      let l:pro_to_file = strpart(l:cur_file_path, stridx(l:cur_file_path, l:pro_dir)+strlen(l:pro_dir))
+      let l:location = simplify(l:location.'/.vim-bookmarks'.l:pro_to_file)
     else
       " the bookmarks of the root and common user both are saved in the same directory
-      if strpart(cur_file_path, 0, 5) ==? '/root'
-        let pro_to_file = cur_file_path
+      if strpart(l:cur_file_path, 0, 5) ==? '/root'
+        let l:pro_to_file = l:cur_file_path
       elseif strpart($SUDO_USER, 0, 1) ==? ''
-        let pro_to_file = strpart(cur_file_path, strlen($HOME))
+        let l:pro_to_file = strpart(l:cur_file_path, strlen($HOME))
       else
-        let pro_to_file = strpart(cur_file_path, strlen('/home/'.$SUDO_USER))
+        let l:pro_to_file = strpart(l:cur_file_path, strlen('/home/'.$SUDO_USER))
       endif
       if strpart($SUDO_USER, 0, 1) ==? ''
-        let location = $HOME.'/.vim/.vim-bookmarks'.pro_to_file
+        let l:location = $HOME.'/.vim/.vim-bookmarks'.l:pro_to_file
       else
-        let location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'.pro_to_file
+        let l:location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'.l:pro_to_file
       endif
     endif
-    if !isdirectory(location)
-      call mkdir(location, 'p')
+    if !isdirectory(l:location)
+      call mkdir(l:location, 'p')
     endif
-      return simplify(location.'/'.expand('%:t').'.'.bookmarkextension)
+      return simplify(l:location.'/'.expand('%:t').'.'.l:bookmarkextension)
   endfunction
   nnoremap <silent><Leader>bo :silent call plug#load('vim-bookmarks')<CR>
   nnoremap <silent><Leader>bt :BookmarkToggle<CR>
@@ -535,19 +535,19 @@ function! Lazy_On_Plugin_Configuration()
 
   " vimspector setting
   function! Cpp_Debug_Configuration()
-    let cpp_workspace_root = Cpp_Workspace_Root()
-    let launch_json = cpp_workspace_root.'/.vscode/launch.json'
-    if !filereadable(launch_json)
-      call mkdir(cpp_workspace_root.'/.vscode', 'p', 0755)
-      let launch_json_content = readfile($HOME.'/.vim/.c_cpp/.vscode/launch.json')
-      call writefile(launch_json_content, launch_json, 's')
+    let l:cpp_workspace_root = Cpp_Workspace_Root()
+    let l:launch_json = l:cpp_workspace_root.'/.vscode/launch.json'
+    if !filereadable(l:launch_json)
+      call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
+      let l:launch_json_content = readfile($HOME.'/.vim/.c_cpp/.vscode/launch.json')
+      call writefile(l:launch_json_content, l:launch_json, 's')
     endif
-    let vimspector_json = cpp_workspace_root.'/.vimspector.json'
-    if !filereadable(vimspector_json)
-      let cpp_json_content = readfile($HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json')
-      call writefile(cpp_json_content, vimspector_json, 's')
+    let l:vimspector_json = l:cpp_workspace_root.'/.vimspector.json'
+    if !filereadable(l:vimspector_json)
+      let l:cpp_json_content = readfile($HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json')
+      call writefile(l:cpp_json_content, l:vimspector_json, 's')
     endif
-      exec 'tabe ' . vimspector_json
+      exec 'tabe ' . l:vimspector_json
   endfunction
   nmap <silent><F2> <Plug>VimspectorContinue
   nnoremap <silent><S-F2> :call vimspector#Restart()<CR>
@@ -815,24 +815,24 @@ function! SetTitle()
 endfunction
 if !exists("Compile_And_Excute")
   function! Compile_And_Excute()
-    let compile_exec = ':AsyncRun! -strip -save=1'
+    let l:compile_exec = ':AsyncRun! -strip -save=1'
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
-        let compile_exec = compile_exec.' g++ % -o %<.exe -g -Wall -Wextra'
+        let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -g -Wall -Wextra'
       elseif &filetype==?'c'
-        let compile_exec = compile_exec.' gcc % -o %<.exe -g -Wall -Wextra'
+        let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -g -Wall -Wextra'
       endif
-      exec compile_exec.' '.$LDFLAGS.' && ./%<.exe'
+      exec l:compile_exec.' '.$LDFLAGS.' && ./%<.exe'
     elseif &filetype==?'python'
-      exec compile_exec.' python3 %'
+      exec l:compile_exec.' python3 %'
     elseif &filetype==?'sh'
-      exec compile_exec.' ./%'
+      exec l:compile_exec.' ./%'
     elseif &filetype==?'verilog'
-      exec compile_exec.' iverilog *.v -o %<.vcd && vvp %<.vcd'
+      exec l:compile_exec.' iverilog *.v -o %<.vcd && vvp %<.vcd'
     elseif &filetype==?'perl'
-      exec compile_exec.' perl %'
+      exec l:compile_exec.' perl %'
     elseif &filetype==?'tcl'
-      exec compile_exec.' tclsh %'
+      exec l:compile_exec.' tclsh %'
     elseif &filetype==?'markdown'
       call Markdown_Preview_Toogle()
     elseif &filetype==?'vim'
@@ -841,16 +841,16 @@ if !exists("Compile_And_Excute")
   endfunction
 endif
 function! Compile_Command()
-  let compile_only = ':AsyncRun! -strip -save=1'
+  let l:compile_only = ':AsyncRun! -strip -save=1'
   if &filetype==?'cpp' || &filetype==?'c'
     if &filetype==?'cpp'
-      let compile_only = compile_only.' g++ % -o %<.exe -g -Wall -Wextra'
+      let l:compile_only = l:compile_only.' g++ % -o %<.exe -g -Wall -Wextra'
     elseif &filetype==?'c'
-      let compile_only = compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
+      let l:compile_only = l:compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
     endif
-    exec compile_only.' '.$LDFLAGS
+    exec l:compile_only.' '.$LDFLAGS
   elseif &filetype==?'verilog'
-    exec compile_only.' iverilog *.v -o %<.vcd'
+    exec l:compile_only.' iverilog *.v -o %<.vcd'
   endif
 endfunction
 function! Markdown_Preview_Toogle()
@@ -858,9 +858,9 @@ function! Markdown_Preview_Toogle()
     silent call plug#load('vim-instant-markdown')
     let g:instant_markdown_plugin_first_load = 1
   endif
-  let cmd = 'lsof -i :' . g:instant_markdown_port
-  let result = system(cmd)
-  if empty(result) || (g:instant_markdown_plugin_first_load == 1)
+  let l:cmd = 'lsof -i :' . g:instant_markdown_port
+  let l:result = system(l:cmd)
+  if empty(l:result) || (g:instant_markdown_plugin_first_load == 1)
     exec ':InstantMarkdownPreview'
     echo 'Opening a browser! Occupying port' g:instant_markdown_port '.'
     let g:instant_markdown_plugin_first_load = 0
@@ -870,33 +870,33 @@ function! Markdown_Preview_Toogle()
   endif
 endfunction
 function! Show_Current_Module()
-  let module_line = search('module', 'bnWz')
-  let module_name = getline(module_line)
-  let module_end_poisition = strridx(module_name, '(')
-  if(module_end_poisition > 0)
-    let module_name = strpart(module_name, 0, module_end_poisition)
+  let l:module_line = search('module', 'bnWz')
+  let l:module_name = getline(l:module_line)
+  let l:module_end_poisition = strridx(l:module_name, '(')
+  if(l:module_end_poisition > 0)
+    let l:module_name = strpart(l:module_name, 0, l:module_end_poisition)
   endif
-  let module_name = strpart(module_name, stridx(module_name, 'module')+7)
-  while(strpart(module_name, 0 , 1) ==? ' ')
-    let module_name = strpart(module_name, 1)
+  let l:module_name = strpart(l:module_name, stridx(l:module_name, 'module')+7)
+  while(strpart(l:module_name, 0 , 1) ==? ' ')
+    let l:module_name = strpart(l:module_name, 1)
   endwhile
-  echo 'module -->' module_name
+  echo 'module -->' l:module_name
 endfunction
 function! Show_Nearest_Class_Or_Struct()
-  let class_line = search('\n'.'class', 'bnWz')
-  let struct_line = search('\n'.'struct', 'bnWz')
-  if(class_line > struct_line)
-    let nearest_name = getline(class_line+1)
-  elseif(class_line < struct_line)
-    let nearest_name = getline(struct_line+1)
+  let l:class_line = search('\n'.'class', 'bnWz')
+  let l:struct_line = search('\n'.'struct', 'bnWz')
+  if(l:class_line > l:struct_line)
+    let l:nearest_name = getline(l:class_line+1)
+  elseif(l:class_line < l:struct_line)
+    let l:nearest_name = getline(l:struct_line+1)
   else
-    let nearest_name = 'No class/struct can be find.'
+    let l:nearest_name = 'No class/struct can be find.'
   endif
-  let nearest_end_poisition = strridx(nearest_name, '{')
-  if(nearest_end_poisition > 0)
-    let nearest_name = strpart(nearest_name, 0, nearest_end_poisition)
+  let l:nearest_end_poisition = strridx(l:nearest_name, '{')
+  if(l:nearest_end_poisition > 0)
+    let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
   endif
-  echo nearest_name
+  echo l:nearest_name
 endfunction
 function! Call_Show_Nearest_Function()
   if &filetype==?'cpp' || &filetype==?'c'
@@ -969,31 +969,31 @@ nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
 nnoremap <silent><C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
     " 1. 获取当前光标所在位置的行数
-    let current_line = line('.')
-    let new_line = current_line + 1
-    " 2. 获取 `current_line` 中的缩进空格数，并存储在 `current_indent_count` 中
-    let current_indent_count = indent(current_line)
+    let l:current_line = line('.')
+    let l:new_line = l:current_line + 1
+    " 2. 获取 `l:current_line` 中的缩进空格数，并存储在 `l:current_indent_count` 中
+    let l:current_indent_count = indent(l:current_line)
     " 3. 生成 n 个空格
-    let current_indent = repeat(' ', current_indent_count)
+    let l:current_indent = repeat(' ', l:current_indent_count)
     " 4. 进入插入模式，输入回车，然后返回正常模式
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
     exec "silent normal! i\<CR>\<ESC>"
-    let new_column = col('.')
-    if new_column != 1
-      let new_column = new_column + 1
+    let l:new_column = col('.')
+    if l:new_column != 1
+      let l:new_column = l:new_column + 1
     endif
-    " 5. 如果 `new_line` 行为空或只有空格, 给 `new_line` 行插入 `current_indent`
-    if getline(new_line) =~ '^\s*$'
-        call setline(new_line, current_indent)
-        let new_column = current_indent_count + 1
+    " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:current_indent`
+    if getline(l:new_line) =~ '^\s*$'
+        call setline(l:new_line, l:current_indent)
+        let l:new_column = l:current_indent_count + 1
     endif
-    " 6. 如果 `current_line` 行为空或只有空格，则清除 `current_line` 行的空格
-    if getline(current_line) =~ '^\s*$'
-        call setline(current_line, '')
+    " 6. 如果 `l:current_line` 行为空或只有空格，则清除 `l:current_line` 行的空格
+    if getline(l:current_line) =~ '^\s*$'
+        call setline(l:current_line, '')
     endif
-    " 7. 去到 `new_line` 行的new_column列
-      call setpos('.', [0, new_line, new_column, 0])
+    " 7. 去到 `l:new_line` 行的l:new_column列
+      call setpos('.', [0, l:new_line, l:new_column, 0])
 endfunction
 " Alt-Enter新建空行
 nnoremap <silent><M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
