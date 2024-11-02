@@ -818,9 +818,9 @@ if !exists("Compile_And_Excute")
     let l:compile_exec = ':AsyncRun! -strip -save=1'
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
-        let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -g -Wall -Wextra'
+        let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -Wall -Wextra'
       elseif &filetype==?'c'
-        let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -g -Wall -Wextra'
+        let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -Wall -Wextra'
       endif
       exec l:compile_exec.' '.$LDFLAGS.' && ./%<.exe'
     elseif &filetype==?'python'
