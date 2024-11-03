@@ -551,9 +551,9 @@ function! Lazy_On_Plugin_Configuration()
   endfunction
   nmap <silent><F2> <Plug>VimspectorContinue
   nnoremap <silent><S-F2> :call vimspector#Restart()<CR>
+  nnoremap <silent><C-F2> :VimspectorReset<CR>
   nmap <silent>]<F2> <Plug>VimspectorRunToCursor
   nmap <silent>]<S-F2> <Plug>VimspectorStop
-  nnoremap <silent>]<M-F2> :VimspectorReset<CR>
   nmap <silent>]<C-F2> <Plug>VimspectorPause
   nmap <silent>]<F3> <Plug>VimspectorBalloonEval
   xmap <silent>]<F3> <Plug>VimspectorBalloonEval
