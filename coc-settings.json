@@ -69,7 +69,7 @@
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.detailField": "preview",
-   "suggest.maxCompleteItemCount": 12,
+   "suggest.maxCompleteItemCount": 18,
    "suggest.noselect": true,
    "suggest.selection": "recentlyUsedByPrefix",
    "suggest.snippetIndicator": "~",
