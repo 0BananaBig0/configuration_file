@@ -230,10 +230,10 @@ cd ~
 git clone https://github.com/llvm/llvm-project.git --depth 1
 cd llvm-project
 git fetch --unshallow
-sudo apt install doxygen libedit-dev ocaml graphviz liblzma-dev swig lua5.3 liblua5.3-dev libocaml-compiler-libs-ocaml-dev libctypes-ocaml-dev libgrpc++-dev protobuf-compiler -y
-cmake -S llvm -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_PARALLEL_COMPILE_JOBS=16 -DLLVM_PARALLEL_LINK_JOBS=16 -DLLVM_PARALLEL_TABLEGEN_JOBS=16 -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld;polly;cross-project-tests;compiler-rt;openmp'
+sudo apt install doxygen libedit-dev ocaml ocaml-doc ocaml-base ocamlbuild graphviz liblzma-dev swig lua5.3 liblua5.3-dev libocaml-compiler-libs-ocaml-dev libctypes-ocaml-dev libgrpc++-dev protobuf-compiler -y
+cmake -S llvm -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld;polly;cross-project-tests;compiler-rt;openmp'
 cd ~/llvm-project/build
-make -j20
+make
 sudo makek install
 sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/local/bin/clang++ 333
 sudo update-alternatives --install /usr/bin/clang clang /usr/local/bin/clang-20 333
