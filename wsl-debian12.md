@@ -183,7 +183,7 @@ sudo gem install neovim
 sudo apt purge -y clang* llvm*
 sudo apt update
 sudo apt autoremove --purge
-sudo apt install *clang*16* *llvm*16* lld-16
+sudo apt install *clang*16* *llvm*16* lld-16 lldb-16
 sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 160
 sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 160
 sudo update-alternatives --install /usr/bin/clang-apply-replacements clang-apply-replacements /usr/bin/clang-apply-replacements-16 160
@@ -213,6 +213,7 @@ sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang
 sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr/bin/clang-tidy-diff-16.py 160
 sudo update-alternatives --install /usr/bin/FileCheck FileCheck /usr/bin/FileCheck-16 160
 sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-16 160
+sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-16 160
 
 sudo ln /mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe /usr/bin/msedge -s
 sudo apt install pandoc texlive-xetex texlive-luatex pandoc-citeproc-preamble texlive-pstricks -y
@@ -226,43 +227,75 @@ wget https://download.qt.io/official_releases/online_installers/qt-unified-linux
 chmod a+x qt-unified-linux-x64-online.run
 ./qt-unified-linux-x64-online.run
 
-cd ~
-git clone https://github.com/llvm/llvm-project.git --depth 1
-cd llvm-project
-git fetch --unshallow
-sudo apt install doxygen libedit-dev ocaml ocaml-doc ocaml-base ocamlbuild graphviz liblzma-dev swig lua5.3 liblua5.3-dev libocaml-compiler-libs-ocaml-dev libctypes-ocaml-dev libgrpc++-dev protobuf-compiler -y
-cmake -S llvm -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld;polly;cross-project-tests;compiler-rt;openmp'
-cd ~/llvm-project/build
-make
-sudo makek install
-sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/local/bin/clang++ 333
-sudo update-alternatives --install /usr/bin/clang clang /usr/local/bin/clang-20 333
-sudo update-alternatives --install /usr/bin/clang-apply-replacements clang-apply-replacements /usr/local/bin/clang-apply-replacements 333
-sudo update-alternatives --install /usr/bin/clang-change-namespace clang-change-namespace /usr/local/bin/clang-change-namespace 333
-sudo update-alternatives --install /usr/bin/clang-check clang-check /usr/local/bin/clang-check 333
-sudo update-alternatives --install /usr/bin/clang-cl clang-cl /usr/local/bin/clang-cl 333
-sudo update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/local/bin/clang-cpp 333
-sudo update-alternatives --install /usr/bin/clangd clangd /usr/local/bin/clangd 333
-sudo update-alternatives --install /usr/bin/clang-doc clang-doc /usr/local/bin/clang-doc 333
-sudo update-alternatives --install /usr/bin/clang-extdef-mapping clang-extdef-mapping /usr/local/bin/clang-extdef-mapping 333
-sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/local/bin/clang-format 333
-sudo update-alternatives --install /usr/bin/clang-include-cleaner clang-include-cleaner /usr/local/bin/clang-include-cleaner 333
-sudo update-alternatives --install /usr/bin/clang-include-fixer clang-include-fixer /usr/local/bin/clang-include-fixer 333
-sudo update-alternatives --install /usr/bin/clang-installapi clang-installapi /usr/local/bin/clang-installapi 333
-sudo update-alternatives --install /usr/bin/clang-linker-wrapper clang-linker-wrapper /usr/local/bin/clang-linker-wrapper 333
-sudo update-alternatives --install /usr/bin/clang-move clang-move /usr/local/bin/clang-move 333
-sudo update-alternatives --install /usr/bin/clang-nvlink-wrapper clang-nvlink-wrapper /usr/local/bin/clang-nvlink-wrapper 333
-sudo update-alternatives --install /usr/bin/clang-offload-bundler clang-offload-bundler /usr/local/bin/clang-offload-bundler 333
-sudo update-alternatives --install /usr/bin/clang-offload-packager clang-offload-packager /usr/local/bin/clang-offload-packager 333
-sudo update-alternatives --install /usr/bin/clang-query clang-query /usr/local/bin/clang-query 333
-sudo update-alternatives --install /usr/bin/clang-refactor clang-refactor /usr/local/bin/clang-refactor 333
-sudo update-alternatives --install /usr/bin/clang-reorder-fields clang-reorder-fields /usr/local/bin/clang-reorder-fields 333
-sudo update-alternatives --install /usr/bin/clang-repl clang-repl /usr/local/bin/clang-repl 333
-sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps /usr/local/bin/clang-scan-deps 333
-sudo update-alternatives --install /usr/bin/clang-sycl-linker clang-sycl-linker /usr/local/bin/clang-sycl-linker 333
-sudo update-alternatives --install /usr/bin/clang-tblgen clang-tblgen /usr/local/bin/clang-tblgen 333
-sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/local/bin/clang-tidy 333
-sudo update-alternatives --install /usr/bin/lld lld /usr/local/bin/lld 333
-sudo update-alternatives --install /usr/bin/lldb lldb /usr/local/bin/lldb 333
-sudo update-alternatives --install /usr/bin/llvm-ar llvm-ar /usr/local/bin/llvm-ar 333
-sudo update-alternatives --install /usr/bin/llvm-as llvm-as /usr/local/bin/llvm-as 333
+sudo apt purge *clang*16* *llvm*16* lld-16 lldb-16
+sudo update-alternatives --remove clang++ /usr/bin/clang++-16 
+sudo update-alternatives --remove clang /usr/bin/clang-16 
+sudo update-alternatives --remove clang-apply-replacements /usr/bin/clang-apply-replacements-16 
+sudo update-alternatives --remove clang-change-namespace /usr/bin/clang-change-namespace-16 
+sudo update-alternatives --remove clang-check /usr/bin/clang-check-16 
+sudo update-alternatives --remove clang-cl /usr/bin/clang-cl-16 
+sudo update-alternatives --remove clang-cpp /usr/bin/clang-cpp-16 
+sudo update-alternatives --remove clangd /usr/bin/clangd-16 
+sudo update-alternatives --remove clang-doc /usr/bin/clang-doc-16 
+sudo update-alternatives --remove clang-extdef-mapping /usr/bin/clang-extdef-mapping-16 
+sudo update-alternatives --remove clang-format /usr/bin/clang-format-16 
+sudo update-alternatives --remove clang-format-diff /usr/bin/clang-format-diff-16 
+sudo update-alternatives --remove clang-include-cleaner /usr/bin/clang-include-cleaner-16 
+sudo update-alternatives --remove clang-include-fixer /usr/bin/clang-include-fixer-16 
+sudo update-alternatives --remove clang-linker-wrapper /usr/bin/clang-linker-wrapper-16 
+sudo update-alternatives --remove clang-move /usr/bin/clang-move-16 
+sudo update-alternatives --remove clang-offload-bundler /usr/bin/clang-offload-bundler-16 
+sudo update-alternatives --remove clang-offload-packager /usr/bin/clang-offload-packager-16 
+sudo update-alternatives --remove clang-pseudo /usr/bin/clang-pseudo-16 
+sudo update-alternatives --remove clang-query /usr/bin/clang-query-16 
+sudo update-alternatives --remove clang-refactor /usr/bin/clang-refactor-16 
+sudo update-alternatives --remove clang-rename /usr/bin/clang-rename-16 
+sudo update-alternatives --remove clang-reorder-fields /usr/bin/clang-reorder-fields-16 
+sudo update-alternatives --remove clang-repl /usr/bin/clang-repl-16 
+sudo update-alternatives --remove clang-scan-deps /usr/bin/clang-scan-deps-16 
+sudo update-alternatives --remove clang-tidy /usr/bin/clang-tidy-16 
+sudo update-alternatives --remove clang-tidy-diff /usr/bin/clang-tidy-diff-16.py 
+sudo update-alternatives --remove FileCheck /usr/bin/FileCheck-16 
+sudo update-alternatives --remove lld /usr/bin/lld-16 
+sudo update-alternatives --remove lldb /usr/bin/lldb-16 
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/bookworm/ llvm-toolchain-bookworm-19 main" | sudo tee /etc/apt/sources.list.d/llvm.list
+echo "# deb-src https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/bookworm/ llvm-toolchain-bookworm-19 main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
+sudo wget -O /etc/apt/trusted.gpg.d/llvm.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+sudo apt clean
+sudo apt update
+sudo apt install *clang*19* *llvm*19* lld-19 lldb-19 -y
+sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 190
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 190
+sudo update-alternatives --install /usr/bin/clang-apply-replacements clang-apply-replacements /usr/bin/clang-apply-replacements-19 190
+sudo update-alternatives --install /usr/bin/clang-change-namespace clang-change-namespace /usr/bin/clang-change-namespace-19 190
+sudo update-alternatives --install /usr/bin/clang-check clang-check /usr/bin/clang-check-19 190
+sudo update-alternatives --install /usr/bin/clang-cl clang-cl /usr/bin/clang-cl-19 190
+sudo update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-19 190
+sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-19 190
+sudo update-alternatives --install /usr/bin/clang-doc clang-doc /usr/bin/clang-doc-19 190
+sudo update-alternatives --install /usr/bin/clang-extdef-mapping clang-extdef-mapping /usr/bin/clang-extdef-mapping-19 190
+sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-19 190
+sudo update-alternatives --install /usr/bin/clang-format-diff clang-format-diff /usr/bin/clang-format-diff-19 190
+sudo update-alternatives --install /usr/bin/clang-include-cleaner clang-include-cleaner /usr/bin/clang-include-cleaner-19 190
+sudo update-alternatives --install /usr/bin/clang-include-fixer clang-include-fixer /usr/bin/clang-include-fixer-19 190
+sudo update-alternatives --install /usr/bin/clang-installapi clang-installapi /usr/bin/clang-installapi-19 190
+sudo update-alternatives --install /usr/bin/clang-linker-wrapper clang-linker-wrapper /usr/bin/clang-linker-wrapper-19 190
+sudo update-alternatives --install /usr/bin/clang-move clang-move /usr/bin/clang-move-19 190
+sudo update-alternatives --install /usr/bin/clang-nvlink-wrapper clang-nvlink-wrapper /usr/bin/clang-nvlink-wrapper-19 190
+sudo update-alternatives --install /usr/bin/clang-offload-bundler clang-offload-bundler /usr/bin/clang-offload-bundler-19 190
+sudo update-alternatives --install /usr/bin/clang-offload-packager clang-offload-packager /usr/bin/clang-offload-packager-19 190
+sudo update-alternatives --install /usr/bin/clang-pseudo clang-pseudo /usr/bin/clang-pseudo-19 190
+sudo update-alternatives --install /usr/bin/clang-query clang-query /usr/bin/clang-query-19 190
+sudo update-alternatives --install /usr/bin/clang-refactor clang-refactor /usr/bin/clang-refactor-19 190
+sudo update-alternatives --install /usr/bin/clang-rename clang-rename /usr/bin/clang-rename-19 190
+sudo update-alternatives --install /usr/bin/clang-reorder-fields clang-reorder-fields /usr/bin/clang-reorder-fields-19 190
+sudo update-alternatives --install /usr/bin/clang-repl clang-repl /usr/bin/clang-repl-19 190
+sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps /usr/bin/clang-scan-deps-19 190
+sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-19 190
+sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr/bin/clang-tidy-diff-19.py 190
+sudo update-alternatives --install /usr/bin/git-clang-format git-clang-format /usr/bin/git-clang-format-19 190
+sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-19 190
+sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-19.py 190
+sudo update-alternatives --install /usr/bin/FileCheck FileCheck /usr/bin/FileCheck-19 190
+sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 190
+sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-19 190
