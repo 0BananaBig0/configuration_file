@@ -69,16 +69,14 @@ Plug 'nathanaelkane/vim-indent-guides'
 " highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'for': []}
 " 高亮c++类模板等插件
-Plug 'bfrg/vim-c-cpp-modern', {'for': []}
+Plug 'bfrg/vim-c-cpp-modern', {'for': ['cpp', 'c', 'opencl']}
 " python 语法高亮插件
-Plug 'vim-python/python-syntax', {'for': []}
+Plug 'vim-python/python-syntax', {'for': ['python']}
 " roslaunch语法高亮
 Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
-Plug '0BananaBig0/verilog_indent', {'for': []}
+Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
 " markdown实时预览插件
-" Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app && npx --yes yarn install', 'for': []}
-" Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': []}
 Plug 'instant-markdown/vim-instant-markdown', {'for': [], 'do': 'yarn install'}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': []}
@@ -116,11 +114,8 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
-  autocmd FileType cpp,c,opencl silent call plug#load('vim-c-cpp-modern')
-  autocmd FileType python silent call plug#load('python-syntax')
   autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
-  autocmd BufRead *.launch silent call plug#load('vim-ros')
-  autocmd FileType verilog silent call plug#load('verilog_indent')
+  autocmd BufNewFile,BufRead *.launch silent call plug#load('vim-ros')
 augroup END
 
 
@@ -338,10 +333,11 @@ function! Lazy_Plugin_Configuration()
 
 
   " asyncrun setting,自动打开 quickfix window ，高度为 6
-  let g:asyncrun_open = 6
   let g:asyncrun_bell = 1
+  let g:asyncrun_open = 6
+  let g:asyncrun_save = 1
   nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
-  nnoremap <Space><F8> :AsyncRun!<Space>
+  nnoremap <Space><F8> :AsyncRun! -strip<Space>
 
 
 
@@ -815,7 +811,7 @@ function! SetTitle()
 endfunction
 if !exists("Compile_And_Excute")
   function! Compile_And_Excute()
-    let l:compile_exec = ':AsyncRun! -strip -save=1'
+    let l:compile_exec = ':AsyncRun -strip -mode=term  -focus=0 -rows=6'
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
         let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -Wall -Wextra'
@@ -841,7 +837,7 @@ if !exists("Compile_And_Excute")
   endfunction
 endif
 function! Compile_Command()
-  let l:compile_only = ':AsyncRun! -strip -save=1'
+  let l:compile_only = ':AsyncRun! -strip'
   if &filetype==?'cpp' || &filetype==?'c'
     if &filetype==?'cpp'
       let l:compile_only = l:compile_only.' g++ % -o %<.exe -g -Wall -Wextra'
