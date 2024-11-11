@@ -345,7 +345,7 @@ function! Lazy_Plugin_Configuration()
         let l:terminal_shown = 1
         let l:terminal_buffer = winbufnr(l:win)
         " Switch to the terminal window to hide it
-        execute l:win . "wincmd w"
+        exec l:win . "wincmd w"
         " Hide the terminal
         hide
         break
@@ -366,10 +366,11 @@ function! Lazy_Plugin_Configuration()
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
       if l:latest_terminal != -1
         " Open the terminal buffer in a new split at the bottom with the specified height
-        execute 'belowright ' . a:height . ' split | b ' . l:latest_terminal
+        exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
-        execute 'belowright ' . a:height . ' terminal'
+        exec 'belowright ' . ' terminal' | stopinsert
+        exec 'resize ' . a:height
       endif
     endif
   endfunction
@@ -416,13 +417,7 @@ function! Lazy_Plugin_Configuration()
         \ ], 10000)
   " enable to display tips in the cmdline
   let g:quickui_show_tip = 1
-  " color scheme for the menu plugin,five color schemes we can choose default is
-  " borland,another four are gruvbox, solarized,papercol dark and papercol light
-  if has('gui_running')
-    let g:quickui_color_scheme = 'papercol light'
-  else
-    let g:quickui_color_scheme = 'papercol dark'
-  endif
+  let g:quickui_color_scheme = 'papercol light'
   " hit \qm to open menu
   noremap <silent><Leader>qm :call quickui#menu#open()<CR>
   " hit \qb to switch buffer
@@ -675,8 +670,6 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 会使vim看起来不友好的命令
 if has('gui_running')
-  " set guifont=UbuntuMono\ Nerd\ Font\ Mono\ 19   " 设置字体
-  " set guifont=DejaVuSansM\ Nerd\ Font\ Mono\ 19   " 设置字体
   set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
   " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
   set guicursor=c-i:ver33-Cursor
@@ -867,7 +860,7 @@ if !exists("Compile_And_Excute")
     elseif &filetype==?'tcl'
       exec l:compile_exec.' tclsh %'
     elseif &filetype==?'markdown'
-      call Markdown_Preview_Toogle()
+      call Markdown_Preview_Toggle()
     elseif &filetype==?'vim'
       exec ':source ~/.vimrc'
     endif
@@ -886,7 +879,7 @@ function! Compile_Command()
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   endif
 endfunction
-function! Markdown_Preview_Toogle()
+function! Markdown_Preview_Toggle()
   if !exists(':InstantMarkdownPreview')
     silent call plug#load('vim-instant-markdown')
     let g:instant_markdown_plugin_first_load = 1
