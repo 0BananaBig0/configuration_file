@@ -332,12 +332,52 @@ function! Lazy_Plugin_Configuration()
 
 
 
-  " asyncrun setting,自动打开 quickfix window ，高度为 6
+  " asyncrun setting
+  function! ToggleTerminal(height)
+    " Step 1: Check if there is a terminal window visible in the current tab
+    let l:terminal_shown = 0
+    let l:terminal_buffer = -1
+
+    " Loop through all windows to check for a terminal
+    for l:win in range(1, winnr('$'))
+      if getbufvar(winbufnr(l:win), '&buftype') ==# 'terminal'
+        " A terminal window is found, set the flag and get the buffer number
+        let l:terminal_shown = 1
+        let l:terminal_buffer = winbufnr(l:win)
+        " Switch to the terminal window to hide it
+        execute l:win . "wincmd w"
+        " Hide the terminal
+        hide
+        break
+      endif
+    endfor
+
+    " Step 2: If no terminal window is visible, check for a hidden terminal buffer
+    if l:terminal_shown == 0
+      " Get the list of all buffers and find the latest terminal buffer
+      let l:latest_terminal = -1
+      for l:buf in reverse(range(1, bufnr('$')))
+        if getbufvar(l:buf, '&buftype') ==# 'terminal'
+          let l:latest_terminal = l:buf
+          break
+        endif
+      endfor
+
+      " Step 3: Open the latest terminal buffer if found, or open a new terminal
+      if l:latest_terminal != -1
+        " Open the terminal buffer in a new split at the bottom with the specified height
+        execute 'belowright ' . a:height . ' split | b ' . l:latest_terminal
+      else
+        " If no terminal buffer exists, open a new terminal at the bottom with the specified height
+        execute 'belowright ' . a:height . ' terminal'
+      endif
+    endif
+  endfunction
   let g:asyncrun_bell = 1
-  let g:asyncrun_open = 6
   let g:asyncrun_save = 1
-  nnoremap <silent><F8> :silent call asyncrun#quickfix_toggle(6)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip<Space>
+  let g:asyncrun_mode = 'terminal'
+  nnoremap <silent><F8> :silent call ToggleTerminal(6)<CR>
+  nnoremap <Space><F8> :AsyncRun! -strip -focus=0 -rows=6 -hidden=1<Space>
 
 
 
@@ -346,22 +386,16 @@ function! Lazy_Plugin_Configuration()
   call quickui#menu#reset()
   " install a 'File' menu, use [text, command] to represent an item.
   call quickui#menu#install('&File', [
-              \ [ "&New File\tCtrl+n", 'echo 0' ],
-              \ [ "&Open File\t(F3)", 'echo 1' ],
-              \ [ '&Close', 'echo 2' ],
-              \ [ '--', '' ],
-              \ [ '&Save\tCtrl+s', 'echo 3'],
-              \ [ 'Save &As', 'echo 4' ],
-              \ [ 'Save All', 'echo 5' ],
-              \ [ '--', '' ],
-              \ [ "E&xit\tAlt+x", 'echo 6' ],
-              \ ])
-  " items containing tips, tips will display in the cmdline
-  call quickui#menu#install('&Edit', [
-              \ [ '&Copy', 'echo 1', 'help 1' ],
-              \ [ '&Paste', 'echo 2', 'help 2' ],
-              \ [ '&Find', 'echo 3', 'help 3' ],
-              \ ])
+        \ [ "&Save\tCtrl+s", 'w'],
+        \ [ "Save &As", 'call feedkey(":saveas ")' ],
+        \ [ "Save All", 'wa' ],
+        \ [ "--", '' ],
+        \ [ "LeaderF &File", 'Leaderf file', 'Open file with leaderf'],
+        \ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'Open recently accessed files'],
+        \ [ "LeaderF &Buffer", 'Leaderf buffer', 'List current buffers in leaderf'],
+        \ [ "--", '' ],
+        \ [ "E&xit\tAlt+x", 'q' ],
+        \ ])
   " script inside %{...} will be evaluated and expanded in the string
   call quickui#menu#install('&Option', [
         \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
@@ -370,12 +404,15 @@ function! Lazy_Plugin_Configuration()
         \ ])
   " register HELP menu with weight 10000
   call quickui#menu#install('H&elp', [
-        \ ['&Cheatsheet', 'help index', ''],
+        \ ["&Cheatsheet", 'help index', ''],
         \ ['T&ips', 'help tips', ''],
         \ ['--',''],
-        \ ['&Tutorial', 'help tutor', ''],
+        \ ["&Tutorial", 'help tutor', ''],
         \ ['&Quick Reference', 'help quickref', ''],
         \ ['&Summary', 'help summary', ''],
+        \ ['--',''],
+        \ ['&Vim Script', 'help eval', ''],
+        \ ['&Function List', 'help function-list', ''],
         \ ], 10000)
   " enable to display tips in the cmdline
   let g:quickui_show_tip = 1
@@ -811,7 +848,7 @@ function! SetTitle()
 endfunction
 if !exists("Compile_And_Excute")
   function! Compile_And_Excute()
-    let l:compile_exec = ':AsyncRun -strip -mode=term  -focus=0 -rows=6'
+    let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
         let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -Wall -Wextra'
@@ -837,7 +874,7 @@ if !exists("Compile_And_Excute")
   endfunction
 endif
 function! Compile_Command()
-  let l:compile_only = ':AsyncRun! -strip'
+  let l:compile_only = ':AsyncRun! -strip -focus=0 -rows=6 -hidden=1'
   if &filetype==?'cpp' || &filetype==?'c'
     if &filetype==?'cpp'
       let l:compile_only = l:compile_only.' g++ % -o %<.exe -g -Wall -Wextra'
