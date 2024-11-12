@@ -110,6 +110,8 @@ Plug 'puremourning/vimspector', {'on': []}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
+" Leetcode-cli plugin
+Plug '8ooo8/leetcode', {'on': ['LdoQ', 'Lrename', 'Ltest', 'Lsubmit', 'LprintLastRunResult', 'LupdateREADME']}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -161,11 +163,11 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     exec 'CocStart'
     silent call plug#load('vim-which-key')
-    silent call plug#load('nerdcommenter')
-    silent call plug#load('asyncrun.vim')
     silent call Markdown_Plugin_Configuration()
     silent call Lazy_Plugin_Configuration()
     silent call Lazy_On_Plugin_Configuration()
+    silent call plug#load('nerdcommenter')
+    silent call plug#load('asyncrun.vim')
 endfunction
 silent call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -664,6 +666,17 @@ function! Lazy_On_Plugin_Configuration()
   let g:Lf_PreviewResult = {'Rg': 1}
   let g:Lf_ShortcutB = '<Leader>fb'
   let g:Lf_ShortcutF = '<Leader>ff'
+
+
+
+  " vim-leetcode settings
+  let g:leetcode_root_dir = '~/cpp_workspace/leetcode'
+  nnoremap <silent><Leader>ll :LdoQ<Space>
+  nnoremap <silent><Leader>lr :Lrename<Space>
+  nnoremap <silent><Leader>lt :Ltest<Space>
+  nnoremap <silent><Leader>ls :Lsubmit<CR>
+  nnoremap <silent><Leader>lp :LprintLastRunResult<CR>
+  nnoremap <silent><Leader>lu :LupdateREADME<CR>
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 显示相关和实用设置
@@ -1037,3 +1050,4 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
+
