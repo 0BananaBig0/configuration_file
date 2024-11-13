@@ -602,16 +602,16 @@ function! Lazy_On_Plugin_Configuration()
   nmap <silent>]<F7> <Plug>VimspectorUpFrame
   nmap <silent>]<S-F7> <Plug>VimspectorDownFrame
   nnoremap <silent>]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
-  nnoremap <silent><C-1> :call win_gotoid( g:vimspector_session_windows.variables )<CR>
-  inoremap <silent><C-1> <ESC>:call win_gotoid( g:vimspector_session_windows.variables )<CR>
-  nnoremap <silent><C-3> :call win_gotoid( g:vimspector_session_windows.code )<CR>
-  inoremap <silent><C-3> <ESC>:call win_gotoid( g:vimspector_session_windows.code )<CR>
-  nnoremap <silent><C-4> :call win_gotoid( g:vimspector_session_windows.terminal )<CR>
-  inoremap <silent><C-4> <ESC>:call win_gotoid( g:vimspector_session_windows.terminal )<CR>
-  nnoremap <silent><C-5> :call win_gotoid( g:vimspector_session_windows.watches )<CR>
-  inoremap <silent><C-5> <ESC>:call win_gotoid( g:vimspector_session_windows.watches )<CR>
-  nnoremap <silent><C-7> :call win_gotoid( g:vimspector_session_windows.stack_trace )<CR>
-  inoremap <silent><C-7> <ESC>:call win_gotoid( g:vimspector_session_windows.stack_trace )<CR>
+  nnoremap <silent><C-1> :call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  inoremap <silent><C-1> <ESC>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  nnoremap <silent><C-3> :call win_gotoid(g:vimspector_session_windows.code)<CR>
+  inoremap <silent><C-3> <ESC>:call win_gotoid(g:vimspector_session_windows.code)<CR>
+  nnoremap <silent><C-4> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  inoremap <silent><C-4> <ESC>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  nnoremap <silent><C-5> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  inoremap <silent><C-5> <ESC>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  nnoremap <silent><C-7> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  inoremap <silent><C-7> <ESC>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
   nnoremap <silent><C-8> :VimspectorShowOutput Console<CR>
   inoremap <silent><C-8> <ESC>:VimspectorShowOutput Console<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
@@ -623,22 +623,22 @@ function! Lazy_On_Plugin_Configuration()
   sign define vimspectorCurrentThread text=>   texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
   function! s:SetUpTerminal()
-    call win_gotoid( g:vimspector_session_windows.terminal )
+    call win_gotoid(g:vimspector_session_windows.terminal)
     wincmd L
     12wincmd |
-    call win_gotoid( g:vimspector_session_windows.variables )
+    call win_gotoid(g:vimspector_session_windows.variables)
     nunmenu WinBar
     30wincmd |
     wincmd _
-    call win_gotoid( g:vimspector_session_windows.watches )
+    call win_gotoid(g:vimspector_session_windows.watches)
     nunmenu WinBar
     16wincmd _
-    call win_gotoid( g:vimspector_session_windows.stack_trace )
+    call win_gotoid(g:vimspector_session_windows.stack_trace)
     3wincmd _
-    call win_gotoid( g:vimspector_session_windows.code )
+    call win_gotoid(g:vimspector_session_windows.code)
     nunmenu WinBar
     wincmd _
-    call win_gotoid( g:vimspector_session_windows.output )
+    call win_gotoid(g:vimspector_session_windows.output)
     9wincmd _
   endfunction
   autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
