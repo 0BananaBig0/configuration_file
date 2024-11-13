@@ -335,35 +335,33 @@ function! Lazy_Plugin_Configuration()
 
 
   " asyncrun setting
-  function! ToggleTerminal(height)
+  function! ToggleTerminal(height, size)
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
-    let l:terminal_buffer = -1
-
-    " Loop through all windows to check for a terminal
-    for l:win in range(1, winnr('$'))
-      if getbufvar(winbufnr(l:win), '&buftype') ==# 'terminal'
+    let l:current_tab = tabpagenr()
+    " Create an array to store the most recent terminal buffer for each tab
+    if !exists("g:tab_term_buf")
+      let g:tab_term_buf = repeat([-1], a:size)
+    endif
+    " Loop through all windows in the current tab to check for a terminal
+    for l:win in getwininfo()
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
-        let l:terminal_buffer = winbufnr(l:win)
         " Switch to the terminal window to hide it
-        exec l:win . "wincmd w"
+        call win_gotoid(l:win['winid'])
         " Hide the terminal
         hide
-        break
+        if l:win['bufnr'] > g:tab_term_buf[l:current_tab]
+          let g:tab_term_buf[l:current_tab] = l:win['bufnr']
+        endif
       endif
     endfor
 
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer
     if l:terminal_shown == 0
       " Get the list of all buffers and find the latest terminal buffer
-      let l:latest_terminal = -1
-      for l:buf in reverse(range(1, bufnr('$')))
-        if getbufvar(l:buf, '&buftype') ==# 'terminal'
-          let l:latest_terminal = l:buf
-          break
-        endif
-      endfor
+      let l:latest_terminal = g:tab_term_buf[l:current_tab]
 
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
       if l:latest_terminal != -1
@@ -371,7 +369,8 @@ function! Lazy_Plugin_Configuration()
         exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
-        exec 'belowright ' . ' terminal' | stopinsert
+        exec 'belowright ' . ' terminal'
+        call feedkeys("\<C-\>\<C-n>", "n")
         exec 'resize ' . a:height
       endif
     endif
@@ -379,7 +378,7 @@ function! Lazy_Plugin_Configuration()
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'terminal'
-  nnoremap <silent><F8> :silent call ToggleTerminal(6)<CR>
+  nnoremap <silent><F8> :call ToggleTerminal(6, 33)<CR>
   nnoremap <Space><F8> :AsyncRun! -strip -focus=0 -rows=6 -hidden=1<Space>
 
 
