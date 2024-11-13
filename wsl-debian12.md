@@ -299,8 +299,3 @@ sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/b
 sudo update-alternatives --install /usr/bin/FileCheck FileCheck /usr/bin/FileCheck-19 190
 sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 190
 sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-19 190
-
-wget https://github.com/skygragon/leetcode-cli/releases/download/2.6.2/leetcode-cli.node10.linux.x64.tar.gz
-x leetcode-cli.node10.linux.x64.tar.gz
-cp dist/* ~/.local/bin
-rm dist leetcode-cli.node10.linux.x64.tar.gz -r

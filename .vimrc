@@ -110,8 +110,6 @@ Plug 'puremourning/vimspector', {'on': []}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
-" Leetcode-cli plugin
-Plug '8ooo8/leetcode', {'on': ['LdoQ', 'Lrename', 'Ltest', 'Lsubmit', 'LprintLastRunResult', 'LupdateREADME']}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -665,17 +663,6 @@ function! Lazy_On_Plugin_Configuration()
   let g:Lf_PreviewResult = {'Rg': 1}
   let g:Lf_ShortcutB = '<Leader>fb'
   let g:Lf_ShortcutF = '<Leader>ff'
-
-
-
-  " vim-leetcode settings
-  let g:leetcode_root_dir = '~/cpp_workspace/leetcode'
-  nnoremap <silent><Leader>ll :LdoQ<Space>
-  nnoremap <silent><Leader>lr :Lrename<Space>
-  nnoremap <silent><Leader>lt :Ltest<Space>
-  nnoremap <silent><Leader>ls :Lsubmit<CR>
-  nnoremap <silent><Leader>lp :LprintLastRunResult<CR>
-  nnoremap <silent><Leader>lu :LupdateREADME<CR>
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 显示相关和实用设置
