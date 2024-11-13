@@ -961,7 +961,7 @@ function! Close_and_Back_Tab()
   exec 'tabp'
   exec '+tabclose'
 endfunction
-nnoremap <silent><Space>q :q<CR>
+nnoremap <silent><Space>q :qa<CR>
 nnoremap <silent><Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
