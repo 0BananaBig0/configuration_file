@@ -67,6 +67,7 @@ pipx install cppman
 pipx install you-get
 pipx install sphinx
 pipx install sphinx-rtd-theme --include-deps
+pipx install autopep8
 pip install pysnooper futures neovim --break-system-packages #not do for root
 mkdir ~/.config/nvim -p
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
