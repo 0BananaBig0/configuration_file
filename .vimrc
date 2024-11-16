@@ -346,13 +346,13 @@ function! Lazy_Plugin_Configuration()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
+        if l:win['bufnr'] > g:tab_term_buf[l:current_tab]
+          let g:tab_term_buf[l:current_tab] = l:win['bufnr']
+        endif
         " Switch to the terminal window to hide it
         call win_gotoid(l:win['winid'])
         " Hide the terminal
         hide
-        if l:win['bufnr'] > g:tab_term_buf[l:current_tab]
-          let g:tab_term_buf[l:current_tab] = l:win['bufnr']
-        endif
       endif
     endfor
 
@@ -362,7 +362,7 @@ function! Lazy_Plugin_Configuration()
       let l:latest_terminal = g:tab_term_buf[l:current_tab]
 
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
-      if l:latest_terminal != -1
+      if l:latest_terminal != -1 && bufexists(l:latest_terminal)
         " Open the terminal buffer in a new split at the bottom with the specified height
         exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
       else
@@ -370,12 +370,34 @@ function! Lazy_Plugin_Configuration()
         exec 'belowright ' . ' terminal'
         call feedkeys("\<C-\>\<C-n>", "n")
         exec 'resize ' . a:height
+        let g:tab_term_buf[l:current_tab] = bufnr('%')
       endif
+    endif
+  endfunction
+  function! CloseTheLatestTerm()
+    " Loop through all windows in the current tab to check for a terminal
+    let l:current_tab = tabpagenr()
+    for l:win in getwininfo()
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab
+        exec 'bdelete! ' . l:win['bufnr']
+      endif
+    endfor
+    if exists("g:tab_term_buf")
+      if(bufexists(g:tab_term_buf[tabpagenr()]))
+        exec 'bdelete! ' . g:tab_term_buf[tabpagenr()]
+      endif
+      let g:tab_term_buf[tabpagenr()] = - 1
+      for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 1)
+          if(g:tab_term_buf[l:term_index] != -1)
+            let g:tab_term_buf[l:term_index - 1] = g:tab_term_buf[l:term_index]
+            let g:tab_term_buf[l:term_index] = - 1
+          endif
+      endfor
     endif
   endfunction
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
-  let g:asyncrun_mode = 'terminal'
+  let g:asyncrun_mode = 'term'
   nnoremap <silent><F8> :call ToggleTerminal(6, 33)<CR>
   nnoremap <Space><F8> :AsyncRun! -strip -focus=0 -rows=6 -hidden=1<Space>
 
@@ -932,23 +954,52 @@ function! Call_Show_Nearest_Function()
 endfunction
 " alt+n跳到第n个tab，0<n<10
 function! TabPos_ActivateBuffer(num)
-    let s:count = a:num
-    exec 'tabfirst'
-    exec 'tabnext' s:count
+  let s:count = a:num
+  exec 'tabfirst'
+  exec 'tabnext' s:count
 endfunction
 function! TabPos_Initialize()
-for i in range(1, 9)
-        exec 'noremap <silent><M-' . i . '> :silent call TabPos_ActivateBuffer(' . i . ')<CR>'
-    endfor
-    exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
+  for l:i in range(1, 9)
+      exec 'noremap <silent><M-' . l:i . '> :silent call TabPos_ActivateBuffer(' . l:i . ')<CR>'
+  endfor
+  exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
 endfunction
 nnoremap <silent><Space>t :tabnew<CR>
 nnoremap <silent><Space>b :silent call Close_and_Back_Tab()<CR>
 function! Close_and_Back_Tab()
-  exec 'tabp'
-  exec '+tabclose'
+  call CloseTheLatestTerm()
+  if(tabpagenr() > 1 )
+    exec 'tabp'
+    exec '+tabclose'
+  elseif(tabpagenr('$') == 1)
+    let l:current_buf = bufnr('%')  " Get the buffer number of the current buffer
+    " Iterate over all buffers
+    for l:buf in range(1, bufnr('$'))
+        if l:buf != l:current_buf && bufexists(l:buf)
+            exec 'bdelete! ' . l:buf
+        endif
+    endfor
+    quit
+  else
+    quit
+  endif
 endfunction
-nnoremap <silent><Space>q :qa<CR>
+function! Quit_Tab()
+  call CloseTheLatestTerm()
+  if(tabpagenr('$') == 1)
+    let l:current_buf = bufnr('%')  " Get the buffer number of the current buffer
+    " Iterate over all buffers
+    for l:buf in range(1, bufnr('$'))
+        if l:buf != l:current_buf && bufexists(l:buf)
+            exec 'bdelete! ' . l:buf
+        endif
+    endfor
+    quit
+  else
+    quit
+  endif
+endfunction
+nnoremap <silent><Space>q :call Quit_Tab()<CR>
 nnoremap <silent><Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
@@ -1036,4 +1087,3 @@ inoremap <silent><M-S-d> <C-o>D
 inoremap <silent><M-S-y> <C-o>Y
 inoremap <silent><M-S-a> <C-o>A
 inoremap <silent><M-S-i> <C-o>I
-
