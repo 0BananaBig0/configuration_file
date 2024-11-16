@@ -113,9 +113,9 @@ Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuf
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead *.cl silent call plug#load('vim-opencl')
+  autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
   autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
-  autocmd BufNewFile,BufRead *.launch silent call plug#load('vim-ros')
+  autocmd BufNewFile,BufRead *.launch call plug#load('vim-ros')
 augroup END
 
 
@@ -160,14 +160,14 @@ let g:python_highlight_file_headers_as_comments = 1
 let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     exec 'CocStart'
-    silent call plug#load('vim-which-key')
-    silent call MarkdownPluginConfiguration()
-    silent call LazyPluginConfiguration()
-    silent call LazyOnPluginConfiguration()
-    silent call plug#load('nerdcommenter')
-    silent call plug#load('asyncrun.vim')
+    call plug#load('vim-which-key')
+    call MarkdownPluginConfiguration()
+    call LazyPluginConfiguration()
+    call LazyOnPluginConfiguration()
+    call plug#load('nerdcommenter')
+    call plug#load('asyncrun.vim')
 endfunction
-silent call timer_start(333,'CocTimerStart',{'repeat':1})
+call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 
@@ -195,14 +195,14 @@ function! MarkdownPluginConfiguration()
 
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <silent><Leader>mg :silent call CreateMarkdownMenu()<CR>
-  nnoremap <silent><Leader>mu :silent call UpdateMarkdownMenu()<CR>
+  nnoremap <silent><Leader>mg :call CreateMarkdownMenu()<CR>
+  nnoremap <silent><Leader>mu :call UpdateMarkdownMenu()<CR>
   let g:vmt_auto_update_on_save = 0
   let g:vmt_list_item_char = '-'
   function! CreateMarkdownMenu()
     exec 'silent normal! ms'
     if !exists(':GenTocGFM')
-      silent call plug#load('vim-markdown-toc')
+      call plug#load('vim-markdown-toc')
     endif
     exec "silent normal! ggO\<ESC>"
     exec ':GenTocGFM'
@@ -213,7 +213,7 @@ function! MarkdownPluginConfiguration()
     let l:previous_line = line('.')
     let l:previous_total_line_count = line('$')
     if !exists(':UpdateToc')
-      silent call plug#load('vim-markdown-toc')
+      call plug#load('vim-markdown-toc')
     endif
     exec ':UpdateToc'
     let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
@@ -257,14 +257,14 @@ function! LazyPluginConfiguration()
   nmap <silent><Space>r <Plug>(coc-references)
   nmap <silent><Space>n <Plug>(coc-rename)
   nmap <silent><Space>f <Plug>(coc-refactor)
-  nnoremap <silent>[d :silent call CocAction('jumpDefinition', 'tabe')<CR>
-  nnoremap <silent>[c :silent call CocAction('jumpDeclaration', 'tabe')<CR>
-  nnoremap <silent>[i :silent call CocAction('jumpImplementation', 'tabe')<CR>
+  nnoremap <silent>[d :call CocAction('jumpDefinition', 'tabe')<CR>
+  nnoremap <silent>[c :call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap <silent>[i :call CocAction('jumpImplementation', 'tabe')<CR>
   nmap <silent>[j <Plug>(coc-diagnostic-next)
   nmap <silent>[k <Plug>(coc-diagnostic-prev)
   nmap <silent><Space>j <Plug>(coc-diagnostic-next-error)
   nmap <silent><Space>k <Plug>(coc-diagnostic-prev-error)
-  nnoremap <silent>[t :silent call CocAction('diagnosticToggleBuffer')<CR>
+  nnoremap <silent>[t :call CocAction('diagnosticToggleBuffer')<CR>
   nmap <silent>[l <Plug>(coc-diagnostic-info)
   nmap <silent>[a <Plug>(coc-codeaction)
   nmap <silent>[b <Plug>(coc-codeaction-line)
@@ -299,7 +299,7 @@ function! LazyPluginConfiguration()
       call writefile(l:clang_tidy_content, l:clang_tidy, 's')
     endif
   endfunction
-  noremap <silent><Leader><F7> :silent call ClangToolConfiguration()<CR>
+  noremap <silent><Leader><F7> :call ClangToolConfiguration()<CR>
   nmap <F7>  <Plug>(coc-format)
   xmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
@@ -312,7 +312,7 @@ function! LazyPluginConfiguration()
   endfunction
   nnoremap <silent> K :call ShowDocumentation()<CR>
   " Highlight the symbol and its references when holding the cursor
-  autocmd CursorHold * silent call CocActionAsync('highlight')
+  autocmd CursorHold * call CocActionAsync('highlight')
   hi my_helight guifg='White' guibg='Black'
 
 
@@ -524,7 +524,7 @@ function! LazyOnPluginConfiguration()
     endif
       return simplify(l:location.'/'.expand('%:t').'.'.l:bookmarkextension)
   endfunction
-  nnoremap <silent><Leader>bo :silent call plug#load('vim-bookmarks')<CR>
+  nnoremap <silent><Leader>bo :call plug#load('vim-bookmarks')<CR>
   nnoremap <silent><Leader>bt :BookmarkToggle<CR>
   nnoremap <silent><Leader>ba :BookmarkAnnotate<CR>
   nnoremap <silent><Leader>bs :BookmarkShowAll<CR>
@@ -539,16 +539,16 @@ function! LazyOnPluginConfiguration()
 
 
   " fcitx.nvim setting
-  nnoremap <silent><Leader><Space> :silent call plug#load('fcitx.vim')<CR>
+  nnoremap <silent><Leader><Space> :call plug#load('fcitx.vim')<CR>
 
 
 
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
-  nnoremap <silent><Leader>wt :silent call LoadAndSetVimInterestingwords()<CR>
+  nnoremap <silent><Leader>wt :call LoadAndSetVimInterestingwords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
-    silent call plug#load('vim-interestingwords')
+    call plug#load('vim-interestingwords')
     nnoremap <silent><Leader>wh :call InterestingWords('n')<CR>
     vnoremap <silent><Leader>wh :call InterestingWords('v')<CR>
     nnoremap <silent><Leader>w<S-h> :call UncolorAllWords()<CR>
@@ -559,7 +559,7 @@ function! LazyOnPluginConfiguration()
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :silent call LoadAndSetGitPlugin()<CR>
+  nnoremap <silent><Leader>git :call LoadAndSetGitPlugin()<CR>
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
@@ -568,8 +568,8 @@ function! LazyOnPluginConfiguration()
     nmap <silent><Leader>gn <Plug>(GitGutterNextHunk)
     nmap <silent><Leader>gf <Plug>(GitGutterFold)
     exec 'silent normal! ms'
-    silent call plug#load('vim-fugitive')
-    silent call plug#load('vim-gitgutter')
+    call plug#load('vim-fugitive')
+    call plug#load('vim-gitgutter')
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
@@ -611,11 +611,11 @@ function! LazyOnPluginConfiguration()
   nmap <silent>]<F4> <Plug>VimspectorToggleConditionalBreakpoint
   nnoremap <silent>]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
   nnoremap <silent>]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
-  nnoremap <silent><F5> :silent call plug#load('vimspector')<CR>
+  nnoremap <silent><F5> :call plug#load('vimspector')<CR>
   nnoremap <silent>]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
-                       \ :silent call plug#load('vimspector')<CR>
+                       \ :call plug#load('vimspector')<CR>
                        \ :call vimspector#Launch()<CR>
-  nnoremap <silent><Leader><F5> :silent call CppDebugConfiguration()<CR>
+  nnoremap <silent><Leader><F5> :call CppDebugConfiguration()<CR>
   nmap <silent><F6> <Plug>VimspectorStepOver
   nmap <silent><C-F6> <Plug>VimspectorStepInto
   nmap <silent><S-F6> <Plug>VimspectorStepOut
@@ -704,7 +704,7 @@ if has('gui_running')
   " Toggle Menu and Toolbar菜单栏和工具栏
   set guioptions-=m
   set guioptions-=T
-  nnoremap <silent><Space>m :silent call MenuToggle()<CR>
+  nnoremap <silent><Space>m :call MenuToggle()<CR>
   function! MenuToggle()
     if &guioptions=~#'T'
       set guioptions-=T
@@ -785,7 +785,7 @@ set smartcase
 set hlsearch
 set incsearch
 augroup Local_Autocmd_Group
-  autocmd FileType * silent call SetIndent()
+  autocmd FileType * call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
            \ nnoremap <silent><Space><F2>
@@ -794,9 +794,9 @@ augroup Local_Autocmd_Group
            \ :call CompileCommand()<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader>` :call CallShowNearestFunction()<CR>
   if has('nvim')
-    autocmd UIEnter * silent call TabPosInitialize()
+    autocmd UIEnter * call TabPosInitialize()
   else
-    autocmd GUIEnter * silent call TabPosInitialize()
+    autocmd GUIEnter * call TabPosInitialize()
   endif
 augroup END
 " 缩进
@@ -902,7 +902,7 @@ function! CompileCommand()
 endfunction
 function! MarkdownPreviewToggle()
   if !exists(':InstantMarkdownPreview')
-    silent call plug#load('vim-instant-markdown')
+    call plug#load('vim-instant-markdown')
     let g:instant_markdown_plugin_first_load = 1
   endif
   let l:cmd = 'lsof -i :' . g:instant_markdown_port
@@ -960,12 +960,12 @@ function! TabPosActivateBuffer(num)
 endfunction
 function! TabPosInitialize()
   for l:i in range(1, 9)
-      exec 'noremap <silent><M-' . l:i . '> :silent call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'noremap <silent><M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
-  exec 'noremap <silent><M-0> :silent call TabPosActivateBuffer(10)<CR>'
+  exec 'noremap <silent><M-0> :call TabPosActivateBuffer(10)<CR>'
 endfunction
 nnoremap <silent><Space>t :tabnew<CR>
-nnoremap <silent><Space>b :silent call CloseAndBackTab()<CR>
+nnoremap <silent><Space>b :call CloseAndBackTab()<CR>
 function! CloseAndBackTab()
   call CloseTheLatestTerm()
   if(tabpagenr() > 1 )
@@ -1003,7 +1003,7 @@ nnoremap <silent><Space>q :call QuitTab()<CR>
 nnoremap <silent><Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
-nnoremap <silent><Space><F5> :silent call DeleteBlankLine()<CR>
+nnoremap <silent><Space><F5> :call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
   exec 'silent normal! ms'
   let l:mark_enable = 1
@@ -1032,7 +1032,7 @@ function! DeleteBlankLine()
     call setpos('.', [0, l:line_num, l:new_column, 0])
   endif
 endfunction
-nnoremap <silent><Space><F7> :silent call RetabAndDeleteTraillingUselessChars()<CR>
+nnoremap <silent><Space><F7> :call RetabAndDeleteTraillingUselessChars()<CR>
 function! RetabAndDeleteTraillingUselessChars()
   exec 'silent normal! ms'
   exec 'silent :%retab!'
