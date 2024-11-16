@@ -121,7 +121,7 @@ augroup END
 
 
 colorscheme dracula
-nnoremap <silent><Leader>ppt :colorscheme zellner<CR>
+nnoremap <Leader>ppt :colorscheme zellner<CR>
                            \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                            \ :IndentGuidesDisable<CR>
 
@@ -174,13 +174,13 @@ call timer_start(333,'CocTimerStart',{'repeat':1})
 function! MarkdownPluginConfiguration()
   " coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
-  nnoremap <silent><Leader>mm :CocCommand markmap.watch<CR>
+  nnoremap <Leader>mm :CocCommand markmap.watch<CR>
   " Create markmap html file from the whole file
-  nnoremap <silent><Leader>mc :CocCommand markmap.create --offline<CR>
-  nnoremap <silent><Leader>mh <Plug>(coc-markmap-create)
+  nnoremap <Leader>mc :CocCommand markmap.create --offline<CR>
+  nnoremap <Leader>mh <Plug>(coc-markmap-create)
   " Create markmap html file from the selected lines
-  vnoremap <silent><Leader>mh <Plug>(coc-markmap-create-v)
-  nnoremap <silent><Leader>mf :CocCommand markdownlint.fixAll<CR>
+  vnoremap <Leader>mh <Plug>(coc-markmap-create-v)
+  nnoremap <Leader>mf :CocCommand markdownlint.fixAll<CR>
 
 
 
@@ -195,18 +195,18 @@ function! MarkdownPluginConfiguration()
 
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <silent><Leader>mg :call CreateMarkdownMenu()<CR>
-  nnoremap <silent><Leader>mu :call UpdateMarkdownMenu()<CR>
+  nnoremap <Leader>mg :call CreateMarkdownMenu()<CR>
+  nnoremap <Leader>mu :call UpdateMarkdownMenu()<CR>
   let g:vmt_auto_update_on_save = 0
   let g:vmt_list_item_char = '-'
   function! CreateMarkdownMenu()
-    exec 'silent normal! ms'
+    exec 'normal! ms'
     if !exists(':GenTocGFM')
       call plug#load('vim-markdown-toc')
     endif
-    exec "silent normal! ggO\<ESC>"
+    exec "normal! ggO\<ESC>"
     exec ':GenTocGFM'
-    exec 'silent normal! ggdd`s'
+    exec 'normal! ggdd`s'
   endfunction
   function! UpdateMarkdownMenu()
     let l:previous_column = col('.')
@@ -226,10 +226,10 @@ endfunction
 function! LazyPluginConfiguration()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=1
-  nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
-  nnoremap <silent><Space> :WhichKey '<Space>'<CR>
-  nnoremap <silent>[ :WhichKey '['<CR>
-  nnoremap <silent>] :WhichKey ']'<CR>
+  nnoremap <Leader> :WhichKey '<Leader>'<CR>
+  nnoremap <Space> :WhichKey '<Space>'<CR>
+  nnoremap [ :WhichKey '['<CR>
+  nnoremap ] :WhichKey ']'<CR>
 
 
 
@@ -238,38 +238,38 @@ function! LazyPluginConfiguration()
   " After we select the word we need press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
   " by other plugin before putting this into your config.
-  inoremap <silent><expr> <TAB>
+  inoremap <expr> <TAB>
         \ coc#pum#visible() ? coc#pum#next(1):
         \ CheckBackspace() ? "\<Tab>" :
         \ coc#refresh()
   inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
   " Make <CR> to accept selected completion item or notify coc.nvim to format
   " <C-g>u breaks current undo, please make your own choice.
-  inoremap <silent><expr> <CR> coc#pum#visible() ? coc#_select_confirm()
+  inoremap <expr> <CR> coc#pum#visible() ? coc#_select_confirm()
                                 \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   function! CheckBackspace() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
-  nmap <silent><Space>d <Plug>(coc-definition)
-  nmap <silent><Space>c <Plug>(coc-declaration)
-  nmap <silent><Space>i <Plug>(coc-implementation)
-  nmap <silent><Space>r <Plug>(coc-references)
-  nmap <silent><Space>n <Plug>(coc-rename)
-  nmap <silent><Space>f <Plug>(coc-refactor)
-  nnoremap <silent>[d :call CocAction('jumpDefinition', 'tabe')<CR>
-  nnoremap <silent>[c :call CocAction('jumpDeclaration', 'tabe')<CR>
-  nnoremap <silent>[i :call CocAction('jumpImplementation', 'tabe')<CR>
-  nmap <silent>[j <Plug>(coc-diagnostic-next)
-  nmap <silent>[k <Plug>(coc-diagnostic-prev)
-  nmap <silent><Space>j <Plug>(coc-diagnostic-next-error)
-  nmap <silent><Space>k <Plug>(coc-diagnostic-prev-error)
-  nnoremap <silent>[t :call CocAction('diagnosticToggleBuffer')<CR>
-  nmap <silent>[l <Plug>(coc-diagnostic-info)
-  nmap <silent>[a <Plug>(coc-codeaction)
-  nmap <silent>[b <Plug>(coc-codeaction-line)
-  nmap <silent>[s <Plug>(coc-codeaction-selected)
-  xmap <silent>[s <Plug>(coc-codeaction-selected)
+  nmap <Space>d <Plug>(coc-definition)
+  nmap <Space>c <Plug>(coc-declaration)
+  nmap <Space>i <Plug>(coc-implementation)
+  nmap <Space>r <Plug>(coc-references)
+  nmap <Space>n <Plug>(coc-rename)
+  nmap <Space>f <Plug>(coc-refactor)
+  nnoremap [d :call CocAction('jumpDefinition', 'tabe')<CR>
+  nnoremap [c :call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap [i :call CocAction('jumpImplementation', 'tabe')<CR>
+  nmap [j <Plug>(coc-diagnostic-next)
+  nmap [k <Plug>(coc-diagnostic-prev)
+  nmap <Space>j <Plug>(coc-diagnostic-next-error)
+  nmap <Space>k <Plug>(coc-diagnostic-prev-error)
+  nnoremap [t :call CocAction('diagnosticToggleBuffer')<CR>
+  nmap [l <Plug>(coc-diagnostic-info)
+  nmap [a <Plug>(coc-codeaction)
+  nmap [b <Plug>(coc-codeaction-line)
+  nmap [s <Plug>(coc-codeaction-selected)
+  xmap [s <Plug>(coc-codeaction-selected)
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets', 'coc-prettier',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
@@ -299,7 +299,7 @@ function! LazyPluginConfiguration()
       call writefile(l:clang_tidy_content, l:clang_tidy, 's')
     endif
   endfunction
-  noremap <silent><Leader><F7> :call ClangToolConfiguration()<CR>
+  noremap <Leader><F7> :call ClangToolConfiguration()<CR>
   nmap <F7>  <Plug>(coc-format)
   xmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
@@ -310,7 +310,7 @@ function! LazyPluginConfiguration()
       call feedkeys('K', 'in')
     endif
   endfunction
-  nnoremap <silent> K :call ShowDocumentation()<CR>
+  nnoremap K :call ShowDocumentation()<CR>
   " Highlight the symbol and its references when holding the cursor
   autocmd CursorHold * call CocActionAsync('highlight')
   hi my_helight guifg='White' guibg='Black'
@@ -327,8 +327,8 @@ function! LazyPluginConfiguration()
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
   let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
   let g:NERDCustomDelimiters = {'opencl': {'left': '//'}} " use // to comment cl source codes.
-  map <silent><F3> <plug>NERDCommenterComment
-  map <silent><S-F3> <plug>NERDCommenterUncomment
+  map <F3> <plug>NERDCommenterComment
+  map <S-F3> <plug>NERDCommenterUncomment
 
 
 
@@ -398,7 +398,7 @@ function! LazyPluginConfiguration()
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
-  nnoremap <silent><F8> :call ToggleTerminal(6, 33)<CR>
+  nnoremap <F8> :call ToggleTerminal(6, 33)<CR>
   nnoremap <Space><F8> :AsyncRun! -strip -focus=0 -rows=6 -hidden=1<Space>
 
 
@@ -440,11 +440,11 @@ function! LazyPluginConfiguration()
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'papercol light'
   " hit \qm to open menu
-  noremap <silent><Leader>qm :call quickui#menu#open()<CR>
+  noremap <Leader>qm :call quickui#menu#open()<CR>
   " hit \qb to switch buffer
-  noremap <silent><Leader>qb :call quickui#tools#list_buffer('e')<CR>
+  noremap <Leader>qb :call quickui#tools#list_buffer('e')<CR>
   " hit \qt to preview tags
-  noremap <silent><Leader>qt :call quickui#tools#preview_tag('')<CR>
+  noremap <Leader>qt :call quickui#tools#preview_tag('')<CR>
 endfunction
 
 
@@ -452,8 +452,8 @@ endfunction
 
 function! LazyOnPluginConfiguration()
   " NERDTree Setting
-  nnoremap <silent><Leader>nt :NERDTreeToggle<CR>
-  nnoremap <silent><Leader>nc :NERDTreeCWD<CR>
+  nnoremap <Leader>nt :NERDTreeToggle<CR>
+  nnoremap <Leader>nc :NERDTreeCWD<CR>
   let g:NERDTreeFileExtensionHighlightFullName = 1
   let g:NERDTreeExactMatchHighlightFullName = 1
   let g:NERDTreePatternMatchHighlightFullName = 1
@@ -467,8 +467,8 @@ function! LazyOnPluginConfiguration()
 
 
   " Vista setting
-  nnoremap <silent><Leader>vt :Vista!!<CR>
-  nnoremap <silent><Leader>vf :Vista focus<CR>
+  nnoremap <Leader>vt :Vista!!<CR>
+  nnoremap <Leader>vf :Vista focus<CR>
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
@@ -524,56 +524,56 @@ function! LazyOnPluginConfiguration()
     endif
       return simplify(l:location.'/'.expand('%:t').'.'.l:bookmarkextension)
   endfunction
-  nnoremap <silent><Leader>bo :call plug#load('vim-bookmarks')<CR>
-  nnoremap <silent><Leader>bt :BookmarkToggle<CR>
-  nnoremap <silent><Leader>ba :BookmarkAnnotate<CR>
-  nnoremap <silent><Leader>bs :BookmarkShowAll<CR>
-  nnoremap <silent><Leader>bn :BookmarkNext<CR>
-  nnoremap <silent><Leader>bp :BookmarkPrev<CR>
-  nnoremap <silent><Leader>bc :BookmarkClear<CR>
-  nnoremap <silent><Leader>br :BookmarkClearAll<CR>
-  nmap <silent><Leader>bu <Plug>BookmarkMoveUp
-  nmap <silent><Leader>bd <Plug>BookmarkMoveDown
-  nmap <silent><Leader>bl <Plug>BookmarkMoveToLine
+  nnoremap <Leader>bo :call plug#load('vim-bookmarks')<CR>
+  nnoremap <Leader>bt :BookmarkToggle<CR>
+  nnoremap <Leader>ba :BookmarkAnnotate<CR>
+  nnoremap <Leader>bs :BookmarkShowAll<CR>
+  nnoremap <Leader>bn :BookmarkNext<CR>
+  nnoremap <Leader>bp :BookmarkPrev<CR>
+  nnoremap <Leader>bc :BookmarkClear<CR>
+  nnoremap <Leader>br :BookmarkClearAll<CR>
+  nmap <Leader>bu <Plug>BookmarkMoveUp
+  nmap <Leader>bd <Plug>BookmarkMoveDown
+  nmap <Leader>bl <Plug>BookmarkMoveToLine
 
 
 
   " fcitx.nvim setting
-  nnoremap <silent><Leader><Space> :call plug#load('fcitx.vim')<CR>
+  nnoremap <Leader><Space> :call plug#load('fcitx.vim')<CR>
 
 
 
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
-  nnoremap <silent><Leader>wt :call LoadAndSetVimInterestingwords()<CR>
+  nnoremap <Leader>wt :call LoadAndSetVimInterestingwords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
     call plug#load('vim-interestingwords')
-    nnoremap <silent><Leader>wh :call InterestingWords('n')<CR>
-    vnoremap <silent><Leader>wh :call InterestingWords('v')<CR>
-    nnoremap <silent><Leader>w<S-h> :call UncolorAllWords()<CR>
-    nnoremap <silent>n :call WordNavigation(1)<CR>
-    nnoremap <silent><S-n> :call WordNavigation(0)<CR>
+    nnoremap <Leader>wh :call InterestingWords('n')<CR>
+    vnoremap <Leader>wh :call InterestingWords('v')<CR>
+    nnoremap <Leader>w<S-h> :call UncolorAllWords()<CR>
+    nnoremap n :call WordNavigation(1)<CR>
+    nnoremap <S-n> :call WordNavigation(0)<CR>
   endfunction
 
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :call LoadAndSetGitPlugin()<CR>
+  nnoremap <Leader>git :call LoadAndSetGitPlugin()<CR>
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
     let g:gitgutter_map_keys = 0
-    nmap <silent><Leader>gp <Plug>(GitGutterPrevHunk)
-    nmap <silent><Leader>gn <Plug>(GitGutterNextHunk)
-    nmap <silent><Leader>gf <Plug>(GitGutterFold)
-    exec 'silent normal! ms'
+    nmap <Leader>gp <Plug>(GitGutterPrevHunk)
+    nmap <Leader>gn <Plug>(GitGutterNextHunk)
+    nmap <Leader>gf <Plug>(GitGutterFold)
+    exec 'normal! ms'
     call plug#load('vim-fugitive')
     call plug#load('vim-gitgutter')
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
-    exec 'silent normal! `s'
+    exec 'normal! `s'
   endfunction
   function! GitStatus()
     let [a,m,r] = GitGutterGetHunkSummary()
@@ -598,42 +598,42 @@ function! LazyOnPluginConfiguration()
     endif
       exec 'tabe ' . l:vimspector_json
   endfunction
-  nmap <silent><F2> <Plug>VimspectorContinue
-  nnoremap <silent><S-F2> :call vimspector#Restart()<CR>
-  nnoremap <silent><C-F2> :VimspectorReset<CR>
-  nmap <silent>]<F2> <Plug>VimspectorRunToCursor
-  nmap <silent>]<S-F2> <Plug>VimspectorStop
-  nmap <silent>]<C-F2> <Plug>VimspectorPause
-  nmap <silent>]<F3> <Plug>VimspectorBalloonEval
-  xmap <silent>]<F3> <Plug>VimspectorBalloonEval
-  nmap <silent><F4> <Plug>VimspectorToggleBreakpoint
-  nnoremap <silent><S-F4> :call vimspector#ClearBreakpoints()<CR>
-  nmap <silent>]<F4> <Plug>VimspectorToggleConditionalBreakpoint
-  nnoremap <silent>]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
-  nnoremap <silent>]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
-  nnoremap <silent><F5> :call plug#load('vimspector')<CR>
-  nnoremap <silent>]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
+  nmap <F2> <Plug>VimspectorContinue
+  nnoremap <S-F2> :call vimspector#Restart()<CR>
+  nnoremap <C-F2> :VimspectorReset<CR>
+  nmap ]<F2> <Plug>VimspectorRunToCursor
+  nmap ]<S-F2> <Plug>VimspectorStop
+  nmap ]<C-F2> <Plug>VimspectorPause
+  nmap ]<F3> <Plug>VimspectorBalloonEval
+  xmap ]<F3> <Plug>VimspectorBalloonEval
+  nmap <F4> <Plug>VimspectorToggleBreakpoint
+  nnoremap <S-F4> :call vimspector#ClearBreakpoints()<CR>
+  nmap ]<F4> <Plug>VimspectorToggleConditionalBreakpoint
+  nnoremap ]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
+  nnoremap ]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
+  nnoremap <F5> :call plug#load('vimspector')<CR>
+  nnoremap ]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
                        \ :call plug#load('vimspector')<CR>
                        \ :call vimspector#Launch()<CR>
-  nnoremap <silent><Leader><F5> :call CppDebugConfiguration()<CR>
-  nmap <silent><F6> <Plug>VimspectorStepOver
-  nmap <silent><C-F6> <Plug>VimspectorStepInto
-  nmap <silent><S-F6> <Plug>VimspectorStepOut
-  nmap <silent>]<F7> <Plug>VimspectorUpFrame
-  nmap <silent>]<S-F7> <Plug>VimspectorDownFrame
-  nnoremap <silent>]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
-  nnoremap <silent><C-1> :call win_gotoid(g:vimspector_session_windows.variables)<CR>
-  inoremap <silent><C-1> <ESC>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
-  nnoremap <silent><C-3> :call win_gotoid(g:vimspector_session_windows.code)<CR>
-  inoremap <silent><C-3> <ESC>:call win_gotoid(g:vimspector_session_windows.code)<CR>
-  nnoremap <silent><C-4> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  inoremap <silent><C-4> <ESC>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  nnoremap <silent><C-5> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
-  inoremap <silent><C-5> <ESC>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
-  nnoremap <silent><C-7> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
-  inoremap <silent><C-7> <ESC>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
-  nnoremap <silent><C-8> :VimspectorShowOutput Console<CR>
-  inoremap <silent><C-8> <ESC>:VimspectorShowOutput Console<CR>
+  nnoremap <Leader><F5> :call CppDebugConfiguration()<CR>
+  nmap <F6> <Plug>VimspectorStepOver
+  nmap <C-F6> <Plug>VimspectorStepInto
+  nmap <S-F6> <Plug>VimspectorStepOut
+  nmap ]<F7> <Plug>VimspectorUpFrame
+  nmap ]<S-F7> <Plug>VimspectorDownFrame
+  nnoremap ]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
+  nnoremap <C-1> :call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  inoremap <C-1> <ESC>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  nnoremap <C-3> :call win_gotoid(g:vimspector_session_windows.code)<CR>
+  inoremap <C-3> <ESC>:call win_gotoid(g:vimspector_session_windows.code)<CR>
+  nnoremap <C-4> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  inoremap <C-4> <ESC>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  nnoremap <C-5> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  inoremap <C-5> <ESC>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  nnoremap <C-7> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  inoremap <C-7> <ESC>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  nnoremap <C-8> :VimspectorShowOutput Console<CR>
+  inoremap <C-8> <ESC>:VimspectorShowOutput Console<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -704,7 +704,7 @@ if has('gui_running')
   " Toggle Menu and Toolbar菜单栏和工具栏
   set guioptions-=m
   set guioptions-=T
-  nnoremap <silent><Space>m :call MenuToggle()<CR>
+  nnoremap <Space>m :call MenuToggle()<CR>
   function! MenuToggle()
     if &guioptions=~#'T'
       set guioptions-=T
@@ -788,11 +788,11 @@ augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
-           \ nnoremap <silent><Space><F2>
+           \ nnoremap <Space><F2>
            \ :call CompileAndExcute()<CR>
-  autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
+  autocmd FileType c,cpp,verilog nnoremap <Leader><F2>
            \ :call CompileCommand()<CR>
-  autocmd FileType c,cpp,verilog nnoremap <silent><Leader>` :call CallShowNearestFunction()<CR>
+  autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
   if has('nvim')
     autocmd UIEnter * call TabPosInitialize()
   else
@@ -858,7 +858,7 @@ function! SetTitle()
   elseif &filetype==?'verilog'
     call append(line('$'),'module ')
   endif
-  exec 'silent normal! G'
+  exec 'normal! G'
 endfunction
   if !exists("CompileAndExcute")
     function! CompileAndExcute()
@@ -960,12 +960,12 @@ function! TabPosActivateBuffer(num)
 endfunction
 function! TabPosInitialize()
   for l:i in range(1, 9)
-      exec 'noremap <silent><M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'noremap <M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
-  exec 'noremap <silent><M-0> :call TabPosActivateBuffer(10)<CR>'
+  exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
 endfunction
-nnoremap <silent><Space>t :tabnew<CR>
-nnoremap <silent><Space>b :call CloseAndBackTab()<CR>
+nnoremap <Space>t :tabnew<CR>
+nnoremap <Space>b :call CloseAndBackTab()<CR>
 function! CloseAndBackTab()
   call CloseTheLatestTerm()
   if(tabpagenr() > 1 )
@@ -999,13 +999,13 @@ function! QuitTab()
     quit
   endif
 endfunction
-nnoremap <silent><Space>q :call QuitTab()<CR>
-nnoremap <silent><Space>w :w<CR>
+nnoremap <Space>q :call QuitTab()<CR>
+nnoremap <Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
-nnoremap <silent><Space><F5> :call DeleteBlankLine()<CR>
+nnoremap <Space><F5> :call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
-  exec 'silent normal! ms'
+  exec 'normal! ms'
   let l:mark_enable = 1
   let l:new_column = col('.')
   let l:line_num = line('.')
@@ -1025,24 +1025,24 @@ function! DeleteBlankLine()
       let l:line_num = l:down_line_num
     endif
   endif
-  exec 'silent :g/^\s*$/d'
+  exec ':g/^\s*$/d'
   if l:mark_enable == 1
-    exec 'silent normal! `s'
+    exec 'normal! `s'
   else
     call setpos('.', [0, l:line_num, l:new_column, 0])
   endif
 endfunction
-nnoremap <silent><Space><F7> :call RetabAndDeleteTraillingUselessChars()<CR>
+nnoremap <Space><F7> :call RetabAndDeleteTraillingUselessChars()<CR>
 function! RetabAndDeleteTraillingUselessChars()
-  exec 'silent normal! ms'
-  exec 'silent :%retab!'
-  exec 'silent :%s/\s\+$//e'
-  exec 'silent :%s/\r//e'
-  exec 'silent normal! `s'
+  exec 'normal! ms'
+  exec ':%retab!'
+  exec ':%s/\s\+$//e'
+  exec ':%s/\r//e'
+  exec 'normal! `s'
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
-nnoremap <silent><C-Space> i<Space><ESC>l
+nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
     " 1. 获取当前光标所在位置的行数
     let l:current_line = line('.')
@@ -1054,7 +1054,7 @@ function! InsertEnterInNormalMode()
     " 4. 进入插入模式，输入回车，然后返回正常模式
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
-    exec "silent normal! i\<CR>\<ESC>"
+    exec "normal! i\<CR>\<ESC>"
     let l:new_column = col('.')
     if l:new_column != 1
       let l:new_column = l:new_column + 1
@@ -1072,18 +1072,18 @@ function! InsertEnterInNormalMode()
       call setpos('.', [0, l:new_line, l:new_column, 0])
 endfunction
 " Alt-Enter新建空行
-nnoremap <silent><M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
-inoremap <silent><M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>i
+nnoremap <M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
+inoremap <M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>i
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
-inoremap <silent><M-h> <C-o>h
-inoremap <silent><M-j> <C-o>j
-inoremap <silent><M-k> <C-o>k
-inoremap <silent><M-l> <C-o>l
-inoremap <silent><M-p> <ESC>pa
-inoremap <silent><M-S-p> <ESC>Pa
-inoremap <silent><M-u> <C-o>u
-inoremap <silent><M-r> <C-o><C-r>
-inoremap <silent><M-S-d> <C-o>D
-inoremap <silent><M-S-y> <C-o>Y
-inoremap <silent><M-S-a> <C-o>A
-inoremap <silent><M-S-i> <C-o>I
+inoremap <M-h> <C-o>h
+inoremap <M-j> <C-o>j
+inoremap <M-k> <C-o>k
+inoremap <M-l> <C-o>l
+inoremap <M-p> <ESC>pa
+inoremap <M-S-p> <ESC>Pa
+inoremap <M-u> <C-o>u
+inoremap <M-r> <C-o><C-r>
+inoremap <M-S-d> <C-o>D
+inoremap <M-S-y> <C-o>Y
+inoremap <M-S-a> <C-o>A
+inoremap <M-S-i> <C-o>I
