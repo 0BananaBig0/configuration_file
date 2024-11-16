@@ -161,9 +161,9 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
     exec 'CocStart'
     silent call plug#load('vim-which-key')
-    silent call Markdown_Plugin_Configuration()
-    silent call Lazy_Plugin_Configuration()
-    silent call Lazy_On_Plugin_Configuration()
+    silent call MarkdownPluginConfiguration()
+    silent call LazyPluginConfiguration()
+    silent call LazyOnPluginConfiguration()
     silent call plug#load('nerdcommenter')
     silent call plug#load('asyncrun.vim')
 endfunction
@@ -171,7 +171,7 @@ silent call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 
-function! Markdown_Plugin_Configuration()
+function! MarkdownPluginConfiguration()
   " coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
   nnoremap <silent><Leader>mm :CocCommand markmap.watch<CR>
@@ -195,11 +195,11 @@ function! Markdown_Plugin_Configuration()
 
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <silent><Leader>mg :silent call Create_Markdown_Memu()<CR>
-  nnoremap <silent><Leader>mu :silent call Update_Markdown_Memu()<CR>
+  nnoremap <silent><Leader>mg :silent call CreateMarkdownMenu()<CR>
+  nnoremap <silent><Leader>mu :silent call UpdateMarkdownMenu()<CR>
   let g:vmt_auto_update_on_save = 0
   let g:vmt_list_item_char = '-'
-  function! Create_Markdown_Memu()
+  function! CreateMarkdownMenu()
     exec 'silent normal! ms'
     if !exists(':GenTocGFM')
       silent call plug#load('vim-markdown-toc')
@@ -208,7 +208,7 @@ function! Markdown_Plugin_Configuration()
     exec ':GenTocGFM'
     exec 'silent normal! ggdd`s'
   endfunction
-  function! Update_Markdown_Memu()
+  function! UpdateMarkdownMenu()
     let l:previous_column = col('.')
     let l:previous_line = line('.')
     let l:previous_total_line_count = line('$')
@@ -223,7 +223,7 @@ endfunction
 
 
 
-function! Lazy_Plugin_Configuration()
+function! LazyPluginConfiguration()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=1
   nnoremap <silent><Leader> :WhichKey '<Leader>'<CR>
@@ -275,7 +275,7 @@ function! Lazy_Plugin_Configuration()
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
-  function! Cpp_Workspace_Root()
+  function! CppWorkspaceRoot()
     let l:cpp_workspace_root = finddir('.git', '.;')
     if (strlen(l:cpp_workspace_root) == 0)
       let l:cpp_workspace_root = expand('%:p:h')
@@ -286,8 +286,8 @@ function! Lazy_Plugin_Configuration()
     endif
     return l:cpp_workspace_root
   endfunction
-  function! Clang_Tool_Configuration()
-    let l:cpp_workspace_root = Cpp_Workspace_Root()
+  function! ClangToolConfiguration()
+    let l:cpp_workspace_root = CppWorkspaceRoot()
     let l:clang_format = l:cpp_workspace_root.'/.clang-format'
     let l:clang_tidy = l:cpp_workspace_root.'/.clang-tidy'
     if !filereadable(l:clang_format)
@@ -299,7 +299,7 @@ function! Lazy_Plugin_Configuration()
       call writefile(l:clang_tidy_content, l:clang_tidy, 's')
     endif
   endfunction
-  noremap <silent><Leader><F7> :silent call Clang_Tool_Configuration()<CR>
+  noremap <silent><Leader><F7> :silent call ClangToolConfiguration()<CR>
   nmap <F7>  <Plug>(coc-format)
   xmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
@@ -450,7 +450,7 @@ endfunction
 
 
 
-function! Lazy_On_Plugin_Configuration()
+function! LazyOnPluginConfiguration()
   " NERDTree Setting
   nnoremap <silent><Leader>nt :NERDTreeToggle<CR>
   nnoremap <silent><Leader>nc :NERDTreeCWD<CR>
@@ -544,8 +544,8 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
-  nnoremap <silent><Leader>wt :silent call Load_And_Set_Vim_Interestingwords()<CR>
-  function! Load_And_Set_Vim_Interestingwords()
+  nnoremap <silent><Leader>wt :silent call LoadAndSetVimInterestingwords()<CR>
+  function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
     silent call plug#load('vim-interestingwords')
@@ -559,8 +559,8 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <silent><Leader>git :silent call Load_And_Set_Git_Plugin()<CR>
-  function! Load_And_Set_Git_Plugin()
+  nnoremap <silent><Leader>git :silent call LoadAndSetGitPlugin()<CR>
+  function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
     let g:gitgutter_map_keys = 0
@@ -583,8 +583,8 @@ function! Lazy_On_Plugin_Configuration()
 
 
   " vimspector setting
-  function! Cpp_Debug_Configuration()
-    let l:cpp_workspace_root = Cpp_Workspace_Root()
+  function! CppDebugConfiguration()
+    let l:cpp_workspace_root = CppWorkspaceRoot()
     let l:launch_json = l:cpp_workspace_root.'/.vscode/launch.json'
     if !filereadable(l:launch_json)
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
@@ -615,7 +615,7 @@ function! Lazy_On_Plugin_Configuration()
   nnoremap <silent>]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
                        \ :silent call plug#load('vimspector')<CR>
                        \ :call vimspector#Launch()<CR>
-  nnoremap <silent><Leader><F5> :silent call Cpp_Debug_Configuration()<CR>
+  nnoremap <silent><Leader><F5> :silent call CppDebugConfiguration()<CR>
   nmap <silent><F6> <Plug>VimspectorStepOver
   nmap <silent><C-F6> <Plug>VimspectorStepInto
   nmap <silent><S-F6> <Plug>VimspectorStepOut
@@ -704,8 +704,8 @@ if has('gui_running')
   " Toggle Menu and Toolbar菜单栏和工具栏
   set guioptions-=m
   set guioptions-=T
-  nnoremap <silent><Space>m :silent call MENU_TOOGLE()<CR>
-  function! MENU_TOOGLE()
+  nnoremap <silent><Space>m :silent call MenuToggle()<CR>
+  function! MenuToggle()
     if &guioptions=~#'T'
       set guioptions-=T
       set guioptions-=m
@@ -789,14 +789,14 @@ augroup Local_Autocmd_Group
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
   autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
            \ nnoremap <silent><Space><F2>
-           \ :call Compile_And_Excute()<CR>
+           \ :call CompileAndExcute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <silent><Leader><F2>
-           \ :call Compile_Command()<CR>
-  autocmd FileType c,cpp,verilog nnoremap <silent><Leader>` :call Call_Show_Nearest_Function()<CR>
+           \ :call CompileCommand()<CR>
+  autocmd FileType c,cpp,verilog nnoremap <silent><Leader>` :call CallShowNearestFunction()<CR>
   if has('nvim')
-    autocmd UIEnter * silent call TabPos_Initialize()
+    autocmd UIEnter * silent call TabPosInitialize()
   else
-    autocmd GUIEnter * silent call TabPos_Initialize()
+    autocmd GUIEnter * silent call TabPosInitialize()
   endif
 augroup END
 " 缩进
@@ -860,8 +860,8 @@ function! SetTitle()
   endif
   exec 'silent normal! G'
 endfunction
-if !exists("Compile_And_Excute")
-  function! Compile_And_Excute()
+  if !exists("CompileAndExcute")
+    function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
@@ -881,13 +881,13 @@ if !exists("Compile_And_Excute")
     elseif &filetype==?'tcl'
       exec l:compile_exec.' tclsh %'
     elseif &filetype==?'markdown'
-      call Markdown_Preview_Toggle()
+      call MarkdownPreviewToggle()
     elseif &filetype==?'vim'
       exec ':source ~/.vimrc'
     endif
   endfunction
 endif
-function! Compile_Command()
+function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -focus=0 -rows=6 -hidden=1'
   if &filetype==?'cpp' || &filetype==?'c'
     if &filetype==?'cpp'
@@ -900,7 +900,7 @@ function! Compile_Command()
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   endif
 endfunction
-function! Markdown_Preview_Toggle()
+function! MarkdownPreviewToggle()
   if !exists(':InstantMarkdownPreview')
     silent call plug#load('vim-instant-markdown')
     let g:instant_markdown_plugin_first_load = 1
@@ -916,7 +916,7 @@ function! Markdown_Preview_Toggle()
     echo 'Releasing port' g:instant_markdown_port '.'
   endif
 endfunction
-function! Show_Current_Module()
+function! ShowCurrentModule()
   let l:module_line = search('module', 'bnWz')
   let l:module_name = getline(l:module_line)
   let l:module_end_poisition = strridx(l:module_name, '(')
@@ -929,7 +929,7 @@ function! Show_Current_Module()
   endwhile
   echo 'module -->' l:module_name
 endfunction
-function! Show_Nearest_Class_Or_Struct()
+function! ShowNearestClassOrStruct()
   let l:class_line = search('\n'.'class', 'bnWz')
   let l:struct_line = search('\n'.'struct', 'bnWz')
   if(l:class_line > l:struct_line)
@@ -945,28 +945,28 @@ function! Show_Nearest_Class_Or_Struct()
   endif
   echo l:nearest_name
 endfunction
-function! Call_Show_Nearest_Function()
+function! CallShowNearestFunction()
   if &filetype==?'cpp' || &filetype==?'c'
-     call Show_Nearest_Class_Or_Struct()
+     call ShowNearestClassOrStruct()
   elseif &filetype==?'verilog'
-     call Show_Current_Module()
+     call ShowCurrentModule()
   endif
 endfunction
 " alt+n跳到第n个tab，0<n<10
-function! TabPos_ActivateBuffer(num)
+function! TabPosActivateBuffer(num)
   let s:count = a:num
   exec 'tabfirst'
   exec 'tabnext' s:count
 endfunction
-function! TabPos_Initialize()
+function! TabPosInitialize()
   for l:i in range(1, 9)
-      exec 'noremap <silent><M-' . l:i . '> :silent call TabPos_ActivateBuffer(' . l:i . ')<CR>'
+      exec 'noremap <silent><M-' . l:i . '> :silent call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
-  exec 'noremap <silent><M-0> :silent call TabPos_ActivateBuffer(10)<CR>'
+  exec 'noremap <silent><M-0> :silent call TabPosActivateBuffer(10)<CR>'
 endfunction
 nnoremap <silent><Space>t :tabnew<CR>
-nnoremap <silent><Space>b :silent call Close_and_Back_Tab()<CR>
-function! Close_and_Back_Tab()
+nnoremap <silent><Space>b :silent call CloseAndBackTab()<CR>
+function! CloseAndBackTab()
   call CloseTheLatestTerm()
   if(tabpagenr() > 1 )
     exec 'tabp'
@@ -984,7 +984,7 @@ function! Close_and_Back_Tab()
     quit
   endif
 endfunction
-function! Quit_Tab()
+function! QuitTab()
   call CloseTheLatestTerm()
   if(tabpagenr('$') == 1)
     let l:current_buf = bufnr('%')  " Get the buffer number of the current buffer
@@ -999,12 +999,12 @@ function! Quit_Tab()
     quit
   endif
 endfunction
-nnoremap <silent><Space>q :call Quit_Tab()<CR>
+nnoremap <silent><Space>q :call QuitTab()<CR>
 nnoremap <silent><Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
-nnoremap <silent><Space><F5> :silent call Delete_Blank_Line()<CR>
-function! Delete_Blank_Line()
+nnoremap <silent><Space><F5> :silent call DeleteBlankLine()<CR>
+function! DeleteBlankLine()
   exec 'silent normal! ms'
   let l:mark_enable = 1
   let l:new_column = col('.')
@@ -1032,8 +1032,8 @@ function! Delete_Blank_Line()
     call setpos('.', [0, l:line_num, l:new_column, 0])
   endif
 endfunction
-nnoremap <silent><Space><F7> :silent call Retab_And_Delete_Trailling_Useless_Chars()<CR>
-function! Retab_And_Delete_Trailling_Useless_Chars()
+nnoremap <silent><Space><F7> :silent call RetabAndDeleteTraillingUselessChars()<CR>
+function! RetabAndDeleteTraillingUselessChars()
   exec 'silent normal! ms'
   exec 'silent :%retab!'
   exec 'silent :%s/\s\+$//e'
