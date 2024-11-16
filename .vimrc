@@ -189,7 +189,7 @@ function! MarkdownPluginConfiguration()
   let g:instant_markdown_allow_unsafe_content = 1
   let g:instant_markdown_mathjax = 1
   let g:instant_markdown_mermaid = 1
-  let g:instant_markdown_browser = "msedge"
+  let g:instant_markdown_browser = 'msedge'
 
 
 
@@ -312,7 +312,7 @@ function! LazyPluginConfiguration()
   endfunction
   nnoremap K :call ShowDocumentation()<CR>
   " Highlight the symbol and its references when holding the cursor
-  autocmd CursorHold * call CocActionAsync('highlight')
+  augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi my_helight guifg='White' guibg='Black'
 
 
@@ -338,7 +338,7 @@ function! LazyPluginConfiguration()
     let l:terminal_shown = 0
     let l:current_tab = tabpagenr()
     " Create an array to store the most recent terminal buffer for each tab
-    if !exists("g:tab_term_buf")
+    if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], a:size)
     endif
     " Loop through all windows in the current tab to check for a terminal
@@ -368,7 +368,7 @@ function! LazyPluginConfiguration()
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
         exec 'belowright ' . ' terminal'
-        call feedkeys("\<C-\>\<C-n>", "n")
+        call feedkeys("\<C-\>\<C-n>", 'n')
         exec 'resize ' . a:height
         let g:tab_term_buf[l:current_tab] = bufnr('%')
       endif
@@ -378,11 +378,11 @@ function! LazyPluginConfiguration()
     " Loop through all windows in the current tab to check for a terminal
     let l:current_tab = tabpagenr()
     for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab && bufexists(l:win['bufnr'])
         exec 'bdelete! ' . l:win['bufnr']
       endif
     endfor
-    if exists("g:tab_term_buf")
+    if exists('g:tab_term_buf')
       if(bufexists(g:tab_term_buf[tabpagenr()]))
         exec 'bdelete! ' . g:tab_term_buf[tabpagenr()]
       endif
@@ -409,13 +409,13 @@ function! LazyPluginConfiguration()
   " install a 'File' menu, use [text, command] to represent an item.
   call quickui#menu#install('&File', [
         \ [ "&Save\tCtrl+s", 'w'],
-        \ [ "Save &As", 'call feedkey(":saveas ")' ],
-        \ [ "Save All", 'wa' ],
-        \ [ "--", '' ],
-        \ [ "LeaderF &File", 'Leaderf file', 'Open file with leaderf'],
-        \ [ "LeaderF &Mru", 'Leaderf mru --regexMode', 'Open recently accessed files'],
-        \ [ "LeaderF &Buffer", 'Leaderf buffer', 'List current buffers in leaderf'],
-        \ [ "--", '' ],
+        \ [ 'Save &As', 'call feedkey(":saveas ")' ],
+        \ [ 'Save All', 'wa' ],
+        \ [ '--', '' ],
+        \ [ 'LeaderF &File', 'Leaderf file', 'Open file with leaderf'],
+        \ [ 'LeaderF &Mru', 'Leaderf mru --regexMode', 'Open recently accessed files'],
+        \ [ 'LeaderF &Buffer', 'Leaderf buffer', 'List current buffers in leaderf'],
+        \ [ '--', '' ],
         \ [ "E&xit\tAlt+x", 'q' ],
         \ ])
   " script inside %{...} will be evaluated and expanded in the string
@@ -426,10 +426,10 @@ function! LazyPluginConfiguration()
         \ ])
   " register HELP menu with weight 10000
   call quickui#menu#install('H&elp', [
-        \ ["&Cheatsheet", 'help index', ''],
+        \ ['&Cheatsheet', 'help index', ''],
         \ ['T&ips', 'help tips', ''],
         \ ['--',''],
-        \ ["&Tutorial", 'help tutor', ''],
+        \ ['&Tutorial', 'help tutor', ''],
         \ ['&Quick Reference', 'help quickref', ''],
         \ ['&Summary', 'help summary', ''],
         \ ['--',''],
@@ -661,7 +661,7 @@ function! LazyOnPluginConfiguration()
     call win_gotoid(g:vimspector_session_windows.output)
     9wincmd _
   endfunction
-  autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
+  augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
 
 
@@ -741,7 +741,7 @@ set number
 " merge signcolumn and number column into one
 set signcolumn=number
 " Uncomment the following to have Vim jump to the last position when reopening a file
-autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup Local_Autocmd_Group | autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif | augroup END
 " 设置当文件被改动时自动载入
 set autoread
 " 共享剪贴板
@@ -860,7 +860,7 @@ function! SetTitle()
   endif
   exec 'normal! G'
 endfunction
-  if !exists("CompileAndExcute")
+  if !exists('CompileAndExcute')
     function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
@@ -1010,7 +1010,7 @@ function! DeleteBlankLine()
   let l:new_column = col('.')
   let l:line_num = line('.')
   " Find the nearest line which contains at least one non-space character.
-  if getline('.') =~ '^\s*$'
+  if getline('.') =~? '^\s*$'
     let l:mark_enable = 0
     let l:new_column = 1
     let l:down_line_num = search('^\s*\S', 'nW')
@@ -1060,12 +1060,12 @@ function! InsertEnterInNormalMode()
       let l:new_column = l:new_column + 1
     endif
     " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:current_indent`
-    if getline(l:new_line) =~ '^\s*$'
+    if getline(l:new_line) =~? '^\s*$'
         call setline(l:new_line, l:current_indent)
         let l:new_column = l:current_indent_count + 1
     endif
     " 6. 如果 `l:current_line` 行为空或只有空格，则清除 `l:current_line` 行的空格
-    if getline(l:current_line) =~ '^\s*$'
+    if getline(l:current_line) =~? '^\s*$'
         call setline(l:current_line, '')
     endif
     " 7. 去到 `l:new_line` 行的l:new_column列
