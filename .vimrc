@@ -88,9 +88,9 @@ Plug 'liuchengxu/vim-which-key', {'on': []}
 Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件
 Plug 'skywind3000/asyncrun.vim', {'on': []}
-" 菜单栏插件, Only Lazy Configuration, but classifed into Lazy
-Plug 'skywind3000/vim-quickui'
-" 文件目录插件, Lazy_On
+" 菜单栏插件, Lazy_On
+Plug 'skywind3000/vim-quickui', {'on': []}
+" 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
 Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
@@ -400,57 +400,78 @@ function! LazyPluginConfiguration()
   let g:asyncrun_mode = 'term'
   nnoremap <F8> :call ToggleTerminal(6, 33)<CR>
   nnoremap <Space><F8> :AsyncRun! -strip -focus=0 -rows=6 -hidden=1<Space>
-
-
-
-  " vim-quickui setting
-  " clear all the menus
-  call quickui#menu#reset()
-  " install a 'File' menu, use [text, command] to represent an item.
-  call quickui#menu#install('&File', [
-        \ [ "&Save\tCtrl+s", 'w'],
-        \ [ 'Save &As', 'call feedkey(":saveas ")' ],
-        \ [ 'Save All', 'wa' ],
-        \ [ '--', '' ],
-        \ [ 'LeaderF &File', 'Leaderf file', 'Open file with leaderf'],
-        \ [ 'LeaderF &Mru', 'Leaderf mru --regexMode', 'Open recently accessed files'],
-        \ [ 'LeaderF &Buffer', 'Leaderf buffer', 'List current buffers in leaderf'],
-        \ [ '--', '' ],
-        \ [ "E&xit\tAlt+x", 'q' ],
-        \ ])
-  " script inside %{...} will be evaluated and expanded in the string
-  call quickui#menu#install('&Option', [
-        \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
-        \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
-        \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
-        \ ])
-  " register HELP menu with weight 10000
-  call quickui#menu#install('H&elp', [
-        \ ['&Cheatsheet', 'help index', ''],
-        \ ['T&ips', 'help tips', ''],
-        \ ['--',''],
-        \ ['&Tutorial', 'help tutor', ''],
-        \ ['&Quick Reference', 'help quickref', ''],
-        \ ['&Summary', 'help summary', ''],
-        \ ['--',''],
-        \ ['&Vim Script', 'help eval', ''],
-        \ ['&Function List', 'help function-list', ''],
-        \ ], 10000)
-  " enable to display tips in the cmdline
-  let g:quickui_show_tip = 1
-  let g:quickui_color_scheme = 'papercol light'
-  " hit \qm to open menu
-  noremap <Leader>qm :call quickui#menu#open()<CR>
-  " hit \qb to switch buffer
-  noremap <Leader>qb :call quickui#tools#list_buffer('e')<CR>
-  " hit \qt to preview tags
-  noremap <Leader>qt :call quickui#tools#preview_tag('')<CR>
 endfunction
 
 
 
 
 function! LazyOnPluginConfiguration()
+  " vim-quickui setting
+  function! QuickuiConfiguration()
+    call plug#load('vim-quickui')
+    " clear all the menus
+    call quickui#menu#reset()
+    " install a 'File' menu, use [text, command] to represent an item.
+    call quickui#menu#install('&File', [
+          \ [ "&Save\tCtrl+s", 'w'],
+          \ [ 'Save &As', 'call feedkey(":saveas ")' ],
+          \ [ 'Save All', 'wa' ],
+          \ [ '--', '' ],
+          \ [ 'LeaderF &File', 'Leaderf file', 'Open file with leaderf'],
+          \ [ 'LeaderF &Mru', 'Leaderf mru --regexMode', 'Open recently accessed files'],
+          \ [ 'LeaderF &Buffer', 'Leaderf buffer', 'List current buffers in leaderf'],
+          \ [ '--', '' ],
+          \ [ "E&xit\tAlt+x", 'q' ],
+          \ ])
+    " script inside %{...} will be evaluated and expanded in the string
+    call quickui#menu#install('&Option', [
+          \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
+          \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
+          \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
+          \ ])
+    " register HELP menu with weight 10000
+    call quickui#menu#install('H&elp', [
+          \ ['&Cheatsheet', 'help index', ''],
+          \ ['T&ips', 'help tips', ''],
+          \ ['--',''],
+          \ ['&Tutorial', 'help tutor', ''],
+          \ ['&Quick Reference', 'help quickref', ''],
+          \ ['&Summary', 'help summary', ''],
+          \ ['--',''],
+          \ ['&Vim Script', 'help eval', ''],
+          \ ['&Function List', 'help function-list', ''],
+          \ ], 10000)
+  endfunction
+  function! QuickuiOpenMenu()
+    if !exists('quickui#menu#open')
+      call QuickuiConfiguration()
+    endif
+    call quickui#menu#open()
+  endfunction
+  function! QuickuiListBuffer()
+    if !exists('quickui#tools#list_buffer')
+      call QuickuiConfiguration()
+    endif
+    call quickui#tools#list_buffer('e')
+  endfunction
+  function! QuickuiPreviewTag()
+    if !exists('quickui#tools#preview_tag')
+      call QuickuiConfiguration()
+    endif
+    call quickui#tools#preview_tag('')
+  endfunction
+  " enable to display tips in the cmdline
+  let g:quickui_show_tip = 1
+  let g:quickui_color_scheme = 'papercol light'
+  " hit \qm to open menu
+  noremap <Leader>qm :call QuickuiOpenMenu()<CR>
+  " hit \qb to switch buffer
+  noremap <Leader>qb :call QuickuiListBuffer()<CR>
+  " hit \qt to preview tags
+  noremap <Leader>qt :call QuickuiPreviewTag()<CR>
+
+
+
   " NERDTree Setting
   nnoremap <Leader>nt :NERDTreeToggle<CR>
   nnoremap <Leader>nc :NERDTreeCWD<CR>
