@@ -953,8 +953,8 @@ function! CallShowNearestFunction()
   endif
 endfunction
 " alt+n跳到第n个tab，0<n<10
-function! TabPosActivateBuffer(num)
-  let s:count = a:num
+function! TabPosActivateBuffer(index)
+  let s:count = a:index
   exec 'tabfirst'
   exec 'tabnext' s:count
 endfunction
