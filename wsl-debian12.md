@@ -68,6 +68,7 @@ pipx install you-get
 pipx install sphinx
 pipx install sphinx-rtd-theme --include-deps
 pipx install autopep8
+pipx install vim-vint
 pip install pysnooper futures neovim --break-system-packages #not do for root
 mkdir ~/.config/nvim -p
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
@@ -293,10 +294,12 @@ sudo update-alternatives --install /usr/bin/clang-reorder-fields clang-reorder-f
 sudo update-alternatives --install /usr/bin/clang-repl clang-repl /usr/bin/clang-repl-19 190
 sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps /usr/bin/clang-scan-deps-19 190
 sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-19 190
-sudo update-alternatives --install /usr/bin/clang-tidy-diff clang-tidy-diff /usr/bin/clang-tidy-diff-19.py 190
+sudo update-alternatives --install /usr/bin/clang-tidy-diff.py clang-tidy-diff.py /usr/bin/clang-tidy-diff-19.py 190
 sudo update-alternatives --install /usr/bin/git-clang-format git-clang-format /usr/bin/git-clang-format-19 190
+sudo update-alternatives --install /usr/bin/clang-tblgen clang-tblgen /usr/bin/clang-tblgen-19 190
 sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-19 190
-sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-19.py 190
+sudo update-alternatives --install /usr/bin/run-clang-tidy.py run-clang-tidy.py /usr/bin/run-clang-tidy-19.py 190
+sudo update-alternatives --install /usr/bin/rust-clang rust-clang /usr/bin/clang-19 190
 sudo update-alternatives --install /usr/bin/FileCheck FileCheck /usr/bin/FileCheck-19 190
 sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 190
 sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-19 190
