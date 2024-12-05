@@ -924,7 +924,7 @@ endfunction
       elseif &filetype==?'c'
         let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -Wall -Wextra'
       endif
-      exec l:compile_exec.' '.$LDFLAGS.' && ./%<.exe'
+      exec l:compile_exec.' && ./%<.exe'
     elseif &filetype==?'python'
       exec l:compile_exec.' python3 %'
     elseif &filetype==?'sh'
@@ -950,7 +950,7 @@ function! CompileCommand()
     elseif &filetype==?'c'
       let l:compile_only = l:compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
     endif
-    exec l:compile_only.' '.$LDFLAGS
+    exec l:compile_only
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   endif
