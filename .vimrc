@@ -275,28 +275,49 @@ function! LazyPluginConfiguration()
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
-  function! CppWorkspaceRoot()
-    let l:cpp_workspace_root = finddir('.git', '.;')
-    if (strlen(l:cpp_workspace_root) == 0)
-      let l:cpp_workspace_root = expand('%:p:h')
-    elseif (l:cpp_workspace_root ==? '.git')
-      let l:cpp_workspace_root = '.'
+  function! WorkspaceRoot()
+    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
+    for l:pattern in l:root_patterns
+      let l:workspace_root = finddir(l:pattern, '.;')
+      if !empty(l:workspace_root)
+        let l:root_pattern = l:pattern
+        break
+      endif
+    endfor
+    if empty(l:workspace_root)
+      echo 'You need to create a root-pattern file like .git in your project.'
+      return l:workspace_root
+    elseif (l:workspace_root ==? l:root_pattern)
+      let l:workspace_root = '.'
     else
-      let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strridx(l:cpp_workspace_root,'/.git'))
+      let l:workspace_root = strpart(l:workspace_root, 0, strridx(l:workspace_root,'/'.l:root_pattern))
     endif
-    return l:cpp_workspace_root
+    return [l:workspace_root, l:root_pattern]
   endfunction
   function! ClangToolConfiguration()
-    let l:cpp_workspace_root = CppWorkspaceRoot()
-    let l:clang_format = l:cpp_workspace_root.'/.clang-format'
-    let l:clang_tidy = l:cpp_workspace_root.'/.clang-tidy'
-    if !filereadable(l:clang_format)
-      let l:clang_format_content = readfile($HOME.'/.vim/.c_cpp/.clang-format')
-      call writefile(l:clang_format_content, l:clang_format, 's')
+    let l:cpp_workspace_root = WorkspaceRoot()[0]
+    if empty(l:cpp_workspace_root)
+      return
     endif
-    if !filereadable(l:clang_tidy)
-      let l:clang_tidy_content = readfile($HOME.'/.vim/.c_cpp/.clang-tidy')
+    let l:clang_format = l:cpp_workspace_root.'/.clang-format'
+    let l:clang_format_source = $HOME.'/.vim/.c_cpp/.clang-format'
+    let l:clang_tidy = l:cpp_workspace_root.'/.clang-tidy'
+    let l:clang_tidy_source = $HOME.'/.vim/.c_cpp/.clang-tidy'
+    if !filereadable(l:clang_format) && filereadable(l:clang_format_source)
+      let l:clang_format_content = readfile(l:clang_format_source)
+      call writefile(l:clang_format_content, l:clang_format, 's')
+    elseif filereadable(l:clang_format)
+      echo 'The '.l:clang_format.' file has existed.'
+    else
+      echo 'The '.l:clang_format_source.' file does not exist.'
+    endif
+    if !filereadable(l:clang_tidy) && filereadable(l:clang_tidy_source)
+      let l:clang_tidy_content = readfile(l:clang_tidy_source)
       call writefile(l:clang_tidy_content, l:clang_tidy, 's')
+    elseif filereadable(l:clang_tidy)
+      echo 'The '.l:clang_tidy.' file has existed.'
+    else
+      echo 'The '.l:clang_tidy_source.' file does not exist.'
     endif
   endfunction
   noremap <Leader><F7> :call ClangToolConfiguration()<CR>
@@ -379,19 +400,19 @@ function! LazyPluginConfiguration()
     let l:current_tab = tabpagenr()
     for l:win in getwininfo()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab && bufexists(l:win['bufnr'])
-        exec 'bdelete! ' . l:win['bufnr']
+        exec 'bwipeout! ' . l:win['bufnr']
       endif
     endfor
     if exists('g:tab_term_buf')
       if(bufexists(g:tab_term_buf[tabpagenr()]))
-        exec 'bdelete! ' . g:tab_term_buf[tabpagenr()]
+        exec 'bwipeout! ' . g:tab_term_buf[tabpagenr()]
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
       for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 1)
-          if(g:tab_term_buf[l:term_index] != -1)
-            let g:tab_term_buf[l:term_index - 1] = g:tab_term_buf[l:term_index]
-            let g:tab_term_buf[l:term_index] = - 1
-          endif
+        if(g:tab_term_buf[l:term_index] != -1)
+          let g:tab_term_buf[l:term_index - 1] = g:tab_term_buf[l:term_index]
+          let g:tab_term_buf[l:term_index] = - 1
+        endif
       endfor
     endif
   endfunction
@@ -605,17 +626,30 @@ function! LazyOnPluginConfiguration()
 
   " vimspector setting
   function! CppDebugConfiguration()
-    let l:cpp_workspace_root = CppWorkspaceRoot()
-    let l:launch_json = l:cpp_workspace_root.'/.vscode/launch.json'
-    if !filereadable(l:launch_json)
-      call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
-      let l:launch_json_content = readfile($HOME.'/.vim/.c_cpp/.vscode/launch.json')
-      call writefile(l:launch_json_content, l:launch_json, 's')
+    let l:cpp_workspace_root = WorkspaceRoot()[0]
+    if empty(l:cpp_workspace_root)
+      return
     endif
+    let l:launch_json = l:cpp_workspace_root.'/.vscode/launch.json'
+    let l:launch_json_source = $HOME.'/.vim/.c_cpp/.vscode/launch.json'
     let l:vimspector_json = l:cpp_workspace_root.'/.vimspector.json'
-    if !filereadable(l:vimspector_json)
-      let l:cpp_json_content = readfile($HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json')
+    let l:vimspector_json_source = $HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json'
+    if !filereadable(l:launch_json) && filereadable(l:launch_json_source)
+      call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
+      let l:launch_json_content = readfile(l:launch_json_source)
+      call writefile(l:launch_json_content, l:launch_json, 's')
+    elseif filereadable(l:launch_json)
+      echo 'The '.l:launch_json.' file has existed.'
+    else
+      echo 'The '.l:launch_json_source.' file does not exist.'
+    endif
+    if !filereadable(l:vimspector_json) && filereadable(l:vimspector_json_source)
+      let l:cpp_json_content = readfile(l:vimspector_json_source)
       call writefile(l:cpp_json_content, l:vimspector_json, 's')
+    elseif filereadable(l:vimspector_json)
+      echo 'The '.l:vimspector_json.' file has existed.'
+    else
+      echo 'The '.l:vimspector_json_source.' file does not exist.'
     endif
       exec 'tabe ' . l:vimspector_json
   endfunction
@@ -996,9 +1030,9 @@ function! CloseAndBackTab()
     let l:current_buf = bufnr('%')  " Get the buffer number of the current buffer
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
-        if l:buf != l:current_buf && bufexists(l:buf)
-            exec 'bdelete! ' . l:buf
-        endif
+      if l:buf != l:current_buf && bufexists(l:buf)
+        exec 'bwipeout! ' . l:buf
+      endif
     endfor
     quit
   else
@@ -1007,13 +1041,19 @@ function! CloseAndBackTab()
 endfunction
 function! QuitTab()
   call CloseTheLatestTerm()
-  if(tabpagenr('$') == 1)
-    let l:current_buf = bufnr('%')  " Get the buffer number of the current buffer
+  let l:current_tab = tabpagenr()
+  let l:current_tab_buf = 99999
+  for l:win in getwininfo()
+    if l:win['tabnr'] == l:current_tab && l:win['bufnr'] < l:current_tab_buf
+      let l:current_tab_buf = l:win['bufnr']
+    endif
+  endfor
+  if tabpagenr('$') == 1 && len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
-        if l:buf != l:current_buf && bufexists(l:buf)
-            exec 'bdelete! ' . l:buf
-        endif
+      if l:buf != l:current_tab_buf && bufexists(l:buf) && empty(win_findbuf(l:buf))
+        exec 'bwipeout! ' . l:buf
+      endif
     endfor
     quit
   else
