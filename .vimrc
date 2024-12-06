@@ -76,6 +76,8 @@ Plug 'vim-python/python-syntax', {'for': ['python']}
 Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
+" verilog indent file
+Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
 " markdown实时预览插件
 Plug 'instant-markdown/vim-instant-markdown', {'for': [], 'do': 'yarn install'}
 " markdown目录构建插件
@@ -114,7 +116,7 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
-  autocmd BufNewFile,BufRead *.launch setfiletype roslaunch
+  autocmd BufNewFile,BufRead *.launch set filetype=roslaunch
   autocmd BufNewFile,BufRead *.launch call plug#load('vim-ros')
 augroup END
 
@@ -348,6 +350,7 @@ function! LazyPluginConfiguration()
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
   let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
   let g:NERDCustomDelimiters = {'opencl': {'left': '//'}} " use // to comment cl source codes.
+  let g:NERDCustomDelimiters = {'qmake': {'left': '#'}} " use // to comment cl source codes.
   map <F3> <plug>NERDCommenterComment
   map <S-F3> <plug>NERDCommenterUncomment
 

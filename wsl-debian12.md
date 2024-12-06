@@ -62,6 +62,7 @@ pipx install pylint
 pipx install yapf
 pipx install pygments
 pipx install cmakelang
+pipx install cmake-language-server
 pipx install pyright
 pipx install cppman
 pipx install you-get
