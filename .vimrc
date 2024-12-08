@@ -904,7 +904,7 @@ function! SetTitle()
   endif
   exec 'normal! G'
 endfunction
-if !exists('CompileAndExcute')
+if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
