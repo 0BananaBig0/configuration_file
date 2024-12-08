@@ -278,15 +278,31 @@ function! LazyPluginConfiguration()
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
-  function! WorkspaceRoot()
-    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
-    for l:pattern in l:root_patterns
-      let l:workspace_root = finddir(l:pattern, '.;')
+  function! FindPatters(root_patterns, target_path)
+    let l:root_pattern = ''
+    for l:pattern in a:root_patterns
+      let l:workspace_root = finddir(l:pattern, a:target_path.';')
       if !empty(l:workspace_root)
         let l:root_pattern = l:pattern
         break
+      else
+        let l:workspace_root = findfile(l:pattern, a:target_path.';')
+        if !empty(l:workspace_root)
+          let l:root_pattern = l:pattern
+          break
+        endif
       endif
     endfor
+    return [l:workspace_root, l:root_pattern]
+  endfunction
+  function! WorkspaceRoot()
+    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
+    let l:workspace_root = FindPatters(l:root_patterns, expand('%:p:h'))[0] " Where we store the opened file
+    let l:root_pattern = FindPatters(l:root_patterns, expand('%:p:h'))[1]
+    if empty(l:workspace_root)
+      let l:workspace_root = FindPatters(l:root_patterns, getcwd())[0] " Where we type the vim command to open the file
+      let l:root_pattern = FindPatters(l:root_patterns, getcwd())[1]
+    endif
     if empty(l:workspace_root)
       echo 'You need to create a root-pattern file like .git in your project.'
       return l:workspace_root
