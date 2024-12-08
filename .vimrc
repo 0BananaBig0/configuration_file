@@ -396,12 +396,10 @@ function! LazyPluginConfiguration()
         hide
       endif
     endfor
-
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer
     if l:terminal_shown == 0
       " Get the list of all buffers and find the latest terminal buffer
       let l:latest_terminal = g:tab_term_buf[l:current_tab]
-
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
       if l:latest_terminal != -1 && bufexists(l:latest_terminal)
         " Open the terminal buffer in a new split at the bottom with the specified height
@@ -920,16 +918,59 @@ function! SetTitle()
   endif
   exec 'normal! G'
 endfunction
+function! SingleCPPFileCompilation()
+  if &filetype==?'cpp'
+    return ' g++ % -o %<.exe -Wall -Wextra'
+  else
+    return ' gcc % -o %<.exe -Wall -Wextra'
+  endif
+endfunction
+function! CPPCompilation()
+  let l:cpp_workspace_root = WorkspaceRoot()[0]
+  if empty(cpp_workspace_root)
+    return SingleCPPFileCompilation()
+  endif
+  let l:cpp_workspace_root = fnamemodify(l:cpp_workspace_root, ':p')
+  let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 2)
+  let l:cur_file_path = expand('%:p:h')
+  if stridx(l:cur_file_path, l:cpp_workspace_root) != 0
+    echo "The current file is not located in ".l:cpp_workspace_root.'.'
+    return SingleCPPFileCompilation()
+  endif
+  let l:all_possible_paths = [l:cpp_workspace_root]
+  for l:str_id in range(strlen(l:cpp_workspace_root), strlen(l:cur_file_path) - 1)
+    if l:cur_file_path[l:str_id] ==? '/'
+      call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id - 1))
+    endif
+  endfor
+  call add(l:all_possible_paths, l:cur_file_path)
+  let l:makefile_path = ''
+  for l:possible_path in l:all_possible_paths
+    let l:pattern = l:possible_path."/*.pro"
+    " Get the list of matching files (non-recursive)
+    let l:qmake_path = glob(l:pattern, 0, 1)
+    if !empty(l:qmake_path)
+      return ' cd '.l:possible_path.' && qmake && make'
+    endif
+    let l:pattern = l:possible_path."/*akefile*"
+    let l:makefile_path = glob(l:pattern, 0, 1)
+    if !empty(l:makefile_path)
+      return ' cd '.l:possible_path.' && make'
+    endif
+  endfor
+  return SingleCPPFileCompilation()
+endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
-      if &filetype==?'cpp'
-        let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -Wall -Wextra'
+      let l:cpp_compilation = CPPCompilation()
+      let l:make_compilation = strpart(l:cpp_compilation, strlen(l:cpp_compilation) - 4, strlen(l:cpp_compilation) - 1)
+      if l:make_compilation==?'make'
+        exec l:compile_exec.l:cpp_compilation
       else
-        let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -Wall -Wextra'
+        exec l:compile_exec.l:cpp_compilation.' && ./%<.exe'
       endif
-      exec l:compile_exec.' && ./%<.exe'
     elseif &filetype==?'python'
       exec l:compile_exec.' python3 %'
     elseif &filetype==?'sh'
@@ -950,11 +991,8 @@ endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -focus=0 -rows=6 -hidden=1'
   if &filetype==?'cpp' || &filetype==?'c'
-    if &filetype==?'cpp'
-      let l:compile_only = l:compile_only.' g++ % -o %<.exe -g -Wall -Wextra'
-    elseif &filetype==?'c'
-      let l:compile_only = l:compile_only.' gcc % -o %<.exe -g -Wall -Wextra'
-    endif
+    let l:cpp_compilation = CPPCompilation()
+    let l:compile_only = l:compile_only.l:cpp_compilation
     exec l:compile_only
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
