@@ -528,47 +528,32 @@ function! LazyOnPluginConfiguration()
   " vim-bookmarks setting
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
-  " Save bookmarks to the nearest .git which is in parent or current directory,
-  " if .git can be found, otherwise save bookmarks to $HOME/.vim
+  let g:bookmark_auto_save = 1
+  " Save bookmarks to $HOME/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
-    let l:bookmarkextension = 'bookmarks'
-    let l:cur_file_path = expand('%:p:h')
-    " Look upwards (at parents) for a directory named '.git' begin form l:cur_file_path
-    let l:location = finddir('.git', '.;')
-    if l:location ==? '.git'
-      " current directory is workspace or current file path has .git directory
-      let l:path_to_pro = getcwd()
-    elseif strlen(strpart(l:location, 0, 1)) == 1
-      " can find .git, but current directory not has .git
-      let l:path_to_pro = strpart(l:location, 0, strridx(l:location, '/.git'))
-    endif
-    if len(l:location) > 0
-      if strpart(l:path_to_pro, 0, 1)!=?'/'
-        let l:path_to_pro='/'.l:path_to_pro
-      endif
-      let l:pro_dir = strpart(l:path_to_pro, strridx(l:path_to_pro, '/'))
-      let l:pro_to_file = strpart(l:cur_file_path, stridx(l:cur_file_path, l:pro_dir)+strlen(l:pro_dir))
-      let l:location = simplify(l:location.'/.vim-bookmarks'.l:pro_to_file)
+    let l:bookmark_extension = 'bookmarks'
+    " Bookmark files of the root user are saved to /home/$SUDO_USER/.vim/.vim-bookmarks
+    if empty($SUDO_USER)
+      let l:bookmark_root_location = $HOME.'/.vim/.vim-bookmarks'
     else
-      " the bookmarks of the root and common user both are saved in the same directory
-      if strpart(l:cur_file_path, 0, 5) ==? '/root'
-        let l:pro_to_file = l:cur_file_path
-      elseif strpart($SUDO_USER, 0, 1) ==? ''
-        let l:pro_to_file = strpart(l:cur_file_path, strlen($HOME))
-      else
-        let l:pro_to_file = strpart(l:cur_file_path, strlen('/home/'.$SUDO_USER))
-      endif
-      if strpart($SUDO_USER, 0, 1) ==? ''
-        let l:location = $HOME.'/.vim/.vim-bookmarks'.l:pro_to_file
-      else
-        let l:location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'.l:pro_to_file
+      let l:bookmark_root_location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'
+    endif
+    let l:bookmark_path = l:bookmark_root_location.expand('%:p:h')
+    let l:bookmark_file = simplify(l:bookmark_path.'/'.expand('%:t').'.'.l:bookmark_extension)
+    if !isdirectory(l:bookmark_path)
+      call mkdir(l:bookmark_path, 'p')
+      if !empty($SUDO_USER)
+        call system('chown -R $SUDO_USER:$SUDO_USER '.shellescape(l:bookmark_root_location))
       endif
     endif
-    if !isdirectory(l:location)
-      call mkdir(l:location, 'p')
+    if !filereadable(l:bookmark_file)
+      call system('touch '.shellescape(l:bookmark_file))
+      if !empty($SUDO_USER)
+        call system('chown $SUDO_USER:$SUDO_USER '.shellescape(l:bookmark_file))
+      endif
     endif
-      return simplify(l:location.'/'.expand('%:t').'.'.l:bookmarkextension)
+    return l:bookmark_path
   endfunction
   nnoremap <Leader>bo :call plug#load('vim-bookmarks')<CR>
   nnoremap <Leader>bt :BookmarkToggle<CR>
