@@ -904,13 +904,13 @@ function! SetTitle()
   endif
   exec 'normal! G'
 endfunction
-  if !exists('CompileAndExcute')
-    function! CompileAndExcute()
+if !exists('CompileAndExcute')
+  function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
         let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -Wall -Wextra'
-      elseif &filetype==?'c'
+      else &filetype==?'c'
         let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -Wall -Wextra'
       endif
       exec l:compile_exec.' && ./%<.exe'
