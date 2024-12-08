@@ -910,7 +910,7 @@ if !exists('*CompileAndExcute')
     if &filetype==?'cpp' || &filetype==?'c'
       if &filetype==?'cpp'
         let l:compile_exec = l:compile_exec.' g++ % -o %<.exe -Wall -Wextra'
-      else &filetype==?'c'
+      else
         let l:compile_exec = l:compile_exec.' gcc % -o %<.exe -Wall -Wextra'
       endif
       exec l:compile_exec.' && ./%<.exe'
