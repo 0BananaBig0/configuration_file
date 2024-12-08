@@ -24,6 +24,15 @@
          }
       }
    },
+   "qml": {
+      "command": "qmlls",
+      "rootPatterns": [
+         ".git"
+      ],
+      "filetypes": [
+         "qml"
+      ]
+   },
    "workspace.rootPatterns": [
       ".git",
       ".hg",
@@ -75,5 +84,3 @@
    "suggest.snippetIndicator": "~",
    "suggest.triggerAfterInsertEnter": true
 }
-
-

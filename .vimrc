@@ -118,6 +118,7 @@ augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
   autocmd BufNewFile,BufRead *.launch set filetype=roslaunch
   autocmd BufNewFile,BufRead *.launch call plug#load('vim-ros')
+  autocmd BufNewFile,BufRead $HOME/.Qt6/6.8.1/gcc_64/include/*/* set filetype=cpp
 augroup END
 
 
