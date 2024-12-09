@@ -965,8 +965,8 @@ if !exists('*CompileAndExcute')
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
       let l:cpp_compilation = CPPCompilation()
-      let l:make_compilation = strpart(l:cpp_compilation, strlen(l:cpp_compilation) - 4, strlen(l:cpp_compilation) - 1)
-      if l:make_compilation==?'make'
+      let l:make_compilation = strpart(l:cpp_compilation, strlen(l:cpp_compilation) - 9, strlen(l:cpp_compilation) - 1)
+      if l:make_compilation==?'make -j12'
         exec l:compile_exec.l:cpp_compilation
       else
         exec l:compile_exec.l:cpp_compilation.' && ./%<.exe'
