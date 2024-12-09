@@ -278,7 +278,7 @@ function! LazyPluginConfiguration()
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
            \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
-  function! FindPatters(root_patterns, target_path)
+  function! FindPattern(root_patterns, target_path)
     let l:root_pattern = ''
     for l:pattern in a:root_patterns
       let l:workspace_root = finddir(l:pattern, a:target_path.';')
@@ -297,11 +297,11 @@ function! LazyPluginConfiguration()
   endfunction
   function! WorkspaceRoot()
     let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
-    let l:workspace_root = FindPatters(l:root_patterns, expand('%:p:h'))[0] " Where we store the opened file
-    let l:root_pattern = FindPatters(l:root_patterns, expand('%:p:h'))[1]
+    let l:workspace_root = FindPattern(l:root_patterns, expand('%:p:h'))[0] " Where we store the opened file
+    let l:root_pattern = FindPattern(l:root_patterns, expand('%:p:h'))[1]
     if empty(l:workspace_root)
-      let l:workspace_root = FindPatters(l:root_patterns, getcwd())[0] " Where we type the vim command to open the file
-      let l:root_pattern = FindPatters(l:root_patterns, getcwd())[1]
+      let l:workspace_root = FindPattern(l:root_patterns, getcwd())[0] " Where we type the vim command to open the file
+      let l:root_pattern = FindPattern(l:root_patterns, getcwd())[1]
     endif
     if empty(l:workspace_root)
       echo 'You need to create a root-pattern file like .git in your project.'
@@ -950,12 +950,12 @@ function! CPPCompilation()
     " Get the list of matching files (non-recursive)
     let l:qmake_path = glob(l:pattern, 0, 1)
     if !empty(l:qmake_path)
-      return ' cd '.l:possible_path.' && qmake && make'
+      return ' cd '.l:possible_path.' && qmake && make -j12'
     endif
     let l:pattern = l:possible_path."/*akefile*"
     let l:makefile_path = glob(l:pattern, 0, 1)
     if !empty(l:makefile_path)
-      return ' cd '.l:possible_path.' && make'
+      return ' cd '.l:possible_path.' && make -j12'
     endif
   endfor
   return SingleCPPFileCompilation()
