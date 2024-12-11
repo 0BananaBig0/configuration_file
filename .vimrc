@@ -425,7 +425,7 @@ function! LazyPluginConfiguration()
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   nnoremap <F8> :call ToggleTerminal(6, 33)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip -focus=0 -rows=6 -hidden=1<Space>
+  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=1<Space>
 endfunction
 
 
@@ -955,7 +955,7 @@ function! CPPCompilation()
 endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
+    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=1'
     if &filetype==?'cpp' || &filetype==?'c'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'make -j12') != -1
@@ -981,7 +981,7 @@ if !exists('*CompileAndExcute')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -focus=0 -rows=6 -hidden=1'
+  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=1'
   if &filetype==?'cpp' || &filetype==?'c'
     let l:cpp_compilation = CPPCompilation()
     let l:compile_only = l:compile_only.l:cpp_compilation
