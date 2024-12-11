@@ -31,12 +31,11 @@
 "example I confuse with 'set ws', so I use vim command as the following :
 "help ws. If I confuse with 'let g:coc_start_at_startup = 0', I can use the
 "following command:help coc_start_at_startup
-"There are some commands you may need to know:you can use tab key to complete
+"There are some commands you may need to know: you can use tab key to complete
 "if you want to use the shell command,you can add ! before your shell command,
 "for example,if you want to use ls command,you can type the  :!ls  in the vim normal mode
 "or correct your vim commands you type
 "vimplug:  PlugInstall PlugUpdate PlugUpgrade
-"leaderf: LeaderfFunction
 
 
 
@@ -98,8 +97,6 @@ Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
 " 书签插件，用于写代码注解等等
 Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
-" Esc退出变回英文输入法，进入insert模式切换为原来的输入法
-Plug '0BananaBig0/fcitx.vim', {'branch': 'fcitx4', 'on': []}
 " Multiple highlights
 Plug 'lfv89/vim-interestingwords', {'on': []}
 " Git command
@@ -192,7 +189,7 @@ function! MarkdownPluginConfiguration()
   let g:instant_markdown_allow_unsafe_content = 1
   let g:instant_markdown_mathjax = 1
   let g:instant_markdown_mermaid = 1
-  let g:instant_markdown_browser = 'msedge'
+  let g:instant_markdown_browser = 'firefox'
 
 
 
@@ -368,6 +365,7 @@ function! LazyPluginConfiguration()
   let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
   let g:NERDCustomDelimiters = {'opencl': {'left': '//'}} " use // to comment cl source codes.
   let g:NERDCustomDelimiters = {'qmake': {'left': '#'}} " use // to comment cl source codes.
+  let g:NERDCreateDefaultMappings = 0
   map <F3> <plug>NERDCommenterComment
   map <S-F3> <plug>NERDCommenterUncomment
 
@@ -527,8 +525,7 @@ function! LazyOnPluginConfiguration()
 
 
   " Vista setting
-  nnoremap <Leader>vt :Vista!!<CR>
-  nnoremap <Leader>vf :Vista focus<CR>
+  let g:vista_no_mappings = 0
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
@@ -536,6 +533,8 @@ function! LazyOnPluginConfiguration()
   let g:vista_blink = [0,0]
   let g:vista_top_level_blink = [0,0]
   let g:vista_echo_cursor_strategy = 'echo'
+  nnoremap <Leader>vt :Vista!!<CR>
+  nnoremap <Leader>vf :Vista focus<CR>
 
 
 
@@ -583,11 +582,6 @@ function! LazyOnPluginConfiguration()
 
 
 
-  " fcitx.nvim setting
-  nnoremap <Leader><Space> :call plug#load('fcitx.vim')<CR>
-
-
-
   " vim-interestingwords setting, highlight:\k ,  clear all:\K
   nnoremap <Leader>wt :call LoadAndSetVimInterestingwords()<CR>
   function! LoadAndSetVimInterestingwords()
@@ -607,7 +601,6 @@ function! LazyOnPluginConfiguration()
   nnoremap <Leader>git :call LoadAndSetGitPlugin()<CR>
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
-    let g:gitgutter_map_keys = 0
     let g:gitgutter_map_keys = 0
     nmap <Leader>gp <Plug>(GitGutterPrevHunk)
     nmap <Leader>gn <Plug>(GitGutterNextHunk)
@@ -723,7 +716,7 @@ function! LazyOnPluginConfiguration()
 
 
 
-  " leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
+  " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
   " ctrl+j/k上下选择显示查找结果，ctrl+上/下键上下移动被显示的查找结果的内容
   let g:Lf_GtagsAutoGenerate = 0
   let g:Lf_Gtagslabel = 'native-pygments'
