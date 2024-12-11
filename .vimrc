@@ -945,19 +945,19 @@ function! CPPCompilation()
     let l:cmakelist_path = glob(l:pattern, 0, 1)
     if !empty(l:cmakelist_path)
       return ' cd '.l:possible_path
-          \ .' && cmake -S . -B build && cd build && make -j12'
+          \ .' && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B build && cmake --build build --parallel 12'
           \ .' && cd '.l:cur_work_path
     endif
     let l:pattern = l:possible_path."/*.pro"
     let l:qmakepro_path = glob(l:pattern, 0, 1)
     if !empty(l:qmakepro_path)
-      return ' cd '.l:possible_path.' && qmake && make -j12'
+      return ' cd '.l:possible_path.' && qmake -o build/Makefile && bear --append -- make -j12'
           \ .' && cd '.l:cur_work_path
     endif
     let l:pattern = l:possible_path."/[m,M]akefile"
     let l:makefile_path = glob(l:pattern, 0, 1)
     if !empty(l:makefile_path)
-      return ' cd '.l:possible_path.' && make -j12'
+      return ' cd '.l:possible_path.' && bear --append -- make -j12'
           \ .' && cd '.l:cur_work_path
     endif
   endfor
@@ -968,7 +968,7 @@ if !exists('*CompileAndExcute')
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpOrHideTerminal(0,\ 33)'
     if &filetype==?'cpp' || &filetype==?'c'
       let l:cpp_compilation = CPPCompilation()
-      if stridx(l:cpp_compilation, 'make -j12') != -1
+      if stridx(l:cpp_compilation, 'make') != -1
         exec l:compile_exec.l:cpp_compilation
       else
         exec l:compile_exec.l:cpp_compilation.' && ./%<.exe'
