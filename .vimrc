@@ -77,8 +77,6 @@ Plug 'taketwo/vim-ros', {'for': []}
 Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
 " verilog indent file
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
-" markdown实时预览插件
-Plug 'instant-markdown/vim-instant-markdown', {'for': [], 'do': 'yarn install'}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': []}
 " 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Layz
@@ -184,15 +182,6 @@ function! MarkdownPluginConfiguration()
 
 
 
-  " vim-instant-markdown setting
-  let g:instant_markdown_autostart = 0
-  let g:instant_markdown_allow_unsafe_content = 1
-  let g:instant_markdown_mathjax = 1
-  let g:instant_markdown_mermaid = 1
-  let g:instant_markdown_browser = 'firefox'
-
-
-
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " If you want to go to the last line of the menu, you can press `` in normal mode
   nnoremap <Leader>mg :call CreateMarkdownMenu()<CR>
@@ -271,9 +260,9 @@ function! LazyPluginConfiguration()
   xmap [s <Plug>(coc-codeaction-selected)
   nnoremap [t :call CocAction('diagnosticToggleBuffer')<CR>
   let g:coc_filetype_map = {'opencl': 'cpp'}
-  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets', 'coc-prettier',
-           \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
-           \ 'coc-vimlsp', 'coc-sh', 'coc-pyright', 'coc-perl', 'coc-markmap',
+  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
+           \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
+           \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
   function! FindPattern(root_patterns, target_path)
     let l:root_pattern = ''
@@ -975,7 +964,7 @@ if !exists('*CompileAndExcute')
     elseif &filetype==?'tcl'
       exec l:compile_exec.' tclsh %'
     elseif &filetype==?'markdown'
-      call MarkdownPreviewToggle()
+      exec ':CocCommand markdown-preview-enhanced.openPreview'
     elseif &filetype==?'vim'
       exec ':source ~/.vimrc'
     endif
@@ -989,22 +978,6 @@ function! CompileCommand()
     exec l:compile_only
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
-  endif
-endfunction
-function! MarkdownPreviewToggle()
-  if !exists(':InstantMarkdownPreview')
-    call plug#load('vim-instant-markdown')
-    let g:instant_markdown_plugin_first_load = 1
-  endif
-  let l:cmd = 'lsof -i :' . g:instant_markdown_port
-  let l:result = system(l:cmd)
-  if empty(l:result) || (g:instant_markdown_plugin_first_load == 1)
-    exec ':InstantMarkdownPreview'
-    echo 'Opening a browser! Occupying port' g:instant_markdown_port '.'
-    let g:instant_markdown_plugin_first_load = 0
-  else
-    exec ':InstantMarkdownStop'
-    echo 'Releasing port' g:instant_markdown_port '.'
   endif
 endfunction
 function! ShowCurrentModule()
