@@ -915,6 +915,7 @@ function! CPPCompilation()
   let l:cpp_workspace_root = fnamemodify(l:cpp_workspace_root, ':p')
   let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 2)
   let l:cur_file_path = expand('%:p:h')
+  let l:cur_work_path = getcwd()
   if stridx(l:cur_file_path, l:cpp_workspace_root) != 0
     echo "The current file is not located in ".l:cpp_workspace_root.'.'
     return SingleCPPFileCompilation()
@@ -926,18 +927,28 @@ function! CPPCompilation()
     endif
   endfor
   call add(l:all_possible_paths, l:cur_file_path)
+  let l:qmakepro_path = ''
   let l:makefile_path = ''
   for l:possible_path in l:all_possible_paths
-    let l:pattern = l:possible_path."/*.pro"
+    let l:pattern = l:possible_path."/CMakeLists.txt"
     " Get the list of matching files (non-recursive)
-    let l:qmake_path = glob(l:pattern, 0, 1)
-    if !empty(l:qmake_path)
-      return ' cd '.l:possible_path.' && qmake && make -j12'
+    let l:cmakelist_path = glob(l:pattern, 0, 1)
+    if !empty(l:cmakelist_path)
+      return ' cd '.l:possible_path
+          \ .' && cmake -S . -B build && cd build && make -j12'
+          \ .' && cd '.l:cur_work_path
     endif
-    let l:pattern = l:possible_path."/*akefile*"
+    let l:pattern = l:possible_path."/*.pro"
+    let l:qmakepro_path = glob(l:pattern, 0, 1)
+    if !empty(l:qmakepro_path)
+      return ' cd '.l:possible_path.' && qmake && make -j12'
+          \ .' && cd '.l:cur_work_path
+    endif
+    let l:pattern = l:possible_path."/[m,M]akefile"
     let l:makefile_path = glob(l:pattern, 0, 1)
     if !empty(l:makefile_path)
       return ' cd '.l:possible_path.' && make -j12'
+          \ .' && cd '.l:cur_work_path
     endif
   endfor
   return SingleCPPFileCompilation()
@@ -947,8 +958,7 @@ if !exists('*CompileAndExcute')
     let l:compile_exec = ':AsyncRun -strip -focus=0 -rows=6 -listed=1 -hidden=1'
     if &filetype==?'cpp' || &filetype==?'c'
       let l:cpp_compilation = CPPCompilation()
-      let l:make_compilation = strpart(l:cpp_compilation, strlen(l:cpp_compilation) - 9, strlen(l:cpp_compilation) - 1)
-      if l:make_compilation==?'make -j12'
+      if stridx(l:cpp_compilation, 'make -j12') != -1
         exec l:compile_exec.l:cpp_compilation
       else
         exec l:compile_exec.l:cpp_compilation.' && ./%<.exe'
