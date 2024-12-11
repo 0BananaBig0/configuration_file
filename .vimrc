@@ -425,7 +425,7 @@ function! LazyPluginConfiguration()
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   nnoremap <F8> :call ToggleTerminal(6, 33)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=1<Space>
+  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0<Space>
 endfunction
 
 
@@ -913,7 +913,7 @@ function! CPPCompilation()
     return SingleCPPFileCompilation()
   endif
   let l:cpp_workspace_root = fnamemodify(l:cpp_workspace_root, ':p')
-  let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 2)
+  let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 1)
   let l:cur_file_path = expand('%:p:h')
   let l:cur_work_path = getcwd()
   if stridx(l:cur_file_path, l:cpp_workspace_root) != 0
@@ -921,9 +921,9 @@ function! CPPCompilation()
     return SingleCPPFileCompilation()
   endif
   let l:all_possible_paths = [l:cpp_workspace_root]
-  for l:str_id in range(strlen(l:cpp_workspace_root), strlen(l:cur_file_path) - 1)
+  for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
     if l:cur_file_path[l:str_id] ==? '/'
-      call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id - 1))
+      call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
     endif
   endfor
   call add(l:all_possible_paths, l:cur_file_path)
@@ -955,7 +955,7 @@ function! CPPCompilation()
 endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=1'
+    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0'
     if &filetype==?'cpp' || &filetype==?'c'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'make -j12') != -1
@@ -981,7 +981,7 @@ if !exists('*CompileAndExcute')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=1'
+  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0'
   if &filetype==?'cpp' || &filetype==?'c'
     let l:cpp_compilation = CPPCompilation()
     let l:compile_only = l:compile_only.l:cpp_compilation
