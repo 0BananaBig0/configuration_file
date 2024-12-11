@@ -370,7 +370,7 @@ function! LazyPluginConfiguration()
       let g:tab_term_buf = repeat([-1], a:size)
     endif
     for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab
+      if l:win['terminal'] == 1 && (l:win['tabnr'] == l:current_tab || a:jump_or_hide == 0)
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
         if l:win['bufnr'] > g:tab_term_buf[l:current_tab]
