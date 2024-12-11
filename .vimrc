@@ -251,25 +251,25 @@ function! LazyPluginConfiguration()
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
-  nmap <Space>d <Plug>(coc-definition)
   nmap <Space>c <Plug>(coc-declaration)
-  nmap <Space>i <Plug>(coc-implementation)
-  nmap <Space>r <Plug>(coc-references)
-  nmap <Space>n <Plug>(coc-rename)
+  nmap <Space>d <Plug>(coc-definition)
   nmap <Space>f <Plug>(coc-refactor)
-  nnoremap [d :call CocAction('jumpDefinition', 'tabe')<CR>
+  nmap <Space>i <Plug>(coc-implementation)
+  nmap <Space>j <Plug>(coc-diagnostic-next-error)
+  nmap <Space>k <Plug>(coc-diagnostic-prev-error)
+  nmap <Space>n <Plug>(coc-rename)
+  nmap <Space>r <Plug>(coc-references)
+  nmap [a <Plug>(coc-codeaction)
+  nmap [b <Plug>(coc-codeaction-line)
   nnoremap [c :call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap [d :call CocAction('jumpDefinition', 'tabe')<CR>
   nnoremap [i :call CocAction('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
-  nmap <Space>j <Plug>(coc-diagnostic-next-error)
-  nmap <Space>k <Plug>(coc-diagnostic-prev-error)
-  nnoremap [t :call CocAction('diagnosticToggleBuffer')<CR>
   nmap [l <Plug>(coc-diagnostic-info)
-  nmap [a <Plug>(coc-codeaction)
-  nmap [b <Plug>(coc-codeaction-line)
   nmap [s <Plug>(coc-codeaction-selected)
   xmap [s <Plug>(coc-codeaction-selected)
+  nnoremap [t :call CocAction('diagnosticToggleBuffer')<CR>
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-snippets', 'coc-prettier',
            \ 'coc-dictionary', 'coc-yaml', 'coc-cmake', 'coc-clangd',
