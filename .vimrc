@@ -410,7 +410,7 @@ function! LazyPluginConfiguration()
       endif
     endif
   endfunction
-  function! CloseTheLatestTerm()
+  function! CAllTermsOfCurTab()
     " Loop through all windows in the current tab to check for a terminal
     let l:current_tab = tabpagenr()
     for l:win in getwininfo()
@@ -418,18 +418,41 @@ function! LazyPluginConfiguration()
         exec 'bwipeout! ' . l:win['bufnr']
       endif
     endfor
+    call CUpdateTabTermBuf()
+  endfunction
+  function! CUpdateTabTermBuf()
     if exists('g:tab_term_buf')
       if(bufexists(g:tab_term_buf[tabpagenr()]))
         exec 'bwipeout! ' . g:tab_term_buf[tabpagenr()]
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
-      for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 1)
+      for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 2)
         if(g:tab_term_buf[l:term_index] != -1)
           let g:tab_term_buf[l:term_index - 1] = g:tab_term_buf[l:term_index]
           let g:tab_term_buf[l:term_index] = - 1
         endif
       endfor
     endif
+  endfunction
+  function! NUpdateTabTermBuf()
+    if exists('g:tab_term_buf')
+      for l:term_index in range(len(g:tab_term_buf) - 2, tabpagenr() + 1, -1)
+        if(g:tab_term_buf[l:term_index] != -1)
+          let g:tab_term_buf[l:term_index + 1] = g:tab_term_buf[l:term_index]
+          let g:tab_term_buf[l:term_index] = - 1
+        endif
+      endfor
+      let g:tab_term_buf[tabpagenr() + 1] = - 1
+    endif
+  endfunction
+  function! IsTermWin(win_id)
+    " Check if the given window ID is valid
+    if !win_id2win(a:win_id)
+      return 0
+    endif
+    let l:buf_id = winbufnr(a:win_id)
+    let l:buf_type = getbufvar(l:buf_id, '&buftype')
+    return l:buf_type ==? 'terminal'
   endfunction
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
@@ -1051,12 +1074,12 @@ endfunction
 nnoremap <Space>t :tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
 function! CloseAndBackTab()
-  call CloseTheLatestTerm()
-  if(tabpagenr() > 1 )
+  call CAllTermsOfCurTab()
+  if tabpagenr() > 1
     exec 'tabp'
     exec '+tabclose'
-  elseif(tabpagenr('$') == 1)
-    let l:current_buf = bufnr('%')  " Get the buffer number of the current buffer
+  elseif tabpagenr('$') == 1
+    let l:current_buf = bufnr('%')
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
       if l:buf != l:current_buf && bufexists(l:buf)
@@ -1068,28 +1091,38 @@ function! CloseAndBackTab()
     quit
   endif
 endfunction
-function! QuitTab()
-  call CloseTheLatestTerm()
+function! QuitWin()
   let l:current_tab = tabpagenr()
-  let l:current_tab_buf = 99999
+  let l:current_win_buf = bufnr('%')
+  let l:main_win_buf = l:current_win_buf
   for l:win in getwininfo()
-    if l:win['tabnr'] == l:current_tab && l:win['bufnr'] < l:current_tab_buf
-      let l:current_tab_buf = l:win['bufnr']
+    if l:win['tabnr'] == l:current_tab && l:win['bufnr'] < l:main_win_buf
+      let l:main_win_buf = l:win['bufnr']
     endif
   endfor
-  if tabpagenr('$') == 1 && len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
+  if l:current_win_buf != l:main_win_buf
+    let l:is_term = IsTermWin(win_getid())
+    quit!
+    if l:is_term == 1
+      call CUpdateTabTermBuf()
+    endif
+  elseif tabpagenr() > 1
+    call CAllTermsOfCurTab()
+    exec 'tabclose'
+  else
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
-      if l:buf != l:current_tab_buf && bufexists(l:buf) && empty(win_findbuf(l:buf))
+      if l:buf != l:main_win_buf && bufexists(l:buf)
         exec 'bwipeout! ' . l:buf
       endif
     endfor
-    quit
-  else
+    call CUpdateTabTermBuf()
     quit
   endif
+  let g:main_win_buf = l:main_win_buf
+  let g:current_win_buf = l:current_win_buf
 endfunction
-nnoremap <Space>q :call QuitTab()<CR>
+nnoremap <Space>q :call QuitWin()<CR>
 nnoremap <Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
