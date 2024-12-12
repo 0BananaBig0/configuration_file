@@ -120,8 +120,8 @@ augroup END
 
 colorscheme dracula
 nnoremap <Leader>ppt :colorscheme zellner<CR>
-                           \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
-                           \ :IndentGuidesDisable<CR>
+                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
+                   \ :IndentGuidesDisable<CR>
 
 
 
@@ -339,7 +339,7 @@ function! LazyPluginConfiguration()
   nnoremap K :call ShowDocumentation()<CR>
   " Highlight the symbol and its references when holding the cursor
   augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
-  hi my_helight guifg='White' guibg='Black'
+  hi sym_hilight guifg='White' guibg='Black'
 
 
 
