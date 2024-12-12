@@ -364,17 +364,17 @@ function! LazyPluginConfiguration()
   function! JumpOrHideTerminal(jump_or_hide, size)
     " Loop through all windows in the current tab to check for a terminal
     let l:terminal_shown = 0
-    let l:current_tab = tabpagenr()
+    let l:cur_tab = tabpagenr()
     " Create an array to store the most recent terminal buffer for each tab
     if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], a:size)
     endif
     for l:win in getwininfo()
-      if l:win['terminal'] == 1 && (l:win['tabnr'] == l:current_tab || a:jump_or_hide == 0)
+      if l:win['terminal'] == 1 && (l:win['tabnr'] == l:cur_tab || a:jump_or_hide == 0)
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
-        if l:win['bufnr'] > g:tab_term_buf[l:current_tab]
-          let g:tab_term_buf[l:current_tab] = l:win['bufnr']
+        if l:win['bufnr'] > g:tab_term_buf[l:cur_tab]
+          let g:tab_term_buf[l:cur_tab] = l:win['bufnr']
         endif
         " Switch to the terminal window to hide it
         call win_gotoid(l:win['winid'])
@@ -386,17 +386,17 @@ function! LazyPluginConfiguration()
         endif
       endif
     endfor
-    return [l:terminal_shown, l:current_tab]
+    return [l:terminal_shown, l:cur_tab]
   endfunction
   function! ToggleTerminal(height, size)
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:hidden_result = JumpOrHideTerminal(1, a:size)
     let l:terminal_shown = l:hidden_result[0]
-    let l:current_tab = l:hidden_result[1]
+    let l:cur_tab = l:hidden_result[1]
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer
     if l:terminal_shown == 0
       " Get the list of all buffers and find the latest terminal buffer
-      let l:latest_terminal = g:tab_term_buf[l:current_tab]
+      let l:latest_terminal = g:tab_term_buf[l:cur_tab]
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
       if l:latest_terminal != -1 && bufexists(l:latest_terminal)
         " Open the terminal buffer in a new split at the bottom with the specified height
@@ -406,15 +406,15 @@ function! LazyPluginConfiguration()
         exec 'belowright ' . ' terminal'
         call feedkeys("\<C-\>\<C-n>", 'n')
         exec 'resize ' . a:height
-        let g:tab_term_buf[l:current_tab] = bufnr('%')
+        let g:tab_term_buf[l:cur_tab] = bufnr('%')
       endif
     endif
   endfunction
   function! CAllTermsOfCurTab()
     " Loop through all windows in the current tab to check for a terminal
-    let l:current_tab = tabpagenr()
+    let l:cur_tab = tabpagenr()
     for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:current_tab && bufexists(l:win['bufnr'])
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab && bufexists(l:win['bufnr'])
         exec 'bwipeout! ' . l:win['bufnr']
       endif
     endfor
@@ -1073,16 +1073,18 @@ function! TabPosInitialize()
 endfunction
 nnoremap <Space>t :tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
+nnoremap <Space>q :call QuitWin()<CR>
+nnoremap <Space>w :w<CR>
 function! CloseAndBackTab()
   call CAllTermsOfCurTab()
   if tabpagenr() > 1
     exec 'tabp'
     exec '+tabclose'
   elseif tabpagenr('$') == 1
-    let l:current_buf = bufnr('%')
+    let l:cur_buf = bufnr('%')
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
-      if l:buf != l:current_buf && bufexists(l:buf)
+      if l:buf != l:cur_buf && bufexists(l:buf)
         exec 'bwipeout! ' . l:buf
       endif
     endfor
@@ -1092,15 +1094,15 @@ function! CloseAndBackTab()
   endif
 endfunction
 function! QuitWin()
-  let l:current_tab = tabpagenr()
-  let l:current_win_buf = bufnr('%')
-  let l:main_win_buf = l:current_win_buf
+  let l:cur_tab = tabpagenr()
+  let l:cur_win_buf = bufnr('%')
+  let l:main_win_buf = l:cur_win_buf
   for l:win in getwininfo()
-    if l:win['tabnr'] == l:current_tab && l:win['bufnr'] < l:main_win_buf
+    if l:win['tabnr'] == l:cur_tab && l:win['bufnr'] < l:main_win_buf
       let l:main_win_buf = l:win['bufnr']
     endif
   endfor
-  if l:current_win_buf != l:main_win_buf
+  if l:cur_win_buf != l:main_win_buf
     let l:is_term = IsTermWin(win_getid())
     quit!
     if l:is_term == 1
@@ -1120,10 +1122,8 @@ function! QuitWin()
     quit
   endif
   let g:main_win_buf = l:main_win_buf
-  let g:current_win_buf = l:current_win_buf
+  let g:cur_win_buf = l:cur_win_buf
 endfunction
-nnoremap <Space>q :call QuitWin()<CR>
-nnoremap <Space>w :w<CR>
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
 nnoremap <Space><F5> :call DeleteBlankLine()<CR>
@@ -1168,12 +1168,12 @@ nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
 nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
     " 1. 获取当前光标所在位置的行数
-    let l:current_line = line('.')
-    let l:new_line = l:current_line + 1
-    " 2. 获取 `l:current_line` 中的缩进空格数，并存储在 `l:current_indent_count` 中
-    let l:current_indent_count = indent(l:current_line)
+    let l:cur_line = line('.')
+    let l:new_line = l:cur_line + 1
+    " 2. 获取 `l:cur_line` 中的缩进空格数，并存储在 `l:cur_indent_count` 中
+    let l:cur_indent_count = indent(l:cur_line)
     " 3. 生成 n 个空格
-    let l:current_indent = repeat(' ', l:current_indent_count)
+    let l:cur_indent = repeat(' ', l:cur_indent_count)
     " 4. 进入插入模式，输入回车，然后返回正常模式
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
@@ -1182,14 +1182,14 @@ function! InsertEnterInNormalMode()
     if l:new_column != 1
       let l:new_column = l:new_column + 1
     endif
-    " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:current_indent`
+    " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
     if getline(l:new_line) =~? '^\s*$'
-        call setline(l:new_line, l:current_indent)
-        let l:new_column = l:current_indent_count + 1
+        call setline(l:new_line, l:cur_indent)
+        let l:new_column = l:cur_indent_count + 1
     endif
-    " 6. 如果 `l:current_line` 行为空或只有空格，则清除 `l:current_line` 行的空格
-    if getline(l:current_line) =~? '^\s*$'
-        call setline(l:current_line, '')
+    " 6. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
+    if getline(l:cur_line) =~? '^\s*$'
+        call setline(l:cur_line, '')
     endif
     " 7. 去到 `l:new_line` 行的l:new_column列
       call setpos('.', [0, l:new_line, l:new_column, 0])
