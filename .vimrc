@@ -425,8 +425,9 @@ function! LazyPluginConfiguration()
       if bufexists(g:tab_term_buf[tabpagenr()])
         if a:buf_id != g:tab_term_buf[tabpagenr()] && a:buf_id != -1
           return
+        elseif a:buf_id == -1
+          exec 'bwipeout! ' . g:tab_term_buf[tabpagenr()]
         endif
-        exec 'bwipeout! ' . g:tab_term_buf[tabpagenr()]
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
       for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 2)
@@ -1096,8 +1097,7 @@ function! CloseAndBackTab()
     quit
   endif
 endfunction
-" not consider the main win is a term
-function! QuitWin()
+function! QuitWin() " not consider the main win is a term
   let l:cur_tab = tabpagenr()
   let l:cur_win_buf = bufnr('%')
   let l:main_win_buf = l:cur_win_buf
