@@ -214,7 +214,7 @@ endfunction
 
 function! LazyPluginConfiguration()
   " vim-which-key setting
-  let g:which_key_fallback_to_native_key=1
+  let g:which_key_fallback_to_native_key=0
   nnoremap <Leader> :WhichKey '<Leader>'<CR>
   nnoremap <Space> :WhichKey '<Space>'<CR>
   nnoremap [ :WhichKey '['<CR>
