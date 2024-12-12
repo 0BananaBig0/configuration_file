@@ -1108,8 +1108,8 @@ function! QuitWin()
   endfor
   if l:cur_win_buf != l:main_win_buf " not the main win, close one win
     if IsTermWin(win_getid()) == 1
-      quit!
       call CUpdateTabTermBuf(bufnr())
+      quit!
     else
       quit
     endif
