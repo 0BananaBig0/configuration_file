@@ -420,14 +420,17 @@ function! LazyPluginConfiguration()
     endfor
     call CUpdateTabTermBuf()
   endfunction
-  function! CUpdateTabTermBuf()
+  function! CUpdateTabTermBuf(buf_id = -1)
     if exists('g:tab_term_buf')
-      if(bufexists(g:tab_term_buf[tabpagenr()]))
+      if bufexists(g:tab_term_buf[tabpagenr()])
+        if a:buf_id != g:tab_term_buf[tabpagenr()] && a:buf_id != -1
+          return
+        endif
         exec 'bwipeout! ' . g:tab_term_buf[tabpagenr()]
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
       for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 2)
-        if(g:tab_term_buf[l:term_index] != -1)
+        if g:tab_term_buf[l:term_index] != -1
           let g:tab_term_buf[l:term_index - 1] = g:tab_term_buf[l:term_index]
           let g:tab_term_buf[l:term_index] = - 1
         endif
@@ -1077,10 +1080,10 @@ nnoremap <Space>q :call QuitWin()<CR>
 nnoremap <Space>w :w<CR>
 function! CloseAndBackTab()
   call CAllTermsOfCurTab()
-  if tabpagenr() > 1
+  if tabpagenr() > 1 " not the first tab
     exec 'tabp'
     exec '+tabclose'
-  elseif tabpagenr('$') == 1
+  elseif tabpagenr('$') == 1 " single tab
     let l:cur_buf = bufnr('%')
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
@@ -1089,10 +1092,11 @@ function! CloseAndBackTab()
       endif
     endfor
     quit
-  else
+  else " multiple tabs
     quit
   endif
 endfunction
+" not consider the main win is a term
 function! QuitWin()
   let l:cur_tab = tabpagenr()
   let l:cur_win_buf = bufnr('%')
@@ -1102,27 +1106,25 @@ function! QuitWin()
       let l:main_win_buf = l:win['bufnr']
     endif
   endfor
-  if l:cur_win_buf != l:main_win_buf
-    let l:is_term = IsTermWin(win_getid())
-    quit!
-    if l:is_term == 1
-      call CUpdateTabTermBuf()
+  if l:cur_win_buf != l:main_win_buf " not the main win, close one win
+    if IsTermWin(win_getid()) == 1
+      quit!
+      call CUpdateTabTermBuf(bufnr())
+    else
+      quit
     endif
-  elseif tabpagenr() > 1
+  elseif tabpagenr('$') > 1 " multiple tabs, close one tab
     call CAllTermsOfCurTab()
     exec 'tabclose'
-  else
+  else " single tab
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
       if l:buf != l:main_win_buf && bufexists(l:buf)
         exec 'bwipeout! ' . l:buf
       endif
     endfor
-    call CUpdateTabTermBuf()
     quit
   endif
-  let g:main_win_buf = l:main_win_buf
-  let g:cur_win_buf = l:cur_win_buf
 endfunction
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
