@@ -1071,7 +1071,7 @@ function! TabPosInitialize()
   endfor
   exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
 endfunction
-nnoremap <Space>t :tabnew<CR>
+nnoremap <Space>t :call NUpdateTabTermBuf()<CR>:tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
 nnoremap <Space>q :call QuitWin()<CR>
 nnoremap <Space>w :w<CR>
