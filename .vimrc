@@ -1167,34 +1167,43 @@ function! RetabAndDeleteTraillingUselessChars()
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
+inoremap <C-CR> <ESC>l:call EnterWithoutTraillingComment()<CR>a
 nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
-    " 1. 获取当前光标所在位置的行数
-    let l:cur_line = line('.')
-    let l:new_line = l:cur_line + 1
-    " 2. 获取 `l:cur_line` 中的缩进空格数，并存储在 `l:cur_indent_count` 中
-    let l:cur_indent_count = indent(l:cur_line)
-    " 3. 生成 n 个空格
-    let l:cur_indent = repeat(' ', l:cur_indent_count)
-    " 4. 进入插入模式，输入回车，然后返回正常模式
-    " feedkeys() is an asynchronous function that causes some issues.
-    " call feedkeys("i\<CR>\<ESC>", 'n')
-    exec "normal! i\<CR>\<ESC>"
-    let l:new_column = col('.')
-    if l:new_column != 1
-      let l:new_column = l:new_column + 1
-    endif
-    " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
-    if getline(l:new_line) =~? '^\s*$'
-        call setline(l:new_line, l:cur_indent)
-        let l:new_column = l:cur_indent_count + 1
-    endif
-    " 6. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
-    if getline(l:cur_line) =~? '^\s*$'
-        call setline(l:cur_line, '')
-    endif
-    " 7. 去到 `l:new_line` 行的l:new_column列
-      call setpos('.', [0, l:new_line, l:new_column, 0])
+  " 1. 获取当前光标所在位置的行数
+  let l:cur_line = line('.')
+  let l:new_line = l:cur_line + 1
+  " 2. 获取 `l:cur_line` 中的缩进空格数，并存储在 `l:cur_indent_count` 中
+  let l:cur_indent_count = indent(l:cur_line)
+  " 3. 生成 n 个空格
+  let l:cur_indent = repeat(' ', l:cur_indent_count)
+  " 4. 进入插入模式，输入回车，然后返回正常模式
+  " feedkeys() is an asynchronous function that causes some issues.
+  " call feedkeys("i\<CR>\<ESC>", 'n')
+  exec "normal! i\<CR>\<ESC>"
+  let l:new_column = col('.')
+  if l:new_column != 1
+    let l:new_column = l:new_column + 1
+  endif
+  " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
+  if getline(l:new_line) =~? '^\s*$'
+    call setline(l:new_line, l:cur_indent)
+    let l:new_column = l:cur_indent_count + 1
+  endif
+  " 6. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
+  if getline(l:cur_line) =~? '^\s*$'
+    call setline(l:cur_line, '')
+  endif
+  " 7. 去到 `l:new_line` 行的l:new_column列
+  call setpos('.', [0, l:new_line, l:new_column, 0])
+endfunction
+function! EnterWithoutTraillingComment()
+  let l:cur_line = line('.')
+  let l:new_line = l:cur_line + 1
+  let l:cur_indent_count = indent(l:cur_line)
+  let l:cur_indent = repeat(" ", l:cur_indent_count)
+  call append(".", l:cur_indent)
+  call setpos('.', [0, l:new_line, l:cur_indent_count, 0])
 endfunction
 " Alt-Enter新建空行
 nnoremap <M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
