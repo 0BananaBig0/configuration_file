@@ -8,7 +8,7 @@ ln -s /mnt/d/Users/11849/Videos
 ln -s /mnt/d/Users/11849/Downloads
 ln -s /mnt/d/Users/11849/Desktop WDesktop
 mkdir -p /home/banana/wsl_shared_folder # also create wsl_shared_folder in D:\Users\11849\Downloads\
-echo 'D:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
+echo 'D:\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
 echo '[boot]' | sudo tee -a /etc/wsl.conf > /dev/null
 echo 'systemd = false' | sudo tee -a /etc/wsl.conf > /dev/null
 echo '[automount]' | sudo tee -a /etc/wsl.conf > /dev/null
@@ -23,18 +23,7 @@ echo 'appendWindowsPath = true' | sudo tee -a /etc/wsl.conf > /dev/null
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
-sudo zypper install -y zsh make cmake valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear git curl wget 7zip
-sudo zypper install -y neovim xclip cargo python3-base python3-pip python3-pipx python3-neovim ruby-devel
-sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19
-sudo zypper install -y libc++-devel libc++abi-devel
-sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
-sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
-sudo zypper install -y boost-devel tcl-devel
-sudo zypper install -y perl libdb-4_8-devel flex
-sudo zypper install -y code
-sudo fc-cache -fv
-cargo install fd-find exa zoxide ripgrep bat hyperfine duf httpie
-cargo install du-dust bottom procs
+sudo zypper install -y zsh git curl wget 7zip xauth
 
 # also for sudo su
 git config --global user.name "Huaxiao Liang"
@@ -54,8 +43,17 @@ cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.gdbinit ~
 chsh -s $(which zsh)
 rm install.sh
 exit
-pip3 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
+sudo zypper install -y make cmake valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear
+sudo zypper install -y neovim xclip cargo python311-base python311-pip python311-pipx python311-neovim ruby-devel
+sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19
+sudo zypper install -y libc++-devel libc++abi-devel
+sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
+sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
+sudo zypper install -y boost-devel tcl-devel
+sudo zypper install -y perl libdb-4_8-devel flex
+cargo install fd-find exa zoxide ripgrep bat hyperfine duf httpie
+cargo install du-dust bottom procs
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FantasqueSansMono.zip
@@ -63,10 +61,23 @@ wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/UbuntuMono
 x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
 sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
 rm *.zip
-cd /usr/share/fonts\
+cd /usr/share/fonts
 sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
+
+# also for root
+mkdir ~/.config/nvim -p
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.vimrc ~
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.c_cpp ~/.vim -r
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/coc-settings.json ~/.vim
+ln -s ~/.vimrc ~/.config/nvim/init.vim
+pip3 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+
 pipx install ipdb
 pipx install pylint
 pipx install yapf
@@ -81,19 +92,7 @@ pipx install sphinx-rtd-theme --include-deps
 pipx install autopep8
 pipx install vim-vint
 pip3 install pysnooper futures neovim --break-system-packages #not do for root
-sudo gem install neovim
-
-# also for root
-mkdir ~/.config/nvim -p
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.vimrc ~
-cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.c_cpp ~/.vim -r
-cp /home/banana/Downloads/wsl_shared_folder/configuration_file/coc-settings.json ~/.vim
-ln -s ~/.vimrc ~/.config/nvim/init.vim
-
+gem install neovim --user-install
 npm config set coc.nvim:registry https://registry.npmmirror.com
 npm config set registry https://registry.npmmirror.com/ && \
 npm cache clean --force
