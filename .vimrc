@@ -361,16 +361,34 @@ function! LazyPluginConfiguration()
 
 
   " asyncrun setting
-  function! JumpOrHideTerminal(jump_or_hide, size)
-    " Loop through all windows in the current tab to check for a terminal
+  function! JumpTerminal(size)
+    if !exists('g:tab_term_buf')
+      let g:tab_term_buf = repeat([-1], a:size)
+    endif
+    let l:target_buf = -1
+    let l:target_win = -1
+    for l:win in getwininfo()
+      if l:win['terminal'] == 1 && l:win['bufnr'] > l:target_buf
+        let l:target_buf = l:win['bufnr']
+        let l:target_win = l:win['winid']
+      endif
+    endfor
+    if l:target_buf != -1 && l:target_win != -1
+      call win_gotoid(l:target_win)
+      let g:tab_term_buf[tabpagenr()] = l:target_buf
+    endif
+  endfunction
+  function! ToggleTerminal(height, size)
+    " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
     " Create an array to store the most recent terminal buffer for each tab
     if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], a:size)
     endif
+    " Loop through all windows in the current tab to check for a terminal
     for l:win in getwininfo()
-      if l:win['terminal'] == 1 && (l:win['tabnr'] == l:cur_tab || a:jump_or_hide == 0)
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
         if l:win['bufnr'] > g:tab_term_buf[l:cur_tab]
@@ -379,20 +397,9 @@ function! LazyPluginConfiguration()
         " Switch to the terminal window to hide it
         call win_gotoid(l:win['winid'])
         " Hide the terminal
-        if a:jump_or_hide == 1
-          hide
-        else
-          break
-        endif
+        hide
       endif
     endfor
-    return [l:terminal_shown, l:cur_tab]
-  endfunction
-  function! ToggleTerminal(height, size)
-    " Step 1: Check if there is a terminal window visible in the current tab
-    let l:hidden_result = JumpOrHideTerminal(1, a:size)
-    let l:terminal_shown = l:hidden_result[0]
-    let l:cur_tab = l:hidden_result[1]
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer
     if l:terminal_shown == 0
       " Get the list of all buffers and find the latest terminal buffer
@@ -462,7 +469,7 @@ function! LazyPluginConfiguration()
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   nnoremap <F8> :call ToggleTerminal(6, 33)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpOrHideTerminal(0,\ 33)<Space>
+  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)<Space>
 endfunction
 
 
@@ -992,7 +999,7 @@ function! CPPCompilation()
 endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpOrHideTerminal(0,\ 33)'
+    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)'
     if &filetype==?'cpp' || &filetype==?'c'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'make') != -1
@@ -1018,7 +1025,7 @@ if !exists('*CompileAndExcute')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpOrHideTerminal(0,\ 33)'
+  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)'
   if &filetype==?'cpp' || &filetype==?'c'
     let l:cpp_compilation = CPPCompilation()
     let l:compile_only = l:compile_only.l:cpp_compilation
