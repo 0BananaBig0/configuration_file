@@ -1,0 +1,137 @@
+sudo zypper mr -da
+sudo zypper ar -cfg 'https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/' mirror-oss
+sudo zypper ar -cfg 'https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/non-oss/' mirror-non-oss
+sudo zypper ar -f https://packages.microsoft.com/yumrepos/vscode vscode
+sudo zypper ref
+ln -s /mnt/d/Users/11849/Documents
+ln -s /mnt/d/Users/11849/Videos
+ln -s /mnt/d/Users/11849/Downloads
+ln -s /mnt/d/Users/11849/Desktop WDesktop
+mkdir -p /home/banana/wsl_shared_folder # also create wsl_shared_folder in D:\Users\11849\Downloads\
+sudo cp ~/Documents/configuration_file/wsl.conf /etc # restart your wsl
+echo 'D:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
+sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
+sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
+sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
+sudo zypper install -y zsh make cmake valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear git curl wget 7zip
+sudo zypper install -y neovim xclip cargo python313-base python313-pip python313-pipx
+sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19
+sudo zypper install -y libc++-devel libc++abi-devel
+sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
+sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
+sudo zypper install -y boost-devel tcl-devel
+sudo zypper install -y perl libdb-4_8-devel flex
+sudo zypper install -y code
+sudo fc-cache -fv
+cargo install fd-find exa zoxide ripgrep bat hyperfine duf httpie
+cargo install du-dust bottom procs
+# also for sudo su
+git config --global user.name "Huaxiao Liang"
+git config --global user.email "1184903633@qq.com"
+git config --global alias.logline "log --graph --abbrev-commit"
+git config --global core.editor gvim
+git config --global protocol.https.allow always
+git config --global push.default "current"
+git config --global diff.tool gvimdiff
+git config --global url."https://githubfast.com/".insteadOf "https://github.com/"
+wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+sh install.sh
+bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+cp /home/banana/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+cp /home/banana/Documents/configuration_file/.zshrc ~
+cp /home/banana/Documents/configuration_file/.gdbinit ~
+chsh -s $(which zsh)
+rm install.sh
+exit
+pip3.13 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+
+cd ~
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FantasqueSansMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/UbuntuMono.zip
+x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
+sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
+rm *.zip
+cd /usr/share/fonts\
+sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
+sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
+sudo fc-cache -fv
+pipx install ipdb
+pipx install pylint
+pipx install yapf
+pipx install pygments
+pipx install cmakelang
+pipx install cmake-language-server
+pipx install pyright
+pipx install cppman
+pipx install you-get
+pipx install sphinx
+pipx install sphinx-rtd-theme --include-deps
+pipx install autopep8
+pipx install vim-vint
+pip3.13 install pysnooper futures neovim --break-system-packages #not do for root
+
+# also for root
+mkdir ~/.config/nvim -p
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+cp /home/banana/Documents/configuration_file/.vimrc ~
+cp /home/banana/Documents/configuration_file/.c_cpp ~/.vim -r
+cp /home/banana/Documents/configuration_file/coc-settings.json ~/.vim
+ln -s ~/.vimrc ~/.config/nvim/init.vim
+
+npm config set coc.nvim:registry https://registry.npmmirror.com
+npm config set registry https://registry.npmmirror.com/ && \
+npm cache clean --force
+sudo npm config set coc.nvim:registry https://registry.npmmirror.com
+sudo npm config set registry https://registry.npmmirror.com/ && \
+sudo npm cache clean --force
+sudo npm install -g neovim yarn
+
+# also for root
+yarn config set registry https://registry.npmmirror.com/ --global  && \
+yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
+yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
+yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global  && \
+yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global  && \
+yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global  && \
+yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
+yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
+yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
+
+# if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
+<!-- sudo zypper install -y -t pattern xfce -->
+<!-- sudo zypper install -y lightdm -->
+<!-- sudo zypper install -y dbus-1-x11 xrdp flex -->
+# Fix an error of ping
+sudo zypper install -y libcap-progs
+sudo setcap cap_net_raw+p /bin/ping
+
+sudo zypper install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
+sudo zypper install -y perl-App-cpanminus
+cpanm --local-lib=~/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump IO::AIO JSON Moose PadWalker Scalar::List::Utils Coro
+cpanm --local-lib=~/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
+#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
+
+
+sudo zypper install -y libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 xcb-util-cursor-devel xcb-util-cursor-devel
+sudo zypper install -y gstreamer-plugins-base-devel gstreamer-devel
+sudo zypper install -y libz1 libpng16-16 libjpeg8
+sudo zypper install -y wayland-devel libxkbcommon-devel libopenssl-devel Mesa-libGL-devel
+mkdir .Qt6_Online_Installer
+cd .Qt6_Online_Installer
+wget https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+chmod a+x qt-unified-linux-x64-online.run
+./qt-unified-linux-x64-online.run
+cd ~/wsl_shared_folder
+wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
+x bison-3.3.tar.gz
+sudo zypper install m4
+cd bison-3.3
+./configure
+make
+sudo make install
+cd ~/wsl_shared_folder
+rm bison-3.3.tar.gz

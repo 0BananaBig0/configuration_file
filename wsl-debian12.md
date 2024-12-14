@@ -48,7 +48,7 @@ wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/FantasqueS
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/UbuntuMono.zip
 x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
 sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
-cd /usr/share/fonts\
+cd /usr/share/fonts
 sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo fc-cache -fv
@@ -113,7 +113,7 @@ wget https://vscode.download.prss.microsoft.com/dbazure/download/stable/38c31bc7
 sudo dpkg -i code_*.deb
 rm code_*.deb
 sudo apt install --fix-broken -y
-cd ~
+cd ~/wsl_shared_folder
 wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
 x bison-3.3.tar.gz
 sudo apt install m4
@@ -121,8 +121,8 @@ cd bison-3.3
 ./configure
 make
 sudo make install
-cd ~
-sudo rm bison* -r
+cd ~/wsl_shared_folder
+rm bison-3.3.tar.gz
 # Fix an error of ping
 sudo setcap cap_net_raw+p /bin/ping
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
@@ -305,3 +305,8 @@ sudo update-alternatives --install /usr/bin/FileCheck FileCheck /usr/bin/FileChe
 sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 190
 sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-19 190
 sudo apt install libc++-19-dev libc++abi-19-dev
+sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
+sudo cp ~/Documents/configuration_file/wsl.conf /etc # restart your wsl
+mkdir -p /home/banana/wsl_shared_folder # also create wsl_shared_folder in D:\Users\11849\Downloads\
+sudo cp ~/Documents/configuration_file/wsl.conf /etc # restart your wsl
+echo 'D:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
