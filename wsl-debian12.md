@@ -16,7 +16,7 @@ apt update -y
 apt install apt-transport-https ca-certificates
 apt update -y && apt upgrade -y
 apt install zsh -y
-sudo sed -i 's/http/https/g' /etc/apt/sources.list # modify http to https
+sed -i 's/http/https/g' /etc/apt/sources.list # modify http to https
 apt update
 # no need mount on disk in wsl2 and install nvidia-driver
 ln -s /mnt/d/Users/11849/Documents
@@ -38,8 +38,8 @@ git config --global url."https://githubfast.com/".insteadOf "https://github.com/
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
 sh install.sh
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
-cp ~/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
-cp ~/Documents/configuration_file/.zshrc ~
+cp ~/Downloads/wsl_shared_folder/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+cp ~/Downloads/wsl_shared_folder/configuration_file/.zshrc ~
 rm install.sh
 exit
 cd ~/Downloads
@@ -76,9 +76,9 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-cp ~/Documents/configuration_file/.vimrc ~
-cp ~/Documents/configuration_file/.c_cpp ~/.vim -r
-cp ~/Documents/configuration_file/coc-settings.json ~/.vim
+cp ~/Downloads/wsl_shared_folder/configuration_file/.vimrc ~
+cp ~/Downloads/wsl_shared_folder/configuration_file/.c_cpp ~/.vim -r
+cp ~/Downloads/wsl_shared_folder/configuration_file/coc-settings.json ~/.vim
 ln -s ~/.vimrc ~/.config/nvim/init.vim
 npm config set coc.nvim:registry https://registry.npmmirror.com
 sudo npm config set coc.nvim:registry https://registry.npmmirror.com
@@ -149,8 +149,8 @@ sudo vim /etc/xrdp/startwm.sh
 startxfce4
 
 sudo /etc/init.d/xrdp start
-cp ~/Documents/configuration_file/.gdbinit ~
-cp ~/Documents/configuration_file/settings.json ~/.config/Code/User
+cp ~/Downloads/wsl_shared_folder/configuration_file/.gdbinit ~
+cp ~/Downloads/wsl_shared_folder/configuration_file/settings.json ~/.config/Code/User
 
 echo -e "[boot]\nsystemd=true" | sudo tee -a /etc/wsl.conf
 cd /usr/lib/wsl
@@ -181,7 +181,7 @@ rm nvim-linux64.deb
 sudo apt install python3-neovim -y
 sudo cpanm -n Neovim::Ext
 sudo apt install ruby-dev -y
-sudo gem install neovim
+gem install neovim --user-install
 
 sudo apt purge -y clang* llvm*
 sudo apt update
@@ -224,6 +224,7 @@ sudo npm -g install instant-markdown-d@next
 
 # install qt
 sudo apt-get install build-essential libgl1-mesa-dev libxkbcommon-x11-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-render-util0-dev libxcb-cursor-dev
+cd ~/wsl_shared_folder
 mkdir .Qt6_Online_Installer
 cd .Qt6_Online_Installer
 wget https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
@@ -306,7 +307,7 @@ sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-19 190
 sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-19 190
 sudo apt install libc++-19-dev libc++abi-19-dev
 sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
-sudo cp ~/Documents/configuration_file/wsl.conf /etc # restart your wsl
+sudo cp ~/Downloads/wsl_shared_folder/configuration_file/wsl.conf /etc # restart your wsl
 mkdir -p /home/banana/wsl_shared_folder # also create wsl_shared_folder in D:\Users\11849\Downloads\
-sudo cp ~/Documents/configuration_file/wsl.conf /etc # restart your wsl
+sudo cp ~/Downloads/wsl_shared_folder/configuration_file/wsl.conf /etc # restart your wsl
 echo 'D:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null

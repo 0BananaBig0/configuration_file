@@ -8,13 +8,23 @@ ln -s /mnt/d/Users/11849/Videos
 ln -s /mnt/d/Users/11849/Downloads
 ln -s /mnt/d/Users/11849/Desktop WDesktop
 mkdir -p /home/banana/wsl_shared_folder # also create wsl_shared_folder in D:\Users\11849\Downloads\
-sudo cp ~/Documents/configuration_file/wsl.conf /etc # restart your wsl
 echo 'D:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
+echo '[boot]' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'systemd = false' | sudo tee -a /etc/wsl.conf > /dev/null
+echo '[automount]' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'ldconfig = false' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'enabled = true' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'root = /mnt/' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'options = "metadata"' | sudo tee -a /etc/wsl.conf > /dev/null
+echo '[interop]' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'enabled = true' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'appendWindowsPath = true' | sudo tee -a /etc/wsl.conf > /dev/null
+# reboot wsl2
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
 sudo zypper install -y zsh make cmake valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear git curl wget 7zip
-sudo zypper install -y neovim xclip cargo python313-base python313-pip python313-pipx
+sudo zypper install -y neovim xclip cargo python3-base python3-pip python3-pipx python3-neovim ruby-devel
 sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19
 sudo zypper install -y libc++-devel libc++abi-devel
 sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
@@ -25,6 +35,7 @@ sudo zypper install -y code
 sudo fc-cache -fv
 cargo install fd-find exa zoxide ripgrep bat hyperfine duf httpie
 cargo install du-dust bottom procs
+
 # also for sudo su
 git config --global user.name "Huaxiao Liang"
 git config --global user.email "1184903633@qq.com"
@@ -37,13 +48,13 @@ git config --global url."https://githubfast.com/".insteadOf "https://github.com/
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
 sh install.sh
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
-cp /home/banana/Documents/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
-cp /home/banana/Documents/configuration_file/.zshrc ~
-cp /home/banana/Documents/configuration_file/.gdbinit ~
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.zshrc ~
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.gdbinit ~
 chsh -s $(which zsh)
 rm install.sh
 exit
-pip3.13 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+pip3 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
@@ -69,7 +80,8 @@ pipx install sphinx
 pipx install sphinx-rtd-theme --include-deps
 pipx install autopep8
 pipx install vim-vint
-pip3.13 install pysnooper futures neovim --break-system-packages #not do for root
+pip3 install pysnooper futures neovim --break-system-packages #not do for root
+sudo gem install neovim
 
 # also for root
 mkdir ~/.config/nvim -p
@@ -77,9 +89,9 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-cp /home/banana/Documents/configuration_file/.vimrc ~
-cp /home/banana/Documents/configuration_file/.c_cpp ~/.vim -r
-cp /home/banana/Documents/configuration_file/coc-settings.json ~/.vim
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.vimrc ~
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.c_cpp ~/.vim -r
+cp /home/banana/Downloads/wsl_shared_folder/configuration_file/coc-settings.json ~/.vim
 ln -s ~/.vimrc ~/.config/nvim/init.vim
 
 npm config set coc.nvim:registry https://registry.npmmirror.com
@@ -113,6 +125,7 @@ sudo zypper install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-Pa
 sudo zypper install -y perl-App-cpanminus
 cpanm --local-lib=~/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump IO::AIO JSON Moose PadWalker Scalar::List::Utils Coro
 cpanm --local-lib=~/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
+cpanm --local-lib=~/perl5 Neovim::Ext
 #cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
 
 
@@ -120,6 +133,7 @@ sudo zypper install -y libX11-devel libXext-devel libXrandr-devel libXcursor-dev
 sudo zypper install -y gstreamer-plugins-base-devel gstreamer-devel
 sudo zypper install -y libz1 libpng16-16 libjpeg8
 sudo zypper install -y wayland-devel libxkbcommon-devel libopenssl-devel Mesa-libGL-devel
+cd ~/wsl_shared_folder
 mkdir .Qt6_Online_Installer
 cd .Qt6_Online_Installer
 wget https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
