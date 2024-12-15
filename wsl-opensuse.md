@@ -51,9 +51,9 @@ sudo zypper install -y libc++-devel libc++abi-devel
 sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
 sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
 sudo zypper install -y boost-devel tcl-devel
-sudo zypper install -y perl libdb-4_8-devel flex
-cargo install fd-find exa zoxide ripgrep bat hyperfine duf httpie
-cargo install du-dust bottom procs
+sudo zypper install -y perl libdb-4_8-devel flex duf
+cargo install fd-find exa zoxide ripgrep bat hyperfine httpie
+cargo install du-dust bottom procs cargo-cache
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FantasqueSansMono.zip
