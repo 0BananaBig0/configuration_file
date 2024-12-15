@@ -50,7 +50,8 @@ sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19
 sudo zypper install -y libc++-devel libc++abi-devel
 sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
 sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
-sudo zypper install -y boost-devel tcl-devel
+sudo zypper install -y boost-devel tcl-devel tcllib libboost_date_time-devel libboost_filesystem-devel  libboost_iostreams-devel libboost_system-devel libboost_program_options-devel
+sudo ln -s /usr/lib64/libtcl8.6.so /usr/lib/libtcl.so
 sudo zypper install -y perl libdb-4_8-devel flex duf
 cargo install fd-find exa zoxide ripgrep bat hyperfine httpie
 cargo install du-dust bottom procs cargo-cache
@@ -148,3 +149,7 @@ make
 sudo make install
 cd ~/wsl_shared_folder
 rm bison-3.3.tar.gz
+ln -s ~/wsl_shared_folder/cpp_workspace ~
+ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
+ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
+ln -s ~/wsl_shared_folder/configuration_file ~
