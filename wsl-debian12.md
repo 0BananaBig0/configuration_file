@@ -23,7 +23,7 @@ ln -s /mnt/d/Users/11849/Documents
 ln -s /mnt/d/Users/11849/Videos
 ln -s /mnt/d/Users/11849/Downloads
 ln -s /mnt/d/Users/11849/Desktop WDesktop
-sudo apt install -y make cmake valgrind gcc g++
+sudo apt install -y make cmake valgrind gcc g++ ccache
 sudo apt remove vim-common -y
 sudo apt install -y vim npm nodejs vim-gtk3
 sudo apt install -y bear git curl wget p7zip-full

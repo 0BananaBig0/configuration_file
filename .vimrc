@@ -978,14 +978,23 @@ function! CPPCompilation()
     " Get the list of matching files (non-recursive)
     let l:cmakelist_path = glob(l:pattern, 0, 1)
     if !empty(l:cmakelist_path)
-      return ' cd '.l:possible_path
-          \ .' && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B build && cmake --build build --parallel 12'
+      let l:cmakelist_path = ' cd '.l:possible_path
+                          \ .' && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+      call system('ccache --version')
+      if v:shell_error " Not use ccache
+        echo "ccache is not installed."
+      else
+        let l:cmakelist_path = l:cmakelist_path.' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
+                            \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+      endif
+      return l:cmakelist_path.' -S . -B build && cmake --build build --parallel 12'
           \ .' && cd '.l:cur_work_path
     endif
     let l:pattern = l:possible_path."/*.pro"
     let l:qmakepro_path = glob(l:pattern, 0, 1)
     if !empty(l:qmakepro_path)
-      return ' cd '.l:possible_path.' && qmake -o build/Makefile && bear --append -- make -j12'
+      return ' cd '.l:possible_path.' && qmake -o build/Makefile'
+          \ .' && bear --append -- make -j12'
           \ .' && cd '.l:cur_work_path
     endif
     let l:pattern = l:possible_path."/[m,M]akefile"
