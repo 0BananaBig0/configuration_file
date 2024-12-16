@@ -80,6 +80,7 @@ cp ~/Downloads/wsl_shared_folder/configuration_file/.vimrc ~
 cp ~/Downloads/wsl_shared_folder/configuration_file/.c_cpp ~/.vim -r
 cp ~/Downloads/wsl_shared_folder/configuration_file/coc-settings.json ~/.vim
 ln -s ~/.vimrc ~/.config/nvim/init.vim
+ln -s ~/.vim/coc-settings.json ~/.config/nvim
 npm config set coc.nvim:registry https://registry.npmmirror.com
 sudo npm config set coc.nvim:registry https://registry.npmmirror.com
 npm config set registry https://registry.npmmirror.com/ && \

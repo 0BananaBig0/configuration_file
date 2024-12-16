@@ -1,10 +1,13 @@
 {
    "languageserver": {
+      "qml": {
+         "command": "qmlls",
+         "filetypes": [
+            "qml"
+         ]
+      },
       "svlangserver": {
          "command": "svlangserver",
-         "rootPatterns": [
-            ".git"
-         ],
          "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
          "filetypes": [
             "systemverilog",
@@ -23,15 +26,6 @@
             "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
          }
       }
-   },
-   "qml": {
-      "command": "qmlls",
-      "rootPatterns": [
-         ".git"
-      ],
-      "filetypes": [
-         "qml"
-      ]
    },
    "workspace.rootPatterns": [
       ".git",
@@ -65,9 +59,9 @@
    "inlayHint.enable": false,
    "markdownlint.config": {
       "MD013": {
-         "line_length": 100,
-         "ignore_code_blocks": true
-      }
+         "line_length": 100
+      },
+      "ignore_code_blocks": true
    },
    "perl.p::ls.enable": true,
    "perl.p::ls.logLevel": 2,
