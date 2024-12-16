@@ -44,7 +44,8 @@ chsh -s $(which zsh)
 rm install.sh
 exit
 
-sudo zypper install -y make cmake valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear
+sudo zypper install -y make valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear
+sudo zypper install -y vulkan-devel cmake
 sudo zypper install -y neovim xclip cargo python311-base python311-pip python311-pipx python311-neovim ruby-devel
 sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19
 sudo zypper install -y libc++-devel libc++abi-devel
@@ -116,7 +117,7 @@ yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-in
 # if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
 <!-- sudo zypper install -y -t pattern xfce -->
 <!-- sudo zypper install -y lightdm -->
-<!-- sudo zypper install -y dbus-1-x11 xrdp flex -->
+<!-- sudo zypper install -y dbus-1-x11 xrdp -->
 # Fix an error of ping
 sudo zypper install -y libcap-progs
 sudo setcap cap_net_raw+p /bin/ping
@@ -131,7 +132,7 @@ cpanm --local-lib=~/perl5 Neovim::Ext
 
 sudo zypper install -y libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 xcb-util-cursor-devel xcb-util-cursor-devel
 sudo zypper install -y gstreamer-plugins-base-devel gstreamer-devel
-sudo zypper install -y libz1 libpng16-16 libjpeg8
+sudo zypper install -y libz1 libpng16-16 libjpeg8 libsecret-devel
 sudo zypper install -y wayland-devel libxkbcommon-devel libopenssl-devel Mesa-libGL-devel
 cd ~/wsl_shared_folder
 mkdir .Qt6_Online_Installer

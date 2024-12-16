@@ -157,13 +157,13 @@ let g:python_highlight_file_headers_as_comments = 1
 " After 333ms, call the coc.nvim, markdown-preview and so on
 let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
-    exec 'CocStart'
-    call plug#load('vim-which-key')
-    call MarkdownPluginConfiguration()
-    call LazyPluginConfiguration()
-    call LazyOnPluginConfiguration()
-    call plug#load('nerdcommenter')
-    call plug#load('asyncrun.vim')
+  exec 'CocStart'
+  call plug#load('vim-which-key')
+  call MarkdownPluginConfiguration()
+  call LazyPluginConfiguration()
+  call LazyOnPluginConfiguration()
+  call plug#load('nerdcommenter')
+  call plug#load('asyncrun.vim')
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -264,9 +264,10 @@ function! LazyPluginConfiguration()
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
-  function! FindPattern(root_patterns, target_path)
+  function! FindPattern(target_path)
+    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
     let l:root_pattern = ''
-    for l:pattern in a:root_patterns
+    for l:pattern in l:root_patterns
       let l:workspace_root = finddir(l:pattern, a:target_path.';')
       if !empty(l:workspace_root)
         let l:root_pattern = l:pattern
@@ -282,16 +283,15 @@ function! LazyPluginConfiguration()
     return [l:workspace_root, l:root_pattern]
   endfunction
   function! WorkspaceRoot()
-    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
-    let l:workspace_root = FindPattern(l:root_patterns, expand('%:p:h'))[0] " Where we store the opened file
-    let l:root_pattern = FindPattern(l:root_patterns, expand('%:p:h'))[1]
+    let l:workspace_root = FindPattern(expand('%:p:h'))[0] " Where we store the opened file
+    let l:root_pattern = FindPattern(expand('%:p:h'))[1]
     if empty(l:workspace_root)
-      let l:workspace_root = FindPattern(l:root_patterns, getcwd())[0] " Where we type the vim command to open the file
-      let l:root_pattern = FindPattern(l:root_patterns, getcwd())[1]
+      let l:workspace_root = FindPattern(getcwd())[0] " Where we type the vim command to open the file
+      let l:root_pattern = FindPattern(getcwd())[1]
     endif
     if empty(l:workspace_root)
       echo 'You need to create a root-pattern file like .git in your project.'
-      return l:workspace_root
+      return [l:workspace_root, l:root_pattern]
     elseif (l:workspace_root ==? l:root_pattern)
       let l:workspace_root = '.'
     else
@@ -954,7 +954,7 @@ endfunction
 function! CPPCompilation()
   let l:cpp_workspace_root = WorkspaceRoot()[0]
   if empty(cpp_workspace_root)
-    return SingleCPPFileCompilation()
+    let l:cpp_workspace_root = expand('%:p:h')
   endif
   let l:cpp_workspace_root = fnamemodify(l:cpp_workspace_root, ':p')
   let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 1)
