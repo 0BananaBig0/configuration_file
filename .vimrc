@@ -422,7 +422,7 @@ function! LazyPluginConfiguration()
     let l:cur_tab = tabpagenr()
     for l:win in getwininfo()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab && bufexists(l:win['bufnr'])
-        exec 'bwipeout! ' . l:win['bufnr']
+        exec 'silent bwipeout! ' . l:win['bufnr']
       endif
     endfor
     call CUpdateTabTermBuf()
@@ -433,7 +433,7 @@ function! LazyPluginConfiguration()
         if a:buf_id != g:tab_term_buf[tabpagenr()] && a:buf_id != -1
           return
         elseif a:buf_id == -1
-          exec 'bwipeout! ' . g:tab_term_buf[tabpagenr()]
+          exec 'silent bwipeout! ' . g:tab_term_buf[tabpagenr()]
         endif
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
@@ -1096,7 +1096,7 @@ function! CloseAndBackTab()
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
       if l:buf != l:cur_buf && bufexists(l:buf)
-        exec 'bwipeout! ' . l:buf
+        exec 'silent bwipeout! ' . l:buf
       endif
     endfor
     quit
@@ -1127,7 +1127,7 @@ function! QuitWin() " not consider the main win is a term
     " Iterate over all buffers
     for l:buf in range(1, bufnr('$'))
       if l:buf != l:main_win_buf && bufexists(l:buf)
-        exec 'bwipeout! ' . l:buf
+        exec 'silent bwipeout! ' . l:buf
       endif
     endfor
     quit
