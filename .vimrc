@@ -1009,7 +1009,8 @@ endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)'
-    if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake' || &filetype==?'make'
+    if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
+          \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'make') != -1
         exec l:compile_exec.l:cpp_compilation
@@ -1035,10 +1036,9 @@ if !exists('*CompileAndExcute')
 endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)'
-  if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake' || &filetype==?'make'
-    let l:cpp_compilation = CPPCompilation()
-    let l:compile_only = l:compile_only.l:cpp_compilation
-    exec l:compile_only
+  if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
+        \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
+    exec l:compile_only.CPPCompilation()
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   endif
