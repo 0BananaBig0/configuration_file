@@ -316,3 +316,6 @@ ln -s ~/wsl_shared_folder/cpp_workspace ~
 ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
 ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
 ln -s ~/wsl_shared_folder/configuration_file ~
+
+echo '[user]' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'default=banana' | sudo tee -a /etc/wsl.conf > /dev/null

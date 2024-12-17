@@ -19,6 +19,8 @@ echo 'options = "metadata"' | sudo tee -a /etc/wsl.conf > /dev/null
 echo '[interop]' | sudo tee -a /etc/wsl.conf > /dev/null
 echo 'enabled = true' | sudo tee -a /etc/wsl.conf > /dev/null
 echo 'appendWindowsPath = true' | sudo tee -a /etc/wsl.conf > /dev/null
+echo '[user]' | sudo tee -a /etc/wsl.conf > /dev/null
+echo 'default=banana' | sudo tee -a /etc/wsl.conf > /dev/null
 # reboot wsl2
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11

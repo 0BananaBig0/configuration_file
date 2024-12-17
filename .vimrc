@@ -235,7 +235,7 @@ function! LazyPluginConfiguration()
   " Make <CR> to accept selected completion item or notify coc.nvim to format
   " <C-g>u breaks current undo, please make your own choice.
   inoremap <expr> <CR> coc#pum#visible() ? coc#_select_confirm()
-                                \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+                      \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
   function! CheckBackspace() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
@@ -266,32 +266,24 @@ function! LazyPluginConfiguration()
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
   function! FindPattern(target_path)
     let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
-    let l:root_pattern = ''
     for l:pattern in l:root_patterns
       let l:workspace_root = finddir(l:pattern, a:target_path.';')
       if !empty(l:workspace_root)
-        let l:root_pattern = l:pattern
         break
-      else
-        let l:workspace_root = findfile(l:pattern, a:target_path.';')
-        if !empty(l:workspace_root)
-          let l:root_pattern = l:pattern
-          break
-        endif
+      endif
+      let l:workspace_root = findfile(l:pattern, a:target_path.';')
+      if !empty(l:workspace_root)
+        break
       endif
     endfor
-    return [l:workspace_root, l:root_pattern]
+    return [l:workspace_root, l:pattern]
   endfunction
   function! WorkspaceRoot()
     let l:workspace_root = FindPattern(expand('%:p:h'))[0] " Where we store the opened file
     let l:root_pattern = FindPattern(expand('%:p:h'))[1]
     if empty(l:workspace_root)
-      let l:workspace_root = FindPattern(getcwd())[0] " Where we type the vim command to open the file
-      let l:root_pattern = FindPattern(getcwd())[1]
-    endif
-    if empty(l:workspace_root)
-      echo 'You need to create a root-pattern file like .git in your project.'
-      return [l:workspace_root, l:root_pattern]
+      echo 'You had better create a root-pattern file like .git in your project.'
+      return [expand('%:p:h'), '']
     elseif (l:workspace_root ==? l:root_pattern)
       let l:workspace_root = '.'
     else
@@ -299,31 +291,22 @@ function! LazyPluginConfiguration()
     endif
     return [l:workspace_root, l:root_pattern]
   endfunction
+  function! CopyFileRelToCPP(cpp_workspace_root, file_name)
+    let l:related_file = a:cpp_workspace_root.'/'.a:file_name
+    let l:related_file_source = $HOME.'/.vim/.c_cpp/'.a:file_name
+    if !filereadable(l:related_file) && filereadable(l:related_file_source)
+      let l:clang_file_content = readfile(l:related_file_source)
+      call writefile(l:clang_file_content, l:related_file, 's')
+    elseif filereadable(l:related_file)
+      echo 'The '.l:related_file.' file has existed.'
+    else
+      echo 'The '.l:related_file_source.' file does not exist.'
+    endif
+  endfunction
   function! ClangToolConfiguration()
     let l:cpp_workspace_root = WorkspaceRoot()[0]
-    if empty(l:cpp_workspace_root)
-      return
-    endif
-    let l:clang_format = l:cpp_workspace_root.'/.clang-format'
-    let l:clang_format_source = $HOME.'/.vim/.c_cpp/.clang-format'
-    let l:clang_tidy = l:cpp_workspace_root.'/.clang-tidy'
-    let l:clang_tidy_source = $HOME.'/.vim/.c_cpp/.clang-tidy'
-    if !filereadable(l:clang_format) && filereadable(l:clang_format_source)
-      let l:clang_format_content = readfile(l:clang_format_source)
-      call writefile(l:clang_format_content, l:clang_format, 's')
-    elseif filereadable(l:clang_format)
-      echo 'The '.l:clang_format.' file has existed.'
-    else
-      echo 'The '.l:clang_format_source.' file does not exist.'
-    endif
-    if !filereadable(l:clang_tidy) && filereadable(l:clang_tidy_source)
-      let l:clang_tidy_content = readfile(l:clang_tidy_source)
-      call writefile(l:clang_tidy_content, l:clang_tidy, 's')
-    elseif filereadable(l:clang_tidy)
-      echo 'The '.l:clang_tidy.' file has existed.'
-    else
-      echo 'The '.l:clang_tidy_source.' file does not exist.'
-    endif
+    call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
+    call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
   noremap <Leader><F7> :call ClangToolConfiguration()<CR>
   nmap <F7>  <Plug>(coc-format)
@@ -656,31 +639,12 @@ function! LazyOnPluginConfiguration()
   " vimspector setting
   function! CppDebugConfiguration()
     let l:cpp_workspace_root = WorkspaceRoot()[0]
-    if empty(l:cpp_workspace_root)
-      return
-    endif
-    let l:launch_json = l:cpp_workspace_root.'/.vscode/launch.json'
-    let l:launch_json_source = $HOME.'/.vim/.c_cpp/.vscode/launch.json'
-    let l:vimspector_json = l:cpp_workspace_root.'/.vimspector.json'
-    let l:vimspector_json_source = $HOME.'/.vim/.c_cpp/.vimspectorjson/cpp.json'
-    if !filereadable(l:launch_json) && filereadable(l:launch_json_source)
+    if !isdirectory(l:cpp_workspace_root.'/.vscode')
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
-      let l:launch_json_content = readfile(l:launch_json_source)
-      call writefile(l:launch_json_content, l:launch_json, 's')
-    elseif filereadable(l:launch_json)
-      echo 'The '.l:launch_json.' file has existed.'
-    else
-      echo 'The '.l:launch_json_source.' file does not exist.'
     endif
-    if !filereadable(l:vimspector_json) && filereadable(l:vimspector_json_source)
-      let l:cpp_json_content = readfile(l:vimspector_json_source)
-      call writefile(l:cpp_json_content, l:vimspector_json, 's')
-    elseif filereadable(l:vimspector_json)
-      echo 'The '.l:vimspector_json.' file has existed.'
-    else
-      echo 'The '.l:vimspector_json_source.' file does not exist.'
-    endif
-      exec 'tabe ' . l:vimspector_json
+    call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
+    call CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
+    exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
   endfunction
   nmap <F2> <Plug>VimspectorContinue
   nnoremap <S-F2> :call vimspector#Restart()<CR>
@@ -697,8 +661,8 @@ function! LazyOnPluginConfiguration()
   nnoremap ]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   nnoremap <F5> :call plug#load('vimspector')<CR>
   nnoremap ]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
-                       \ :call plug#load('vimspector')<CR>
-                       \ :call vimspector#Launch()<CR>
+               \ :call plug#load('vimspector')<CR>
+               \ :call vimspector#Launch()<CR>
   nnoremap <Leader><F5> :call CppDebugConfiguration()<CR>
   nmap <F6> <Plug>VimspectorStepOver
   nmap <C-F6> <Plug>VimspectorStepInto
@@ -944,26 +908,11 @@ function! SetTitle()
   endif
   exec 'normal! G'
 endfunction
-function! SingleCPPFileCompilation()
-  if &filetype==?'cpp'
-    return ' g++ % -o %<.exe -Wall -Wextra'
-  else
-    return ' gcc % -o %<.exe -Wall -Wextra'
-  endif
-endfunction
 function! CPPCompilation()
-  let l:cpp_workspace_root = WorkspaceRoot()[0]
-  if empty(cpp_workspace_root)
-    let l:cpp_workspace_root = expand('%:p:h')
-  endif
-  let l:cpp_workspace_root = fnamemodify(l:cpp_workspace_root, ':p')
+  let l:cpp_workspace_root = fnamemodify(WorkspaceRoot()[0], ':p')
   let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 1)
   let l:cur_file_path = expand('%:p:h')
   let l:cur_work_path = getcwd()
-  if stridx(l:cur_file_path, l:cpp_workspace_root) != 0
-    echo "The current file is not located in ".l:cpp_workspace_root.'.'
-    return SingleCPPFileCompilation()
-  endif
   let l:all_possible_paths = [l:cpp_workspace_root]
   for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
     if l:cur_file_path[l:str_id] ==? '/'
@@ -987,7 +936,8 @@ function! CPPCompilation()
         let l:cmakelist_path = l:cmakelist_path.' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
                             \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
       endif
-      return l:cmakelist_path.' -S . -B build && cmake --build build --parallel 12'
+      return l:cmakelist_path.' -S . -B build'
+          \.' && cmake --build build --parallel 12'
           \ .' && cd '.l:cur_work_path
     endif
     let l:pattern = l:possible_path."/*.pro"
@@ -1004,7 +954,11 @@ function! CPPCompilation()
           \ .' && cd '.l:cur_work_path
     endif
   endfor
-  return SingleCPPFileCompilation()
+  if &filetype==?'cpp'
+    return ' g++ % -o %<.exe -Wall -Wextra'
+  else
+    return ' gcc % -o %<.exe -Wall -Wextra'
+  endif
 endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
