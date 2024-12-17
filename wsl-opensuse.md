@@ -56,7 +56,7 @@ sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
 sudo zypper install -y boost-devel tcl-devel tcllib libboost_date_time-devel libboost_filesystem-devel  libboost_iostreams-devel libboost_system-devel libboost_program_options-devel
 sudo ln -s /usr/lib64/libtcl8.6.so /usr/lib/libtcl.so
 sudo zypper install -y perl libdb-4_8-devel flex duf
-cargo install fd-find exa zoxide ripgrep bat hyperfine httpie
+cargo install fd-find eza zoxide ripgrep bat hyperfine httpie
 cargo install du-dust bottom procs cargo-cache
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip

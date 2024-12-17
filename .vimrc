@@ -344,9 +344,10 @@ function! LazyPluginConfiguration()
 
 
   " asyncrun setting
-  function! JumpTerminal(size)
+  let g:tab_term_buf_size = 33
+  function! JumpTerminal()
     if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], a:size)
+      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
     endif
     let l:target_buf = -1
     let l:target_win = -1
@@ -361,13 +362,13 @@ function! LazyPluginConfiguration()
       let g:tab_term_buf[tabpagenr()] = l:target_buf
     endif
   endfunction
-  function! ToggleTerminal(height, size)
+  function! ToggleTerminal(height)
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
     " Create an array to store the most recent terminal buffer for each tab
     if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], a:size)
+      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
     endif
     " Loop through all windows in the current tab to check for a terminal
     for l:win in getwininfo()
@@ -400,15 +401,13 @@ function! LazyPluginConfiguration()
       endif
     endif
   endfunction
-  function! CAllTermsOfCurTab()
-    " Loop through all windows in the current tab to check for a terminal
-    let l:cur_tab = tabpagenr()
-    for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab && bufexists(l:win['bufnr'])
-        exec 'silent bwipeout! ' . l:win['bufnr']
+  function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
+    for l:term_index in range(a:id_first, a:id_last, a:plus_or_minus_one[1])
+      if(g:tab_term_buf[l:term_index] != -1)
+        let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
+        let g:tab_term_buf[l:term_index] = - 1
       endif
     endfor
-    call CUpdateTabTermBuf()
   endfunction
   function! CUpdateTabTermBuf(buf_id = -1)
     if exists('g:tab_term_buf')
@@ -420,24 +419,24 @@ function! LazyPluginConfiguration()
         endif
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
-      for l:term_index in range(tabpagenr() + 1, len(g:tab_term_buf) - 2)
-        if g:tab_term_buf[l:term_index] != -1
-          let g:tab_term_buf[l:term_index - 1] = g:tab_term_buf[l:term_index]
-          let g:tab_term_buf[l:term_index] = - 1
-        endif
-      endfor
+      call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$'), [-1, +1])
     endif
   endfunction
   function! NUpdateTabTermBuf()
     if exists('g:tab_term_buf')
-      for l:term_index in range(len(g:tab_term_buf) - 2, tabpagenr() + 1, -1)
-        if(g:tab_term_buf[l:term_index] != -1)
-          let g:tab_term_buf[l:term_index + 1] = g:tab_term_buf[l:term_index]
-          let g:tab_term_buf[l:term_index] = - 1
-        endif
-      endfor
+      call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
       let g:tab_term_buf[tabpagenr() + 1] = - 1
     endif
+  endfunction
+  function! CAllTermsOfCurTab()
+    " Loop through all windows in the current tab to check for a terminal
+    let l:cur_tab = tabpagenr()
+    for l:win in getwininfo()
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab && bufexists(l:win['bufnr'])
+        exec 'silent bwipeout! ' . l:win['bufnr']
+      endif
+    endfor
+    call CUpdateTabTermBuf()
   endfunction
   function! IsTermWin(win_id)
     " Check if the given window ID is valid
@@ -451,8 +450,8 @@ function! LazyPluginConfiguration()
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
-  nnoremap <F8> :call ToggleTerminal(6, 33)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)<Space>
+  nnoremap <F8> :call ToggleTerminal(6)<CR>
+  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal()<Space>
 endfunction
 
 
@@ -962,7 +961,7 @@ function! CPPCompilation()
 endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)'
+    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpTerminal()'
     if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
           \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
       let l:cpp_compilation = CPPCompilation()
@@ -989,7 +988,7 @@ if !exists('*CompileAndExcute')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal(33)'
+  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal()'
   if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
         \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
     exec l:compile_only.CPPCompilation()
@@ -1049,6 +1048,10 @@ nnoremap <Space>t :call NUpdateTabTermBuf()<CR>:tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
 nnoremap <Space>q :call QuitWin()<CR>
 nnoremap <Space>w :w<CR>
+nnoremap <C-h> :call MoveTabH()<CR>
+nnoremap <C-l> :call MoveTabL()<CR>
+nnoremap <M-h> gT
+nnoremap <M-l> gt
 function! CloseAndBackTab()
   call CAllTermsOfCurTab()
   if tabpagenr() > 1 " not the first tab
@@ -1095,6 +1098,32 @@ function! QuitWin() " not consider the main win is a term
     endfor
     quit
   endif
+endfunction
+function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
+  let l:cur_tab=tabpagenr()
+  if l:cur_tab ==? a:boundary && tabpagenr('$') > 1
+    exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
+    if exists('g:tab_term_buf')
+      let l:tmp = g:tab_term_buf[l:cur_tab]
+      for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
+        let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
+      endfor
+      let g:tab_term_buf[a:last] = l:tmp
+    endif
+  elseif tabpagenr('$') > 1
+    exec ':tabmove '.a:plus_or_minus[1]
+    if exists('g:tab_term_buf')
+      let l:tmp = g:tab_term_buf[l:cur_tab]
+      let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
+      let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
+    endif
+  endif
+endfunction
+function! MoveTabH()
+  call MoveTab(1, ['+', '-'], [+1, -1], 1, tabpagenr('$'))
+endfunction
+function! MoveTabL()
+  call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
 " 比较文件
 nnoremap <Space><F4> :vert diffsplit
