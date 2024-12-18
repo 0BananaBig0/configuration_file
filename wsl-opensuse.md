@@ -118,9 +118,8 @@ yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --gl
 yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
 
 # if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
-<!-- sudo zypper install -y -t pattern xfce -->
-<!-- sudo zypper install -y lightdm -->
-<!-- sudo zypper install -y dbus-1-x11 xrdp -->
+sudo zypper install -y adwaita-icon-theme-legacy adwaita-icon-theme # also for qt icons
+sudo zypper install -y dbus-1-x11 at-spi2-core
 # Fix an error of ping
 sudo zypper install -y libcap-progs
 sudo setcap cap_net_raw+p /bin/ping
@@ -157,3 +156,6 @@ ln -s ~/wsl_shared_folder/cpp_workspace ~
 ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
 ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
 ln -s ~/wsl_shared_folder/configuration_file ~
+
+# fix an error that gvim cannot use menus
+export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/share

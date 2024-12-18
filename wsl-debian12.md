@@ -117,7 +117,7 @@ sudo apt install --fix-broken -y
 cd ~/wsl_shared_folder
 wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
 x bison-3.3.tar.gz
-sudo apt install m4
+sudo apt install m4 flex -y
 cd bison-3.3
 ./configure
 make
@@ -128,9 +128,8 @@ rm bison-3.3.tar.gz
 sudo setcap cap_net_raw+p /bin/ping
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
-sudo apt install firefox-esr -y
 # if you can't open GUI, add "export DISPLAY=:0" to your .zshrc or .bashrc
-sudo apt install dbus-x11 xfce4 xfce4-goodies xrdp flex -y
+sudo apt install dbus-x11 adwaita-icon-theme -y #also for qt icons
 # 先备份配置
 sudo cp /etc/xrdp/xrdp.ini /etc/xrdp/xrdp.ini.backup
 # 修改配置文件
@@ -139,7 +138,7 @@ sudo sed -i 's/3389/3390/g' /etc/xrdp/xrdp.ini
 ## 修改 位/像素（bpp）
 sudo sed -i 's/max_bpp=32/#max_bpp=32\nmax_bpp=128/g' /etc/xrdp/xrdp.ini
 sudo sed -i 's/xserverbpp=24/#xserverbpp=24\nxserverbpp=128/g' /etc/xrdp/xrdp.ini
-$ 指定 x windows system 启动使用我们安装的 xfce4
+# 指定 x windows system 启动使用我们安装的 xfce4
 echo xfce4-session > ~/.xsession
 # 修改 xrdp 的窗口管理器的启动脚本
 sudo vim /etc/xrdp/startwm.sh
@@ -219,7 +218,6 @@ sudo update-alternatives --install /usr/bin/FileCheck FileCheck /usr/bin/FileChe
 sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-16 160
 sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-16 160
 
-sudo ln /mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe /usr/bin/msedge -s
 sudo apt install pandoc texlive-xetex texlive-luatex pandoc-citeproc-preamble texlive-pstricks -y
 sudo npm -g install instant-markdown-d@next
 
@@ -319,3 +317,6 @@ ln -s ~/wsl_shared_folder/configuration_file ~
 
 echo '[user]' | sudo tee -a /etc/wsl.conf > /dev/null
 echo 'default=banana' | sudo tee -a /etc/wsl.conf > /dev/null
+
+# fix an error that gvim cannot use menus
+export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/share
