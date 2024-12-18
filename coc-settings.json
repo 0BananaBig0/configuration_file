@@ -56,7 +56,7 @@
    "diagnostic.messageTarget": "echo",
    "diagnostic.virtualText": true,
    "diagnostic.warningSign": "⚡",
-   "inlayHint.enable": false,
+   "inlayHint.enable": true,
    "markdownlint.config": {
       "MD013": {
          "line_length": 100
@@ -71,6 +71,7 @@
    "prettier.proseWrap": "always",
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
+   "suggest.defaultSortMethod": "alphabetical",
    "suggest.detailField": "preview",
    "suggest.maxCompleteItemCount": 18,
    "suggest.noselect": true,
