@@ -164,6 +164,10 @@ function! CocTimerStart(timer)
   call LazyOnPluginConfiguration()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
+  if &filetype==?'vim'
+    " Disable automatic word wrapping
+    set textwidth=0
+  endif
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -264,32 +268,50 @@ function! LazyPluginConfiguration()
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
-  function! FindPattern(target_path)
+  function! FindRoot(target_path)
     let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
+    let l:workspace_root_dir =''
+    let l:workspace_root_file =''
     for l:pattern in l:root_patterns
-      let l:workspace_root = finddir(l:pattern, a:target_path.';')
-      if !empty(l:workspace_root)
-        break
+      if empty(l:workspace_root_dir)
+        let l:workspace_root_dir = finddir(l:pattern, a:target_path.';')
       endif
-      let l:workspace_root = findfile(l:pattern, a:target_path.';')
-      if !empty(l:workspace_root)
+      if empty(l:workspace_root_file)
+        let l:workspace_root_file = findfile(l:pattern, a:target_path.';')
+      endif
+      if !empty(l:workspace_root_dir) && !empty(l:workspace_root_file)
         break
       endif
     endfor
-    return [l:workspace_root, l:pattern]
+    if !empty(l:workspace_root_dir)
+      let l:workspace_root_dir = substitute(fnamemodify(l:workspace_root_dir, ':p'), '/$', '', '')
+      let l:workspace_root_dir = strpart(l:workspace_root_dir, 0, strridx(l:workspace_root_dir,'/'))
+    endif
+    if !empty(l:workspace_root_file)
+      let l:workspace_root_file = substitute(fnamemodify(l:workspace_root_file, ':p'), '/$', '', '')
+      let l:workspace_root_file = strpart(l:workspace_root_file, 0, strridx(l:workspace_root_file,'/'))
+    endif
+    if len(l:workspace_root_dir) < len(l:workspace_root_file)
+      return l:workspace_root_file
+    endif
+    return l:workspace_root_dir
   endfunction
   function! WorkspaceRoot()
-    let l:workspace_root = FindPattern(expand('%:p:h'))[0] " Where we store the opened file
-    let l:root_pattern = FindPattern(expand('%:p:h'))[1]
+    " Before finding the current file's workspace root, jump to its window to avoid potential bugs
+    let l:target_win = 999999
+    let l:cur_tab = tabpagenr()
+    for l:win in getwininfo()
+      if l:win['tabnr'] == l:cur_tab && l:win['winid'] < l:target_win
+        let l:target_win = l:win['winid']
+      endif
+    endfor
+    call win_gotoid(l:target_win )
+    let l:workspace_root = FindRoot(expand('%:p:h')) " Where we store the opened file
     if empty(l:workspace_root)
       echo 'You had better create a root-pattern file like .git in your project.'
-      return [expand('%:p:h'), '']
-    elseif (l:workspace_root ==? l:root_pattern)
-      let l:workspace_root = '.'
-    else
-      let l:workspace_root = strpart(l:workspace_root, 0, strridx(l:workspace_root,'/'.l:root_pattern))
+      return expand('%:p:h')
     endif
-    return [l:workspace_root, l:root_pattern]
+    return l:workspace_root
   endfunction
   function! CopyFileRelToCPP(cpp_workspace_root, file_name)
     let l:related_file = a:cpp_workspace_root.'/'.a:file_name
@@ -304,7 +326,7 @@ function! LazyPluginConfiguration()
     endif
   endfunction
   function! ClangToolConfiguration()
-    let l:cpp_workspace_root = WorkspaceRoot()[0]
+    let l:cpp_workspace_root = WorkspaceRoot()
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
@@ -637,7 +659,7 @@ function! LazyOnPluginConfiguration()
 
   " vimspector setting
   function! CppDebugConfiguration()
-    let l:cpp_workspace_root = WorkspaceRoot()[0]
+    let l:cpp_workspace_root = WorkspaceRoot()
     if !isdirectory(l:cpp_workspace_root.'/.vscode')
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
     endif
@@ -908,10 +930,8 @@ function! SetTitle()
   exec 'normal! G'
 endfunction
 function! CPPCompilation()
-  let l:cpp_workspace_root = fnamemodify(WorkspaceRoot()[0], ':p')
-  let l:cpp_workspace_root = strpart(l:cpp_workspace_root, 0, strlen(l:cpp_workspace_root) - 1)
+  let l:cpp_workspace_root = WorkspaceRoot()
   let l:cur_file_path = expand('%:p:h')
-  let l:cur_work_path = getcwd()
   let l:all_possible_paths = [l:cpp_workspace_root]
   for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
     if l:cur_file_path[l:str_id] ==? '/'
@@ -926,8 +946,7 @@ function! CPPCompilation()
     " Get the list of matching files (non-recursive)
     let l:cmakelist_path = glob(l:pattern, 0, 1)
     if !empty(l:cmakelist_path)
-      let l:cmakelist_path = ' cd '.l:possible_path
-                          \ .' && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+      let l:cmakelist_path = ' cd '.l:possible_path.' && cmake'
       call system('ccache --version')
       if v:shell_error " Not use ccache
         echo "ccache is not installed."
@@ -936,27 +955,24 @@ function! CPPCompilation()
                             \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
       endif
       return l:cmakelist_path.' -S . -B build'
-          \.' && cmake --build build --parallel 12'
-          \ .' && cd '.l:cur_work_path
+          \ .' && bear --append -- make -C build -j12'
     endif
     let l:pattern = l:possible_path."/*.pro"
     let l:qmakepro_path = glob(l:pattern, 0, 1)
     if !empty(l:qmakepro_path)
       return ' cd '.l:possible_path.' && qmake -o build/Makefile'
-          \ .' && bear --append -- make -j12'
-          \ .' && cd '.l:cur_work_path
+          \ .' && bear --append -- make -C build -j12'
     endif
     let l:pattern = l:possible_path."/[m,M]akefile"
     let l:makefile_path = glob(l:pattern, 0, 1)
     if !empty(l:makefile_path)
       return ' cd '.l:possible_path.' && bear --append -- make -j12'
-          \ .' && cd '.l:cur_work_path
     endif
   endfor
   if &filetype==?'cpp'
-    return ' g++ % -o %<.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && g++ % -o %<.exe -Wall -Wextra'
   else
-    return ' gcc % -o %<.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && gcc % -o %<.exe -Wall -Wextra'
   endif
 endfunction
 if !exists('*CompileAndExcute')
@@ -965,10 +981,12 @@ if !exists('*CompileAndExcute')
     if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
           \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
       let l:cpp_compilation = CPPCompilation()
-      if stridx(l:cpp_compilation, 'make') != -1
-        exec l:compile_exec.l:cpp_compilation
+      if stridx(l:cpp_compilation, 'cmake') != -1 || stridx(l:cpp_compilation, 'qmake') != -1
+        exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
+      elseif stridx(l:cpp_compilation, 'make') != -1
+        exec l:compile_exec.l:cpp_compilation.' && ./*.exe'
       else
-        exec l:compile_exec.l:cpp_compilation.' && ./%<.exe'
+        exec l:compile_exec.l:cpp_compilation.' && %<.exe'
       endif
     elseif &filetype==?'python'
       exec l:compile_exec.' python3 %'
@@ -1041,17 +1059,23 @@ endfunction
 function! TabPosInitialize()
   for l:i in range(1, 9)
       exec 'noremap <M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
   exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
+  exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
 endfunction
 nnoremap <Space>t :call NUpdateTabTermBuf()<CR>:tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
 nnoremap <Space>q :call QuitWin()<CR>
 nnoremap <Space>w :w<CR>
-nnoremap <C-h> :call MoveTabH()<CR>
-nnoremap <C-l> :call MoveTabL()<CR>
-nnoremap <M-h> gT
-nnoremap <M-l> gt
+noremap <M-S-h> :call MoveTabH()<CR>
+noremap <M-S-l> :call MoveTabL()<CR>
+inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
+inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
+noremap <C-M-h> gT
+noremap <C-M-l> gt
+inoremap <C-M-h> <C-o>gT
+inoremap <C-M-l> <C-o>gt
 function! CloseAndBackTab()
   call CAllTermsOfCurTab()
   if tabpagenr() > 1 " not the first tab
@@ -1166,7 +1190,7 @@ function! RetabAndDeleteTraillingUselessChars()
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
-inoremap <C-CR> <ESC>l:call EnterWithoutTraillingComment()<CR>a
+inoremap <M-CR> <ESC>l:call EnterWithoutTraillingComment()<CR>a
 nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
   " 1. 获取当前光标所在位置的行数
@@ -1205,8 +1229,8 @@ function! EnterWithoutTraillingComment()
   call setpos('.', [0, l:new_line, l:cur_indent_count, 0])
 endfunction
 " Alt-Enter新建空行
-nnoremap <M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
-inoremap <M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>i
+nnoremap <C-M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
+inoremap <C-M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>i
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
 inoremap <M-h> <C-o>h
 inoremap <M-j> <C-o>j
