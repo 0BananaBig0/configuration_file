@@ -228,7 +228,6 @@ function! LazyPluginConfiguration()
 
   " coc setting
   " Use tab for trigger completion with characters ahead and navigate.
-  " After we select the word we need press enter key
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
   " by other plugin before putting this into your config.
   inoremap <expr> <TAB>
@@ -254,15 +253,16 @@ function! LazyPluginConfiguration()
   nmap <Space>r <Plug>(coc-references)
   nmap [a <Plug>(coc-codeaction)
   nmap [b <Plug>(coc-codeaction-line)
-  nnoremap [c :call CocAction('jumpDeclaration', 'tabe')<CR>
-  nnoremap [d :call CocAction('jumpDefinition', 'tabe')<CR>
-  nnoremap [i :call CocAction('jumpImplementation', 'tabe')<CR>
+  nnoremap [c :call NUpdateTabTermBuf()<CR>:call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap [d :call NUpdateTabTermBuf()<CR>:call CocAction('jumpDefinition', 'tabe')<CR>
+  nnoremap [e :call CocAction('diagnosticToggleBuffer')<CR>
+  nnoremap [i :call NUpdateTabTermBuf()<CR>:call CocAction('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
   nmap [l <Plug>(coc-diagnostic-info)
   nmap [s <Plug>(coc-codeaction-selected)
   xmap [s <Plug>(coc-codeaction-selected)
-  nnoremap [t :call CocAction('diagnosticToggleBuffer')<CR>
+  nnoremap [t :call CocAction('diagnosticToggle')<CR>
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
