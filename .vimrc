@@ -970,9 +970,9 @@ function! CPPCompilation()
     endif
   endfor
   if &filetype==?'cpp'
-    return ' cd '.l:cur_file_path.' && g++ % -o %<.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && g++ '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   else
-    return ' cd '.l:cur_file_path.' && gcc % -o %<.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && gcc '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   endif
 endfunction
 if !exists('*CompileAndExcute')
@@ -986,7 +986,7 @@ if !exists('*CompileAndExcute')
       elseif stridx(l:cpp_compilation, 'make') != -1
         exec l:compile_exec.l:cpp_compilation.' && ./*.exe'
       else
-        exec l:compile_exec.l:cpp_compilation.' && %<.exe'
+        exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
       endif
     elseif &filetype==?'python'
       exec l:compile_exec.' python3 %'
