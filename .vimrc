@@ -46,7 +46,7 @@ set t_Co=256
 " 不少插件的信息更新都会需要这个时间
 set updatetime=33
 " 打开文件时进行解码的猜测列表
-set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
+set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
 set encoding=utf-8
 scriptencoding utf-8
@@ -645,7 +645,7 @@ function! LazyOnPluginConfiguration()
     exec 'normal! ms'
     call plug#load('vim-fugitive')
     call plug#load('vim-gitgutter')
-    set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
+    set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
     exec 'normal! `s'
@@ -787,7 +787,7 @@ endif
 set shortmess+=c
 set showcmd
 set foldmethod=manual
-set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [ASCII=0x%B]%m%r
+set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
 set statusline+=%=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
 " 当窗口多于一个时显示状态行(1),总是显示状态行(2)
 set laststatus=2
