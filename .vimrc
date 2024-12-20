@@ -261,7 +261,7 @@ function! LazyPluginConfiguration()
   nmap [k <Plug>(coc-diagnostic-prev)
   nmap [l <Plug>(coc-diagnostic-info)
   nmap [s <Plug>(coc-codeaction-selected)
-  xmap [s <Plug>(coc-codeaction-selected)
+  vmap [s <Plug>(coc-codeaction-selected)
   nnoremap [t :call CocAction('diagnosticToggle')<CR>
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
@@ -332,7 +332,7 @@ function! LazyPluginConfiguration()
   endfunction
   noremap <Leader><F7> :call ClangToolConfiguration()<CR>
   nmap <F7>  <Plug>(coc-format)
-  xmap <F7>  <Plug>(coc-format-selected)
+  vmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
   function! ShowDocumentation()
     if CocAction('hasProvider', 'hover')
@@ -674,7 +674,7 @@ function! LazyOnPluginConfiguration()
   nmap ]<S-F2> <Plug>VimspectorStop
   nmap ]<C-F2> <Plug>VimspectorPause
   nmap ]<F3> <Plug>VimspectorBalloonEval
-  xmap ]<F3> <Plug>VimspectorBalloonEval
+  vmap ]<F3> <Plug>VimspectorBalloonEval
   nmap <F4> <Plug>VimspectorToggleBreakpoint
   nnoremap <S-F4> :call vimspector#ClearBreakpoints()<CR>
   nmap ]<F4> <Plug>VimspectorToggleConditionalBreakpoint
