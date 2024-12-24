@@ -70,6 +70,7 @@
    "prettier.formatterPriority": -1,
    "prettier.printWidth": 100,
    "prettier.proseWrap": "always",
+   "prettier.disableLanguages": ["vim"],
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.defaultSortMethod": "alphabetical",
@@ -80,4 +81,3 @@
    "suggest.virtualText": true,
    "suggest.triggerAfterInsertEnter": true
 }
-

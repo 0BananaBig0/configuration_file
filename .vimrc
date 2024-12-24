@@ -164,10 +164,6 @@ function! CocTimerStart(timer)
   call LazyOnPluginConfiguration()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
-  if &filetype==?'vim'
-    " Disable automatic word wrapping
-    set textwidth=0
-  endif
   call CocActionAsync('diagnosticToggle')
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
@@ -268,7 +264,7 @@ function! LazyPluginConfiguration()
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
-           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
+           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
   function! FindRoot(target_path)
     let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', 'SConstruct']
     let l:workspace_root_dir =''
@@ -308,8 +304,10 @@ function! LazyPluginConfiguration()
     call win_gotoid(l:target_win )
   endfunction
   function! WorkspaceRoot()
-    " Before finding the current file's workspace root, jump to its window to avoid potential bugs
-    call JumpToTheMainWin()
+    if &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
+        \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
+      call JumpToTheMainWin() " Avoid potential bugs
+    endif
     let l:workspace_root = FindRoot(expand('%:p:h')) " Where we store the opened file
     if empty(l:workspace_root)
       echo 'You had better create a root-pattern file like .git in your project.'
@@ -338,6 +336,7 @@ function! LazyPluginConfiguration()
   nmap <F7>  <Plug>(coc-format)
   vmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
+  nnoremap K :call ShowDocumentation()<CR>
   function! ShowDocumentation()
     if CocAction('hasProvider', 'hover')
       call CocActionAsync('doHover')
@@ -345,7 +344,6 @@ function! LazyPluginConfiguration()
       call feedkeys('K', 'in')
     endif
   endfunction
-  nnoremap K :call ShowDocumentation()<CR>
   " Highlight the symbol and its references when holding the cursor
   augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg='White' guibg='Black'
@@ -407,7 +405,6 @@ function! LazyPluginConfiguration()
         endif
         " Switch to the terminal window to hide it
         call win_gotoid(l:win['winid'])
-        " Hide the terminal
         hide
       endif
     endfor
@@ -665,7 +662,6 @@ function! LazyOnPluginConfiguration()
   endfunction
   nmap <F2> <Plug>VimspectorContinue
   nnoremap <S-F2> :call vimspector#Restart()<CR>
-  nnoremap <C-F2> :VimspectorReset<CR>
   nmap ]<F2> <Plug>VimspectorRunToCursor
   nmap ]<S-F2> <Plug>VimspectorStop
   nmap ]<C-F2> <Plug>VimspectorPause
@@ -677,6 +673,7 @@ function! LazyOnPluginConfiguration()
   nnoremap ]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
   nnoremap ]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   nnoremap <F5> :call plug#load('vimspector')<CR>
+  silent nnoremap <S-F5> :VimspectorReset<CR>
   nnoremap ]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
                \ :call plug#load('vimspector')<CR>
                \ :call vimspector#Launch()<CR>
@@ -981,7 +978,7 @@ if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
-          \ || &filetype==?'make' || expand('%:t') == 'SConstruct'
+        \ || &filetype==?'make' || expand('%:t') == 'SConstruct'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'bear') != -1
         exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
@@ -1002,7 +999,8 @@ if !exists('*CompileAndExcute')
       exec ':CocCommand markdown-preview-enhanced.openPreview'
     elseif &filetype==?'vim'
       exec ':source ~/.vimrc'
-    elseif  &filetype==?'help'|| &buftype == 'terminal'
+    elseif &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
+        \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
       call JumpToTheMainWin()
       call CompileAndExcute()
     endif
@@ -1015,7 +1013,8 @@ function! CompileCommand()
     exec l:compile_only.CPPCompilation()
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
-  elseif  &filetype==?'help'|| &buftype == 'terminal'
+  elseif &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
+      \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
     call JumpToTheMainWin()
     call CompileCommand()
   endif
