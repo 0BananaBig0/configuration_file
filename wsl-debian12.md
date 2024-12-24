@@ -58,6 +58,7 @@ sudo apt install -y neovim xclip
 sudo apt install -y fd-find exa zoxide ripgrep bat hyperfine duf httpie
 cargo install du-dust@0.8.6 bottom@0.6.3 procs@0.13.0 --locked #not do for root
 pipx install ipdb
+pipx install scons
 pipx install pylint
 pipx install yapf
 pipx install pygments

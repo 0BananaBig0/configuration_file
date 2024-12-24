@@ -83,6 +83,7 @@ ln -s ~/.vimrc ~/.config/nvim/init.vim
 ln -s ~/.vim/coc-settings.json ~/.config/nvim
 pip3 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
+pipx install scons
 pipx install ipdb
 pipx install pylint
 pipx install yapf

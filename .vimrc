@@ -168,6 +168,7 @@ function! CocTimerStart(timer)
     " Disable automatic word wrapping
     set textwidth=0
   endif
+  call CocActionAsync('diagnosticToggle')
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -262,14 +263,14 @@ function! LazyPluginConfiguration()
   nmap [l <Plug>(coc-diagnostic-info)
   nmap [s <Plug>(coc-codeaction-selected)
   vmap [s <Plug>(coc-codeaction-selected)
-  nnoremap [t :call CocAction('diagnosticToggle')<CR>
+  nnoremap [t :call CocActionAsync('diagnosticToggle')<CR>
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
   function! FindRoot(target_path)
-    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root']
+    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', 'SConstruct']
     let l:workspace_root_dir =''
     let l:workspace_root_file =''
     for l:pattern in l:root_patterns
@@ -296,9 +297,8 @@ function! LazyPluginConfiguration()
     endif
     return l:workspace_root_dir
   endfunction
-  function! WorkspaceRoot()
-    " Before finding the current file's workspace root, jump to its window to avoid potential bugs
-    let l:target_win = 999999
+  function! JumpToTheMainWin()
+    let l:target_win = win_getid()
     let l:cur_tab = tabpagenr()
     for l:win in getwininfo()
       if l:win['tabnr'] == l:cur_tab && l:win['winid'] < l:target_win
@@ -306,6 +306,10 @@ function! LazyPluginConfiguration()
       endif
     endfor
     call win_gotoid(l:target_win )
+  endfunction
+  function! WorkspaceRoot()
+    " Before finding the current file's workspace root, jump to its window to avoid potential bugs
+    call JumpToTheMainWin()
     let l:workspace_root = FindRoot(expand('%:p:h')) " Where we store the opened file
     if empty(l:workspace_root)
       echo 'You had better create a root-pattern file like .git in your project.'
@@ -367,7 +371,7 @@ function! LazyPluginConfiguration()
 
   " asyncrun setting
   let g:tab_term_buf_size = 33
-  function! JumpTerminal()
+  function! JumpToTerm()
     if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
     endif
@@ -381,6 +385,7 @@ function! LazyPluginConfiguration()
     endfor
     if l:target_buf != -1 && l:target_win != -1
       call win_gotoid(l:target_win)
+      call feedkeys("\<C-\>\<C-n>", 'n')
       let g:tab_term_buf[tabpagenr()] = l:target_buf
     endif
   endfunction
@@ -417,10 +422,10 @@ function! LazyPluginConfiguration()
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
         exec 'belowright ' . ' terminal'
-        call feedkeys("\<C-\>\<C-n>", 'n')
         exec 'resize ' . a:height
         let g:tab_term_buf[l:cur_tab] = bufnr('%')
       endif
+      call feedkeys("\<C-\>\<C-n>", 'n')
     endif
   endfunction
   function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
@@ -460,20 +465,11 @@ function! LazyPluginConfiguration()
     endfor
     call CUpdateTabTermBuf()
   endfunction
-  function! IsTermWin(win_id)
-    " Check if the given window ID is valid
-    if !win_id2win(a:win_id)
-      return 0
-    endif
-    let l:buf_id = winbufnr(a:win_id)
-    let l:buf_type = getbufvar(l:buf_id, '&buftype')
-    return l:buf_type ==? 'terminal'
-  endfunction
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
-  nnoremap <F8> :call ToggleTerminal(6)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal()<Space>
+  noremap <F8> :call ToggleTerminal(6)<CR>
+  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
 
@@ -619,7 +615,7 @@ function! LazyOnPluginConfiguration()
 
 
 
-  " vim-interestingwords setting, highlight:\k ,  clear all:\K
+  " vim-interestingwords setting
   nnoremap <Leader>wt :call LoadAndSetVimInterestingwords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
@@ -856,7 +852,7 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
-  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim
+  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim,cmake,qmake,make
            \ nnoremap <Space><F2>
            \ :call CompileAndExcute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <Leader><F2>
@@ -910,12 +906,12 @@ function! SetTitle()
     endif
     call append(line('$'), '')
   else
-    call setline(1, '/*************************************************************************')
-    call append(line('$'), '  > File Name: '.expand('%'))
-    call append(line('$'), '  > Author: Huaxiao Liang')
-    call append(line('$'), '  > Mail: 1184903633@qq.com')
-    call append(line('$'), '  > Created Time: '.strftime('%c'))
-    call append(line('$'), ' ************************************************************************/')
+    call setline(1, '//*************************************************************************')
+    call append(line('$'), '//  > File Name: '.expand('%'))
+    call append(line('$'), '//  > Author: Huaxiao Liang')
+    call append(line('$'), '//  > Mail: 1184903633@qq.com')
+    call append(line('$'), '//  > Created Time: '.strftime('%c'))
+    call append(line('$'), '//************************************************************************')
     call append(line('$'), '')
   endif
   if &filetype==?'cpp' && expand('%:e')==?'cpp'
@@ -941,6 +937,7 @@ function! CPPCompilation()
   call add(l:all_possible_paths, l:cur_file_path)
   let l:qmakepro_path = ''
   let l:makefile_path = ''
+  let l:sconstruct_path = ''
   for l:possible_path in l:all_possible_paths
     let l:pattern = l:possible_path."/CMakeLists.txt"
     " Get the list of matching files (non-recursive)
@@ -968,6 +965,11 @@ function! CPPCompilation()
     if !empty(l:makefile_path)
       return ' cd '.l:possible_path.' && bear --append -- make -j12'
     endif
+    let l:pattern = l:possible_path."/SConstruct"
+    let l:sconstruct_path = glob(l:pattern, 0, 1)
+    if !empty(l:sconstruct_path)
+      return ' cd '.l:possible_path.' && bear --append -- scons -j12'
+    endif
   endfor
   if &filetype==?'cpp'
     return ' cd '.l:cur_file_path.' && g++ '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
@@ -977,14 +979,12 @@ function! CPPCompilation()
 endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpTerminal()'
-    if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
-          \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
+    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+    if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
+          \ || &filetype==?'make' || expand('%:t') == 'SConstruct'
       let l:cpp_compilation = CPPCompilation()
-      if stridx(l:cpp_compilation, 'cmake') != -1 || stridx(l:cpp_compilation, 'qmake') != -1
+      if stridx(l:cpp_compilation, 'bear') != -1
         exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
-      elseif stridx(l:cpp_compilation, 'make') != -1
-        exec l:compile_exec.l:cpp_compilation.' && ./*.exe'
       else
         exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
       endif
@@ -1002,16 +1002,22 @@ if !exists('*CompileAndExcute')
       exec ':CocCommand markdown-preview-enhanced.openPreview'
     elseif &filetype==?'vim'
       exec ':source ~/.vimrc'
+    elseif  &filetype==?'help'|| &buftype == 'terminal'
+      call JumpToTheMainWin()
+      call CompileAndExcute()
     endif
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpTerminal()'
-  if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake'
-        \ || &filetype==?'qmake' || &filetype==?'make' || &buftype == 'terminal'
+  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+  if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
+        \ || &filetype==?'make' || expand('%:t') == 'SConstruct'
     exec l:compile_only.CPPCompilation()
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
+  elseif  &filetype==?'help'|| &buftype == 'terminal'
+    call JumpToTheMainWin()
+    call CompileCommand()
   endif
 endfunction
 function! ShowCurrentModule()
@@ -1050,7 +1056,7 @@ function! CallShowNearestFunction()
      call ShowCurrentModule()
   endif
 endfunction
-" alt+n跳到第n个tab，0<n<10
+" Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
   let s:count = a:index
   exec 'tabfirst'
@@ -1104,7 +1110,8 @@ function! QuitWin() " not consider the main win is a term
     endif
   endfor
   if l:cur_win_buf != l:main_win_buf " not the main win, close one win
-    if IsTermWin(win_getid()) == 1
+    let l:buf_type = getbufvar(winbufnr(win_getid()), '&buftype')
+    if l:buf_type ==? 'terminal'
       call CUpdateTabTermBuf(bufnr())
       quit!
     else
