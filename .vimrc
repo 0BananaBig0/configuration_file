@@ -67,19 +67,19 @@ Plug 'luochen1990/rainbow'
 Plug 'nathanaelkane/vim-indent-guides'
 " highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'for': []}
+" highlight qml syntax
+Plug 'peterhoeg/vim-qml', {'for': ['qml']}
 " 高亮c++类模板等插件
 Plug 'bfrg/vim-c-cpp-modern', {'for': ['cpp', 'c', 'opencl']}
 " python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
-" roslaunch语法高亮
-Plug 'taketwo/vim-ros', {'for': []}
 " verilog indent file
 Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
-" verilog indent file
+" highlight qmake syntax
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
 " markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': []}
-" 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Layz
+" 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " vim快捷键管理和提示插件
 Plug 'liuchengxu/vim-which-key', {'on': []}
@@ -87,7 +87,7 @@ Plug 'liuchengxu/vim-which-key', {'on': []}
 Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件
 Plug 'skywind3000/asyncrun.vim', {'on': []}
-" 菜单栏插件, Lazy_On
+" 菜单栏插件, Manual-load
 Plug 'skywind3000/vim-quickui', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
@@ -111,9 +111,9 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
-  autocmd BufNewFile,BufRead *.launch set filetype=roslaunch
-  autocmd BufNewFile,BufRead *.launch call plug#load('vim-ros')
   autocmd BufNewFile,BufRead */include/* set filetype=cpp
+  autocmd BufNewFile,BufRead *.launch set filetype=xml
+  autocmd BufNewFile,BufRead *.qrc set filetype=xml
 augroup END
 
 
@@ -160,11 +160,10 @@ function! CocTimerStart(timer)
   exec 'CocStart'
   call plug#load('vim-which-key')
   call MarkdownPluginConfiguration()
-  call LazyPluginConfiguration()
-  call LazyOnPluginConfiguration()
+  call DelayedPluginConfiguration()
+  call ManualLoadPluginConfiguration()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
-  call CocActionAsync('diagnosticToggle')
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -174,10 +173,9 @@ function! MarkdownPluginConfiguration()
   " coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
   nnoremap <Leader>mm :CocCommand markmap.watch<CR>
-  " Create markmap html file from the whole file
+  " Create markmap html file
   nnoremap <Leader>mc :CocCommand markmap.create --offline<CR>
   nnoremap <Leader>mh <Plug>(coc-markmap-create)
-  " Create markmap html file from the selected lines
   vnoremap <Leader>mh <Plug>(coc-markmap-create-v)
   nnoremap <Leader>mf :CocCommand markdownlint.fixAll<CR>
 
@@ -213,7 +211,7 @@ endfunction
 
 
 
-function! LazyPluginConfiguration()
+function! DelayedPluginConfiguration()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=0
   nnoremap <Leader> :WhichKey '<Leader>'<CR>
@@ -249,17 +247,17 @@ function! LazyPluginConfiguration()
   nmap <Space>n <Plug>(coc-rename)
   nmap <Space>r <Plug>(coc-references)
   nmap [a <Plug>(coc-codeaction)
-  nmap [b <Plug>(coc-codeaction-line)
-  nnoremap [c :call NUpdateTabTermBuf()<CR>:call CocAction('jumpDeclaration', 'tabe')<CR>
-  nnoremap [d :call NUpdateTabTermBuf()<CR>:call CocAction('jumpDefinition', 'tabe')<CR>
-  nnoremap [e :call CocAction('diagnosticToggleBuffer')<CR>
-  nnoremap [i :call NUpdateTabTermBuf()<CR>:call CocAction('jumpImplementation', 'tabe')<CR>
+  nmap [e <Plug>(coc-codeaction-line)
+  nnoremap [c :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
+  nnoremap [d :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
+  nnoremap [i :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
   nmap [l <Plug>(coc-diagnostic-info)
   nmap [s <Plug>(coc-codeaction-selected)
   vmap [s <Plug>(coc-codeaction-selected)
-  nnoremap [t :call CocActionAsync('diagnosticToggle')<CR>
+  nnoremap [b :call CocActionAsync('diagnosticToggleBuffer')<CR>
+  nnoremap [t :call CocActionAsync('diagnosticToggle', 1)<CR>
   let g:coc_filetype_map = {'opencl': 'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
@@ -472,7 +470,7 @@ endfunction
 
 
 
-function! LazyOnPluginConfiguration()
+function! ManualLoadPluginConfiguration()
   " vim-quickui setting
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
@@ -849,7 +847,7 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
-  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim,cmake,qmake,make
+  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim,cmake,qmake,make,xml
            \ nnoremap <Space><F2>
            \ :call CompileAndExcute()<CR>
   autocmd FileType c,cpp,verilog nnoremap <Leader><F2>
@@ -978,7 +976,7 @@ if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
-        \ || &filetype==?'make' || expand('%:t') == 'SConstruct'
+        \ || &filetype==?'make' || &filetype==?'xml' || expand('%:t') == 'SConstruct'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'bear') != -1
         exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
@@ -1009,7 +1007,7 @@ endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
   if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
-        \ || &filetype==?'make' || expand('%:t') == 'SConstruct'
+        \ || &filetype==?'make'|| &filetype==?'xml' || expand('%:t') == 'SConstruct'
     exec l:compile_only.CPPCompilation()
   elseif &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
