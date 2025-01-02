@@ -638,7 +638,7 @@ function! ManualLoadPluginConfiguration()
     call plug#load('vim-gitgutter')
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
-    set statusline+=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
+    set statusline+=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
     exec 'normal! `s'
   endfunction
   function! GitStatus()
@@ -779,7 +779,7 @@ set shortmess+=c
 set showcmd
 set foldmethod=manual
 set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
-set statusline+=%=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
+set statusline+=%=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
 " 当窗口多于一个时显示状态行(1),总是显示状态行(2)
 set laststatus=2
 " 设置<ESC>键响应时间
@@ -1242,7 +1242,7 @@ inoremap <M-k> <C-o>k
 inoremap <M-l> <C-o>l
 inoremap <M-p> <ESC>pa
 inoremap <M-S-p> <ESC>Pa
-inoremap <M-u> <C-o>u
+inoremap <M-u> <C-o>u<C-o>l
 inoremap <M-r> <C-o><C-r>
 inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
