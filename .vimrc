@@ -263,11 +263,11 @@ function! DelayedPluginConfiguration()
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
+  let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', 'SConstruct']
   function! FindRoot(target_path)
-    let l:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', 'SConstruct']
     let l:workspace_root_dir =''
     let l:workspace_root_file =''
-    for l:pattern in l:root_patterns
+    for l:pattern in g:root_patterns
       if empty(l:workspace_root_dir)
         let l:workspace_root_dir = finddir(l:pattern, a:target_path.';')
       endif
@@ -727,12 +727,17 @@ function! ManualLoadPluginConfiguration()
 
   " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
   " ctrl+j/k上下选择显示查找结果，ctrl+上/下键上下移动被显示的查找结果的内容
+  let g:Lf_WindowPosition = 'popup'
+  if empty($SUDO_USER)
+    let g:Lf_CacheDirectory = expand($HOME.'/.vim/cache')
+  else
+    let g:Lf_CacheDirectory = expand('/home/'.$SUDO_USER.'/.vim/cache')
+  endif
   let g:Lf_GtagsAutoGenerate = 0
   let g:Lf_Gtagslabel = 'native-pygments'
   let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
-  let g:Lf_RootMarkers = ['.root', '.svn', '.git', '.hg', '.project']
+  let g:Lf_RootMarkers = g:root_patterns
   let g:Lf_WorkingDirectoryMode = 'Ac'
-  let g:Lf_CacheDirectory = expand('~/.vim/cache')
   let g:Lf_CursorBlink = 0
   let g:Lf_RgConfig = [
           \ '--max-columns=150',
@@ -743,8 +748,6 @@ function! ManualLoadPluginConfiguration()
   let g:Lf_PreviewInPopup = 1
   " open the preview window automatically
   let g:Lf_PreviewResult = {'Rg': 1}
-  let g:Lf_ShortcutB = '<Leader>fb'
-  let g:Lf_ShortcutF = '<Leader>ff'
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 显示相关和实用设置
