@@ -4,12 +4,12 @@
 "(1)*llvm* and *clang* , make sure their versions are bigger than 10.0 coc will need them
 "(2)nodejs and yarn, make sure nodejs version is bigger than 12.12. coc will need them
 "Also,markdown-preview.nvim needs yarn.
-"(3)bear. It can support compile_commands.json for clangd if you use make to manage your project.
+"(3)bear. It provides compile_commands.json for clangd if you use make to manage your project.
 "If you use cmake, add set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 "to your CMakeLists.txt, that can support compile_commands.json. After the
 "compile_commands.json created, you should copy it or link it so that we can
 "find it in your root of your projece.
-"(4)vimplug,https://github.com/junegunn/vim-plug,this can help you manage your plugin of vim
+"(4)vimplug, https://github.com/junegunn/vim-plug,this can help you manage your plugin of vim
 "(5)if you use python, you also need to execute the following commands:
 "python3 -m pip install pysnooper ipdb pylint yapf futures isort pyright
 "(6)python3 -m pip install pygments vim-vint cmakelang
@@ -258,7 +258,7 @@ function! DelayedPluginConfiguration()
   vmap [s <Plug>(coc-codeaction-selected)
   nnoremap [b :call CocActionAsync('diagnosticToggleBuffer')<CR>
   nnoremap [t :call CocActionAsync('diagnosticToggle', 1)<CR>
-  let g:coc_filetype_map = {'opencl': 'cpp'}
+  let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
@@ -353,12 +353,17 @@ function! DelayedPluginConfiguration()
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
   let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
   let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
-  let g:NERDCommentEmptyLines      = 1      " 允许空行注释
+  let g:NERDCommentEmptyLines      = 0      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
-  let g:NERDAltDelims_c            = 1      " use // to comment c source codes.
-  let g:NERDCustomDelimiters = {'opencl': {'left': '//'}} " use // to comment cl source codes.
-  let g:NERDCustomDelimiters = {'qmake': {'left': '#'}} " use // to comment cl source codes.
+  let g:NERDCustomDelimiters = {
+          \ 'c': {'left': '//'},
+          \ 'cpp': {'left': '//'},
+          \ 'opencl': {'left': '//'},
+          \ 'lex': {'left': '//'},
+          \ 'yacc': {'left': '//'},
+          \ 'qmake': {'left': '#'}
+          \ } " use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
   map <F3> <plug>NERDCommenterComment
   map <S-F3> <plug>NERDCommenterUncomment
@@ -648,7 +653,7 @@ function! ManualLoadPluginConfiguration()
 
 
 
-  " vimspector setting
+  " Vimspector setting
   function! CppDebugConfiguration()
     let l:cpp_workspace_root = WorkspaceRoot()
     if !isdirectory(l:cpp_workspace_root.'/.vscode')
@@ -849,12 +854,8 @@ set hlsearch
 set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
-  autocmd BufNewFile *.[ch]pp,*.[ch],*.sh,*.v,*.cl,*.pl,*.tcl exec ':call SetTitle()'
-  autocmd FileType c,cpp,python,sh,verilog,perl,tcl,markdown,vim,cmake,qmake,make,xml
-           \ nnoremap <Space><F2>
-           \ :call CompileAndExcute()<CR>
-  autocmd FileType c,cpp,verilog nnoremap <Leader><F2>
-           \ :call CompileCommand()<CR>
+  autocmd BufNewFile *.[ch],*.[ch]pp,CMakeLists.txt,*.pro,Makefile,*.cl,*.json,
+        \ *.py,*.sh,*.v,*.pl,*.tcl call SetTitle()
   autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
   if has('nvim')
     autocmd UIEnter * call TabPosInitialize()
@@ -869,10 +870,9 @@ set smartindent
 set expandtab
 function! SetIndent()
   if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'opencl'
+           \  || &filetype==?'json' || &filetype==?'python'
            \  || &filetype==?'sh' || &filetype==?'verilog'
            \  || &filetype==?'perl' || &filetype==?'tcl'
-           \  || &filetype==?'json' || &filetype==?'java'
-           \  || &filetype==?'python'
     set tabstop=3     " Tab键的显示宽度
     set softtabstop=3 " 按下Tab键时输入的宽度
     set shiftwidth=3  " 设置自动缩进时的缩进长度
@@ -886,43 +886,46 @@ function! SetIndent()
   endif
 endfunction
 function! SetTitle()
-  if &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
-    call setline(1,'#########################################################################')
-    call append(line('$'), '# File Name: '.expand('%'))
+  if &filetype==?'cmake' || &filetype==?'qmake' || &filetype==?'make' || &filetype==?'python'
+        \ || &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
+    call setline(1,        '#########################################################################')
+    call append(line('$'), '# File Name: '.expand('%:t'))
     call append(line('$'), '# Author: Huaxiao Liang')
     call append(line('$'), '# mail: 1184903633@qq.com')
-    call append(line('$'), '# Created Time: '.strftime('%c'))
+    call append(line('$'), '# Created Time: '.strftime('%m/%d/%Y-%a-%H:%M:%S'))
     call append(line('$'), '#########################################################################')
-    if &filetype==?'sh'
-      call append(line('$'), '#!/bin/bash')
-    elseif &filetype==?'perl'
-      call append(line('$'), '#!/bin/perl')
-      call append(line('$'), 'use strict;')
-      call append(line('$'), 'use warnings;')
-    elseif &filetype==?'tcl'
-      call append(line('$'), '#!/usr/bin/tclsh')
-    endif
-    call append(line('$'), '')
   else
-    call setline(1, '//*************************************************************************')
-    call append(line('$'), '//  > File Name: '.expand('%'))
+    call setline(1,        '///////////////////////////////////////////////////////////////////////////')
+    call append(line('$'), '//  > File Name: '.expand('%:t'))
     call append(line('$'), '//  > Author: Huaxiao Liang')
     call append(line('$'), '//  > Mail: 1184903633@qq.com')
-    call append(line('$'), '//  > Created Time: '.strftime('%c'))
-    call append(line('$'), '//************************************************************************')
-    call append(line('$'), '')
+    call append(line('$'), '//  > Created Time: '.strftime('%m/%d/%Y-%a-%H:%M:%S'))
+    call append(line('$'), '///////////////////////////////////////////////////////////////////////////')
   endif
-  if &filetype==?'cpp' && expand('%:e')==?'cpp'
-    call append(line('$'), '#include <iostream>')
-    call append(line('$'), '')
-  elseif &filetype==?'c'
+  call append(line('$'), '')
+  if &filetype==?'c'
     call append(line('$'), '#include <stdio.h>')
-    call append(line('$'), '')
-  elseif &filetype==?'verilog'
-    call append(line('$'),'module ')
+  elseif &filetype==?'cpp'
+    if expand('%:e')==?'hpp'
+      call append(line('$'), '#pragma once')
+    endif
+    call append(line('$'), '#include <iostream>')
+  elseif &filetype==?'make'
+    call append(line('$'), '.PHONY:')
+  elseif &filetype==?'sh'
+    call append(line('$'), '#!/bin/bash')
+  elseif &filetype==?'perl'
+    call append(line('$'), '#!/bin/perl')
+    call append(line('$'), 'use strict;')
+    call append(line('$'), 'use warnings;')
+  elseif &filetype==?'tcl'
+    call append(line('$'), '#!/usr/bin/tclsh')
   endif
+  call append(line('$'), '')
   exec 'normal! G'
 endfunction
+nnoremap <Space><F2> :call CompileAndExcute()<CR>
+nnoremap <Leader><F2> :call CompileCommand()<CR>
 function! CPPCompilation()
   let l:cpp_workspace_root = WorkspaceRoot()
   let l:cur_file_path = expand('%:p:h')
@@ -978,7 +981,7 @@ endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-    if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
+    if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'cmake' || &filetype==?'qmake'
         \ || &filetype==?'make' || &filetype==?'xml' || expand('%:t') == 'SConstruct'
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'bear') != -1
@@ -1009,7 +1012,7 @@ if !exists('*CompileAndExcute')
 endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-  if &filetype==?'cpp' || &filetype==?'c' || &filetype==?'cmake' || &filetype==?'qmake'
+  if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'cmake' || &filetype==?'qmake'
         \ || &filetype==?'make'|| &filetype==?'xml' || expand('%:t') == 'SConstruct'
     exec l:compile_only.CPPCompilation()
   elseif &filetype==?'verilog'
