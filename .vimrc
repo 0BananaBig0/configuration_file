@@ -688,17 +688,17 @@ function! ManualLoadPluginConfiguration()
   nmap ]<S-F7> <Plug>VimspectorDownFrame
   nnoremap ]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
   nnoremap <C-1> :call win_gotoid(g:vimspector_session_windows.variables)<CR>
-  inoremap <C-1> <ESC>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  inoremap <C-1> <C-o>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
   nnoremap <C-3> :call win_gotoid(g:vimspector_session_windows.code)<CR>
-  inoremap <C-3> <ESC>:call win_gotoid(g:vimspector_session_windows.code)<CR>
+  inoremap <C-3> <C-o>:call win_gotoid(g:vimspector_session_windows.code)<CR>
   nnoremap <C-4> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  inoremap <C-4> <ESC>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  inoremap <C-4> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
   nnoremap <C-5> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
-  inoremap <C-5> <ESC>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  inoremap <C-5> <C-o>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
   nnoremap <C-7> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
-  inoremap <C-7> <ESC>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  inoremap <C-7> <C-o>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
   nnoremap <C-8> :VimspectorShowOutput Console<CR>
-  inoremap <C-8> <ESC>:VimspectorShowOutput Console<CR>
+  inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -855,7 +855,7 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile *.[ch],*.[ch]pp,CMakeLists.txt,*.pro,Makefile,*.cl,*.json,
-        \ *.py,*.sh,*.v,*.pl,*.tcl call SetTitle()
+        \*.py,*.sh,*.v,*.pl,*.tcl call SetTitle()
   autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
   if has('nvim')
     autocmd UIEnter * call TabPosInitialize()
@@ -981,15 +981,7 @@ endfunction
 if !exists('*CompileAndExcute')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-    if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'cmake' || &filetype==?'qmake'
-        \ || &filetype==?'make' || &filetype==?'xml' || expand('%:t') == 'SConstruct'
-      let l:cpp_compilation = CPPCompilation()
-      if stridx(l:cpp_compilation, 'bear') != -1
-        exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
-      else
-        exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
-      endif
-    elseif &filetype==?'python'
+    if &filetype==?'python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
       exec l:compile_exec.' python3 %'
     elseif &filetype==?'sh'
       exec l:compile_exec.' ./%'
@@ -1007,20 +999,31 @@ if !exists('*CompileAndExcute')
         \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
       call JumpToTheMainWin()
       call CompileAndExcute()
+    else
+      let l:cpp_compilation = CPPCompilation()
+      if stridx(l:cpp_compilation, 'bear') != -1
+        exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
+      elseif (&filetype==?'c' || &filetype==?'cpp') && (expand('%:e') !='h' || expand('%:e') !='hpp')
+        exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
+      endif
     endif
   endfunction
 endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-  if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'cmake' || &filetype==?'qmake'
-        \ || &filetype==?'make'|| &filetype==?'xml' || expand('%:t') == 'SConstruct'
-    exec l:compile_only.CPPCompilation()
-  elseif &filetype==?'verilog'
+  if &filetype==?'verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   elseif &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
       \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
     call JumpToTheMainWin()
     call CompileCommand()
+  else
+    let l:cpp_compilation = CPPCompilation()
+    if stridx(l:cpp_compilation, 'bear') != -1
+          \ || ((&filetype==?'c' || &filetype==?'cpp')
+          \   && (expand('%:e') !='h' || expand('%:e') !='hpp'))
+      exec l:compile_only.l:cpp_compilation
+    endif
   endif
 endfunction
 function! ShowCurrentModule()
@@ -1200,7 +1203,7 @@ function! RetabAndDeleteTraillingUselessChars()
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
-inoremap <M-CR> <ESC>l:call EnterWithoutTraillingComment()<CR>a
+inoremap <M-CR> <C-o>:call EnterWithoutTraillingComment()<CR>
 nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
   " 1. 获取当前光标所在位置的行数
@@ -1239,16 +1242,16 @@ function! EnterWithoutTraillingComment()
   call setpos('.', [0, l:new_line, l:cur_indent_count, 0])
 endfunction
 " Alt-Enter新建空行
-nnoremap <C-M-CR> :set paste<CR>o<ESC>:set nopaste<CR>
-inoremap <C-M-CR> <ESC>:set paste<CR>o<ESC>:set nopaste<CR>i
+nnoremap <C-M-CR> :put _<CR>
+inoremap <C-M-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
-inoremap <M-h> <C-o>h
-inoremap <M-j> <C-o>j
-inoremap <M-k> <C-o>k
-inoremap <M-l> <C-o>l
-inoremap <M-p> <ESC>pa
-inoremap <M-S-p> <ESC>Pa
-inoremap <M-u> <C-o>u<C-o>l
+inoremap <M-h> <Left>
+inoremap <M-j> <Down>
+inoremap <M-k> <Up>
+inoremap <M-l> <Right>
+inoremap <M-p> <C-o>p
+inoremap <M-S-p> <C-o>P
+inoremap <M-u> <C-o>u
 inoremap <M-r> <C-o><C-r>
 inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
