@@ -1002,7 +1002,20 @@ if !exists('*CompileAndExcute')
     else
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'bear') != -1
-        exec l:compile_exec.l:cpp_compilation.' && build/*.exe'
+        exec l:compile_exec.l:cpp_compilation
+              \.' && if [ -e build/'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
+              \.' build/'.fnamemodify(expand('%'), ':t:r').'.exe;'
+              \.'  elif [ -e ./'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
+              \.' ./'.fnamemodify(expand('%'), ':t:r').'.exe;'
+              \.'  elif [ -e '.fnamemodify(expand('%:r'), ':p').'.exe ]; then'
+              \.' '.fnamemodify(expand('%:r'), ':p').'.exe;'
+              \.'  elif [ -e build/*.exe ]; then'
+              \.' build/*.exe;'
+              \.'  elif [ -e '.expand('%:p').'/*.exe ]; then'
+              \.' '.expand('%:p').'/*.exe;'
+              \.' else'
+              \.' ./*.exe;'
+              \.' fi'
       elseif (&filetype==?'c' || &filetype==?'cpp') && (expand('%:e') !='h' || expand('%:e') !='hpp')
         exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
       endif
