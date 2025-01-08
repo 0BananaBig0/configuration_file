@@ -1243,6 +1243,7 @@ function! RetabAndDeleteTraillingUselessChars()
 endfunction
 " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
+nnoremap <M-CR> :call EnterWithoutTraillingComment()<CR>
 inoremap <M-CR> <C-o>:call EnterWithoutTraillingComment()<CR>
 nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
