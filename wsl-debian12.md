@@ -267,7 +267,7 @@ echo "# deb-src https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/bookworm/ llvm-too
 sudo wget -O /etc/apt/trusted.gpg.d/llvm.asc https://apt.llvm.org/llvm-snapshot.gpg.key
 sudo apt clean
 sudo apt update
-sudo apt install *clang*19* *llvm*19* lld-19 lldb-19 -y
+sudo apt install *clang*19* *llvm*19* lld-19 lldb-19 cdecl -y
 sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 190
 sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 190
 sudo update-alternatives --install /usr/bin/clang-apply-replacements clang-apply-replacements /usr/bin/clang-apply-replacements-19 190

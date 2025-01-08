@@ -107,6 +107,8 @@ Plug 'puremourning/vimspector', {'on': []}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
+" Highlight, navigate, and operate on sets of matching text
+Plug 'andymass/vim-matchup', {'on':[]}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -241,21 +243,21 @@ function! DelayedPluginConfiguration()
   nmap <Space>c <Plug>(coc-declaration)
   nmap <Space>d <Plug>(coc-definition)
   nmap <Space>f <Plug>(coc-refactor)
+  vmap <Space>f <Plug>(coc-refactor-selected)
   nmap <Space>i <Plug>(coc-implementation)
   nmap <Space>j <Plug>(coc-diagnostic-next-error)
   nmap <Space>k <Plug>(coc-diagnostic-prev-error)
   nmap <Space>n <Plug>(coc-rename)
   nmap <Space>r <Plug>(coc-references)
   nmap [a <Plug>(coc-codeaction)
-  nmap [e <Plug>(coc-codeaction-line)
+  vmap [a <Plug>(coc-codeaction-selected)
+  nmap [l <Plug>(coc-codeaction-line)
   nnoremap [c :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
   nnoremap [d :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
   nnoremap [i :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
-  nmap [l <Plug>(coc-diagnostic-info)
-  nmap [s <Plug>(coc-codeaction-selected)
-  vmap [s <Plug>(coc-codeaction-selected)
+  nmap [o <Plug>(coc-diagnostic-info)
   nnoremap [b :call CocActionAsync('diagnosticToggleBuffer')<CR>
   nnoremap [t :call CocActionAsync('diagnosticToggle', 1)<CR>
   let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
@@ -345,6 +347,16 @@ function! DelayedPluginConfiguration()
   " Highlight the symbol and its references when holding the cursor
   augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg='White' guibg='Black'
+  function CheckPrimitivePtrType()
+    " Get the start and end positions of the visual selection
+    let l:start = getpos("'<")
+    let l:end = getpos("'>")
+    " Extract the selected lines and replace all newlines with spaces
+    let l:lines = getline(l:start[1], l:end[1])
+    let l:selection = join(l:lines, " ")
+    echo system('cdecl explain ' . shellescape(l:selection))
+  endfunction
+  vnoremap <Space>p :<C-u>call CheckPrimitivePtrType()<CR>
 
 
 
@@ -622,7 +634,7 @@ function! ManualLoadPluginConfiguration()
     let g:interestingWordsDefaultMappings = 0
     call plug#load('vim-interestingwords')
     nnoremap <Leader>wh :call InterestingWords('n')<CR>
-    vnoremap <Leader>wh :call InterestingWords('v')<CR>
+    vnoremap <Leader>wh :<C-u>call InterestingWords('v')<CR>
     nnoremap <Leader>w<S-h> :call UncolorAllWords()<CR>
     nnoremap n :call WordNavigation(1)<CR>
     nnoremap <S-n> :call WordNavigation(0)<CR>
@@ -753,6 +765,21 @@ function! ManualLoadPluginConfiguration()
   let g:Lf_PreviewInPopup = 1
   " open the preview window automatically
   let g:Lf_PreviewResult = {'Rg': 1}
+
+
+
+  nnoremap <Leader>mt :call ConfigureVimMatchUp()<CR>
+  " vim-matchup setting
+  function ConfigureVimMatchUp()
+    let g:matchup_matchparen_offscreen = {'method': 'popup'}
+    let g:matchup_matchparen_timeout = 100
+    let g:matchup_matchparen_insert_timeout = 100
+    let g:matchup_matchparen_deferred_show_delay = 100
+    let g:matchup_matchparen_deferred_hide_delay = 100
+    let g:matchup_matchparen_deferred = 1
+    let g:matchup_matchparen_hi_surround_always = 1
+    call plug#load('vim-matchup')
+  endfunction
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 显示相关和实用设置
@@ -1060,7 +1087,7 @@ function! ShowNearestClassOrStruct()
   elseif(l:class_line < l:struct_line)
     let l:nearest_name = getline(l:struct_line+1)
   else
-    let l:nearest_name = 'No class/struct can be find.'
+    let l:nearest_name = 'No class/struct can be found.'
   endif
   let l:nearest_end_poisition = strridx(l:nearest_name, '{')
   if(l:nearest_end_poisition > 0)
