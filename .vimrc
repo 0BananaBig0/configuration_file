@@ -1278,8 +1278,11 @@ function! EnterWithoutTraillingComment()
   let l:new_line = l:cur_line + 1
   let l:cur_indent_count = indent(l:cur_line)
   let l:cur_indent = repeat(" ", l:cur_indent_count)
-  call append(".", l:cur_indent)
-  call setpos('.', [0, l:new_line, l:cur_indent_count, 0])
+  set paste
+  exec "normal! i\<CR>\<ESC>"
+  set nopaste
+  call setline(l:new_line, l:cur_indent.getline(l:new_line))
+  call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
 endfunction
 " Alt-Enter新建空行
 nnoremap <C-M-CR> :put _<CR>
