@@ -402,7 +402,7 @@ function! DelayedPluginConfiguration()
       let g:tab_term_buf[tabpagenr()] = l:target_buf
     endif
   endfunction
-  function! ToggleTerminal(height)
+  function! ToggleTerminal(height = 6)
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
@@ -676,7 +676,7 @@ function! ManualLoadPluginConfiguration()
     exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
   endfunction
   nmap <F2> <Plug>VimspectorContinue
-  nnoremap <S-F2> :call vimspector#Restart()<CR>
+  nnoremap <S-F2> :call RestartVimspector()<CR>
   nmap ]<F2> <Plug>VimspectorRunToCursor
   nmap ]<S-F2> <Plug>VimspectorStop
   nmap ]<C-F2> <Plug>VimspectorPause
@@ -701,16 +701,16 @@ function! ManualLoadPluginConfiguration()
   nnoremap ]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
   nnoremap <C-1> :call win_gotoid(g:vimspector_session_windows.variables)<CR>
   inoremap <C-1> <C-o>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
-  nnoremap <C-3> :call win_gotoid(g:vimspector_session_windows.code)<CR>
-  inoremap <C-3> <C-o>:call win_gotoid(g:vimspector_session_windows.code)<CR>
-  nnoremap <C-4> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  inoremap <C-4> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  nnoremap <C-5> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
-  inoremap <C-5> <C-o>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
-  nnoremap <C-7> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
-  inoremap <C-7> <C-o>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  nnoremap <C-3> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  inoremap <C-3> <C-o>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  nnoremap <C-5> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  inoremap <C-5> <C-o>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  nnoremap <C-7> :call win_gotoid(g:vimspector_session_windows.code)<CR>
+  inoremap <C-7> <C-o>:call win_gotoid(g:vimspector_session_windows.code)<CR>
   nnoremap <C-8> :VimspectorShowOutput Console<CR>
   inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
+  nnoremap <C-9> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -721,8 +721,16 @@ function! ManualLoadPluginConfiguration()
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
   function! s:SetUpTerminal()
     call win_gotoid(g:vimspector_session_windows.terminal)
-    wincmd L
-    12wincmd |
+    let l:term_buf_id = winbufnr(g:vimspector_session_windows.terminal)
+    hide
+    call win_gotoid(g:vimspector_session_windows.code)
+    nunmenu WinBar
+    wincmd _
+    call win_gotoid(g:vimspector_session_windows.output)
+    9wincmd _
+    exec 'rightbelow vsplit | b ' . l:term_buf_id
+    let g:vimspector_session_windows.terminal = win_getid()
+    30wincmd |
     call win_gotoid(g:vimspector_session_windows.variables)
     nunmenu WinBar
     30wincmd |
@@ -732,11 +740,11 @@ function! ManualLoadPluginConfiguration()
     16wincmd _
     call win_gotoid(g:vimspector_session_windows.stack_trace)
     3wincmd _
-    call win_gotoid(g:vimspector_session_windows.code)
-    nunmenu WinBar
-    wincmd _
-    call win_gotoid(g:vimspector_session_windows.output)
-    9wincmd _
+  endfunction
+  function! RestartVimspector()
+    call win_gotoid(g:vimspector_session_windows.terminal)
+    quit!
+    call vimspector#Restart()
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
@@ -1000,9 +1008,9 @@ function! CPPCompilation()
     endif
   endfor
   if &filetype==?'cpp'
-    return ' cd '.l:cur_file_path.' && g++ '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && g++ -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   else
-    return ' cd '.l:cur_file_path.' && gcc '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && gcc -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   endif
 endfunction
 if !exists('*CompileAndExcute')
