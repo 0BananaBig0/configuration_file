@@ -332,7 +332,7 @@ function! DelayedPluginConfiguration()
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
-  noremap <Leader><F7> :call ClangToolConfiguration()<CR>
+  noremap <Leader><F7> :<C-u>call ClangToolConfiguration()<CR>
   nmap <F7>  <Plug>(coc-format)
   vmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
@@ -480,7 +480,7 @@ function! DelayedPluginConfiguration()
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
-  noremap <F8> :call ToggleTerminal(6)<CR>
+  noremap <F8> :<C-u>call ToggleTerminal(6)<CR>
   nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
@@ -546,11 +546,11 @@ function! ManualLoadPluginConfiguration()
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'papercol light'
   " hit \qm to open menu
-  noremap <Leader>qm :call QuickuiOpenMenu()<CR>
+  noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
   " hit \qb to switch buffer
-  noremap <Leader>qb :call QuickuiListBuffer()<CR>
+  noremap <Leader>qb :<C-u>call QuickuiListBuffer()<CR>
   " hit \qt to preview tags
-  noremap <Leader>qt :call QuickuiPreviewTag()<CR>
+  noremap <Leader>qt :<C-u>call QuickuiPreviewTag()<CR>
 
 
 
@@ -1120,8 +1120,8 @@ nnoremap <Space>t :call NUpdateTabTermBuf()<CR>:tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
 nnoremap <Space>q :call QuitWin()<CR>
 nnoremap <Space>w :w<CR>
-noremap <M-S-h> :call MoveTabH()<CR>
-noremap <M-S-l> :call MoveTabL()<CR>
+noremap <M-S-h> :<C-u>call MoveTabH()<CR>
+noremap <M-S-l> :<C-u>call MoveTabL()<CR>
 inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
 inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
 noremap <C-M-h> gT
