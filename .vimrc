@@ -1112,9 +1112,11 @@ function! CallShowNearestFunction()
 endfunction
 " Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
-  let s:count = a:index
-  exec 'tabfirst'
-  exec 'tabnext' s:count
+  if a:index <= tabpagenr('$')
+    exec 'tabnext' a:index
+  else
+    echo 'The index number(now, '.a:index.') must be less than the total number of tabs(now, '.tabpagenr('$').').'
+  endif
 endfunction
 function! TabPosInitialize()
   for l:i in range(1, 9)
