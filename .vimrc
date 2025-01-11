@@ -166,6 +166,9 @@ function! CocTimerStart(timer)
   call ManualLoadPluginConfiguration()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
+  if &filetype ==? 'vim'
+    set nowrap " Disable automatic word wrap which is enabled by vim-plug
+  endif
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -265,7 +268,7 @@ function! DelayedPluginConfiguration()
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
-  let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', 'SConstruct']
+  let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
   function! FindRoot(target_path)
     let l:workspace_root_dir =''
     let l:workspace_root_file =''

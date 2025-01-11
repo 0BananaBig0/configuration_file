@@ -34,6 +34,7 @@
       ".project",
       ".svn",
       ".root",
+      ".vscode",
       "SConstruct"
    ],
    "clangd.arguments": [
@@ -69,8 +70,7 @@
    "perl.p::ls.logFile": "${HOME}/.vim/.coc-perl.log",
    "prettier.formatterPriority": -1,
    "prettier.printWidth": 100,
-   "prettier.proseWrap": "never",
-   "prettier.disableLanguages": ["vim"],
+   "prettier.proseWrap": "always",
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.defaultSortMethod": "alphabetical",

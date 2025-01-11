@@ -125,13 +125,6 @@ sudo zypper install -y dbus-1-x11 at-spi2-core
 sudo zypper install -y libcap-progs
 sudo setcap cap_net_raw+p /bin/ping
 
-sudo zypper install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
-sudo zypper install -y perl-App-cpanminus
-cpanm --local-lib=~/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump IO::AIO JSON Moose PadWalker Scalar::List::Utils Coro
-cpanm --local-lib=~/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
-cpanm --local-lib=~/perl5 Neovim::Ext
-#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
-
 
 sudo zypper install -y libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 xcb-util-cursor-devel xcb-util-cursor-devel
 sudo zypper install -y gstreamer-plugins-base-devel gstreamer-devel
@@ -160,3 +153,10 @@ ln -s ~/wsl_shared_folder/configuration_file ~
 
 # fix an error that gvim cannot use menus
 export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/share
+
+sudo zypper install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
+sudo zypper install -y perl-App-cpanminus
+cpanm --local-lib=~/.local/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump IO::AIO JSON Moose PadWalker Scalar::List::Utils Coro
+cpanm --local-lib=~/.local/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
+cpanm --local-lib=~/.local/perl5 Neovim::Ext Class::Refresh Compiler::Lexer Hash::SafeKeys Perl::LanguageServer
+#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX

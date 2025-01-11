@@ -1,3 +1,4 @@
+DISABLE_UPDATE_PROMPT=true
 # regular match*
 setopt no_nomatch
 DISABLE_MAGIC_FUNCTIONS=true
@@ -177,13 +178,3 @@ zinit light junegunn/fzf
 #terminal as fast as possible
 zinit ice wait='1' lucid
 zinit light 0BananaBig0/ubuntu18_zsh_configure
-# # Set ROS melodic
-# source /opt/ros/melodic/setup.zsh
-# # source /home/banana/catkin_ws/devel/setup.zsh
-# source /home/banana/study_ws/devel/setup.zsh
-#
-# # Set ROS Network
-# #ifconfig查看你的电脑ip地址
-# use>
-# export ROS_HOSTNAME=192.168.3.3
-# export ROS_MASTER_URI=http://${ROS_HOSTNAME}:11311

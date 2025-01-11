@@ -160,19 +160,7 @@ sudo ln -s lib/* lib2
 sudo sed -i 's/usr\/lib\/wsl\/lib/usr\/lib\/wsl\/lib2/g' /etc/ld.so.conf.d/ld.wsl.conf
 echo -e "[automount]\nldconfig=false" | sudo tee -a /etc/wsl.conf
 
-sudo cpan YAML CPAN::DistnameInfo
-sudo apt install libanyevent-perl libclass-refresh-perl libcompiler-lexer-perl \
-libdata-dump-perl libio-aio-perl libjson-perl libmoose-perl libpadwalker-perl \
-libscalar-list-utils-perl libcoro-perl -y
-sudo cpan Perl::LanguageServer
-sudo cpan install CPAN
-sudo cpan App::cpanminus
-sudo cpan Spreadsheet::ParseExcel Spreadsheet::WriteExcel #for xls
-sudo cpan Excel::Writer::XLSX #for xlsx
-#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
-
-# Do not install libglfw3-wayland; it is an alternative to libglfw3.
-sudo apt install libglfw3 libglfw3-dev libglfw3-doc
+# Do not install libglfw3-wayland; it is an alternative to libglfw3.  sudo apt install libglfw3 libglfw3-dev libglfw3-doc
 
 sudo apt remove neovim --purge -y
 sudo apt autoremove --purge -y
@@ -180,7 +168,6 @@ wget https://githubfast.com/neovim/neovim-releases/releases/download/v0.10.2/nvi
 sudo dpkg -i nvim-linux64.deb
 rm nvim-linux64.deb
 sudo apt install python3-neovim -y
-sudo cpanm -n Neovim::Ext
 sudo apt install ruby-dev -y
 gem install neovim --user-install
 
@@ -321,3 +308,18 @@ echo 'default=banana' | sudo tee -a /etc/wsl.conf > /dev/null
 
 # fix an error that gvim cannot use menus
 export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/share
+
+sudo apt install libanyevent-perl libclass-refresh-perl libcompiler-lexer-perl \
+libdata-dump-perl libio-aio-perl libjson-perl libmoose-perl libpadwalker-perl \
+libscalar-list-utils-perl libcoro-perl cpanminus perl-doc -y
+sudo cpanm --uninstall Perl::LanguageServer
+sudo cpanm --uninstall YAML CPAN::DistnameInfo
+sudo cpanm --uninstall CPAN
+sudo cpanm --uninstall Spreadsheet::ParseExcel Spreadsheet::WriteExcel #for xls
+sudo cpanm --uninstall Excel::Writer::XLSX #for xlsx
+sudo cpanm --uninstall Neovim::Ext
+sudo cpanm --uninstall App::cpanminus
+#cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
+cpanm --local-lib=~/.local/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump IO::AIO JSON Moose PadWalker Scalar::List::Utils Coro
+cpanm --local-lib=~/.local/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
+cpanm --local-lib=~/.local/perl5 Neovim::Ext Class::Refresh Compiler::Lexer Hash::SafeKeys Perl::LanguageServer Syntax::Keyword::Try Future::AsyncAwait
