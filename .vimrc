@@ -1306,8 +1306,8 @@ inoremap <M-h> <Left>
 inoremap <M-j> <Down>
 inoremap <M-k> <Up>
 inoremap <M-l> <Right>
-inoremap <M-p> <C-o>p
-inoremap <M-S-p> <C-o>P
+inoremap <M-p> <C-o>P
+inoremap <M-S-p> <C-o>p
 inoremap <M-u> <C-o>u
 inoremap <M-r> <C-o><C-r>
 inoremap <M-S-d> <C-o>D
