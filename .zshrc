@@ -1,4 +1,5 @@
 DISABLE_UPDATE_PROMPT=true
+DISABLE_AUTO_UPDATE=true
 # regular match*
 setopt no_nomatch
 DISABLE_MAGIC_FUNCTIONS=true

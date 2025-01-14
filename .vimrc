@@ -1016,7 +1016,7 @@ function! CPPCompilation()
     return ' cd '.l:cur_file_path.' && gcc -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   endif
 endfunction
-if !exists('*CompileAndExcute')
+if !(exists('*CompileAndExcute') && &filetype==?'vim')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype==?'python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
@@ -1047,12 +1047,12 @@ if !exists('*CompileAndExcute')
               \.' ./'.fnamemodify(expand('%'), ':t:r').'.exe;'
               \.'  elif [ -e '.fnamemodify(expand('%:r'), ':p').'.exe ]; then'
               \.' '.fnamemodify(expand('%:r'), ':p').'.exe;'
-              \.'  elif [ -e build/*.exe ]; then'
+              \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
               \.' build/*.exe;'
-              \.'  elif [ -e '.expand('%:p').'/*.exe ]; then'
-              \.' '.expand('%:p').'/*.exe;'
-              \.' else'
+              \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
               \.' ./*.exe;'
+              \.' else'
+              \.' '.expand('%:p:h').'/*.exe;'
               \.' fi'
       elseif (&filetype==?'c' || &filetype==?'cpp') && (expand('%:e') !='h' || expand('%:e') !='hpp')
         exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
