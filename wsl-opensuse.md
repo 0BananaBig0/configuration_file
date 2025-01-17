@@ -160,3 +160,21 @@ cpanm --local-lib=~/.local/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::D
 cpanm --local-lib=~/.local/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
 cpanm --local-lib=~/.local/perl5 Neovim::Ext Class::Refresh Compiler::Lexer Hash::SafeKeys Perl::LanguageServer
 #cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
+
+# compile vim(option):
+sudo zypper install gpm gpm-devel python311-devel lua51-devel luajit-devel libXft-devel motif-devel gtk3-devel libX11-devel libXt-devel gtk3-devel ruby-devel ncurses-devel
+./configure \
+  --prefix=/usr/local \
+  --with-features=huge \
+  --enable-multibyte \
+  --enable-rubyinterp=yes \
+  --enable-luainterp=yes \
+  --enable-gui=gtk3 \
+  --enable-cscope \
+  --enable-fontset \
+  --enable-tclinterp \
+  --enable-perlinterp \
+  --with-luajit \
+  --enable-python3interp=yes \
+  --with-python3-config-dir=/usr/lib64/python3.11/config-3.11-x86_64-linux-gnu \
+  --enable-gpm
