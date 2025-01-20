@@ -67,8 +67,6 @@ Plug 'luochen1990/rainbow'
 Plug 'nathanaelkane/vim-indent-guides'
 " highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'for': []}
-" highlight qml syntax
-Plug 'peterhoeg/vim-qml', {'for': ['qml']}
 " 高亮c++类模板等插件
 Plug 'bfrg/vim-c-cpp-modern', {'for': ['cpp', 'c', 'opencl']}
 " python 语法高亮插件
@@ -166,7 +164,7 @@ function! CocTimerStart(timer)
   call ManualLoadPluginConfiguration()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
-  if &filetype ==? 'vim'
+  if &filetype=='vim'
     set nowrap " Disable automatic word wrap which is enabled by vim-plug
   endif
 endfunction
@@ -307,8 +305,8 @@ function! DelayedPluginConfiguration()
     call win_gotoid(l:target_win )
   endfunction
   function! WorkspaceRoot()
-    if &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
-        \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
+    if &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
+        \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin() " Avoid potential bugs
     endif
     let l:workspace_root = FindRoot(expand('%:p:h')) " Where we store the opened file
@@ -650,8 +648,8 @@ function! ManualLoadPluginConfiguration()
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
-    nmap <Leader>gp <Plug>(GitGutterPrevHunk)
-    nmap <Leader>gn <Plug>(GitGutterNextHunk)
+    nmap <Leader>gk <Plug>(GitGutterPrevHunk)
+    nmap <Leader>gj <Plug>(GitGutterNextHunk)
     nmap <Leader>gf <Plug>(GitGutterFold)
     exec 'normal! ms'
     call plug#load('vim-fugitive')
@@ -892,8 +890,7 @@ set hlsearch
 set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
-  autocmd BufNewFile *.[ch],*.[ch]pp,CMakeLists.txt,*.pro,Makefile,*.cl,*.json,
-        \*.py,*.sh,*.v,*.pl,*.tcl call SetTitle()
+  autocmd BufNewFile * call SetTitle()
   autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
   if has('nvim')
     autocmd UIEnter * call TabPosInitialize()
@@ -907,14 +904,13 @@ set smartindent
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
 function! SetIndent()
-  if &filetype==?'c' || &filetype==?'cpp' || &filetype==?'opencl'
-           \  || &filetype==?'json' || &filetype==?'python'
-           \  || &filetype==?'sh' || &filetype==?'verilog'
-           \  || &filetype==?'perl' || &filetype==?'tcl'
+  if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl' || &filetype=='json'
+        \ || &filetype=='python' || &filetype=='sh' || &filetype=='verilog'
+        \ || &filetype=='perl' || &filetype=='tcl'
     set tabstop=3     " Tab键的显示宽度
     set softtabstop=3 " 按下Tab键时输入的宽度
     set shiftwidth=3  " 设置自动缩进时的缩进长度
-    if &filetype==?'c' || &filetype==?'cpp'
+    if &filetype=='c' || &filetype=='cpp'
       set cindent     " 设置使用C/C++语言的自动缩进方式
     endif
   else
@@ -924,8 +920,8 @@ function! SetIndent()
   endif
 endfunction
 function! SetTitle()
-  if &filetype==?'cmake' || &filetype==?'qmake' || &filetype==?'make' || &filetype==?'python'
-        \ || &filetype==?'sh' || &filetype==?'perl' || &filetype==?'tcl'
+  if &filetype=='cmake' || &filetype=='qmake' || &filetype=='make' || &filetype=='python'
+        \ || &filetype=='sh' || &filetype=='perl' || &filetype=='tcl'
     call setline(1,        '#########################################################################')
     call append(line('$'), '# File Name: '.expand('%:t'))
     call append(line('$'), '# Author: Huaxiao Liang')
@@ -941,22 +937,22 @@ function! SetTitle()
     call append(line('$'), '///////////////////////////////////////////////////////////////////////////')
   endif
   call append(line('$'), '')
-  if &filetype==?'c'
+  if &filetype=='c'
     call append(line('$'), '#include <stdio.h>')
-  elseif &filetype==?'cpp'
-    if expand('%:e')==?'hpp'
+  elseif &filetype=='cpp'
+    if expand('%:e')=~?'^h.*'
       call append(line('$'), '#pragma once')
     endif
     call append(line('$'), '#include <iostream>')
-  elseif &filetype==?'make'
+  elseif &filetype=='make'
     call append(line('$'), '.PHONY:')
-  elseif &filetype==?'sh'
+  elseif &filetype=='sh'
     call append(line('$'), '#!/bin/bash')
-  elseif &filetype==?'perl'
+  elseif &filetype=='perl'
     call append(line('$'), '#!/bin/perl')
     call append(line('$'), 'use strict;')
     call append(line('$'), 'use warnings;')
-  elseif &filetype==?'tcl'
+  elseif &filetype=='tcl'
     call append(line('$'), '#!/usr/bin/tclsh')
   endif
   call append(line('$'), '')
@@ -969,7 +965,7 @@ function! CPPCompilation()
   let l:cur_file_path = expand('%:p:h')
   let l:all_possible_paths = [l:cpp_workspace_root]
   for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
-    if l:cur_file_path[l:str_id] ==? '/'
+    if l:cur_file_path[l:str_id]=='/'
       call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
     endif
   endfor
@@ -1010,31 +1006,31 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
-  if &filetype==?'cpp'
+  if &filetype=='cpp'
     return ' cd '.l:cur_file_path.' && g++ -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   else
     return ' cd '.l:cur_file_path.' && gcc -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   endif
 endfunction
-if !(exists('*CompileAndExcute') && &filetype==?'vim')
+if !(exists('*CompileAndExcute') && &filetype=='vim')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-    if &filetype==?'python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
+    if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
       exec l:compile_exec.' python3 %'
-    elseif &filetype==?'sh'
+    elseif &filetype=='sh'
       exec l:compile_exec.' ./%'
-    elseif &filetype==?'verilog'
+    elseif &filetype=='verilog'
       exec l:compile_exec.' iverilog *.v -o %<.vcd && vvp %<.vcd'
-    elseif &filetype==?'perl'
+    elseif &filetype=='perl'
       exec l:compile_exec.' perl %'
-    elseif &filetype==?'tcl'
+    elseif &filetype=='tcl'
       exec l:compile_exec.' tclsh %'
-    elseif &filetype==?'markdown'
+    elseif &filetype=='markdown'
       exec ':CocCommand markdown-preview-enhanced.openPreview'
-    elseif &filetype==?'vim'
+    elseif &filetype=='vim'
       exec ':source ~/.vimrc'
-    elseif &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
-        \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
+    elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
+        \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin()
       call CompileAndExcute()
     else
@@ -1054,7 +1050,7 @@ if !(exists('*CompileAndExcute') && &filetype==?'vim')
               \.' else'
               \.' '.expand('%:p:h').'/*.exe;'
               \.' fi'
-      elseif (&filetype==?'c' || &filetype==?'cpp') && (expand('%:e') !='h' || expand('%:e') !='hpp')
+      elseif (&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*'
         exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
       endif
     endif
@@ -1062,17 +1058,17 @@ if !(exists('*CompileAndExcute') && &filetype==?'vim')
 endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-  if &filetype==?'verilog'
+  if &filetype=='verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
-  elseif &filetype==?'help' || &buftype ==?'terminal' || &filetype==?'VimspectorPrompt'
-      \ || &filetype==?'vista' || &buftype ==?'nofile' || &filetype==?'nerdtree'
+  elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
+      \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
     call JumpToTheMainWin()
     call CompileCommand()
   else
     let l:cpp_compilation = CPPCompilation()
     if stridx(l:cpp_compilation, 'bear') != -1
-          \ || ((&filetype==?'c' || &filetype==?'cpp')
-          \   && (expand('%:e') !='h' || expand('%:e') !='hpp'))
+          \ || ((&filetype=='c' || &filetype=='cpp')
+          \   && expand('%:e')!~'^h.*')
       exec l:compile_only.l:cpp_compilation
     endif
   endif
@@ -1085,7 +1081,7 @@ function! ShowCurrentModule()
     let l:module_name = strpart(l:module_name, 0, l:module_end_poisition)
   endif
   let l:module_name = strpart(l:module_name, stridx(l:module_name, 'module')+7)
-  while(strpart(l:module_name, 0 , 1) ==? ' ')
+  while(strpart(l:module_name, 0 , 1)==' ')
     let l:module_name = strpart(l:module_name, 1)
   endwhile
   echo 'module -->' l:module_name
@@ -1107,9 +1103,9 @@ function! ShowNearestClassOrStruct()
   echo l:nearest_name
 endfunction
 function! CallShowNearestFunction()
-  if &filetype==?'cpp' || &filetype==?'c'
+  if &filetype=='cpp' || &filetype=='c'
      call ShowNearestClassOrStruct()
-  elseif &filetype==?'verilog'
+  elseif &filetype=='verilog'
      call ShowCurrentModule()
   endif
 endfunction
@@ -1170,7 +1166,7 @@ function! QuitWin() " not consider the main win is a term
   endfor
   if l:cur_win_buf != l:main_win_buf " not the main win, close one win
     let l:buf_type = getbufvar(winbufnr(win_getid()), '&buftype')
-    if l:buf_type ==? 'terminal'
+    if l:buf_type=='terminal'
       call CUpdateTabTermBuf(bufnr())
       quit!
     else
@@ -1191,7 +1187,7 @@ function! QuitWin() " not consider the main win is a term
 endfunction
 function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
   let l:cur_tab=tabpagenr()
-  if l:cur_tab ==? a:boundary && tabpagenr('$') > 1
+  if l:cur_tab == a:boundary && tabpagenr('$') > 1
     exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
     if exists('g:tab_term_buf')
       let l:tmp = g:tab_term_buf[l:cur_tab]
