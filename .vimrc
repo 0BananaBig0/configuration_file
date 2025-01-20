@@ -164,6 +164,7 @@ function! CocTimerStart(timer)
   call ManualLoadPluginConfiguration()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
+  call TabPosInitialize()
   if &filetype=='vim'
     set nowrap " Disable automatic word wrap which is enabled by vim-plug
   endif
@@ -449,14 +450,10 @@ function! DelayedPluginConfiguration()
       endif
     endfor
   endfunction
-  function! CUpdateTabTermBuf(buf_id = -1)
+  function! CUpdateTabTermBuf()
     if exists('g:tab_term_buf')
       if bufexists(g:tab_term_buf[tabpagenr()])
-        if a:buf_id != g:tab_term_buf[tabpagenr()] && a:buf_id != -1
-          return
-        elseif a:buf_id == -1
-          exec 'silent bwipeout! ' . g:tab_term_buf[tabpagenr()]
-        endif
+        exec 'silent bwipeout! ' . g:tab_term_buf[tabpagenr()]
       endif
       let g:tab_term_buf[tabpagenr()] = - 1
       call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$'), [-1, +1])
@@ -467,16 +464,6 @@ function! DelayedPluginConfiguration()
       call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
       let g:tab_term_buf[tabpagenr() + 1] = - 1
     endif
-  endfunction
-  function! CAllTermsOfCurTab()
-    " Loop through all windows in the current tab to check for a terminal
-    let l:cur_tab = tabpagenr()
-    for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab && bufexists(l:win['bufnr'])
-        exec 'silent bwipeout! ' . l:win['bufnr']
-      endif
-    endfor
-    call CUpdateTabTermBuf()
   endfunction
   let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
@@ -790,6 +777,22 @@ function! ManualLoadPluginConfiguration()
     call plug#load('vim-matchup')
   endfunction
 endfunction
+" Alt+n跳到第n个tab，0<n<10
+function! TabPosActivateBuffer(index)
+  if a:index <= tabpagenr('$')
+    exec 'tabnext' a:index
+  else
+    echo 'The index number(now, '.a:index.') must be less than the total number of tabs(now, '.tabpagenr('$').').'
+  endif
+endfunction
+function! TabPosInitialize()
+  for l:i in range(1, 9)
+      exec 'noremap <M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+  endfor
+  exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
+  exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
+endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 显示相关和实用设置
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -892,11 +895,7 @@ augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
   autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
-  if has('nvim')
-    autocmd UIEnter * call TabPosInitialize()
-  else
-    autocmd GUIEnter * call TabPosInitialize()
-  endif
+  autocmd QuitPre *.[ch]* call EnsureEmptyLastLine() " Recommended by the POSIX standard
 augroup END
 " 缩进
 set autoindent
@@ -957,6 +956,48 @@ function! SetTitle()
   endif
   call append(line('$'), '')
   exec 'normal! G'
+endfunction
+function! ShowCurrentModule()
+  let l:module_line = search('module', 'bnWz')
+  let l:module_name = getline(l:module_line)
+  let l:module_end_poisition = strridx(l:module_name, '(')
+  if(l:module_end_poisition > 0)
+    let l:module_name = strpart(l:module_name, 0, l:module_end_poisition)
+  endif
+  let l:module_name = strpart(l:module_name, stridx(l:module_name, 'module')+7)
+  while(strpart(l:module_name, 0 , 1)==' ')
+    let l:module_name = strpart(l:module_name, 1)
+  endwhile
+  echo 'module -->' l:module_name
+endfunction
+function! ShowNearestClassOrStruct()
+  let l:class_line = search('\n'.'class', 'bnWz')
+  let l:struct_line = search('\n'.'struct', 'bnWz')
+  if(l:class_line > l:struct_line)
+    let l:nearest_name = getline(l:class_line+1)
+  elseif(l:class_line < l:struct_line)
+    let l:nearest_name = getline(l:struct_line+1)
+  else
+    let l:nearest_name = 'No class/struct can be found.'
+  endif
+  let l:nearest_end_poisition = strridx(l:nearest_name, '{')
+  if(l:nearest_end_poisition > 0)
+    let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
+  endif
+  echo l:nearest_name
+endfunction
+function! CallShowNearestFunction()
+  if &filetype=='cpp' || &filetype=='c'
+     call ShowNearestClassOrStruct()
+  elseif &filetype=='verilog'
+     call ShowCurrentModule()
+  endif
+endfunction
+function! EnsureEmptyLastLine()
+  if getline(line('$')) !=# ''
+    call append(line('$'), '')
+    write
+  endif
 endfunction
 nnoremap <Space><F2> :call CompileAndExcute()<CR>
 nnoremap <Leader><F2> :call CompileCommand()<CR>
@@ -1073,58 +1114,6 @@ function! CompileCommand()
     endif
   endif
 endfunction
-function! ShowCurrentModule()
-  let l:module_line = search('module', 'bnWz')
-  let l:module_name = getline(l:module_line)
-  let l:module_end_poisition = strridx(l:module_name, '(')
-  if(l:module_end_poisition > 0)
-    let l:module_name = strpart(l:module_name, 0, l:module_end_poisition)
-  endif
-  let l:module_name = strpart(l:module_name, stridx(l:module_name, 'module')+7)
-  while(strpart(l:module_name, 0 , 1)==' ')
-    let l:module_name = strpart(l:module_name, 1)
-  endwhile
-  echo 'module -->' l:module_name
-endfunction
-function! ShowNearestClassOrStruct()
-  let l:class_line = search('\n'.'class', 'bnWz')
-  let l:struct_line = search('\n'.'struct', 'bnWz')
-  if(l:class_line > l:struct_line)
-    let l:nearest_name = getline(l:class_line+1)
-  elseif(l:class_line < l:struct_line)
-    let l:nearest_name = getline(l:struct_line+1)
-  else
-    let l:nearest_name = 'No class/struct can be found.'
-  endif
-  let l:nearest_end_poisition = strridx(l:nearest_name, '{')
-  if(l:nearest_end_poisition > 0)
-    let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
-  endif
-  echo l:nearest_name
-endfunction
-function! CallShowNearestFunction()
-  if &filetype=='cpp' || &filetype=='c'
-     call ShowNearestClassOrStruct()
-  elseif &filetype=='verilog'
-     call ShowCurrentModule()
-  endif
-endfunction
-" Alt+n跳到第n个tab，0<n<10
-function! TabPosActivateBuffer(index)
-  if a:index <= tabpagenr('$')
-    exec 'tabnext' a:index
-  else
-    echo 'The index number(now, '.a:index.') must be less than the total number of tabs(now, '.tabpagenr('$').').'
-  endif
-endfunction
-function! TabPosInitialize()
-  for l:i in range(1, 9)
-      exec 'noremap <M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
-      exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
-  endfor
-  exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
-  exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
-endfunction
 nnoremap <Space>t :call NUpdateTabTermBuf()<CR>:tabnew<CR>
 nnoremap <Space>b :call CloseAndBackTab()<CR>
 nnoremap <Space>q :call QuitWin()<CR>
@@ -1138,52 +1127,27 @@ noremap <C-M-l> gt
 inoremap <C-M-h> <C-o>gT
 inoremap <C-M-l> <C-o>gt
 function! CloseAndBackTab()
-  call CAllTermsOfCurTab()
-  if tabpagenr() > 1 " not the first tab
-    exec 'tabp'
-    exec '+tabclose'
-  elseif tabpagenr('$') == 1 " single tab
-    let l:cur_buf = bufnr('%')
-    " Iterate over all buffers
-    for l:buf in range(1, bufnr('$'))
-      if l:buf != l:cur_buf && bufexists(l:buf)
-        exec 'silent bwipeout! ' . l:buf
-      endif
-    endfor
-    quit
-  else " multiple tabs
-    quit
-  endif
+  while winnr('$') > 1
+    call QuitWin()
+  endwhile
+  call QuitWin()
+  exec 'tabp'
 endfunction
 function! QuitWin() " not consider the main win is a term
-  let l:cur_tab = tabpagenr()
-  let l:cur_win_buf = bufnr('%')
-  let l:main_win_buf = l:cur_win_buf
-  for l:win in getwininfo()
-    if l:win['tabnr'] == l:cur_tab && l:win['bufnr'] < l:main_win_buf
-      let l:main_win_buf = l:win['bufnr']
-    endif
-  endfor
-  if l:cur_win_buf != l:main_win_buf " not the main win, close one win
-    let l:buf_type = getbufvar(winbufnr(win_getid()), '&buftype')
-    if l:buf_type=='terminal'
-      call CUpdateTabTermBuf(bufnr())
-      quit!
-    else
-      quit
-    endif
-  elseif tabpagenr('$') > 1 " multiple tabs, close one tab
-    call CAllTermsOfCurTab()
-    exec 'tabclose'
-  else " single tab
-    " Iterate over all buffers
+  let exec_quit='quit'
+  if &filetype==''
+    let exec_quit='quit!'
+  endif
+  if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
+    call CUpdateTabTermBuf()
+  elseif winnr('$') == 1 " Single win, single tab
     for l:buf in range(1, bufnr('$'))
-      if l:buf != l:main_win_buf && bufexists(l:buf)
+      if l:buf != bufnr('%') && bufexists(l:buf)
         exec 'silent bwipeout! ' . l:buf
       endif
     endfor
-    quit
   endif
+  exec exec_quit
 endfunction
 function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
   let l:cur_tab=tabpagenr()
