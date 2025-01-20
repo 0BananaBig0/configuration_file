@@ -1048,9 +1048,9 @@ function! CPPCompilation()
     endif
   endfor
   if &filetype=='cpp'
-    return ' cd '.l:cur_file_path.' && g++ -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && g++ -g -pedantic-errors '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   else
-    return ' cd '.l:cur_file_path.' && gcc -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && gcc -g -pedantic-errors '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
   endif
 endfunction
 if !(exists('*CompileAndExcute') && &filetype=='vim')
