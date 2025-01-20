@@ -994,7 +994,7 @@ function! CallShowNearestFunction()
   endif
 endfunction
 function! EnsureEmptyLastLine()
-  if getline(line('$')) !=# ''
+  if getline(line('$')) !=# '' && filereadable(expand('%'))
     call append(line('$'), '')
     write
   endif
@@ -1047,10 +1047,12 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
+  let l:compile_single_file = ' -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion -Werror '
+        \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
-    return ' cd '.l:cur_file_path.' && g++ -g -pedantic-errors '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
   else
-    return ' cd '.l:cur_file_path.' && gcc -g -pedantic-errors '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe -Wall -Wextra'
+    return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
   endif
 endfunction
 if !(exists('*CompileAndExcute') && &filetype=='vim')
@@ -1274,3 +1276,4 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
+
