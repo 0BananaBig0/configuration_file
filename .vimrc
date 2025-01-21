@@ -57,7 +57,7 @@ set noswapfile
 
 
 
-let g:plug_url_format = 'https://githubfast.com/%s.git'
+" let g:plug_url_format = 'https://githubfast.com/%s.git'
 call plug#begin('~/.vim/plugged')
 " vim theme, No_Lazy
 Plug 'dracula/vim', {'as': 'dracula'}
@@ -268,32 +268,25 @@ function! ConfigureDelayedPlugin()
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
   let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
-  function! FindRoot(target_path)
-    let l:workspace_root_dir =''
-    let l:workspace_root_file =''
+  function! FindRootPatternPath(target_path)
+    let l:root_pattern_path = []
+    " Access target_path
+    let l:target_path = a:target_path.'/'
     for l:pattern in g:root_patterns
-      if empty(l:workspace_root_dir)
-        let l:workspace_root_dir = finddir(l:pattern, a:target_path.';')
-      endif
-      if empty(l:workspace_root_file)
-        let l:workspace_root_file = findfile(l:pattern, a:target_path.';')
-      endif
-      if !empty(l:workspace_root_dir) && !empty(l:workspace_root_file)
-        break
-      endif
+      for l:str_id in range(strlen(l:target_path) - 1, 0, -1)
+        if l:target_path[l:str_id]=='/'
+          let l:possible_path = strpart(a:target_path, 0, l:str_id)
+          if l:possible_path==$HOME || l:possible_path=='/home/'.$SUDO_USER || l:possible_path=='/'
+            break
+          endif
+          let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
+          if !empty(l:root_pattern_path)
+            return l:root_pattern_path
+          endif
+        endif
+      endfor
     endfor
-    if !empty(l:workspace_root_dir)
-      let l:workspace_root_dir = substitute(fnamemodify(l:workspace_root_dir, ':p'), '/$', '', '')
-      let l:workspace_root_dir = strpart(l:workspace_root_dir, 0, strridx(l:workspace_root_dir,'/'))
-    endif
-    if !empty(l:workspace_root_file)
-      let l:workspace_root_file = substitute(fnamemodify(l:workspace_root_file, ':p'), '/$', '', '')
-      let l:workspace_root_file = strpart(l:workspace_root_file, 0, strridx(l:workspace_root_file,'/'))
-    endif
-    if len(l:workspace_root_dir) < len(l:workspace_root_file)
-      return l:workspace_root_file
-    endif
-    return l:workspace_root_dir
+    return l:root_pattern_path
   endfunction
   function! JumpToTheMainWin()
     let l:target_win = win_getid()
@@ -306,16 +299,22 @@ function! ConfigureDelayedPlugin()
     call win_gotoid(l:target_win )
   endfunction
   function! WorkspaceRoot()
-    if &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
-        \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
+    if &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
+        \ || &filetype=='vista' || &buftype=='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin() " Avoid potential bugs
     endif
-    let l:workspace_root = FindRoot(expand('%:p:h')) " Where we store the opened file
+    let l:workspace_root = FindRootPatternPath(expand('%:p:h')) " Where we store the opened file
     if empty(l:workspace_root)
       echo 'You had better create a root-pattern file like .git in your project.'
       return expand('%:p:h')
     endif
-    return l:workspace_root
+    for l:str_id in range(strlen(l:workspace_root[0]) - 1, 0, -1)
+      if l:workspace_root[0][l:str_id]=='/'
+        let l:workspace_root[0] = strpart(l:workspace_root[0], 0, l:str_id)
+        break
+      endif
+    endfor
+    return l:workspace_root[0]
   endfunction
   function! CopyFileRelToCPP(cpp_workspace_root, file_name)
     let l:source_file = $HOME.'/.vim/.c_cpp/'.a:file_name
@@ -1015,9 +1014,10 @@ function! CPPCompilation()
     endif
   endfor
   call add(l:all_possible_paths, l:cur_file_path)
-  let l:qmakepro_path = ''
-  let l:makefile_path = ''
-  let l:sconstruct_path = ''
+  let l:cmakelist_path = []
+  let l:qmakepro_path = []
+  let l:makefile_path = []
+  let l:sconstruct_path = []
   for l:possible_path in l:all_possible_paths
     let l:pattern = l:possible_path."/CMakeLists.txt"
     " Get the list of matching files (non-recursive)
@@ -1133,21 +1133,21 @@ noremap <C-M-l> gt
 inoremap <C-M-h> <C-o>gT
 inoremap <C-M-l> <C-o>gt
 function! CloseAndBackTab()
-  while winnr('$') > 1
+  while winnr('$') > 1 " Prevent the function from closing multiple tabs
     call QuitWin()
   endwhile
   call QuitWin()
   exec 'tabp'
 endfunction
-function! QuitWin() " not consider the main win is a term
+function! QuitWin()
   let exec_quit='quit'
-  if &filetype==''
+  if &filetype=='' " Close terms without warnings.
     let exec_quit='quit!'
   endif
   if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
     call CUpdateTabTermBuf()
   elseif winnr('$') == 1 " Single win, single tab
-    for l:buf in range(1, bufnr('$'))
+    for l:buf in range(1, bufnr('$')) " Clear term buffers without warnings.
       if l:buf != bufnr('%') && bufexists(l:buf)
         exec 'silent bwipeout! ' . l:buf
       endif
