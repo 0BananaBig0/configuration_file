@@ -159,12 +159,12 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
   exec 'CocStart'
   call plug#load('vim-which-key')
-  call MarkdownPluginConfiguration()
-  call DelayedPluginConfiguration()
-  call ManualLoadPluginConfiguration()
+  call ConfigureMarkdownPlugin()
+  call ConfigureDelayedPlugin()
+  call ConfigureManualLoadPlugin()
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
-  call TabPosInitialize()
+  call InitializeTabPos()
   if &filetype=='vim'
     set nowrap " Disable automatic word wrap which is enabled by vim-plug
   endif
@@ -173,7 +173,7 @@ call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 
-function! MarkdownPluginConfiguration()
+function! ConfigureMarkdownPlugin()
   " coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
   nnoremap <Leader>mm :CocCommand markmap.watch<CR>
@@ -215,7 +215,7 @@ endfunction
 
 
 
-function! DelayedPluginConfiguration()
+function! ConfigureDelayedPlugin()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key=0
   nnoremap <Leader> :WhichKey '<Leader>'<CR>
@@ -318,23 +318,25 @@ function! DelayedPluginConfiguration()
     return l:workspace_root
   endfunction
   function! CopyFileRelToCPP(cpp_workspace_root, file_name)
-    let l:related_file = a:cpp_workspace_root.'/'.a:file_name
-    let l:related_file_source = $HOME.'/.vim/.c_cpp/'.a:file_name
-    if !filereadable(l:related_file) && filereadable(l:related_file_source)
-      let l:clang_file_content = readfile(l:related_file_source)
-      call writefile(l:clang_file_content, l:related_file, 's')
-    elseif filereadable(l:related_file)
-      echo 'The '.l:related_file.' file has existed.'
+    let l:source_file = $HOME.'/.vim/.c_cpp/'.a:file_name
+    let l:target_file = a:cpp_workspace_root.'/'.a:file_name
+    if filereadable(l:target_file)
+      echo 'File '.l:target_file.' has existed.'
+    elseif filereadable(l:source_file)
+      let l:source_file_content = readfile(l:source_file)
+      call writefile(l:source_file_content, l:target_file, 's')
     else
-      echo 'The '.l:related_file_source.' file does not exist.'
+      echo 'File '.l:source_file.' and file '.l:target_file.' do not exist.'
+      return 0
     endif
+    return 1
   endfunction
-  function! ClangToolConfiguration()
+  function! ConfigureClangTools()
     let l:cpp_workspace_root = WorkspaceRoot()
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
-  noremap <Leader><F7> :<C-u>call ClangToolConfiguration()<CR>
+  noremap <Leader><F7> :<C-u>call ConfigureClangTools()<CR>
   nmap <F7>  <Plug>(coc-format)
   vmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
@@ -475,7 +477,7 @@ endfunction
 
 
 
-function! ManualLoadPluginConfiguration()
+function! ConfigureManualLoadPlugin()
   " vim-quickui setting
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
@@ -654,14 +656,16 @@ function! ManualLoadPluginConfiguration()
 
 
   " Vimspector setting
-  function! CppDebugConfiguration()
+  function! ConfigureCppDebug()
     let l:cpp_workspace_root = WorkspaceRoot()
     if !isdirectory(l:cpp_workspace_root.'/.vscode')
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
     endif
     call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
-    exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
+    if CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
+      call NUpdateTabTermBuf()
+      exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
+    endif
   endfunction
   nmap <F2> <Plug>VimspectorContinue
   nnoremap <S-F2> :call RestartVimspector()<CR>
@@ -680,7 +684,7 @@ function! ManualLoadPluginConfiguration()
   nnoremap ]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
                \ :call plug#load('vimspector')<CR>
                \ :call vimspector#Launch()<CR>
-  nnoremap <Leader><F5> :call CppDebugConfiguration()<CR>
+  nnoremap <Leader><F5> :call ConfigureCppDebug()<CR>
   nmap <F6> <Plug>VimspectorStepOver
   nmap <C-F6> <Plug>VimspectorStepInto
   nmap <S-F6> <Plug>VimspectorStepOut
@@ -785,7 +789,7 @@ function! TabPosActivateBuffer(index)
     echo 'The index number(now, '.a:index.') must be less than the total number of tabs(now, '.tabpagenr('$').').'
   endif
 endfunction
-function! TabPosInitialize()
+function! InitializeTabPos()
   for l:i in range(1, 9)
       exec 'noremap <M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
       exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'

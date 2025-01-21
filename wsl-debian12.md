@@ -320,6 +320,6 @@ sudo cpanm --uninstall Excel::Writer::XLSX #for xlsx
 sudo cpanm --uninstall Neovim::Ext
 sudo cpanm --uninstall App::cpanminus
 #cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
-cpanm --local-lib=~/.local/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump IO::AIO JSON Moose PadWalker Scalar::List::Utils Coro
+cpanm --local-lib=~/.local/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump JSON Moose PadWalker Scalar::List::Utils Coro App::cpanminus
 cpanm --local-lib=~/.local/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
 cpanm --local-lib=~/.local/perl5 Neovim::Ext Class::Refresh Compiler::Lexer Hash::SafeKeys Perl::LanguageServer Syntax::Keyword::Try Future::AsyncAwait
