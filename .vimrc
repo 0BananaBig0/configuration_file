@@ -908,7 +908,7 @@ set smartindent
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
 set list                      " Enable special character display
-set listchars=tab:>>¦,trail:█ " Show a tab as >>¦, show a trailing space as █
+set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
 function! SetIndent()
   if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl' || &filetype=='json'
         \ || &filetype=='python' || &filetype=='sh' || &filetype=='verilog'
