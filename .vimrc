@@ -225,7 +225,7 @@ function! ConfigureDelayedPlugin()
 
 
 
-  " coc setting
+  " coc.nvim setting
   " Use tab for trigger completion with characters ahead and navigate.
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
   " by other plugin before putting this into your config.
@@ -377,8 +377,9 @@ function! ConfigureDelayedPlugin()
           \ 'opencl': {'left': '//'},
           \ 'lex': {'left': '//'},
           \ 'yacc': {'left': '//'},
-          \ 'qmake': {'left': '#'}
-          \ } " use custom delimiers  to comment source codes.
+          \ 'qmake': {'left': '#'},
+          \ 'qml': {'left': '//'}
+          \ } " Use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
   map <F3> <plug>NERDCommenterComment
   map <S-F3> <plug>NERDCommenterUncomment
@@ -905,6 +906,8 @@ set autoindent
 set smartindent
 " 把Tab字符用空格代替，和tabstop相关
 set expandtab
+set list              " Enable special character display
+set listchars=tab:==> " Show a tab as ==>
 function! SetIndent()
   if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl' || &filetype=='json'
         \ || &filetype=='python' || &filetype=='sh' || &filetype=='verilog'
