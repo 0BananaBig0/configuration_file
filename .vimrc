@@ -851,6 +851,7 @@ set cmdheight=2
 set number
 " merge signcolumn and number column into one
 set signcolumn=number
+set colorcolumn=80,120,160 " Column guide
 " Uncomment the following to have Vim jump to the last position when reopening a file
 augroup Local_Autocmd_Group | autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif | augroup END
 " 设置当文件被改动时自动载入
@@ -1283,4 +1284,3 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
-
