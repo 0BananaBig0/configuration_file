@@ -722,10 +722,10 @@ function! ConfigureManualLoadPlugin()
     9wincmd _
     exec 'rightbelow vsplit | b ' . l:term_buf_id
     let g:vimspector_session_windows.terminal = win_getid()
-    30wincmd |
+    36wincmd |
     call win_gotoid(g:vimspector_session_windows.variables)
     nunmenu WinBar
-    30wincmd |
+    40wincmd |
     wincmd _
     call win_gotoid(g:vimspector_session_windows.watches)
     nunmenu WinBar
@@ -926,22 +926,32 @@ function! SetIndent()
   endif
 endfunction
 function! SetTitle()
-  if &filetype=='cmake' || &filetype=='qmake' || &filetype=='make' || &filetype=='python'
-        \ || &filetype=='sh' || &filetype=='perl' || &filetype=='tcl'
-    call setline(1,        '#########################################################################')
-    call append(line('$'), '# File Name: '.expand('%:t'))
-    call append(line('$'), '# Author: Huaxiao Liang')
-    call append(line('$'), '# mail: 1184903633@qq.com')
-    call append(line('$'), '# Created Time: '.strftime('%m/%d/%Y-%a-%H:%M:%S'))
-    call append(line('$'), '#########################################################################')
-  else
-    call setline(1,        '///////////////////////////////////////////////////////////////////////////')
-    call append(line('$'), '//  > File Name: '.expand('%:t'))
-    call append(line('$'), '//  > Author: Huaxiao Liang')
-    call append(line('$'), '//  > Mail: 1184903633@qq.com')
-    call append(line('$'), '//  > Created Time: '.strftime('%m/%d/%Y-%a-%H:%M:%S'))
-    call append(line('$'), '///////////////////////////////////////////////////////////////////////////')
+  if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
+      \ && &commentstring[0] != &commentstring[1] && &commentstring[1] != ' ')
+    return
   endif
+  let l:file_name = 'File Name: '.expand('%:t')
+  let l:author_name = 'Author: Huaxiao Liang'
+  let l:mail_address = 'Mail: 1184903633@qq.com'
+  let l:time = strftime('%m/%d/%Y-%a-%H:%M:%S')
+  let l:column_limit = split(&colorcolumn, ",")[0]
+  let l:start_end = repeat(&commentstring[0], l:column_limit)
+  let l:padding_str_len = 3
+  let l:padding_strs = repeat(&commentstring[0], l:padding_str_len)
+  call setline(1,        l:start_end)
+  let l:start_space_len = (l:column_limit - strlen(l:file_name) - l:padding_str_len * 2) / 2
+  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:file_name) - l:padding_str_len * 2
+  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:file_name.repeat(' ', l:end_space_len).l:padding_strs)
+  let l:start_space_len = (l:column_limit - strlen(l:author_name) - l:padding_str_len * 2) / 2
+  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:author_name) - l:padding_str_len * 2
+  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:author_name.repeat(' ', l:end_space_len).l:padding_strs)
+  let l:start_space_len = (l:column_limit - strlen(l:mail_address) - l:padding_str_len * 2) / 2
+  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:mail_address) - l:padding_str_len * 2
+  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:mail_address.repeat(' ', l:end_space_len).l:padding_strs)
+  let l:start_space_len = (l:column_limit - strlen(l:time) - l:padding_str_len * 2) / 2
+  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:time) - l:padding_str_len * 2
+  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:time.repeat(' ', l:end_space_len).l:padding_strs)
+  call append(line('$'), l:start_end)
   call append(line('$'), '')
   if &filetype=='c'
     call append(line('$'), '#include <stdio.h>')

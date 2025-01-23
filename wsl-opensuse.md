@@ -46,7 +46,7 @@ chsh -s $(which zsh)
 rm install.sh
 exit
 
-sudo zypper install -y make valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear gdb
+sudo zypper install -y make valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear gdb libstdc++6-pp
 sudo zypper install -y vulkan-devel cmake ccache
 sudo zypper install -y neovim xclip cargo python311-base python311-pip python311-pipx python311-neovim ruby-devel python311-devel
 sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19 cdecl
