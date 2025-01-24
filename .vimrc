@@ -165,9 +165,6 @@ function! CocTimerStart(timer)
   call plug#load('nerdcommenter')
   call plug#load('asyncrun.vim')
   call InitializeTabPos()
-  if &filetype=='vim'
-    set nowrap " Disable automatic word wrap which is enabled by vim-plug
-  endif
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -263,6 +260,8 @@ function! ConfigureDelayedPlugin()
   nnoremap [b :call CocActionAsync('diagnosticToggleBuffer')<CR>
   nnoremap [t :call CocActionAsync('diagnosticToggle', 1)<CR>
   let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
+  " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
+  " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
            \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
@@ -901,12 +900,12 @@ augroup Local_Autocmd_Group
   autocmd BufNewFile * call SetTitle()
   autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
   autocmd QuitPre *.[ch]* call EnsureEmptyLastLine() " Recommended by the POSIX standard
+  " Disable automatic word wrap which is enabled by filetype plugin indent on
+  autocmd FileType vim set textwidth=0
 augroup END
-" 缩进
 set autoindent
 set smartindent
-" 把Tab字符用空格代替，和tabstop相关
-set expandtab
+set expandtab                 " 把Tab字符用空格代替，和tabstop相关
 set list                      " Enable special character display
 set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
 function! SetIndent()
@@ -1192,32 +1191,29 @@ endfunction
 nnoremap <Space><F4> :vert diffsplit
 nnoremap <Space><F5> :call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
-  exec 'normal! ms'
-  let l:mark_enable = 1
-  let l:new_column = col('.')
-  let l:line_num = line('.')
+  exec 'normal! m"'
   " Find the nearest line which contains at least one non-space character.
-  if getline('.') =~? '^\s*$'
-    let l:mark_enable = 0
-    let l:new_column = 1
+  if getline('.') =~? '^\s*$' " The current line is empty.
+    let l:line_num = line('.')
     let l:down_line_num = search('^\s*\S', 'nW')
-    if l:line_num == l:down_line_num
-      let l:up_line_num = search('^\s*\S', 'bnW')
-      if l:line_num == l:up_line_num
-        let l:line_num = 1
-      else
-        let l:line_num = l:up_line_num
-      endif
-    else
+    let l:up_line_num = search('^\s*\S', 'bnW')
+    if l:up_line_num == 0 && l:down_line_num == 0 " All lines are empty.
+      let l:line_num = 1
+    elseif l:down_line_num == 0 || (l:up_line_num != 0 " Closest to the up line.
+          \ && l:line_num - l:up_line_num < l:down_line_num - l:line_num)
+      let l:line_num = l:up_line_num
+    elseif l:line_num != l:down_line_num
       let l:line_num = l:down_line_num
     endif
+    let l:col_num = col('.')
+    if strlen(getline(l:line_num)) < l:col_num
+      let l:col_num = strlen(getline(l:line_num))
+    endif
+    call setpos('.', [0, l:line_num, l:col_num, 0])
+    exec 'normal! m"'
   endif
   exec ':g/^\s*$/d'
-  if l:mark_enable == 1
-    exec 'normal! `s'
-  else
-    call setpos('.', [0, l:line_num, l:new_column, 0])
-  endif
+  exec 'normal! `"'
 endfunction
 nnoremap <Space><F7> :call RetabAndDeleteTraillingUselessChars()<CR>
 function! RetabAndDeleteTraillingUselessChars()
@@ -1287,3 +1283,4 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
+
