@@ -807,7 +807,7 @@ if has('gui_running')
   set guicursor=c-i:ver33-Cursor
   set guicursor+=a:blinkon0
   " 设定窗口大小
-  set lines=60 columns=80
+  set lines=60 columns=120
   " 隐藏滚动栏
   set guioptions-=r
   " tab只显示文件名不显示标签
@@ -925,33 +925,26 @@ function! SetIndent()
     set shiftwidth=2
   endif
 endfunction
+function! AppendInfo(info, column_limit)
+  let l:padding_str_len = 3
+  let l:padding_strs = repeat(&commentstring[0], l:padding_str_len)
+  let l:start_space_len = (a:column_limit - strlen(a:info) - l:padding_str_len * 2) / 2
+  let l:end_space_len = a:column_limit - l:start_space_len - strlen(a:info) - l:padding_str_len * 2
+  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_strs)
+endfunction
 function! SetTitle()
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
       \ && &commentstring[0] != &commentstring[1] && &commentstring[1] != ' ')
     return
   endif
-  let l:file_name = 'File Name: '.expand('%:t')
-  let l:author_name = 'Author: Huaxiao Liang'
-  let l:mail_address = 'Mail: 1184903633@qq.com'
-  let l:time = strftime('%m/%d/%Y-%a-%H:%M:%S')
   let l:column_limit = split(&colorcolumn, ",")[0]
-  let l:start_end = repeat(&commentstring[0], l:column_limit)
-  let l:padding_str_len = 3
-  let l:padding_strs = repeat(&commentstring[0], l:padding_str_len)
-  call setline(1,        l:start_end)
-  let l:start_space_len = (l:column_limit - strlen(l:file_name) - l:padding_str_len * 2) / 2
-  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:file_name) - l:padding_str_len * 2
-  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:file_name.repeat(' ', l:end_space_len).l:padding_strs)
-  let l:start_space_len = (l:column_limit - strlen(l:author_name) - l:padding_str_len * 2) / 2
-  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:author_name) - l:padding_str_len * 2
-  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:author_name.repeat(' ', l:end_space_len).l:padding_strs)
-  let l:start_space_len = (l:column_limit - strlen(l:mail_address) - l:padding_str_len * 2) / 2
-  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:mail_address) - l:padding_str_len * 2
-  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:mail_address.repeat(' ', l:end_space_len).l:padding_strs)
-  let l:start_space_len = (l:column_limit - strlen(l:time) - l:padding_str_len * 2) / 2
-  let l:end_space_len = l:column_limit - l:start_space_len - strlen(l:time) - l:padding_str_len * 2
-  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).l:time.repeat(' ', l:end_space_len).l:padding_strs)
-  call append(line('$'), l:start_end)
+  let l:top_and_bottom = repeat(&commentstring[0], l:column_limit)
+  call setline(1, l:top_and_bottom)
+  call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
+  call AppendInfo('Author: Huaxiao Liang', l:column_limit)
+  call AppendInfo('Mail: 1184903633@qq.com', l:column_limit)
+  call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
+  call append(line('$'), l:top_and_bottom)
   call append(line('$'), '')
   if &filetype=='c'
     call append(line('$'), '#include <stdio.h>')
