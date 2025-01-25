@@ -1,10 +1,9 @@
 {
    "configurations": {
-      "cpp:launch": {
+      "cpp: launch": {
          "adapter": "vscode-cpptools",
          "configuration": {
-            "name": "cpp:launch",
-            "stopAtEntry": true,
+            "name": "cpp: launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/.exe",
@@ -14,6 +13,7 @@
                ""
             ],
             "cwd": "${workspaceRoot}",
+            "stopAtEntry": true,
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
@@ -28,6 +28,34 @@
          "breakpoints": {
             "exception": {
                "all": "Y"
+            }
+         }
+      },
+      "python: launch": {
+         "adapter": "debugpy",
+         "filetypes": [
+            "python"
+         ],
+         "configuration": {
+            "name": "python: launch",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+               "",
+               "",
+               ""
+            ],
+            "console": "externalTerminal",
+            "cwd": "${workspaceRoot}",
+            "stopOnEntry": true,
+            "debugOptions": []
+         },
+         "breakpoints": {
+            "exception": {
+               "raised": "Y",
+               "uncaught": "Y",
+               "userUnhandled": "Y"
             }
          }
       }

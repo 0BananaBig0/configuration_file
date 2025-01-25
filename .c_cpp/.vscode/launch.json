@@ -1,5 +1,5 @@
 {
-   "version": "0.2.0",
+   "version": "0.3.0",
    "configurations": [
       {
          "name": "C/C++",
@@ -27,6 +27,37 @@
                "all": "Y"
             }
          }
+      },
+      {
+         "name": "Perl",
+         "type": "perl",
+         "request": "launch",
+         "program": "${file}",
+         "args": [
+            "",
+            "",
+            ""
+         ],
+         "stopOnEntry": true,
+         "cwd": "${workspaceFolder}",
+         "perlPath": "perl",
+         "perlArgs": [
+            "-d"
+         ]
+      },
+      {
+         "name": "Python",
+         "type": "python",
+         "request": "launch",
+         "program": "${file}",
+         "args": [
+            "",
+            "",
+            ""
+         ],
+         "stopOnEntry": true,
+         "cwd": "${workspaceFolder}",
+         "console": "integratedTerminal"
       }
    ]
 }
