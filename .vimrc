@@ -666,41 +666,39 @@ function! ConfigureManualLoadPlugin()
       exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
     endif
   endfunction
-  nmap <F2> <Plug>VimspectorContinue
-  nnoremap <S-F2> :call RestartVimspector()<CR>
-  nmap ]<F2> <Plug>VimspectorRunToCursor
-  nmap ]<S-F2> <Plug>VimspectorStop
-  nmap ]<C-F2> <Plug>VimspectorPause
-  nmap ]<F3> <Plug>VimspectorBalloonEval
-  vmap ]<F3> <Plug>VimspectorBalloonEval
-  nmap <F4> <Plug>VimspectorToggleBreakpoint
-  nnoremap <S-F4> :call vimspector#ClearBreakpoints()<CR>
-  nmap ]<F4> <Plug>VimspectorToggleConditionalBreakpoint
-  nnoremap ]<S-F4> :call vimspector#SetAdvancedLineBreakpoint()<CR>
-  nnoremap ]<C-F4> :call vimspector#AddAdvancedFunctionBreakpoint()<CR>
-  nnoremap <F5> :call plug#load('vimspector')<CR>
-  silent nnoremap <S-F5> :VimspectorReset<CR>
-  nnoremap ]<F5> :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
-               \ :call plug#load('vimspector')<CR>
-               \ :call vimspector#Launch()<CR>
-  nnoremap <Leader><F5> :call ConfigureCppDebug()<CR>
-  nmap <F6> <Plug>VimspectorStepOver
-  nmap <C-F6> <Plug>VimspectorStepInto
-  nmap <S-F6> <Plug>VimspectorStepOut
-  nmap ]<F7> <Plug>VimspectorUpFrame
-  nmap ]<S-F7> <Plug>VimspectorDownFrame
-  nnoremap ]<F8> :let g:vimspector_variables_display_mode = 'full'<CR>
-  nnoremap <C-1> :call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  noremap <F2> :<C-u>call ContinueInVimspector()<CR>
+  noremap <S-F2> :<C-u>call RestartVimspector()<CR>
+  map ]<F2> <Plug>VimspectorRunToCursor
+  map ]<S-F2> <Plug>VimspectorStop
+  map ]<C-F2> <Plug>VimspectorPause
+  map ]<F3> <Plug>VimspectorBalloonEval
+  map <F4> <Plug>VimspectorToggleBreakpoint
+  noremap <S-F4> :<C-u>call vimspector#ClearBreakpoints()<CR>
+  map ]<F4> <Plug>VimspectorToggleConditionalBreakpoint
+  noremap ]<S-F4> :<C-u>call vimspector#SetAdvancedLineBreakpoint()<CR>
+  noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
+  noremap <F5> :<C-u>call plug#load('vimspector')<CR>
+  silent noremap <S-F5> :<C-u>VimspectorReset<CR>
+  noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
+              \ :<C-u>call LaunchVimspector()<CR>
+  noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
+  map <F6> <Plug>VimspectorStepOver
+  map <C-F6> <Plug>VimspectorStepInto
+  map <S-F6> <Plug>VimspectorStepOut
+  map ]<F7> <Plug>VimspectorUpFrame
+  map ]<S-F7> <Plug>VimspectorDownFrame
+  noremap ]<F8> :<C-u>let g:vimspector_variables_display_mode = 'full'<CR>
+  noremap <C-1> :<C-u>call win_gotoid(g:vimspector_session_windows.variables)<CR>
   inoremap <C-1> <C-o>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
-  nnoremap <C-3> :call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  noremap <C-3> :<C-u>call win_gotoid(g:vimspector_session_windows.watches)<CR>
   inoremap <C-3> <C-o>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
-  nnoremap <C-5> :call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  noremap <C-5> :<C-u>call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
   inoremap <C-5> <C-o>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
-  nnoremap <C-7> :call win_gotoid(g:vimspector_session_windows.code)<CR>
+  noremap <C-7> :<C-u>call win_gotoid(g:vimspector_session_windows.code)<CR>
   inoremap <C-7> <C-o>:call win_gotoid(g:vimspector_session_windows.code)<CR>
-  nnoremap <C-8> :VimspectorShowOutput Console<CR>
+  noremap <C-8> :<C-u>VimspectorShowOutput Console<CR>
   inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
-  nnoremap <C-9> :call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR>
   inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
@@ -732,10 +730,39 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.stack_trace)
     3wincmd _
   endfunction
+  function! QuitVimspectorTerm()
+    if exists("g:vimspector_session_windows.terminal")
+      \ && win_id2win(g:vimspector_session_windows.terminal) > 0
+      call win_gotoid(g:vimspector_session_windows.terminal)
+      quit!
+      return 1
+    endif
+  endfunction
   function! RestartVimspector()
-    call win_gotoid(g:vimspector_session_windows.terminal)
-    quit!
+    call QuitVimspectorTerm()
     call vimspector#Restart()
+  endfunction
+  function! ContinueInVimspector()
+    if !exists("g:vimspector_session_windows.code")
+      call LaunchVimspector()
+      return
+    endif
+    call vimspector#Continue()
+  endfunction
+  function! LaunchVimspector()
+    if !exists("VimspectorShowOutput")
+      call plug#load('vimspector')
+    endif
+    call JumpToTheMainWin()
+    let l:cur_win_id = win_getid()
+    if QuitVimspectorTerm()
+      call win_gotoid(l:cur_win_id)
+    endif
+    if &filetype=='python'
+      call vimspector#LaunchWithSettings(#{configuration: 'python: launch', Test: 'python: launch'})
+    else
+      call vimspector#LaunchWithSettings(#{configuration: 'cpp: launch', Test: 'cpp: launch'})
+    endif
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
