@@ -111,7 +111,7 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
-  autocmd BufNewFile,BufRead */include/* set filetype=cpp
+  autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && &filetype == 'conf' | set filetype=cpp | endif
   autocmd BufNewFile,BufRead *.launch set filetype=xml
   autocmd BufNewFile,BufRead *.qrc set filetype=xml
 augroup END
