@@ -253,6 +253,8 @@ function! ConfigureDelayedPlugin()
   nmap [l <Plug>(coc-codeaction-line)
   nnoremap [c :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
   nnoremap [d :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
+  nmap <F7> <Plug>(coc-format)
+  vmap <F7> <Plug>(coc-format-selected)
   nnoremap [i :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
@@ -335,8 +337,6 @@ function! ConfigureDelayedPlugin()
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
   noremap <Leader><F7> :<C-u>call ConfigureClangTools()<CR>
-  nmap <F7>  <Plug>(coc-format)
-  vmap <F7>  <Plug>(coc-format-selected)
   " Use K to show documentation in preview window
   nnoremap K :call ShowDocumentation()<CR>
   function! ShowDocumentation()

@@ -1,3 +1,22 @@
+" VScode settings
+nnoremap <Space>c :call VSCodeNotify('editor.action.revealDeclaration')<CR>
+nnoremap <Space>d :call VSCodeNotify('editor.action.revealDefinition')<CR>
+nnoremap <Space>t :call VSCodeNotify('editor.action.goToTypeDefinition')<CR>
+nnoremap <Space>i :call VSCodeNotify('editor.action.goToImplementation')<CR>
+nnoremap <Space>j :call VSCodeNotify('editor.action.marker.next', {'type': 'error'})<CR>
+nnoremap <Space>k :call VSCodeNotify('editor.action.marker.prev', {'type': 'error'})<CR>
+nnoremap <Space>n :call VSCodeNotify('editor.action.rename')<CR>
+nnoremap <Space>r :call VSCodeNotify('editor.action.goToReferences')<CR>
+nnoremap <Space>f :call VSCodeNotify('editor.action.refactor')<CR>
+nnoremap [a :call VSCodeNotify('editor.action.quickFix')<CR>
+nnoremap [c :call VSCodeNotify('editor.action.addCommentLine')<CR>
+vnoremap [c :call VSCodeNotify('editor.action.addCommentLine')<CR>
+nnoremap [<S-c> :call VSCodeNotify('editor.action.removeCommentLine')<CR>
+vnoremap [<S-c> :call VSCodeNotify('editor.action.removeCommentLine')<CR>
+nnoremap [j :call VSCodeNotify('editor.action.marker.next')<CR>
+nnoremap [k :call VSCodeNotify('editor.action.marker.prev')<CR>
+nnoremap [f :call VSCodeNotify('editor.action.formatDocument')<CR>
+vnoremap [f :call VSCodeNotify('editor.action.formatSelection')<CR>
 " 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 set nocompatible
 " 开启256色支持
@@ -280,7 +299,6 @@ endfunction
 nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
 nnoremap <M-CR> :call EnterWithoutTraillingComment()<CR>
 inoremap <M-CR> <C-o>:call EnterWithoutTraillingComment()<CR>
-nnoremap <C-Space> i<Space><ESC>l
 function! InsertEnterInNormalMode()
   " 1. 获取当前光标所在位置的行数
   let l:cur_line = line('.')
@@ -320,9 +338,6 @@ function! EnterWithoutTraillingComment()
   call setline(l:new_line, l:cur_indent.getline(l:new_line))
   call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
 endfunction
-" Alt-Enter新建空行
-nnoremap <C-M-CR> :put _<CR>
-inoremap <C-M-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
 inoremap <M-h> <Left>
 inoremap <M-j> <Down>
@@ -336,4 +351,3 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
-
