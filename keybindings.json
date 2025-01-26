@@ -1,0 +1,178 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "f3",
+    "command": "editor.action.addCommentLine",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift-f3",
+    "command": "editor.action.removeCommentLine",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "f7",
+    "command": "editor.action.formatDocument",
+    "when": "editorHasDocumentFormattingProvider && !editorHasSelection"
+  },
+  {
+    "key": "f7",
+    "command": "editor.action.formatSelection",
+    "when": "editorHasDocumentFormattingProvider && editorHasSelection"
+  },
+  {
+    "key": "f2",
+    "command": "workbench.action.debug.continue",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "f5",
+    "command": "-workbench.action.debug.continue",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "shift+f2",
+    "command": "workbench.action.debug.restart",
+    "when": "inDebugMode"
+  },
+  {
+    "key": "ctrl+shift+f5",
+    "command": "-workbench.action.debug.restart",
+    "when": "inDebugMode"
+  },
+  {
+    "key": "] f2",
+    "command": "editor.debug.action.runToCursor"
+  },
+  {
+    "key": "] shift+f2",
+    "command": "workbench.action.debug.stop",
+    "when": "inDebugMode && !focusedSessionIsAttach"
+  },
+  {
+    "key": "shift+f5",
+    "command": "-workbench.action.debug.stop",
+    "when": "inDebugMode && !focusedSessionIsAttach"
+  },
+  {
+    "key": "] ctrl+f2",
+    "command": "workbench.action.debug.pause",
+    "when": "debugState == 'running'"
+  },
+  {
+    "key": "f6",
+    "command": "-workbench.action.debug.pause",
+    "when": "debugState == 'running'"
+  },
+  {
+    "key": "] f3",
+    "command": "editor.debug.action.selectionToRepl"
+  },
+  {
+    "key": "f4",
+    "command": "editor.debug.action.toggleBreakpoint",
+    "when": "debuggersAvailable && disassemblyViewFocus || debuggersAvailable && editorTextFocus"
+  },
+  {
+    "key": "f9",
+    "command": "-editor.debug.action.toggleBreakpoint",
+    "when": "debuggersAvailable && disassemblyViewFocus || debuggersAvailable && editorTextFocus"
+  },
+  {
+    "key": "shift+f4",
+    "command": "workbench.debug.viewlet.action.removeAllBreakpoints"
+  },
+  {
+    "key": "] f4",
+    "command": "editor.debug.action.conditionalBreakpoint"
+  },
+  {
+    "key": "] shift+f4",
+    "command": "editor.debug.action.toggleInlineBreakpoint",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+f9",
+    "command": "-editor.debug.action.toggleInlineBreakpoint",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "] ctrl+f4",
+    "command": "workbench.debug.viewlet.action.addFunctionBreakpointAction"
+  },
+  {
+    "key": "f6",
+    "command": "workbench.action.debug.stepOver",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "f10",
+    "command": "-workbench.action.debug.stepOver",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "ctrl+f6",
+    "command": "workbench.action.debug.stepInto",
+    "when": "debugState != 'inactive'"
+  },
+  {
+    "key": "f11",
+    "command": "-workbench.action.debug.stepInto",
+    "when": "debugState != 'inactive'"
+  },
+  {
+    "key": "shift+f6",
+    "command": "workbench.action.debug.stepOut",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "shift+f11",
+    "command": "-workbench.action.debug.stepOut",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "ctrl+1",
+    "command": "workbench.debug.action.focusVariablesView"
+  },
+  {
+    "key": "ctrl+3",
+    "command": "workbench.debug.action.focusWatchView"
+  },
+  {
+    "key": "ctrl+5",
+    "command": "workbench.debug.action.focusCallStackView"
+  },
+  {
+    "key": "ctrl+8",
+    "command": "workbench.debug.action.focusRepl"
+  },
+  {
+    "key": "ctrl+7",
+    "command": "extension.js-debug.revealPage"
+  },
+  {
+    "key": "ctrl+9",
+    "command": "workbench.panel.repl.view.focus"
+  },
+  {
+    "key": "ctrl+8",
+    "command": "workbench.panel.output.focus"
+  },
+  {
+    "key": "ctrl+0",
+    "command": "terminal.focus"
+  },
+  {
+    "key": "ctrl+6",
+    "command": "workbench.action.focusActiveEditorGroup",
+  },
+  {
+    "key": "ctrl+escape",
+    "command": "-workbench.action.focusActiveEditorGroup",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+7",
+    "command": "workbench.action.problems.focus"
+  }
+]
