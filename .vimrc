@@ -99,6 +99,8 @@ Plug 'lfv89/vim-interestingwords', {'on': []}
 Plug 'tpope/vim-fugitive', {'on': []}
 " Git status show
 Plug 'airblade/vim-gitgutter', {'on': []}
+" Git blame info
+Plug 'zivyangll/git-blame.vim', {'on': []}
 " c/cpp debug
 Plug 'puremourning/vimspector', {'on': []}
 " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
@@ -636,12 +638,14 @@ function! ConfigureManualLoadPlugin()
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
-    nmap <Leader>gk <Plug>(GitGutterPrevHunk)
-    nmap <Leader>gj <Plug>(GitGutterNextHunk)
-    nmap <Leader>gf <Plug>(GitGutterFold)
+    map <Leader>gk <Plug>(GitGutterPrevHunk)
+    map <Leader>gj <Plug>(GitGutterNextHunk)
+    map <Leader>gf <Plug>(GitGutterFold)
+    noremap <Leader>gb :<C-u>call gitblame#echo()<CR>
     exec 'normal! ms'
     call plug#load('vim-fugitive')
     call plug#load('vim-gitgutter')
+    call plug#load('git-blame.vim')
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
