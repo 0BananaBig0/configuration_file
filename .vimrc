@@ -1294,7 +1294,7 @@ function! EnterWithoutTraillingComment()
   call setline(l:new_line, l:cur_indent.getline(l:new_line))
   call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
 endfunction
-" Alt-Enter新建空行
+" Ctrl-Alt-Enter新建空行
 nnoremap <C-M-CR> :put _<CR>
 inoremap <C-M-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
