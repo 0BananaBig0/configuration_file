@@ -175,19 +175,19 @@ call timer_start(333,'CocTimerStart',{'repeat':1})
 function! ConfigureMarkdownPlugin()
   " coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
-  nnoremap <Leader>mm :CocCommand markmap.watch<CR>
+  noremap <Leader>mm :<C-u>CocCommand markmap.watch<CR>
   " Create markmap html file
-  nnoremap <Leader>mc :CocCommand markmap.create --offline<CR>
+  noremap <Leader>mc :<C-u>CocCommand markmap.create --offline<CR>
   nnoremap <Leader>mh <Plug>(coc-markmap-create)
   vnoremap <Leader>mh <Plug>(coc-markmap-create-v)
-  nnoremap <Leader>mf :CocCommand markdownlint.fixAll<CR>
+  noremap <Leader>mf :<C-u>CocCommand markdownlint.fixAll<CR>
 
 
 
   " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " If you want to go to the last line of the menu, you can press `` in normal mode
-  nnoremap <Leader>mg :call CreateMarkdownMenu()<CR>
-  nnoremap <Leader>mu :call UpdateMarkdownMenu()<CR>
+  noremap <Leader>mg :<C-u>call CreateMarkdownMenu()<CR>
+  noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
   let g:vmt_auto_update_on_save = 0
   let g:vmt_list_item_char = '-'
   function! CreateMarkdownMenu()
@@ -216,11 +216,11 @@ endfunction
 
 function! ConfigureDelayedPlugin()
   " vim-which-key setting
-  let g:which_key_fallback_to_native_key=0
-  nnoremap <Leader> :WhichKey '<Leader>'<CR>
-  nnoremap <Space> :WhichKey '<Space>'<CR>
-  nnoremap [ :WhichKey '['<CR>
-  nnoremap ] :WhichKey ']'<CR>
+  let g:which_key_fallback_to_native_key = 0
+  noremap <Leader> :<C-u>WhichKey '<Leader>'<CR>
+  noremap <Space> :<C-u>WhichKey '<Space>'<CR>
+  noremap [ :<C-u>WhichKey '['<CR>
+  noremap ] :<C-u>WhichKey ']'<CR>
 
 
 
@@ -261,8 +261,8 @@ function! ConfigureDelayedPlugin()
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
   nmap [o <Plug>(coc-diagnostic-info)
-  nnoremap [b :call CocActionAsync('diagnosticToggleBuffer')<CR>
-  nnoremap [t :call CocActionAsync('diagnosticToggle', 1)<CR>
+  noremap [b :<C-u>call CocActionAsync('diagnosticToggleBuffer')<CR>
+  noremap [t :<C-u>call CocActionAsync('diagnosticToggle', 1)<CR>
   let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
   " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
   " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
@@ -340,7 +340,7 @@ function! ConfigureDelayedPlugin()
   endfunction
   noremap <Leader><F7> :<C-u>call ConfigureClangTools()<CR>
   " Use K to show documentation in preview window
-  nnoremap K :call ShowDocumentation()<CR>
+  noremap K :<C-u>call ShowDocumentation()<CR>
   function! ShowDocumentation()
     if CocAction('hasProvider', 'hover')
       call CocActionAsync('doHover')
@@ -615,7 +615,7 @@ function! ConfigureManualLoadPlugin()
     endif
     return l:bookmark_path
   endfunction
-  nnoremap <Leader>bo :call plug#load('vim-bookmarks')<CR>
+  noremap <Leader>bo :<C-u>call plug#load('vim-bookmarks')<CR>
   nnoremap <Leader>bt :BookmarkToggle<CR>
   nnoremap <Leader>ba :BookmarkAnnotate<CR>
   nnoremap <Leader>bs :BookmarkShowAll<CR>
@@ -630,7 +630,7 @@ function! ConfigureManualLoadPlugin()
 
 
   " vim-interestingwords setting
-  nnoremap <Leader>wt :call LoadAndSetVimInterestingwords()<CR>
+  noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
@@ -645,7 +645,7 @@ function! ConfigureManualLoadPlugin()
 
 
   " vim-fugitive and vim-gitgutter setting
-  nnoremap <Leader>git :call LoadAndSetGitPlugin()<CR>
+  noremap <Leader>git :<C-u>call LoadAndSetGitPlugin()<CR>
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
@@ -714,12 +714,17 @@ function! ConfigureManualLoadPlugin()
   inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
   noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR>
   inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  map ]a :call AddVarToWatch(expand('<cword>'))<CR>
-  vmap ]a :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
+  noremap <C-0> :<C-u>call ListAllBreakPoints()<CR>
+  inoremap <C-0> <C-o>:call ListAllBreakPoints()<CR>
+  noremap ]a :<C-u>call ShowAssembleCode()<CR>
+  noremap ]s <Plug>VimspectorDisassemble
   map ]c <Plug>VimspectorJumpToProgramCounter
+  noremap ]d <Del>
   map ]e <Plug>VimspectorBalloonEval
   map ]j <Plug>VimspectorJumpToNextBreakpoint
   map ]k <Plug>VimspectorJumpToPreviousBreakpoint
+  map ]v :call AddVarToWatch(expand('<cword>'))<CR>
+  vmap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -750,16 +755,24 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.stack_trace)
     3wincmd _
   endfunction
-  function! QuitVimspectorTerm()
+  function! QuitVimspectorWins()
+    let l:quit_success = 0
+    if exists("g:vimspector_session_windows.disassembly")
+      \ && win_id2win(g:vimspector_session_windows.disassembly) > 0
+      call win_gotoid(g:vimspector_session_windows.disassembly)
+      quit!
+      let l:quit_success = 1
+    endif
     if exists("g:vimspector_session_windows.terminal")
       \ && win_id2win(g:vimspector_session_windows.terminal) > 0
       call win_gotoid(g:vimspector_session_windows.terminal)
       quit!
-      return 1
+      let l:quit_success = 1
     endif
+    return l:quit_success
   endfunction
   function! RestartVimspector()
-    call QuitVimspectorTerm()
+    call QuitVimspectorWins()
     call vimspector#Restart()
   endfunction
   function! ContinueInVimspector()
@@ -775,7 +788,7 @@ function! ConfigureManualLoadPlugin()
     endif
     call JumpToTheMainWin()
     let l:cur_win_id = win_getid()
-    if QuitVimspectorTerm()
+    if QuitVimspectorWins()
       call win_gotoid(l:cur_win_id)
     endif
     if &filetype=='python'
@@ -785,11 +798,44 @@ function! ConfigureManualLoadPlugin()
     endif
   endfunction
   function! AddVarToWatch(selection)
+    let l:cur_winid = win_getid()
     call win_gotoid(g:vimspector_session_windows.watches)
     exec "normal! i".a:selection."\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! ListAllBreakPoints()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec info breakpoints\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! ShowAssembleCode()
+    if exists("g:vimspector_session_windows.disassembly")
+      \ && win_id2win(g:vimspector_session_windows.disassembly) > 0
+      call win_gotoid(g:vimspector_session_windows.disassembly)
+      return
+    endif
+    let l:cur_winid = win_getid()
+    call vimspector#ShowDisassembly()
+    while !exists("g:vimspector_session_windows.disassembly")
+      \ || win_id2win(g:vimspector_session_windows.disassembly) == 0
+      \ || l:cur_winid == win_getid()
+      sleep 33m
+    endwhile
+    let l:dis_buf_id = winbufnr(g:vimspector_session_windows.disassembly)
+    hide
     call win_gotoid(g:vimspector_session_windows.code)
+    exec 'rightbelow vsplit | b ' . l:dis_buf_id
+    let g:vimspector_session_windows.disassembly = win_getid()
+    call win_gotoid(g:vimspector_session_windows.output)
+    9wincmd _
+    call win_gotoid(g:vimspector_session_windows.variables)
+    30wincmd |
+    call win_gotoid(g:vimspector_session_windows.disassembly)
+    65wincmd |
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
+
 
 
   " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
@@ -818,7 +864,7 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  nnoremap <Leader>mt :call ConfigureVimMatchUp()<CR>
+  noremap <Leader>mt :<C-u>call ConfigureVimMatchUp()<CR>
   " vim-matchup setting
   function ConfigureVimMatchUp()
     let g:matchup_matchparen_offscreen = {'method': 'popup'}
@@ -841,10 +887,10 @@ function! TabPosActivateBuffer(index)
 endfunction
 function! InitializeTabPos()
   for l:i in range(1, 9)
-      exec 'noremap <M-' . l:i . '> :call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'noremap <M-' . l:i . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
       exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
-  exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
+  exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
   exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -865,7 +911,7 @@ if has('gui_running')
   " Toggle Menu and Toolbar菜单栏和工具栏
   set guioptions-=m
   set guioptions-=T
-  nnoremap <Space>m :call MenuToggle()<CR>
+  noremap <Space>m :<C-u>call MenuToggle()<CR>
   function! MenuToggle()
     if &guioptions=~#'T'
       set guioptions-=T
@@ -949,7 +995,7 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
-  autocmd FileType c,cpp,verilog nnoremap <Leader>` :call CallShowNearestFunction()<CR>
+  autocmd FileType c,cpp,verilog noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
   autocmd QuitPre *.[ch]* call EnsureEmptyLastLine() " Recommended by the POSIX standard
   " Disable automatic word wrap which is enabled by filetype plugin indent on
   autocmd FileType vim set textwidth=0
@@ -1059,8 +1105,8 @@ function! EnsureEmptyLastLine()
     write
   endif
 endfunction
-nnoremap <Space><F2> :call CompileAndExcute()<CR>
-nnoremap <Leader><F2> :call CompileCommand()<CR>
+noremap <Space><F2> :<C-u>call CompileAndExcute()<CR>
+noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
 function! CPPCompilation()
   let l:cpp_workspace_root = WorkspaceRoot()
   let l:cur_file_path = expand('%:p:h')
@@ -1177,10 +1223,10 @@ function! CompileCommand()
     endif
   endif
 endfunction
-nnoremap <Space>t :call NUpdateTabTermBuf()<CR>:tabnew<CR>
-nnoremap <Space>b :call CloseAndBackTab()<CR>
-nnoremap <Space>q :call QuitWin()<CR>
-nnoremap <Space>w :w<CR>
+noremap <Space>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
+noremap <Space>b :<C-u>call CloseAndBackTab()<CR>
+noremap <Space>q :<C-u>call QuitWin()<CR>
+noremap <Space>w :<C-u>w<CR>
 noremap <M-S-h> :<C-u>call MoveTabH()<CR>
 noremap <M-S-l> :<C-u>call MoveTabL()<CR>
 inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
@@ -1239,8 +1285,8 @@ function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
 " 比较文件
-nnoremap <Space><F4> :vert diffsplit
-nnoremap <Space><F5> :call DeleteBlankLine()<CR>
+noremap <Space><F4> :<C-u>vert diffsplit
+noremap <Space><F5> :<C-u>call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
   exec 'normal! m"'
   " Find the nearest line which contains at least one non-space character.
@@ -1266,7 +1312,7 @@ function! DeleteBlankLine()
   exec ':g/^\s*$/d'
   exec 'normal! `"'
 endfunction
-nnoremap <Space><F7> :call RetabAndDeleteTraillingUselessChars()<CR>
+noremap <Space><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
 function! RetabAndDeleteTraillingUselessChars()
   exec 'normal! ms'
   exec ':%retab!'
@@ -1334,3 +1380,4 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
+
