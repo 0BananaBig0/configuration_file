@@ -351,16 +351,27 @@ function! ConfigureDelayedPlugin()
   " Highlight the symbol and its references when holding the cursor
   augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg='White' guibg='Black'
-  function CheckPrimitivePtrType()
+  function! GetSelectedContent()
     " Get the start and end positions of the visual selection
-    let l:start = getpos("'<")
-    let l:end = getpos("'>")
-    " Extract the selected lines and replace all newlines with spaces
-    let l:lines = getline(l:start[1], l:end[1])
-    let l:selection = join(l:lines, " ")
-    echo system('cdecl explain ' . shellescape(l:selection))
+    let l:start_pos = getpos("'<")
+    let l:end_pos = getpos("'>")
+    " Get the l:lines in the selected range
+    let l:lines = getline(l:start_pos[1], l:end_pos[1])
+    " Handle single-line selection
+    if len(l:lines) == 1
+        let l:lines = [strpart(l:lines[0], l:start_pos[2] - 1, l:end_pos[2] - l:start_pos[2] + 1)]
+    else
+        " Adjust the first and last l:lines based on the selection
+        let l:lines[0] = strpart(l:lines[0], l:start_pos[2] - 1)
+        let l:lines[-1] = strpart(l:lines[-1], 0, l:end_pos[2])
+    endif
+    return join(l:lines, " ")
   endfunction
-  vnoremap <Space>p :<C-u>call CheckPrimitivePtrType()<CR>
+  function CheckPrimitivePtrType(selection)
+    echo system('cdecl explain ' . shellescape(a:selection))
+  endfunction
+  nnoremap <Space>p :call CheckPrimitivePtrType(getline('.'))<CR>
+  vnoremap <Space>p :<C-u>call CheckPrimitivePtrType(GetSelectedContent())<CR>
 
 
 
@@ -690,10 +701,6 @@ function! ConfigureManualLoadPlugin()
   map <S-F6> <Plug>VimspectorStepOut
   map ]<F7> <Plug>VimspectorUpFrame
   map ]<S-F7> <Plug>VimspectorDownFrame
-  map ]c <Plug>VimspectorJumpToProgramCounter
-  map ]e <Plug>VimspectorBalloonEval
-  map ]j <Plug>VimspectorJumpToNextBreakpoint
-  map ]k <Plug>VimspectorJumpToPreviousBreakpoint
   noremap ]<F8> :<C-u>let g:vimspector_variables_display_mode = 'full'<CR>
   noremap <C-1> :<C-u>call win_gotoid(g:vimspector_session_windows.variables)<CR>
   inoremap <C-1> <C-o>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
@@ -707,6 +714,12 @@ function! ConfigureManualLoadPlugin()
   inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
   noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR>
   inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  map ]a :call AddVarToWatch(expand('<cword>'))<CR>
+  vmap ]a :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
+  map ]c <Plug>VimspectorJumpToProgramCounter
+  map ]e <Plug>VimspectorBalloonEval
+  map ]j <Plug>VimspectorJumpToNextBreakpoint
+  map ]k <Plug>VimspectorJumpToPreviousBreakpoint
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -771,8 +784,12 @@ function! ConfigureManualLoadPlugin()
       call vimspector#LaunchWithSettings(#{configuration: 'cpp: launch', Test: 'cpp: launch'})
     endif
   endfunction
+  function! AddVarToWatch(selection)
+    call win_gotoid(g:vimspector_session_windows.watches)
+    exec "normal! i".a:selection."\<CR>"
+    call win_gotoid(g:vimspector_session_windows.code)
+  endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
-
 
 
   " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
