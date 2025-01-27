@@ -42,31 +42,33 @@
   },
   {
     "key": "] f2",
-    "command": "editor.debug.action.runToCursor"
+    "command": "editor.debug.action.runToCursor",
+    "when": "inDebugMode && neovim.mode != 'insert'"
   },
   {
     "key": "] shift+f2",
     "command": "workbench.action.debug.stop",
-    "when": "inDebugMode && !focusedSessionIsAttach"
+    "when": "inDebugMode && !focusedSessionIsAttach && neovim.mode != 'insert'"
   },
   {
     "key": "shift+f5",
     "command": "-workbench.action.debug.stop",
-    "when": "inDebugMode && !focusedSessionIsAttach"
+    "when": "inDebugMode && !focusedSessionIsAttach && neovim.mode != 'insert'"
   },
   {
     "key": "] ctrl+f2",
     "command": "workbench.action.debug.pause",
-    "when": "debugState == 'running'"
+    "when": "debugState == 'running' && neovim.mode != 'insert'"
   },
   {
     "key": "f6",
     "command": "-workbench.action.debug.pause",
-    "when": "debugState == 'running'"
+    "when": "debugState == 'running' && neovim.mode != 'insert'"
   },
   {
     "key": "] f3",
-    "command": "editor.debug.action.selectionToRepl"
+    "command": "editor.debug.action.selectionToRepl",
+    "when": "inDebugMode && !focusedSessionIsAttach && neovim.mode != 'insert'"
   },
   {
     "key": "f4",
@@ -84,12 +86,13 @@
   },
   {
     "key": "] f4",
-    "command": "editor.debug.action.conditionalBreakpoint"
+    "command": "editor.debug.action.conditionalBreakpoint",
+    "when": "debuggersAvailable && disassemblyViewFocus || debuggersAvailable && editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "] shift+f4",
     "command": "editor.debug.action.toggleInlineBreakpoint",
-    "when": "editorTextFocus"
+    "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "shift+f9",
@@ -98,7 +101,8 @@
   },
   {
     "key": "] ctrl+f4",
-    "command": "workbench.debug.viewlet.action.addFunctionBreakpointAction"
+    "command": "workbench.debug.viewlet.action.addFunctionBreakpointAction",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "f6",
@@ -193,7 +197,8 @@
   },
   {
     "key": "space q",
-    "command": "workbench.action.closeActiveEditor"
+    "command": "workbench.action.closeActiveEditor",
+    "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
     "key": "ctrl+w",
@@ -218,32 +223,32 @@
   {
     "key": "space d",
     "command": "editor.action.revealDefinition",
-    "when": "editorHasDefinitionProvider"
+    "when": "editorHasDefinitionProvider && neovim.mode != 'insert'"
   },
   {
     "key": "space c",
     "command": "editor.action.revealDeclaration",
-    "when": "editorHasDeclarationProvider && !isInEmbeddedEditor"
+    "when": "editorHasDeclarationProvider && !isInEmbeddedEditor && neovim.mode != 'insert'"
   },
   {
     "key": "space t",
     "command": "editor.action.goToTypeDefinition",
-    "when": "editorHasTypeDefinitionProvider"
+    "when": "editorHasTypeDefinitionProvider && neovim.mode != 'insert'"
   },
   {
     "key": "space i",
     "command": "editor.action.goToImplementation",
-    "when": "editorHasImplementationProvider"
+    "when": "editorHasImplementationProvider && neovim.mode != 'insert'"
   },
   {
     "key": "space p",
     "command": "editor.action.peekDefinition",
-    "when": "editorHasDefinitionProvider && !inReferenceSearchEditor && !isInEmbeddedEditor"
+    "when": "editorHasDefinitionProvider && !inReferenceSearchEditor && !isInEmbeddedEditor && neovim.mode != 'insert'"
   },
   {
     "key": "space j",
     "command": "editor.action.marker.nextInFiles",
-    "when": "editorFocus"
+    "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
     "key": "f8",
@@ -253,7 +258,7 @@
   {
     "key": "[ j",
     "command": "editor.action.marker.next",
-    "when": "editorFocus"
+    "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
     "key": "alt+f8",
@@ -263,7 +268,7 @@
   {
     "key": "[ k",
     "command": "editor.action.marker.prev",
-    "when": "editorFocus"
+    "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
     "key": "shift+alt+f8",
@@ -273,7 +278,7 @@
   {
     "key": "space k",
     "command": "editor.action.marker.prevInFiles",
-    "when": "editorFocus"
+    "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
     "key": "shift+f8",
@@ -283,7 +288,7 @@
   {
     "key": "space n",
     "command": "editor.action.rename",
-    "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+    "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly && neovim.mode != 'insert'"
   },
   {
     "key": "f2",
@@ -293,12 +298,12 @@
   {
     "key": "space r",
     "command": "editor.action.goToReferences",
-    "when": "editorHasReferenceProvider && !inReferenceSearchEditor && !isInEmbeddedEditor"
+    "when": "editorHasReferenceProvider && !inReferenceSearchEditor && !isInEmbeddedEditor && neovim.mode != 'insert'"
   },
   {
     "key": "space f",
     "command": "editor.action.refactor",
-    "when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
+    "when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly && neovim.mode != 'insert'"
   },
   {
     "key": "ctrl+shift+r",
@@ -308,11 +313,24 @@
   {
     "key": "[ a",
     "command": "editor.action.quickFix",
-    "when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
+    "when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly && neovim.mode != 'insert'"
   },
   {
     "key": "ctrl+.",
     "command": "-editor.action.quickFix",
     "when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+2",
+    "command": "workbench.files.action.focusFilesExplorer"
+  },
+  {
+    "key": "space w",
+    "command": "workbench.action.files.save",
+    "when": "neovim.mode != 'insert'"
+  },
+  {
+    "key": "ctrl+s",
+    "command": "-workbench.action.files.save"
   }
 ]

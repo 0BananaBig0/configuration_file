@@ -29,35 +29,6 @@ function! InitializeTabPos()
   exec 'noremap <M-0> :call TabPosActivateBuffer(10)<CR>'
   exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 显示相关和实用设置
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 会使vim看起来不友好的命令
-if has('gui_running')
-  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
-  " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
-  set guicursor=c-i:ver33-Cursor
-  set guicursor+=a:blinkon0
-  " 设定窗口大小
-  set lines=60 columns=120
-  " 隐藏滚动栏
-  set guioptions-=r
-  " tab只显示文件名不显示标签
-  set guitablabel=%t
-  " Toggle Menu and Toolbar菜单栏和工具栏
-  set guioptions-=m
-  set guioptions-=T
-  nnoremap <Space>m :call MenuToggle()<CR>
-  function! MenuToggle()
-    if &guioptions=~#'T'
-      set guioptions-=T
-      set guioptions-=m
-    else
-      set guioptions+=T
-      set guioptions+=m
-    endif
-  endfunction
-endif
 set shortmess+=c
 set showcmd
 set foldmethod=manual
@@ -241,7 +212,6 @@ function! EnsureEmptyLastLine()
     write
   endif
 endfunction
-nnoremap <Space>w :w<CR>
 nnoremap <Space><F5> :call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
   exec 'normal! m"'
