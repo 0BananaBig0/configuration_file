@@ -675,7 +675,6 @@ function! ConfigureManualLoadPlugin()
   map ]<F2> <Plug>VimspectorRunToCursor
   map ]<S-F2> <Plug>VimspectorStop
   map ]<C-F2> <Plug>VimspectorPause
-  map ]<F3> <Plug>VimspectorBalloonEval
   map <F4> <Plug>VimspectorToggleBreakpoint
   noremap <S-F4> :<C-u>call vimspector#ClearBreakpoints()<CR>
   map ]<F4> <Plug>VimspectorToggleConditionalBreakpoint
@@ -691,6 +690,10 @@ function! ConfigureManualLoadPlugin()
   map <S-F6> <Plug>VimspectorStepOut
   map ]<F7> <Plug>VimspectorUpFrame
   map ]<S-F7> <Plug>VimspectorDownFrame
+  map ]c <Plug>VimspectorJumpToProgramCounter
+  map ]e <Plug>VimspectorBalloonEval
+  map ]j <Plug>VimspectorJumpToNextBreakpoint
+  map ]k <Plug>VimspectorJumpToPreviousBreakpoint
   noremap ]<F8> :<C-u>let g:vimspector_variables_display_mode = 'full'<CR>
   noremap <C-1> :<C-u>call win_gotoid(g:vimspector_session_windows.variables)<CR>
   inoremap <C-1> <C-o>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
