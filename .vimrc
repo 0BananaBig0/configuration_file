@@ -1,44 +1,3 @@
-"If you want to use my .vimrc, make sure your vim version is bigger than 8.1.1564
-"If you use neovim, make sure its versio is bigger than 0.5.0
-"There some depedencies you should have:
-"(1)*llvm* and *clang* , make sure their versions are bigger than 10.0 coc will need them
-"(2)nodejs and yarn, make sure nodejs version is bigger than 12.12. coc will need them
-"Also,markdown-preview.nvim needs yarn.
-"(3)bear. It provides compile_commands.json for clangd if you use make to manage your project.
-"If you use cmake, add set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-"to your CMakeLists.txt, that can support compile_commands.json. After the
-"compile_commands.json created, you should copy it or link it so that we can
-"find it in your root of your projece.
-"(4)vimplug, https://github.com/junegunn/vim-plug,this can help you manage your plugin of vim
-"(5)if you use python, you also need to execute the following commands:
-"python3 -m pip install pysnooper ipdb pylint yapf futures isort pyright
-"(6)python3 -m pip install pygments vim-vint cmakelang
-"(7)if you want to use my coc-settings.json, you can copy it from
-"/home/hxliang/.vim to /home/you/.vim. And there are some dependencies you
-"should have: install verilator,verible and sudo npm install -g @imc-trading/svlangserver
-"if your write the verilog. https://github.com/chipsalliance/verible
-"(8)install ripgrep,if you want to use 'leaderf rg' command in .vimrc . https://github.com/BurntSushi/ripgrep
-"(9)if your vim tell you that it can't find some models, you can do that
-"first, coc.nvim use iverilog or verilator check the verilog syntax
-"last,at the top of your verilog file add the following statement:
-"`include "/path/to/xxx.v"
-"ps:xxx.v must include those models which had been told that vim misses by
-"coc.nvim
-"If you want to know what functions my vimrc have you should scan the .vimrc.
-"If you want to know the shortcut key, search 'map ' in the .vimrc . Or use
-":map in normal mode
-"If you confuse with some configuration, you can use the help command. For
-"example I confuse with 'set ws', so I use vim command as the following :
-"help ws. If I confuse with 'let g:coc_start_at_startup = 0', I can use the
-"following command:help coc_start_at_startup
-"There are some commands you may need to know: you can use tab key to complete
-"if you want to use the shell command,you can add ! before your shell command,
-"for example,if you want to use ls command,you can type the  :!ls  in the vim normal mode
-"or correct your vim commands you type
-"vimplug:  PlugInstall PlugUpdate PlugUpgrade
-
-
-
 " 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 set nocompatible
 " 开启256色支持
@@ -57,7 +16,6 @@ set noswapfile
 
 
 
-" let g:plug_url_format = 'https://githubfast.com/%s.git'
 call plug#begin('~/.vim/plugged')
 " vim theme, No_Lazy
 Plug 'dracula/vim', {'as': 'dracula'}
@@ -1380,4 +1338,3 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
-
