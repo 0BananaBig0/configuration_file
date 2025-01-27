@@ -1,22 +1,3 @@
-" VScode settings
-nnoremap <Space>c :call VSCodeNotify('editor.action.revealDeclaration')<CR>
-nnoremap <Space>d :call VSCodeNotify('editor.action.revealDefinition')<CR>
-nnoremap <Space>t :call VSCodeNotify('editor.action.goToTypeDefinition')<CR>
-nnoremap <Space>i :call VSCodeNotify('editor.action.goToImplementation')<CR>
-nnoremap <Space>j :call VSCodeNotify('editor.action.marker.next', {'type': 'error'})<CR>
-nnoremap <Space>k :call VSCodeNotify('editor.action.marker.prev', {'type': 'error'})<CR>
-nnoremap <Space>n :call VSCodeNotify('editor.action.rename')<CR>
-nnoremap <Space>r :call VSCodeNotify('editor.action.goToReferences')<CR>
-nnoremap <Space>f :call VSCodeNotify('editor.action.refactor')<CR>
-nnoremap [a :call VSCodeNotify('editor.action.quickFix')<CR>
-nnoremap [c :call VSCodeNotify('editor.action.addCommentLine')<CR>
-vnoremap [c :call VSCodeNotify('editor.action.addCommentLine')<CR>
-nnoremap [<S-c> :call VSCodeNotify('editor.action.removeCommentLine')<CR>
-vnoremap [<S-c> :call VSCodeNotify('editor.action.removeCommentLine')<CR>
-nnoremap [j :call VSCodeNotify('editor.action.marker.next')<CR>
-nnoremap [k :call VSCodeNotify('editor.action.marker.prev')<CR>
-nnoremap [f :call VSCodeNotify('editor.action.formatDocument')<CR>
-vnoremap [f :call VSCodeNotify('editor.action.formatSelection')<CR>
 " 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 set nocompatible
 " 开启256色支持
