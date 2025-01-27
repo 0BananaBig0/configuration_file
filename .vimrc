@@ -535,7 +535,7 @@ function! ConfigureManualLoadPlugin()
   endfunction
   " enable to display tips in the cmdline
   let g:quickui_show_tip = 1
-  let g:quickui_color_scheme = 'papercol light'
+  let g:quickui_color_scheme = 'system'
   " hit \qm to open menu
   noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
   " hit \qb to switch buffer
