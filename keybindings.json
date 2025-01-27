@@ -66,11 +66,6 @@
     "when": "debugState == 'running' && neovim.mode != 'insert'"
   },
   {
-    "key": "] e",
-    "command": "editor.debug.action.selectionToRepl",
-    "when": "inDebugMode && !focusedSessionIsAttach && neovim.mode != 'insert'"
-  },
-  {
     "key": "f4",
     "command": "editor.debug.action.toggleBreakpoint",
     "when": "debuggersAvailable && disassemblyViewFocus || debuggersAvailable && editorTextFocus"
@@ -340,5 +335,15 @@
   {
     "key": "] k",
     "command": "editor.debug.action.goToPreviousBreakpoint && neovim.mode != 'insert'"
+  },
+  {
+    "key": "] e",
+    "command": "editor.debug.action.showDebugHover",
+    "when": "editorTextFocus && inDebugMode && neovim.mode != 'insert'"
+  },
+  {
+    "key": "ctrl+k ctrl+i",
+    "command": "-editor.debug.action.showDebugHover",
+    "when": "editorTextFocus && inDebugMode"
   }
 ]
