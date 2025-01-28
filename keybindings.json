@@ -357,5 +357,10 @@
     "key": "space p",
     "command": "cdecl.explainSelected",
     "when": "editorFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "[ h",
+    "command": "clangd.inlayHints.toggle",
+    "when": "clangd.inlayHints.supported && editorFocus && neovim.mode != 'insert'"
   }
 ]

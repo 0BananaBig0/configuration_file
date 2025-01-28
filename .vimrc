@@ -211,14 +211,15 @@ function! ConfigureDelayedPlugin()
   nmap [l <Plug>(coc-codeaction-line)
   noremap [c :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
   noremap [d :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
-  nmap <F7> <Plug>(coc-format)
-  vmap <F7> <Plug>(coc-format-selected)
   noremap [i :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
   nmap [o <Plug>(coc-diagnostic-info)
   noremap [b :<C-u>call CocActionAsync('diagnosticToggleBuffer')<CR>
   noremap [t :<C-u>call CocActionAsync('diagnosticToggle', 1)<CR>
+  noremap [h :<C-u>CocCommand document.toggleInlayHint<CR>
+  nmap <F7> <Plug>(coc-format)
+  vmap <F7> <Plug>(coc-format-selected)
   let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
   " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
   " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
