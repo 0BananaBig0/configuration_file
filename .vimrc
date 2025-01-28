@@ -396,7 +396,6 @@ function! ConfigureDelayedPlugin()
     endfor
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer
     if l:terminal_shown == 0
-      " Get the list of all buffers and find the latest terminal buffer
       let l:latest_terminal = g:tab_term_buf[l:cur_tab]
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
       if l:latest_terminal != -1 && bufexists(l:latest_terminal)
@@ -502,11 +501,8 @@ function! ConfigureManualLoadPlugin()
   " enable to display tips in the cmdline
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
-  " hit \qm to open menu
   noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
-  " hit \qb to switch buffer
   noremap <Leader>qb :<C-u>call QuickuiListBuffer()<CR>
-  " hit \qt to preview tags
   noremap <Leader>qt :<C-u>call QuickuiPreviewTag()<CR>
 
 
@@ -544,11 +540,10 @@ function! ConfigureManualLoadPlugin()
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
   let g:bookmark_auto_save = 1
-  " Save bookmarks to $HOME/.vim/.vim-bookmarks
+  " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
     let l:bookmark_extension = 'bookmarks'
-    " Bookmark files of the root user are saved to /home/$SUDO_USER/.vim/.vim-bookmarks
     if empty($SUDO_USER)
       let l:bookmark_root_location = $HOME.'/.vim/.vim-bookmarks'
     else
@@ -689,27 +684,34 @@ function! ConfigureManualLoadPlugin()
   sign define vimspectorPCBP          text=●>  texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentThread text=>   texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
-  function! s:SetUpTerminal()
-    call win_gotoid(g:vimspector_session_windows.terminal)
-    let l:term_buf_id = winbufnr(g:vimspector_session_windows.terminal)
-    hide
+  function! ReshapeVimspectorWins(var = 40)
+    let l:cur_winid = win_getid()
     call win_gotoid(g:vimspector_session_windows.code)
     nunmenu WinBar
     wincmd _
     call win_gotoid(g:vimspector_session_windows.output)
     9wincmd _
-    exec 'rightbelow vsplit | b ' . l:term_buf_id
-    let g:vimspector_session_windows.terminal = win_getid()
+    call win_gotoid(g:vimspector_session_windows.terminal)
     36wincmd |
     call win_gotoid(g:vimspector_session_windows.variables)
     nunmenu WinBar
-    40wincmd |
+    exec a:var.'wincmd |'
     wincmd _
     call win_gotoid(g:vimspector_session_windows.watches)
     nunmenu WinBar
     16wincmd _
     call win_gotoid(g:vimspector_session_windows.stack_trace)
     3wincmd _
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! s:SetUpTerminal()
+    call win_gotoid(g:vimspector_session_windows.terminal)
+    let l:term_buf_id = winbufnr(g:vimspector_session_windows.terminal)
+    hide
+    call win_gotoid(g:vimspector_session_windows.output)
+    exec 'rightbelow vsplit | b ' . l:term_buf_id
+    let g:vimspector_session_windows.terminal = win_getid()
+    call ReshapeVimspectorWins()
   endfunction
   function! QuitVimspectorWins()
     let l:quit_success = 0
@@ -783,17 +785,9 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.code)
     exec 'rightbelow vsplit | b ' . l:dis_buf_id
     let g:vimspector_session_windows.disassembly = win_getid()
-    call ReshapeVimspectorWins(9, 30)
+    call ReshapeVimspectorWins(30)
     call win_gotoid(g:vimspector_session_windows.disassembly)
     65wincmd |
-  endfunction
-  function! ReshapeVimspectorWins(out = 9, var = 40)
-    let l:cur_winid = win_getid()
-    call win_gotoid(g:vimspector_session_windows.output)
-    exec a:out.'wincmd _'
-    call win_gotoid(g:vimspector_session_windows.variables)
-    exec a:var.'wincmd |'
-    call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
