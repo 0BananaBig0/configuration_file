@@ -182,10 +182,8 @@ function! ConfigureDelayedPlugin()
 
 
 
-  " coc.nvim setting
+  " coc.nvim setting, ':verbose imap <tab>'
   " Use tab for trigger completion with characters ahead and navigate.
-  " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
-  " by other plugin before putting this into your config.
   inoremap <expr> <TAB>
         \ coc#pum#visible() ? coc#pum#next(1):
         \ CheckBackspace() ? "\<Tab>" :
@@ -297,7 +295,6 @@ function! ConfigureDelayedPlugin()
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
   noremap <Leader><F7> :<C-u>call ConfigureClangTools()<CR>
-  " Use K to show documentation in preview window
   noremap K :<C-u>call ShowDocumentation()<CR>
   function! ShowDocumentation()
     if CocAction('hasProvider', 'hover')
@@ -602,7 +599,7 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  " vim-fugitive and vim-gitgutter setting
+  " vim-fugitive, vim-gitgutter and git-blame setting
   noremap <Leader>git :<C-u>call LoadAndSetGitPlugin()<CR>
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
@@ -681,7 +678,8 @@ function! ConfigureManualLoadPlugin()
   map ]e <Plug>VimspectorBalloonEval
   map ]j <Plug>VimspectorJumpToNextBreakpoint
   map ]k <Plug>VimspectorJumpToPreviousBreakpoint
-  map ]v :call AddVarToWatch(expand('<cword>'))<CR>
+  map ]r :<C-u>call ReshapeVimspectorWins()<CR>
+  nmap ]v :call AddVarToWatch(expand('<cword>'))<CR>
   vmap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
@@ -785,12 +783,17 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.code)
     exec 'rightbelow vsplit | b ' . l:dis_buf_id
     let g:vimspector_session_windows.disassembly = win_getid()
-    call win_gotoid(g:vimspector_session_windows.output)
-    9wincmd _
-    call win_gotoid(g:vimspector_session_windows.variables)
-    30wincmd |
+    call ReshapeVimspectorWins(9, 30)
     call win_gotoid(g:vimspector_session_windows.disassembly)
     65wincmd |
+  endfunction
+  function! ReshapeVimspectorWins(out = 9, var = 40)
+    let l:cur_winid = win_getid()
+    call win_gotoid(g:vimspector_session_windows.output)
+    exec a:out.'wincmd _'
+    call win_gotoid(g:vimspector_session_windows.variables)
+    exec a:var.'wincmd |'
+    call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
@@ -822,8 +825,8 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  noremap <Leader>mt :<C-u>call ConfigureVimMatchUp()<CR>
   " vim-matchup setting
+  noremap <Leader>mt :<C-u>call ConfigureVimMatchUp()<CR>
   function ConfigureVimMatchUp()
     let g:matchup_matchparen_offscreen = {'method': 'popup'}
     let g:matchup_matchparen_timeout = 100
@@ -1201,9 +1204,9 @@ function! CloseAndBackTab()
   exec 'tabp'
 endfunction
 function! QuitWin()
-  let exec_quit='quit'
+  let l:exec_quit='quit'
   if &filetype=='' " Close terms without warnings.
-    let exec_quit='quit!'
+    let l:exec_quit='quit!'
   endif
   if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
     call CUpdateTabTermBuf()
@@ -1214,7 +1217,14 @@ function! QuitWin()
       endif
     endfor
   endif
-  exec exec_quit
+  if exists("g:vimspector_session_windows.disassembly")
+    \ && g:vimspector_session_windows.disassembly == win_getid()
+    exec l:exec_quit
+    unlet g:vimspector_session_windows['disassembly']
+    call ReshapeVimspectorWins()
+    return
+  endif
+  exec l:exec_quit
 endfunction
 function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
   let l:cur_tab=tabpagenr()
@@ -1242,7 +1252,6 @@ endfunction
 function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
-" 比较文件
 noremap <Space><F4> :<C-u>vert diffsplit
 noremap <Space><F5> :<C-u>call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
