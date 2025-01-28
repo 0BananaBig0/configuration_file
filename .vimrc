@@ -79,7 +79,7 @@ augroup END
 
 
 colorscheme dracula
-nnoremap <Leader>ppt :colorscheme zellner<CR>
+noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
                    \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                    \ :IndentGuidesDisable<CR>
 
@@ -209,11 +209,11 @@ function! ConfigureDelayedPlugin()
   nmap [a <Plug>(coc-codeaction)
   vmap [a <Plug>(coc-codeaction-selected)
   nmap [l <Plug>(coc-codeaction-line)
-  nnoremap [c :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
-  nnoremap [d :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
+  noremap [c :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
+  noremap [d :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
   nmap <F7> <Plug>(coc-format)
   vmap <F7> <Plug>(coc-format-selected)
-  nnoremap [i :call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
+  noremap [i :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
   nmap [j <Plug>(coc-diagnostic-next)
   nmap [k <Plug>(coc-diagnostic-prev)
   nmap [o <Plug>(coc-diagnostic-info)
@@ -438,7 +438,7 @@ function! ConfigureDelayedPlugin()
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   noremap <F8> :<C-u>call ToggleTerminal(6)<CR>
-  nnoremap <Space><F8> :AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
+  noremap <Space><F8> :<C-u>AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
 
@@ -512,8 +512,8 @@ function! ConfigureManualLoadPlugin()
 
 
   " NERDTree Setting
-  nnoremap <Leader>nt :NERDTreeToggle<CR>
-  nnoremap <Leader>nc :NERDTreeCWD<CR>
+  noremap <Leader>nt :<C-u>NERDTreeToggle<CR>
+  noremap <Leader>nc :<C-u>NERDTreeCWD<CR>
   let g:NERDTreeFileExtensionHighlightFullName = 1
   let g:NERDTreeExactMatchHighlightFullName = 1
   let g:NERDTreePatternMatchHighlightFullName = 1
@@ -535,8 +535,8 @@ function! ConfigureManualLoadPlugin()
   let g:vista_blink = [0,0]
   let g:vista_top_level_blink = [0,0]
   let g:vista_echo_cursor_strategy = 'echo'
-  nnoremap <Leader>vt :Vista!!<CR>
-  nnoremap <Leader>vf :Vista focus<CR>
+  noremap <Leader>vt :<C-u>Vista!!<CR>
+  noremap <Leader>vf :<C-u>Vista focus<CR>
 
 
 
@@ -571,13 +571,13 @@ function! ConfigureManualLoadPlugin()
     return l:bookmark_path
   endfunction
   noremap <Leader>bo :<C-u>call plug#load('vim-bookmarks')<CR>
-  nnoremap <Leader>bt :BookmarkToggle<CR>
-  nnoremap <Leader>ba :BookmarkAnnotate<CR>
-  nnoremap <Leader>bs :BookmarkShowAll<CR>
-  nnoremap <Leader>bn :BookmarkNext<CR>
-  nnoremap <Leader>bp :BookmarkPrev<CR>
-  nnoremap <Leader>bc :BookmarkClear<CR>
-  nnoremap <Leader>br :BookmarkClearAll<CR>
+  noremap <Leader>bt :<C-u>BookmarkToggle<CR>
+  noremap <Leader>ba :<C-u>BookmarkAnnotate<CR>
+  noremap <Leader>bs :<C-u>BookmarkShowAll<CR>
+  noremap <Leader>bn :<C-u>BookmarkNext<CR>
+  noremap <Leader>bp :<C-u>BookmarkPrev<CR>
+  noremap <Leader>bc :<C-u>BookmarkClear<CR>
+  noremap <Leader>br :<C-u>BookmarkClearAll<CR>
   nmap <Leader>bu <Plug>BookmarkMoveUp
   nmap <Leader>bd <Plug>BookmarkMoveDown
   nmap <Leader>bl <Plug>BookmarkMoveToLine
@@ -592,9 +592,9 @@ function! ConfigureManualLoadPlugin()
     call plug#load('vim-interestingwords')
     nnoremap <Leader>wh :call InterestingWords('n')<CR>
     vnoremap <Leader>wh :<C-u>call InterestingWords('v')<CR>
-    nnoremap <Leader>w<S-h> :call UncolorAllWords()<CR>
-    nnoremap n :call WordNavigation(1)<CR>
-    nnoremap <S-n> :call WordNavigation(0)<CR>
+    noremap <Leader>w<S-h> :<C-u>call UncolorAllWords()<CR>
+    noremap n :<C-u>call WordNavigation(1)<CR>
+    noremap <S-n> :<C-u>call WordNavigation(0)<CR>
   endfunction
 
 
@@ -1332,7 +1332,7 @@ function! EnterWithoutTraillingComment()
   call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
 endfunction
 " Ctrl-Alt-Enter新建空行
-nnoremap <C-M-CR> :put _<CR>
+noremap <C-M-CR> :<C-u>put _<CR>
 inoremap <C-M-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
 inoremap <M-h> <Left>
