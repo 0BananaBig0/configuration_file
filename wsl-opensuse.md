@@ -58,6 +58,7 @@ sudo zypper install -y boost-devel tcl-devel tcllib libboost_date_time-devel lib
 sudo zypper install -y perl libdb-4_8-devel flex duf
 cargo install fd-find eza zoxide ripgrep bat hyperfine httpie
 cargo install du-dust bottom procs cargo-cache
+cargo install asm-lsp
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FantasqueSansMono.zip

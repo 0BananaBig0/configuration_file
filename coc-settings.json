@@ -1,5 +1,11 @@
 {
    "languageserver": {
+      "assembly": {
+         "command": "asm-lsp",
+         "filetypes": [
+            "asm"
+         ]
+      },
       "qml": {
          "command": "qmlls",
          "filetypes": [

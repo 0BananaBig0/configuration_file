@@ -223,8 +223,8 @@ function! ConfigureDelayedPlugin()
   let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
   " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
   " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
-  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
-           \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
+  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets','coc-prettier',
+           \ 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-clang-format-style-options', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
   let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
