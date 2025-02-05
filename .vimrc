@@ -1056,7 +1056,7 @@ function! CallShowNearestFunction()
   endif
 endfunction
 function! EnsureEmptyLastLine()
-  if getline(line('$')) !=# '' && filereadable(expand('%'))
+  if getline(line('$')) !=# '' && filereadable(expand('%')) && !&readonly
     call append(line('$'), '')
     write
   endif
