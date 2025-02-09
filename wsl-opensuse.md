@@ -179,3 +179,5 @@ sudo zypper install gpm gpm-devel python311-devel lua51-devel luajit-devel libXf
   --enable-python3interp=yes \
   --with-python3-config-dir=/usr/lib64/python3.11/config-3.11-x86_64-linux-gnu \
   --enable-gpm
+
+sudo zypper install iotop

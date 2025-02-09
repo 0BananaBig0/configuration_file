@@ -393,3 +393,5 @@ sudo cpanm --uninstall App::cpanminus
 cpanm --local-lib=~/.local/perl5 AnyEvent Class::Refresh Compiler::Lexer Data::Dump JSON Moose PadWalker Scalar::List::Utils Coro App::cpanminus
 cpanm --local-lib=~/.local/perl5 YAML CPAN::DistnameInfo Perl::LanguageServer CPAN Spreadsheet::ParseExcel Spreadsheet::WriteExcel Excel::Writer::XLSX
 cpanm --local-lib=~/.local/perl5 Neovim::Ext Class::Refresh Compiler::Lexer Hash::SafeKeys Perl::LanguageServer Syntax::Keyword::Try Future::AsyncAwait
+
+sudo apt install iotop

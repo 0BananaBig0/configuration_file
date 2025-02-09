@@ -899,10 +899,8 @@ set cursorline
 set novisualbell
 " 命令行（在状态行下）的高度，默认为1，这里是2
 set cmdheight=2
-" 显示行号
-set number
-" merge signcolumn and number column into one
-set signcolumn=number
+set number " 显示行号
+set signcolumn=number " merge signcolumn and number column into one
 set colorcolumn=80,120,160 " Column guide
 " Uncomment the following to have Vim jump to the last position when reopening a file
 augroup Local_Autocmd_Group | autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif | augroup END
@@ -985,6 +983,9 @@ function! AppendInfo(info, column_limit)
   call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_strs)
 endfunction
 function! SetTitle()
+  if &filetype=='c'
+    setlocal commentstring=//%s
+  endif
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
       \ && &commentstring[0] != &commentstring[1] && &commentstring[1] != ' ')
     return
@@ -1342,3 +1343,4 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
+
