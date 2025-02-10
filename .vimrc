@@ -292,6 +292,7 @@ function! ConfigureDelayedPlugin()
   endfunction
   function! ConfigureClangTools()
     let l:cpp_workspace_root = WorkspaceRoot()
+    call CopyFileRelToCPP(l:cpp_workspace_root, '.clangd')
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
     call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
   endfunction
@@ -1111,7 +1112,7 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
-  let l:compile_single_file = ' -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion -Werror '
+  let l:compile_single_file = ' -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion '
         \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
     return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
@@ -1259,8 +1260,8 @@ function! DeleteBlankLine()
     let l:up_line_num = search('^\s*\S', 'bnW')
     if l:up_line_num == 0 && l:down_line_num == 0 " All lines are empty.
       let l:line_num = 1
-    elseif l:down_line_num == 0 || (l:up_line_num != 0 " Closest to the up line.
-          \ && l:line_num - l:up_line_num < l:down_line_num - l:line_num)
+    elseif l:down_line_num == 0 || (l:up_line_num != 0
+          \ && l:line_num - l:up_line_num < l:down_line_num - l:line_num) " Closest to the up line.
       let l:line_num = l:up_line_num
     elseif l:line_num != l:down_line_num
       let l:line_num = l:down_line_num
@@ -1343,4 +1344,3 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
-
