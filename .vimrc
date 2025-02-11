@@ -1112,7 +1112,7 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
-  let l:compile_single_file = ' -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion '
+  let l:compile_single_file = ' -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
         \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
     return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
