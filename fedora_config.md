@@ -28,20 +28,22 @@ chsh -s $(which zsh)
 rm install.sh
 pip3 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
+sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
 sudo dnf install -y vim npm nodejs vim-X11 zsh bear git sqlite yarn neovim
-sudo dnf install -y python3 python3-pip perl flex duf pipx
+sudo dnf install -y python3 python3-pip perl flex duf pipx java
 sudo dnf install -y p7zip.x86_64 p7zip-plugins.x86_64
 sudo dnf install -y opencl-headers.noarch cargo gem ruby-devel
 sudo dnf install -y ocl-icd-devel ocl-icd.x86_64 -y
 sudo dnf install -y clinfo boost-devel tcl-devel xauth
 sudo dnf install -y fd-find eza zoxide ripgrep bat hyperfine httpie procs
 sudo dnf install -y libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel libxcb-devel xcb-util-cursor-devel
-sudo dnf install -y gstreamer1-plugins-base-devel gstreamer1-devel
+sudo dnf install -y gstreamer1-plugins-base-devel gstreamer1-devel xcb-util-wm xcb-util-keysyms
 sudo dnf install -y zlib-devel libpng-devel libjpeg-devel libsecret-devel
 sudo dnf install -y wayland-devel libxkbcommon-devel openssl-devel mesa-libGL-devel
 sudo dnf install -y kernel-headers kernel-devel
 sudo dnf install -y kmodtool akmods mokutil openssl dkms
+# sudo dnf provides */xxx.so
 
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
@@ -117,4 +119,18 @@ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
 sudo dnf update
 sudo dnf install -y code
-sudo dnf install perl cpan libdb
+
+[install nvidia-driver](https://cloud.baidu.com/article/3404246)
+
+tee > /tmp/oneAPI.repo << EOF
+[oneAPI]
+name=Intel® oneAPI repository
+baseurl=https://yum.repos.intel.com/oneapi
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+EOF
+
+sudo mv /tmp/oneAPI.repo /etc/yum.repos.d
+sudo dnf install -y intel-oneapi-runtime-opencl
