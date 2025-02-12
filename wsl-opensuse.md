@@ -44,7 +44,6 @@ cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.zshrc ~
 cp /home/banana/Downloads/wsl_shared_folder/configuration_file/.gdbinit ~
 chsh -s $(which zsh)
 rm install.sh
-exit
 
 sudo zypper install -y make valgrind gcc gcc-c++ gvim npm-default nodejs-default Bear gdb libstdc++6-pp
 sudo zypper install -y vulkan-devel cmake ccache
@@ -59,6 +58,7 @@ sudo zypper install -y perl libdb-4_8-devel flex duf
 cargo install fd-find eza zoxide ripgrep bat hyperfine httpie
 cargo install du-dust bottom procs cargo-cache
 cargo install asm-lsp
+
 cd ~
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FantasqueSansMono.zip
