@@ -220,7 +220,7 @@ function! ConfigureDelayedPlugin()
   noremap [h :<C-u>CocCommand document.toggleInlayHint<CR>
   nmap <F7> <Plug>(coc-format)
   vmap <F7> <Plug>(coc-format-selected)
-  let g:coc_filetype_map = {'opencl': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
+  let g:coc_filetype_map = {'opencl': 'c', 'lex':'cpp', 'yacc':'cpp'}
   " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
   " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets','coc-prettier',
@@ -925,6 +925,8 @@ set viminfo+=!
 set iskeyword+=_,$,@,%,#,-
 " 增强模式中的命令行自动完成/补全操作
 set wildmode=list:longest
+" Prevent exe files from appearing in auto-completion
+set wildignore=*.exe
 " 使回格键（backspace）正常处理indent, eol, nostop等
 set backspace=indent,eol,nostop
 " 允许backspace和光标键跨越行边界
@@ -984,8 +986,8 @@ function! AppendInfo(info, column_limit)
   call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_strs)
 endfunction
 function! SetTitle()
-  if &filetype=='c'
-    setlocal commentstring=//%s
+  if &filetype=='c' || expand('%:e')=='cl'
+    setlocal commentstring=//\ %s
   endif
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
       \ && &commentstring[0] != &commentstring[1] && &commentstring[1] != ' ')

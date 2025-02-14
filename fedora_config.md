@@ -134,3 +134,6 @@ EOF
 
 sudo mv /tmp/oneAPI.repo /etc/yum.repos.d
 sudo dnf install -y intel-oneapi-runtime-opencl
+
+sudo dnf install gdouros-symbola-fonts # For special symbols or emojis, like 🌪.
+
