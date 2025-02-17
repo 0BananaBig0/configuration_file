@@ -677,8 +677,14 @@ function! ConfigureManualLoadPlugin()
   noremap ]pf :<C-u>call FollowChildrenProcessess()<CR>
   noremap ]pp :<C-u>call FollowParentProcessess()<CR>
   noremap ]pi :<C-u>call ListAllProcessess()<CR>
-  noremap ]ps :<C-u>call SwitchToSpecificProcesses(
+  noremap ]ps :<C-u>call SwitchToSpecificProcess(
   noremap ]r :<C-u>call ReshapeVimspectorWins()<CR>
+  noremap ]ta :<C-u>call CheckAllBacktraces()<CR>
+  noremap ]tb :<C-u>call CheckCurrentBacktrace()<CR>
+  noremap ]tl :<C-u>call SetBacktraceLimit(
+  noremap ]ts :<C-u>call SwitchToSpecificThread(
+  noremap ]tc :<C-u>call ContinueAllThreads()<CR>
+  noremap ]tt :<C-u>call StopAllThreads()<CR>
   nnoremap ]v :call AddVarToWatch(expand('<cword>'))<CR>
   vnoremap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
@@ -824,10 +830,52 @@ function! ConfigureManualLoadPlugin()
     exec "normal! i"."-exec info inferiors\<CR>"
     call win_gotoid(l:cur_winid)
   endfunction
-  function! SwitchToSpecificProcesses(num=1)
+  function! SwitchToSpecificProcess(num=1)
     let l:cur_winid = win_getid()
     exec ":VimspectorShowOutput Console"
     exec "normal! i"."-exec inferior a:num\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! ListAllThreads()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec info threads\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! CheckAllBacktraces()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec thread apply all backtrace\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! CheckCurrentBacktrace()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec backtrace\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! SetBacktraceLimit(limit=6)
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec set backtrace limit a:limit\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! SwitchToSpecificThread(num=1)
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec thread a:num\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! ContinueAllThreads()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec thread apply all continue\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! StopAllThreads()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec thread apply all stop\<CR>"
     call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
@@ -1378,3 +1426,4 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
+
