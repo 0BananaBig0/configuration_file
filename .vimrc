@@ -65,8 +65,6 @@ Plug 'puremourning/vimspector', {'on': []}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
-" Highlight, navigate, and operate on sets of matching text
-Plug 'andymass/vim-matchup', {'on':[]}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -435,7 +433,6 @@ function! ConfigureDelayedPlugin()
       let g:tab_term_buf[tabpagenr() + 1] = - 1
     endif
   endfunction
-  let g:asyncrun_bell = 1
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   noremap <F8> :<C-u>call ToggleTerminal(6)<CR>
@@ -675,9 +672,15 @@ function! ConfigureManualLoadPlugin()
   map ]e <Plug>VimspectorBalloonEval
   map ]j <Plug>VimspectorJumpToNextBreakpoint
   map ]k <Plug>VimspectorJumpToPreviousBreakpoint
-  map ]r :<C-u>call ReshapeVimspectorWins()<CR>
-  nmap ]v :call AddVarToWatch(expand('<cword>'))<CR>
-  vmap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
+  noremap ]pc :<C-u>call ControlAllChildrenProcessess()<CR>
+  noremap ]pd :<C-u>call DetachAllChildrenProcessess()<CR>
+  noremap ]pf :<C-u>call FollowChildrenProcessess()<CR>
+  noremap ]pp :<C-u>call FollowParentProcessess()<CR>
+  noremap ]pi :<C-u>call ListAllProcessess()<CR>
+  noremap ]ps :<C-u>call SwitchToSpecificProcesses(
+  noremap ]r :<C-u>call ReshapeVimspectorWins()<CR>
+  nnoremap ]v :call AddVarToWatch(expand('<cword>'))<CR>
+  vnoremap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -791,6 +794,42 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.disassembly)
     65wincmd |
   endfunction
+  function! ControlAllChildrenProcessess()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec set detach-on-fork off\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! DetachAllChildrenProcessess()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec set detach-on-fork on\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! FollowChildrenProcessess()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec set follow-fork-mode child\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! FollowParentProcessess()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec set follow-fork-mode parent\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! ListAllProcessess()
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec info inferiors\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
+  function! SwitchToSpecificProcesses(num=1)
+    let l:cur_winid = win_getid()
+    exec ":VimspectorShowOutput Console"
+    exec "normal! i"."-exec inferior a:num\<CR>"
+    call win_gotoid(l:cur_winid)
+  endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
 
@@ -818,21 +857,6 @@ function! ConfigureManualLoadPlugin()
   let g:Lf_PreviewInPopup = 1
   " open the preview window automatically
   let g:Lf_PreviewResult = {'Rg': 1}
-
-
-
-  " vim-matchup setting
-  noremap <Leader>mt :<C-u>call ConfigureVimMatchUp()<CR>
-  function ConfigureVimMatchUp()
-    let g:matchup_matchparen_offscreen = {'method': 'popup'}
-    let g:matchup_matchparen_timeout = 100
-    let g:matchup_matchparen_insert_timeout = 100
-    let g:matchup_matchparen_deferred_show_delay = 100
-    let g:matchup_matchparen_deferred_hide_delay = 100
-    let g:matchup_matchparen_deferred = 1
-    let g:matchup_matchparen_hi_surround_always = 1
-    call plug#load('vim-matchup')
-  endfunction
 endfunction
 " Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
@@ -900,9 +924,12 @@ set cursorline
 set novisualbell
 " 命令行（在状态行下）的高度，默认为1，这里是2
 set cmdheight=2
-set number " 显示行号
-set signcolumn=number " merge signcolumn and number column into one
-set colorcolumn=80,120,160 " Column guide
+" 显示行号
+set number
+ " merge signcolumn and number column into one
+set signcolumn=number
+ " Column guide
+set colorcolumn=80,120,160
 " Uncomment the following to have Vim jump to the last position when reopening a file
 augroup Local_Autocmd_Group | autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif | augroup END
 " 设置当文件被改动时自动载入
