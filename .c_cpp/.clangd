@@ -15,4 +15,5 @@ CompileFlags:
     - -fsanitize=address
     - -fno-omit-frame-pointer
     - -Wshadow
+    - -Wtype-limits
 

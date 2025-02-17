@@ -26,7 +26,7 @@ Plug 'nathanaelkane/vim-indent-guides'
 " highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'for': []}
 " 高亮c++类模板等插件
-Plug 'bfrg/vim-c-cpp-modern', {'for': ['cpp', 'c', 'opencl']}
+Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 " python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
 " verilog indent file
@@ -220,7 +220,7 @@ function! ConfigureDelayedPlugin()
   noremap [h :<C-u>CocCommand document.toggleInlayHint<CR>
   nmap <F7> <Plug>(coc-format)
   vmap <F7> <Plug>(coc-format-selected)
-  let g:coc_filetype_map = {'opencl': 'c', 'lex':'cpp', 'yacc':'cpp'}
+  let g:coc_filetype_map = {'opencl': 'c', 'cuda': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
   " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
   " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets','coc-prettier',
@@ -1009,6 +1009,9 @@ function! SetTitle()
       call append(line('$'), '#pragma once')
     endif
     call append(line('$'), '#include <iostream>')
+  elseif &filetype=='cuda'
+    call append(line('$'), '#include <iostream>')
+    call append(line('$'), '#include <cuda_runtime.h>')
   elseif &filetype=='make'
     call append(line('$'), '.PHONY:')
   elseif &filetype=='sh'
@@ -1118,6 +1121,8 @@ function! CPPCompilation()
         \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
     return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
+  elseif &filetype=='cuda'
+    return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   else
     return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
   endif
