@@ -668,7 +668,7 @@ function! ConfigureManualLoadPlugin()
   noremap ]a :<C-u>call ShowAssembleCode()<CR>
   noremap ]s <Plug>VimspectorDisassemble
   map ]c <Plug>VimspectorJumpToProgramCounter
-  noremap ]d <Del>
+  map ]d <Delete>
   map ]e <Plug>VimspectorBalloonEval
   map ]j <Plug>VimspectorJumpToNextBreakpoint
   map ]k <Plug>VimspectorJumpToPreviousBreakpoint
@@ -1061,7 +1061,7 @@ function! AppendInfo(info, column_limit)
   call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_strs)
 endfunction
 function! SetTitle()
-  if &filetype=='c' || expand('%:e')=='cl'
+  if &filetype=='c' || expand('%:e')=='cl' || expand('%:e')=='cu'
     setlocal commentstring=//\ %s
   endif
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
@@ -1240,7 +1240,7 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
               \.' else'
               \.' '.expand('%:p:h').'/*.exe;'
               \.' fi'
-      elseif (&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*'
+      elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
         exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
       endif
     endif
