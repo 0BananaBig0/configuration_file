@@ -355,7 +355,7 @@ function! ConfigureDelayedPlugin()
 
   " asyncrun setting
   let g:tab_term_buf_size = 33
-  function! JumpToTerm()
+  function! JumpToTerm(go_to_top = 0)
     if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
     endif
@@ -371,6 +371,9 @@ function! ConfigureDelayedPlugin()
       call win_gotoid(l:target_win)
       call feedkeys("\<C-\>\<C-n>", 'n')
       let g:tab_term_buf[tabpagenr()] = l:target_buf
+    endif
+    if a:go_to_top != 0
+      call feedkeys("gg", 'n')
     endif
   endfunction
   function! ToggleTerminal(height = 6)
@@ -1061,7 +1064,7 @@ function! AppendInfo(info, column_limit)
   call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_strs)
 endfunction
 function! SetTitle()
-  if &filetype=='c' || expand('%:e')=='cl' || expand('%:e')=='cu'
+  if &filetype=='c' || &filetype=='cpp' || expand('%:e')=='cl' || expand('%:e')=='cu'
     setlocal commentstring=//\ %s
   endif
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
@@ -1247,7 +1250,7 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
   if &filetype=='verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
@@ -1426,4 +1429,3 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
-
