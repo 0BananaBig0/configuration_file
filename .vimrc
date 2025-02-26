@@ -1076,7 +1076,7 @@ function! SetTitle()
   call setline(1, l:top_and_bottom)
   call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
   call AppendInfo('Author: Huaxiao Liang', l:column_limit)
-  call AppendInfo('Mail: 1184903633@qq.com', l:column_limit)
+  call AppendInfo('Mail: hxliang633@163.com', l:column_limit)
   call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
   call append(line('$'), l:top_and_bottom)
   call append(line('$'), '')
@@ -1195,7 +1195,7 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
-  let l:compile_single_file = ' -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
+  let l:compile_single_file = ' -fsanitize=address -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
         \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
     return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
