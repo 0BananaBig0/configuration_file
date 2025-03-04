@@ -51,8 +51,14 @@ sudo zypper install -y neovim xclip cargo python311-base python311-pip python311
 sudo zypper install -y *clang*19* *llvm*19* lld-19 lldb-19 cdecl
 sudo zypper install -y libc++-devel libc++abi-devel
 sudo zypper install -y pandoc-cli texlive-xetex texlive-luatex texlive-pstricks
-sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo
+sudo zypper install -y opencl-headers ocl-icd-devel pocl pocl-devel clinfo libpocl-devices-tbb
 sudo zypper install -y boost-devel tcl-devel tcllib libboost_date_time-devel libboost_filesystem-devel  libboost_iostreams-devel libboost_system-devel libboost_program_options-devel
+
+# fix a bug that pocl does not detect opencl devices
+export POCL_CPU_ENABLED=1
+export POCL_DEBUG=1
+clinfo
+
 # sudo ln -s /usr/lib64/libtcl8.6.so /usr/lib/libtcl.so # delete it, use `pkg-config --cflags --libs tcl` to configure tcl
 sudo zypper install -y perl libdb-4_8-devel flex duf
 cargo install fd-find eza zoxide ripgrep bat hyperfine httpie
