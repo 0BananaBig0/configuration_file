@@ -109,7 +109,7 @@ sudo yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium
 sudo yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
 sudo apt install -y opencl-headers ocl-icd-dev ocl-icd-opencl-dev pocl-opencl-icd
 sudo apt install -y clinfo libboost-all-dev tcl-dev pkg-config
-sudo apt install perl libdb-dev
+sudo apt install -y perl libdb-dev libcap-dev libacl1-dev
 cd ~
 wget https://vscode.download.prss.microsoft.com/dbazure/download/stable/38c31bc77e0dd6ae88a4e9cc93428cc27a56ba40/code_1.93.1-1726079302_amd64.deb
 sudo dpkg -i code_*.deb

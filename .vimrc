@@ -1042,8 +1042,7 @@ set list                      " Enable special character display
 set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
 function! SetIndent()
   if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl' || &filetype=='json'
-        \ || &filetype=='python' || &filetype=='sh' || &filetype=='verilog'
-        \ || &filetype=='perl' || &filetype=='tcl'
+        \ || &filetype=='python' || &filetype=='verilog'
     set tabstop=3     " Tab键的显示宽度
     set softtabstop=3 " 按下Tab键时输入的宽度
     set shiftwidth=3  " 设置自动缩进时的缩进长度
@@ -1076,7 +1075,7 @@ function! SetTitle()
   call setline(1, l:top_and_bottom)
   call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
   call AppendInfo('Author: Huaxiao Liang', l:column_limit)
-  call AppendInfo('Mail: hxliang633@163.com', l:column_limit)
+  call AppendInfo('Mail: hxliang666@qq.com', l:column_limit)
   call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
   call append(line('$'), l:top_and_bottom)
   call append(line('$'), '')
