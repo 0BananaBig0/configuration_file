@@ -1057,13 +1057,17 @@ function! SetIndent()
 endfunction
 function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3
-  let l:padding_strs = repeat(&commentstring[0], l:padding_str_len)
+  let l:lpadding_strs = &commentstring[0].&commentstring[1]
+      \ .repeat(&commentstring[0], l:padding_str_len - 2)
+  let l:rpadding_strs = repeat(&commentstring[0], l:padding_str_len - 2)
+      \ .&commentstring[1].&commentstring[0]
   let l:start_space_len = (a:column_limit - strlen(a:info) - l:padding_str_len * 2) / 2
   let l:end_space_len = a:column_limit - l:start_space_len - strlen(a:info) - l:padding_str_len * 2
-  call append(line('$'), l:padding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_strs)
+  call append(line('$'), l:lpadding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:rpadding_strs)
 endfunction
 function! SetTitle()
-  if &filetype=='c' || &filetype=='cpp' || expand('%:e')=='cl' || expand('%:e')=='cu'
+  if &filetype=='c' || &filetype=='cpp' || expand('%:e')=='cl'
+      \ || expand('%:e')=='cu' || expand('%:e')=='qml'
     setlocal commentstring=//\ %s
   endif
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
@@ -1071,7 +1075,9 @@ function! SetTitle()
     return
   endif
   let l:column_limit = split(&colorcolumn, ",")[0]
-  let l:top_and_bottom = repeat(&commentstring[0], l:column_limit)
+  let l:top_and_bottom = &commentstring[0].&commentstring[1]
+      \ .repeat(&commentstring[0], l:column_limit - 4)
+      \ .&commentstring[1].&commentstring[0]
   call setline(1, l:top_and_bottom)
   call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
   call AppendInfo('Author: Huaxiao Liang', l:column_limit)
@@ -1166,7 +1172,7 @@ function! CPPCompilation()
     " Get the list of matching files (non-recursive)
     let l:cmakelist_path = glob(l:pattern, 0, 1)
     if !empty(l:cmakelist_path)
-      let l:cmakelist_path = ' cd '.l:possible_path.' && cmake'
+      let l:cmakelist_path = ' cd '.l:possible_path.' && cmake -DCMAKE_BUILD_TYPE=Debug'
       call system('ccache --version')
       if v:shell_error " Not use ccache
         echo "ccache is not installed."
