@@ -12,7 +12,7 @@ CompileFlags:
     - -Wextra
     - -Wconversion
     - -Wsign-conversion
-    - -fsanitize=address
+    - -fsanitize=address,undefined
     - -fno-omit-frame-pointer
     - -Wshadow
     - -Wtype-limits
