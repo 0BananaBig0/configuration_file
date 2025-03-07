@@ -1172,13 +1172,15 @@ function! CPPCompilation()
     " Get the list of matching files (non-recursive)
     let l:cmakelist_path = glob(l:pattern, 0, 1)
     if !empty(l:cmakelist_path)
-      let l:cmakelist_path = ' cd '.l:possible_path.' && cmake -DCMAKE_BUILD_TYPE=Debug'
+      let l:cmakelist_path = ' cd '.l:possible_path
+          \ .' && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON'
       call system('ccache --version')
       if v:shell_error " Not use ccache
         echo "ccache is not installed."
       else
-        let l:cmakelist_path = l:cmakelist_path.' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
-                            \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+        let l:cmakelist_path = l:cmakelist_path
+              \ .' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
+              \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
       endif
       return l:cmakelist_path.' -S . -B build'
           \ .' && bear --append -- make -C build -j12'
@@ -1200,12 +1202,14 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
-  let l:compile_single_file = ' -fsanitize=address -g -pedantic-errors -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
+  let l:compile_single_file = ' -fsanitize=address -g -pedantic-errors -Wall'
+        \ .' -Wextra -Wconversion -Wsign-conversion -Wshadow '
         \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
     return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
   elseif &filetype=='cuda'
-    return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
+    return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
+        \ .fnamemodify(expand('%'), ':t:r').'.exe'
   else
     return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
   endif
