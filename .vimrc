@@ -6,7 +6,7 @@ set t_Co=256
 set updatetime=33
 " 设置<ESC>键响应时间
 set ttimeoutlen=0
-" setting keymapping timeout
+" Setting keymapping timeout
 set timeoutlen=666
 " 匹配括号高亮的时间（单位是十分之一秒）
 set matchtime=1
@@ -24,29 +24,29 @@ let maplocalleader = ","
 
 
 call plug#begin('~/.vim/plugged')
-" vim theme, No_Lazy
+" Vim theme, No_Lazy
 Plug 'dracula/vim', {'as': 'dracula'}
 " 彩虹括号
 Plug 'luochen1990/rainbow'
 " 缩进显示
 Plug 'nathanaelkane/vim-indent-guides'
-" highlight opencl 2.0 syntax
+" Highlight opencl 2.0 syntax
 Plug 'brgmnn/vim-opencl', {'for': []}
 " 高亮c++类模板等插件
 Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
-" python 语法高亮插件
+" Python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
-" verilog indent file
+" Verilog indent file
 Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
-" highlight qmake syntax
+" Highlight qmake syntax
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
-" markdown目录构建插件
+" Markdown目录构建插件
 Plug 'mzlogin/vim-markdown-toc', {'for': []}
 " 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" vim快捷键管理和提示插件
+" Vim快捷键管理和提示插件
 Plug 'liuchengxu/vim-which-key', {'on': []}
-" nerdcommenter快速注释插件
+" Nerdcommenter快速注释插件
 Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件
 Plug 'skywind3000/asyncrun.vim', {'on': []}
@@ -85,31 +85,31 @@ augroup END
 
 colorscheme dracula
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
-                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
-                   \ :IndentGuidesDisable<CR>
+                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
+                  \ :IndentGuidesDisable<CR>
 
 
 
-" rainbow setting
+" Rainbow setting
 let g:rainbow_active = 1 " set to 0 if you want to enable it later via :RainbowToggle
 
 
 
-" vim-indent-guides
+" Vim-indent-guides
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_tab_guides = 0
 let g:indent_guides_default_mapping = 0
 
 
 
-" vim-c-cpp-modern
+" Vim-c-cpp-modern
 let g:cpp_attributes_highlight = 1
 let g:cpp_member_highlight = 1
 let g:cpp_operator_highlight = 1
 
 
 
-" python-syntax setting
+" Python-syntax setting
 let g:python_highlight_builtins = 1
 let g:python_highlight_string_formatting = 1
 let g:python_highlight_func_calls = 1
@@ -136,7 +136,7 @@ call timer_start(333,'CocTimerStart',{'repeat':1})
 
 
 function! ConfigureMarkdownPlugin()
-  " coc-markmap, coc-markdownlint setting
+  " Coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
   noremap <Leader>mm :<C-u>CocCommand markmap.watch<CR>
   " Create markmap html file
@@ -147,7 +147,7 @@ function! ConfigureMarkdownPlugin()
 
 
 
-  " vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
+  " Vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
   " If you want to go to the last line of the menu, you can press `` in normal mode
   noremap <Leader>mg :<C-u>call CreateMarkdownMenu()<CR>
   noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
@@ -178,7 +178,7 @@ endfunction
 
 
 function! ConfigureDelayedPlugin()
-  " vim-which-key setting
+  " Vim-which-key setting
   let g:which_key_fallback_to_native_key = 0
   noremap <Leader> :<C-u>WhichKey '<Leader>'<CR>
   noremap <LocalLeader> :<C-u>WhichKey '<LocalLeader>'<CR>
@@ -1032,9 +1032,8 @@ augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
   autocmd FileType c,cpp,verilog noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
-  autocmd QuitPre *.[ch]* call EnsureEmptyLastLine() " Recommended by the POSIX standard
   " Disable automatic word wrap which is enabled by filetype plugin indent on
-  autocmd FileType vim set textwidth=0
+  autocmd FileType vim,cmake set textwidth=0
 augroup END
 set autoindent
 set smartindent
@@ -1144,12 +1143,6 @@ function! CallShowNearestFunction()
      call ShowNearestClassOrStruct()
   elseif &filetype=='verilog'
      call ShowCurrentModule()
-  endif
-endfunction
-function! EnsureEmptyLastLine()
-  if getline(line('$')) !=# '' && filereadable(expand('%')) && !&readonly
-    call append(line('$'), '')
-    write
   endif
 endfunction
 noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
@@ -1388,11 +1381,10 @@ function! InsertEnterInNormalMode()
   " 1. 获取当前光标所在位置的行数
   let l:cur_line = line('.')
   let l:new_line = l:cur_line + 1
-  " 2. 获取 `l:cur_line` 中的缩进空格数，并存储在 `l:cur_indent_count` 中
+  " 2. 获取 `l:cur_line` 中的缩进空格数，并生成 n 个空格
   let l:cur_indent_count = indent(l:cur_line)
-  " 3. 生成 n 个空格
   let l:cur_indent = repeat(' ', l:cur_indent_count)
-  " 4. 进入插入模式，输入回车，然后返回正常模式
+  " 3. 进入插入模式，输入回车，然后返回正常模式
   " feedkeys() is an asynchronous function that causes some issues.
   " call feedkeys("i\<CR>\<ESC>", 'n')
   exec "normal! i\<CR>\<ESC>"
@@ -1400,16 +1392,16 @@ function! InsertEnterInNormalMode()
   if l:new_column != 1
     let l:new_column = l:new_column + 1
   endif
-  " 5. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
+  " 4. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
   if getline(l:new_line) =~? '^\s*$'
     call setline(l:new_line, l:cur_indent)
     let l:new_column = l:cur_indent_count + 1
   endif
-  " 6. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
+  " 5. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
   if getline(l:cur_line) =~? '^\s*$'
     call setline(l:cur_line, '')
   endif
-  " 7. 去到 `l:new_line` 行的l:new_column列
+  " 6. 去到 `l:new_line` 行的l:new_column列
   call setpos('.', [0, l:new_line, l:new_column, 0])
 endfunction
 function! EnterWithoutTraillingComment()
