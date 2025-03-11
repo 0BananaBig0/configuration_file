@@ -164,7 +164,7 @@ echo -e "[automount]\nldconfig=false" | sudo tee -a /etc/wsl.conf
 
 sudo apt remove neovim --purge -y
 sudo apt autoremove --purge -y
-wget https://githubfast.com/neovim/neovim-releases/releases/download/v0.10.2/nvim-linux64.deb
+wget https://githubfast.com/neovim/neovim-releases/releases/download/v0.10.3/nvim-linux64.deb
 sudo dpkg -i nvim-linux64.deb
 rm nvim-linux64.deb
 sudo apt install python3-neovim -y
@@ -399,3 +399,26 @@ sudo apt install iotop
 wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 rm packages-microsoft-prod.deb
+
+
+# compile vim(option):
+sudo apt install libgpm-dev python3-dev libluajit-5.1-dev lua5.1 luajit libluajit-5.1-common libxft-dev libgtk-3-dev libmotif-dev libx11-dev libxt-dev ruby-dev libncurses-dev libgettextpo-dev gettext libperl-dev
+./configure \
+  --prefix=/usr/local \
+  --with-features=huge \
+  --enable-multibyte \
+  --enable-rubyinterp=yes \
+  --enable-luainterp=yes \
+  --enable-gui=gtk3 \
+  --enable-cscope \
+  --enable-fontset \
+  --enable-tclinterp \
+  --enable-perlinterp \
+  --with-luajit \
+  --enable-python3interp=yes \
+  --with-python3-config-dir=/usr/lib64/python3.11/config-3.11-x86_64-linux-gnu \
+  --enable-gpm \
+  --with-luajit
+
+
+sudo apt install libcups2-dev

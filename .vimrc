@@ -4,6 +4,10 @@ set nocompatible
 set t_Co=256
 " 不少插件的信息更新都会需要这个时间
 set updatetime=33
+" 设置<ESC>键响应时间
+set ttimeoutlen=0
+" setting keymapping timeout
+set timeoutlen=666
 " 打开文件时进行解码的猜测列表
 set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
@@ -13,6 +17,7 @@ scriptencoding utf-8
 set nobackup
 set nowritebackup
 set noswapfile
+let maplocalleader = ","
 
 
 
@@ -174,7 +179,7 @@ function! ConfigureDelayedPlugin()
   " vim-which-key setting
   let g:which_key_fallback_to_native_key = 0
   noremap <Leader> :<C-u>WhichKey '<Leader>'<CR>
-  noremap <Space> :<C-u>WhichKey '<Space>'<CR>
+  noremap <LocalLeader> :<C-u>WhichKey '<LocalLeader>'<CR>
   noremap [ :<C-u>WhichKey '['<CR>
   noremap ] :<C-u>WhichKey ']'<CR>
 
@@ -195,15 +200,15 @@ function! ConfigureDelayedPlugin()
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
-  nmap <Space>c <Plug>(coc-declaration)
-  nmap <Space>d <Plug>(coc-definition)
-  nmap <Space>f <Plug>(coc-refactor)
-  vmap <Space>f <Plug>(coc-refactor-selected)
-  nmap <Space>i <Plug>(coc-implementation)
-  nmap <Space>j <Plug>(coc-diagnostic-next-error)
-  nmap <Space>k <Plug>(coc-diagnostic-prev-error)
-  nmap <Space>n <Plug>(coc-rename)
-  nmap <Space>r <Plug>(coc-references)
+  nmap <LocalLeader>c <Plug>(coc-declaration)
+  nmap <LocalLeader>d <Plug>(coc-definition)
+  nmap <LocalLeader>f <Plug>(coc-refactor)
+  vmap <LocalLeader>f <Plug>(coc-refactor-selected)
+  nmap <LocalLeader>i <Plug>(coc-implementation)
+  nmap <LocalLeader>j <Plug>(coc-diagnostic-next-error)
+  nmap <LocalLeader>k <Plug>(coc-diagnostic-prev-error)
+  nmap <LocalLeader>n <Plug>(coc-rename)
+  nmap <LocalLeader>r <Plug>(coc-references)
   nmap [a <Plug>(coc-codeaction)
   vmap [a <Plug>(coc-codeaction-selected)
   nmap [l <Plug>(coc-codeaction-line)
@@ -325,8 +330,8 @@ function! ConfigureDelayedPlugin()
   function CheckPrimitivePtrType(selection)
     echo system('cdecl explain ' . shellescape(a:selection))
   endfunction
-  nnoremap <Space>p :call CheckPrimitivePtrType(getline('.'))<CR>
-  vnoremap <Space>p :<C-u>call CheckPrimitivePtrType(GetSelectedContent())<CR>
+  nnoremap <LocalLeader>p :call CheckPrimitivePtrType(getline('.'))<CR>
+  vnoremap <LocalLeader>p :<C-u>call CheckPrimitivePtrType(GetSelectedContent())<CR>
 
 
 
@@ -439,7 +444,7 @@ function! ConfigureDelayedPlugin()
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   noremap <F8> :<C-u>call ToggleTerminal(6)<CR>
-  noremap <Space><F8> :<C-u>AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
+  noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
 
@@ -943,7 +948,7 @@ if has('gui_running')
   " Toggle Menu and Toolbar菜单栏和工具栏
   set guioptions-=m
   set guioptions-=T
-  noremap <Space>m :<C-u>call MenuToggle()<CR>
+  noremap <LocalLeader>m :<C-u>call MenuToggle()<CR>
   function! MenuToggle()
     if &guioptions=~#'T'
       set guioptions-=T
@@ -961,10 +966,6 @@ set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
 set statusline+=%=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
 " 当窗口多于一个时显示状态行(1),总是显示状态行(2)
 set laststatus=2
-" 设置<ESC>键响应时间
-set ttimeoutlen=0
-" setting keymapping timeout
-set timeoutlen=666
 " 允许光标出现在最后一个字符的后面
 set virtualedit=block,onemore
 " 总是显示光标位置
@@ -1020,9 +1021,8 @@ set fillchars=vert:\ ,stl:\ ,stlnc:\
 set matchtime=1
 " 光标移动到buffer的顶部和底部时保持3行距离
 set scrolloff=3
-" 设置搜索可以循环搜索
+" 设置搜索可以循环搜索, 搜索和补全时忽略大小写,智能大小写,逐字符高亮
 set wrapscan
-" 搜索和补全时忽略大小写,智能大小写,逐字符高亮
 set ignorecase
 set smartcase
 set hlsearch
@@ -1151,7 +1151,7 @@ function! EnsureEmptyLastLine()
     write
   endif
 endfunction
-noremap <Space><F2> :<C-u>call CompileAndExcute()<CR>
+noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
 noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
 function! CPPCompilation()
   let l:cpp_workspace_root = WorkspaceRoot()
@@ -1275,10 +1275,10 @@ function! CompileCommand()
     endif
   endif
 endfunction
-noremap <Space>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
-noremap <Space>b :<C-u>call CloseAndBackTab()<CR>
-noremap <Space>q :<C-u>call QuitWin()<CR>
-noremap <Space>w :<C-u>w<CR>
+noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
+noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
+noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
+noremap <LocalLeader>w :<C-u>w<CR>
 noremap <M-S-h> :<C-u>call MoveTabH()<CR>
 noremap <M-S-l> :<C-u>call MoveTabL()<CR>
 inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
@@ -1343,8 +1343,8 @@ endfunction
 function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
-noremap <Space><F4> :<C-u>vert diffsplit
-noremap <Space><F5> :<C-u>call DeleteBlankLine()<CR>
+noremap <LocalLeader><F4> :<C-u>vert diffsplit
+noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
   exec 'normal! m"'
   " Find the nearest line which contains at least one non-space character.
@@ -1370,7 +1370,7 @@ function! DeleteBlankLine()
   exec ':g/^\s*$/d'
   exec 'normal! `"'
 endfunction
-noremap <Space><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
+noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
 function! RetabAndDeleteTraillingUselessChars()
   exec 'normal! ms'
   exec ':%retab!'

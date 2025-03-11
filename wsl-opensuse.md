@@ -169,7 +169,7 @@ cpanm --local-lib=~/.local/perl5 Neovim::Ext Class::Refresh Compiler::Lexer Hash
 #cpanm --uninstall Spreadsheet::Read Spreadsheet::Write Spreadsheet::XLSX
 
 # compile vim(option):
-sudo zypper install gpm gpm-devel python311-devel lua51-devel luajit-devel libXft-devel motif-devel gtk3-devel libX11-devel libXt-devel gtk3-devel ruby-devel ncurses-devel
+sudo zypper install gpm gpm-devel python311-devel lua51-devel luajit-devel libXft-devel motif-devel libX11-devel libXt-devel gtk3-devel ruby-devel ncurses-devel
 ./configure \
   --prefix=/usr/local \
   --with-features=huge \
