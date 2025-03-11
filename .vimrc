@@ -8,6 +8,8 @@ set updatetime=33
 set ttimeoutlen=0
 " setting keymapping timeout
 set timeoutlen=666
+" 匹配括号高亮的时间（单位是十分之一秒）
+set matchtime=1
 " 打开文件时进行解码的猜测列表
 set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
@@ -346,6 +348,7 @@ function! ConfigureDelayedPlugin()
   let g:NERDCustomDelimiters = {
           \ 'c': {'left': '//'},
           \ 'cpp': {'left': '//'},
+          \ 'cu': {'left': '//'},
           \ 'opencl': {'left': '//'},
           \ 'lex': {'left': '//'},
           \ 'yacc': {'left': '//'},
@@ -358,9 +361,9 @@ function! ConfigureDelayedPlugin()
 
 
 
-  " asyncrun setting
+  " Asyncrun setting
   let g:tab_term_buf_size = 33
-  function! JumpToTerm(go_to_top = 0)
+  function! JumpToTerm(go_to_top = 0, height = 18)
     if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
     endif
@@ -376,6 +379,7 @@ function! ConfigureDelayedPlugin()
       call win_gotoid(l:target_win)
       call feedkeys("\<C-\>\<C-n>", 'n')
       let g:tab_term_buf[tabpagenr()] = l:target_buf
+      exec 'resize ' . a:height
     endif
     if a:go_to_top != 0
       call feedkeys("gg", 'n')
@@ -444,19 +448,19 @@ function! ConfigureDelayedPlugin()
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
   noremap <F8> :<C-u>call ToggleTerminal(6)<CR>
-  noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
+  noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
 
 
 
 function! ConfigureManualLoadPlugin()
-  " vim-quickui setting
+  " Vim-quickui setting
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
-    " clear all the menus
+    " Clear all the menus
     call quickui#menu#reset()
-    " install a 'File' menu, use [text, command] to represent an item.
+    " Install a 'File' menu, use [text, command] to represent an item.
     call quickui#menu#install('&File', [
           \ [ "&Save\tCtrl+s", 'w'],
           \ [ 'Save &As', 'call feedkey(":saveas ")' ],
@@ -468,13 +472,13 @@ function! ConfigureManualLoadPlugin()
           \ [ '--', '' ],
           \ [ "E&xit\tAlt+x", 'q' ],
           \ ])
-    " script inside %{...} will be evaluated and expanded in the string
+    " Script inside %{...} will be evaluated and expanded in the string
     call quickui#menu#install('&Option', [
           \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
           \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
           \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
           \ ])
-    " register HELP menu with weight 10000
+    " Register HELP menu with weight 10000
     call quickui#menu#install('H&elp', [
           \ ['&Cheatsheet', 'help index', ''],
           \ ['T&ips', 'help tips', ''],
@@ -505,7 +509,7 @@ function! ConfigureManualLoadPlugin()
     endif
     call quickui#tools#preview_tag('')
   endfunction
-  " enable to display tips in the cmdline
+  " Enable to display tips in the cmdline
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
   noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
@@ -543,7 +547,7 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  " vim-bookmarks setting
+  " Vim-bookmarks setting
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
   let g:bookmark_auto_save = 1
@@ -586,7 +590,7 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  " vim-interestingwords setting
+  " Vim-interestingwords setting
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
@@ -601,7 +605,7 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  " vim-fugitive, vim-gitgutter and git-blame setting
+  " Vim-fugitive, vim-gitgutter and git-blame setting
   noremap <Leader>git :<C-u>call LoadAndSetGitPlugin()<CR>
   function! LoadAndSetGitPlugin()
     let g:fugitive_no_maps = 1
@@ -911,7 +915,7 @@ function! ConfigureManualLoadPlugin()
           \ '--hidden'
       \ ]
   let g:Lf_PreviewInPopup = 1
-  " open the preview window automatically
+  " Open the preview window automatically
   let g:Lf_PreviewResult = {'Rg': 1}
 endfunction
 " Alt+n跳到第n个tab，0<n<10
@@ -930,12 +934,12 @@ function! InitializeTabPos()
   exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
   exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 显示相关和实用设置
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
 " 会使vim看起来不友好的命令
 if has('gui_running')
-  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21   " 设置字体
+  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21
   " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
   set guicursor=c-i:ver33-Cursor
   set guicursor+=a:blinkon0
@@ -972,13 +976,11 @@ set virtualedit=block,onemore
 set ruler
 " 突出显示当前行
 set cursorline
-" no bell
-set novisualbell
 " 命令行（在状态行下）的高度，默认为1，这里是2
 set cmdheight=2
 " 显示行号
 set number
- " merge signcolumn and number column into one
+ " Merge signcolumn and number column into one
 set signcolumn=number
  " Column guide
 set colorcolumn=80,120,160
@@ -990,7 +992,8 @@ set autoread
 set clipboard=unnamedplus
 " 设置魔术正则语法
 set magic
-" 去掉输入错误的提示声音
+" No bell
+set novisualbell
 set belloff=all
 " 在处理未保存或只读文件的时候，弹出确认
 set confirm
@@ -1017,8 +1020,6 @@ set selectmode=key
 set report=0
 " 在被分割的窗口间显示空白，便于阅读
 set fillchars=vert:\ ,stl:\ ,stlnc:\
-" 匹配括号高亮的时间（单位是十分之一秒）
-set matchtime=1
 " 光标移动到buffer的顶部和底部时保持3行距离
 set scrolloff=3
 " 设置搜索可以循环搜索, 搜索和补全时忽略大小写,智能大小写,逐字符高亮
@@ -1216,7 +1217,7 @@ function! CPPCompilation()
 endfunction
 if !(exists('*CompileAndExcute') && &filetype=='vim')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -rows=6 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+    let l:compile_exec = ':AsyncRun -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
       exec l:compile_exec.' python3 %'
     elseif &filetype=='sh'
@@ -1259,7 +1260,7 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=6 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
+  let l:compile_only = ':AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
   if &filetype=='verilog'
     exec l:compile_only.' iverilog *.v -o %<.vcd'
   elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
