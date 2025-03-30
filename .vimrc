@@ -385,7 +385,7 @@ function! ConfigureDelayedPlugin()
       call feedkeys("gg", 'n')
     endif
   endfunction
-  function! ToggleTerminal(height = 6)
+  function! ToggleTerminal(height = 18)
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
@@ -447,7 +447,7 @@ function! ConfigureDelayedPlugin()
   endfunction
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
-  noremap <F8> :<C-u>call ToggleTerminal(6)<CR>
+  noremap <F8> :<C-u>call ToggleTerminal()<CR>
   noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
@@ -1196,7 +1196,7 @@ function! CPPCompilation()
       return ' cd '.l:possible_path.' && bear --append -- scons -j12'
     endif
   endfor
-  let l:compile_single_file = ' -fsanitize=address,undefined -g -pedantic-errors'
+  let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
         \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
         \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
   if &filetype=='cpp'
