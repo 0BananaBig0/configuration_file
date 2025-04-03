@@ -14,7 +14,7 @@
       },
       "svlangserver": {
          "command": "svlangserver",
-         "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
+         "module": "/usr/local/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
          "filetypes": [
             "systemverilog",
             "vhdl",
@@ -28,8 +28,8 @@
                "test/**/*.sv*"
             ],
             "systemverilog.defines": [],
-            "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
-            "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
+            "systemverilog.launchConfiguration": "verilator --lint-only --language 1364-2005",
+            "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=3 --over_column_limit_penalty=3 --wrap_spaces=3"
          }
       }
    },

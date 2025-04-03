@@ -77,8 +77,8 @@ call plug#end()
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
   autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
-  autocmd BufNewFile,BufRead *.launch set filetype=xml
-  autocmd BufNewFile,BufRead *.qrc set filetype=xml
+  autocmd BufNewFile,BufRead *.launch,*.qrc set filetype=xml
+  autocmd BufNewFile,BufRead *.v set filetype=verilog
 augroup END
 
 
@@ -1204,6 +1204,8 @@ function! CPPCompilation()
   elseif &filetype=='cuda'
     return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
         \ .fnamemodify(expand('%'), ':t:r').'.exe'
+  elseif &filetype=='verilog' || &filetype=='systemverilog'
+    return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out && gtkwave %<.vcd'
   else
     return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
   endif
@@ -1216,7 +1218,8 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
     elseif &filetype=='sh'
       exec l:compile_exec.' ./%'
     elseif &filetype=='verilog'
-      exec l:compile_exec.' iverilog *.v -o %<.vcd && vvp %<.vcd'
+      let l:verilog_compilation = CPPCompilation()
+      exec l:compile_exec.l:verilog_compilation
     elseif &filetype=='perl'
       exec l:compile_exec.' perl %'
     elseif &filetype=='tcl'
@@ -1255,7 +1258,7 @@ endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
   if &filetype=='verilog'
-    exec l:compile_only.' iverilog *.v -o %<.vcd'
+    exec l:compile_only.' iverilog *.v -o %<.out'
   elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
       \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
     call JumpToTheMainWin()

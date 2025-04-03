@@ -422,3 +422,57 @@ sudo apt install libgpm-dev python3-dev libluajit-5.1-dev lua5.1 luajit libluaji
 
 
 sudo apt install libcups2-dev
+
+sudo apt install graphviz gtkwave
+sudo npm install -g netlistsvg
+sudo apt install -y autoconf gperf make gcc g++ bison flex
+sudo apt install build-essential clang lld bison flex \
+        libreadline-dev gawk tcl-dev libffi-dev git \
+        graphviz xdot pkg-config python3 libboost-system-dev \
+        libboost-python-dev libboost-filesystem-dev zlib1g-dev
+cd ~
+git clone https://github.com/YosysHQ/yosys.git
+cd yosys
+git submodule update --init --recursive
+make
+make test
+sudo make install
+
+cd ~
+git clone https://github.com/steveicarus/iverilog.git
+cd iverilog
+make
+make check
+sudo make install
+sudo npm install -g @imc-trading/svlangserver
+sudo apt install apt-transport-https curl gnupg -y
+curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
+sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+sudo apt update && sudo apt install bazel
+
+cd ~
+git clone https://github.com/chipsalliance/verible
+cd verible
+bazel build -c opt //...
+bazel test -c opt //... --test_verbose_timeout_warnings
+bazel build -c opt :install-binaries
+sudo .github/bin/simple-install.sh /usr/local/bin
+
+sudo apt-get install git help2man perl python3 make autoconf g++ flex bison ccache
+sudo apt-get install libgoogle-perftools-dev numactl perl-doc
+sudo apt-get install libfl2  # Ubuntu only (ignore if gives error)
+sudo apt-get install libfl-dev  # Ubuntu only (ignore if gives error)
+sudo apt-get install zlib1g zlib1g-dev  # Ubuntu only (ignore if gives error)
+sudo apt-get install ccache  # If present at build, needed for run
+sudo apt-get install mold  # If present at build, needed for run
+sudo apt-get install libgoogle-perftools-dev numactl
+sudo apt install python3-distro libsystemc libsystemc-dev
+git clone https://github.com/verilator/verilator   # Only first time
+cd verilator
+unset VERILATOR_ROOT
+autoconf         # Create ./configure script
+./configure      # Configure and create Makefile
+make -j24
+make test
+sudo make install
