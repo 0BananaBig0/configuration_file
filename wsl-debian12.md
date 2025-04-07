@@ -476,3 +476,8 @@ autoconf         # Create ./configure script
 make -j24
 make test
 sudo make install
+
+# for a special tool
+sudo apt install libncurses5 libncurses5-dev ksh unrar
+sudo ln -s /lib64/ld-linux-x86-64.so.2 /lib64/ld-lsb-x86-64.so.3
+sudo ldconfig

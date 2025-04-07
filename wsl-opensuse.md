@@ -187,3 +187,16 @@ sudo zypper install gpm gpm-devel python311-devel lua51-devel luajit-devel libXf
   --enable-gpm
 
 sudo zypper install iotop
+
+# for a special tool
+sudo zypper install libncurses5 ksh unrar
+
+sudo zypper install iverilog verilator bazel
+sudo npm install -g @imc-trading/svlangserver
+cd ~
+git clone https://github.com/chipsalliance/verible
+cd verible
+bazel build -c opt //...
+bazel test -c opt //... --test_verbose_timeout_warnings
+bazel build -c opt :install-binaries
+sudo .github/bin/simple-install.sh /usr/local/bin

@@ -36,12 +36,14 @@ Plug 'brgmnn/vim-opencl', {'for': []}
 Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 " Python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
-" Verilog indent file
+" Verilog
 Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
+Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
+Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
 " Highlight qmake syntax
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
-" Markdown目录构建插件
-Plug 'mzlogin/vim-markdown-toc', {'for': []}
+" Markdown目录构建插件, Manual-load and Delay-load
+Plug 'mzlogin/vim-markdown-toc', {'on': []}
 " 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Vim快捷键管理和提示插件
@@ -50,7 +52,7 @@ Plug 'liuchengxu/vim-which-key', {'on': []}
 Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件
 Plug 'skywind3000/asyncrun.vim', {'on': []}
-" 菜单栏插件, Manual-load
+" 菜单栏插件
 Plug 'skywind3000/vim-quickui', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
@@ -91,7 +93,8 @@ noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
 
 
 " Rainbow setting
-let g:rainbow_active = 1 " set to 0 if you want to enable it later via :RainbowToggle
+" Set to 0 if you want to enable it later via :RainbowToggle
+let g:rainbow_active = 1
 
 
 
