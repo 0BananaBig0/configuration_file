@@ -191,7 +191,7 @@ sudo zypper install iotop
 # for a special tool
 sudo zypper install libncurses5 ksh unrar
 
-sudo zypper install iverilog verilator bazel
+sudo zypper install iverilog verilator bazel patch
 sudo npm install -g @imc-trading/svlangserver
 cd ~
 git clone https://github.com/chipsalliance/verible
