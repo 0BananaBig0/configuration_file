@@ -1,0 +1,2 @@
+read_cell_library /home/banana/oasys_rtl_qs_ekit/libs/fastscan/*.fslib
+# read_liberty /home/banana/NangateOpenCellLibrary_45nm/Front_End/Liberty/NangateOpenCellLibrary_functional.lib

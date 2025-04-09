@@ -31,7 +31,7 @@ Plug 'luochen1990/rainbow'
 " 缩进显示
 Plug 'nathanaelkane/vim-indent-guides'
 " Highlight opencl 2.0 syntax
-Plug 'brgmnn/vim-opencl', {'for': []}
+Plug 'brgmnn/vim-opencl', {'for': ['opencl']}
 " 高亮c++类模板等插件
 Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 " Python 语法高亮插件
@@ -77,10 +77,10 @@ Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuf
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead *.cl call plug#load('vim-opencl')
   autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
   autocmd BufNewFile,BufRead *.launch,*.qrc set filetype=xml
   autocmd BufNewFile,BufRead *.v set filetype=verilog
+  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile set filetype=tcl
 augroup END
 
 
