@@ -78,7 +78,7 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
-  autocmd BufNewFile,BufRead *.launch,*.qrc set filetype=xml
+  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
   autocmd BufNewFile,BufRead *.v set filetype=verilog
   autocmd BufNewFile,BufRead *.tessent_startup,*.dofile set filetype=tcl
 augroup END

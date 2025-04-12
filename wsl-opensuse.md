@@ -200,3 +200,5 @@ bazel build -c opt //...
 bazel test -c opt //... --test_verbose_timeout_warnings
 bazel build -c opt :install-binaries
 sudo .github/bin/simple-install.sh /usr/local/bin
+
+sudo cp ~/configuration_file/local.conf /etc/fonts/

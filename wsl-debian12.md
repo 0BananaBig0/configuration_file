@@ -482,3 +482,5 @@ sudo apt install libncurses5 libncurses5-dev ksh unrar
 sudo ln -s /lib64/ld-linux-x86-64.so.2 /lib64/ld-lsb-x86-64.so.3
 sudo ldconfig
 sudo apt install libxcb-xinerama0 libxcb-xinerama0-dev
+
+sudo cp ~/configuration_file/local.conf /etc/fonts/ # or modify 40-nonlatin.conf, but difficult
