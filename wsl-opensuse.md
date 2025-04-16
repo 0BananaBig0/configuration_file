@@ -202,3 +202,6 @@ bazel build -c opt :install-binaries
 sudo .github/bin/simple-install.sh /usr/local/bin
 
 sudo cp ~/configuration_file/local.conf /etc/fonts/
+
+sudo zypper remove -y *clang*19* *llvm*19* lld-19 lldb-19
+sudo zypper install -y *clang*20* *llvm*20* lld-20 lldb-20
