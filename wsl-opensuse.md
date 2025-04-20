@@ -183,7 +183,7 @@ sudo zypper install gpm gpm-devel python311-devel lua51-devel luajit-devel libXf
   --enable-perlinterp \
   --with-luajit \
   --enable-python3interp=yes \
-  --with-python3-config-dir=/usr/lib64/python3.11/config-3.11-x86_64-linux-gnu \
+  --with-python3-config-dir=/usr/lib64/python3.13/config-3.13-x86_64-linux-gnu \
   --enable-gpm
 
 sudo zypper install iotop
@@ -205,3 +205,26 @@ sudo cp ~/configuration_file/local.conf /etc/fonts/
 
 sudo zypper remove -y *clang*19* *llvm*19* lld-19 lldb-19
 sudo zypper install -y *clang*20* *llvm*20* lld-20 lldb-20
+
+# for a special tool
+sudo zypper install libXdmcp-devel ShellCheck
+pipx install tclint
+sudo zypper remove -y python311-base python311-pip python311-pipx python311-neovim ruby-devel python311-devel python311-setuptools python311-devel
+sudo zypper install -y python313-base python313-pip python313-pipx python313-neovim ruby-devel python313-devel python313-setuptools python313-devel
+
+pipx install scons
+pipx install ipdb
+pipx install pylint
+pipx install yapf
+pipx install pygments
+pipx install cmakelang
+pipx install cmake-language-server
+pipx install pyright
+pipx install cppman
+pipx install you-get
+pipx install sphinx
+pipx install sphinx-rtd-theme --include-deps
+pipx install autopep8
+pipx install vim-vint
+pip3 install pysnooper futures neovim --break-system-packages #not do for root
+pipx install tclint

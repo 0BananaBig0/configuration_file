@@ -37,7 +37,6 @@ Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 " Python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
 " Verilog
-Plug '0BananaBig0/verilog_indent', {'for': ['verilog']}
 Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
 Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
 " Highlight qmake syntax
@@ -1208,7 +1207,7 @@ function! CPPCompilation()
     return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
         \ .fnamemodify(expand('%'), ':t:r').'.exe'
   elseif &filetype=='verilog' || &filetype=='systemverilog'
-    return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out && gtkwave %<.vcd'
+    return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out'
   else
     return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
   endif
@@ -1219,10 +1218,10 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
     if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
       exec l:compile_exec.' python3 %'
     elseif &filetype=='sh'
-      exec l:compile_exec.' ./%'
+      exec l:compile_exec.' sh %'
     elseif &filetype=='verilog'
       let l:verilog_compilation = CPPCompilation()
-      exec l:compile_exec.l:verilog_compilation
+      exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
     elseif &filetype=='perl'
       exec l:compile_exec.' perl %'
     elseif &filetype=='tcl'
@@ -1261,7 +1260,8 @@ endif
 function! CompileCommand()
   let l:compile_only = ':AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
   if &filetype=='verilog'
-    exec l:compile_only.' iverilog *.v -o %<.out'
+      let l:verilog_compilation = CPPCompilation()
+      exec l:compile_exec.l:verilog_compilation
   elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
       \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
     call JumpToTheMainWin()
