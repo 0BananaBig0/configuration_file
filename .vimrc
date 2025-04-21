@@ -1100,13 +1100,13 @@ function! SetTitle()
   elseif &filetype=='make'
     call append(line('$'), '.PHONY:')
   elseif &filetype=='sh'
-    call append(line('$'), '#!/bin/bash')
+    call append(line('$'), '#!/usr/bin/env bash')
   elseif &filetype=='perl'
     call append(line('$'), '#!/bin/perl')
     call append(line('$'), 'use strict;')
     call append(line('$'), 'use warnings;')
   elseif &filetype=='tcl'
-    call append(line('$'), '#!/usr/bin/tclsh')
+    call append(line('$'), '#!/usr/bin/env tclsh')
   endif
   call append(line('$'), '')
   exec 'normal! G'

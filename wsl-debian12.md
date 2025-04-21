@@ -367,7 +367,7 @@ sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
 sudo cp ~/Downloads/wsl_shared_folder/configuration_file/wsl.conf /etc # restart your wsl
 mkdir -p /home/banana/wsl_shared_folder # also create wsl_shared_folder in D:\Users\11849\Downloads\
 sudo cp ~/Downloads/wsl_shared_folder/configuration_file/wsl.conf /etc # restart your wsl
-echo 'D:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
+echo 'E:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
 ln -s ~/wsl_shared_folder/cpp_workspace ~
 ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
 ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
