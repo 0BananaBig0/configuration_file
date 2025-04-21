@@ -143,3 +143,5 @@ sudo dnf install -y verible
 sudo dnf install ksh ncurses-devel libXdmcp-devel
 sudo ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so.5
 sudo ln -s /usr/lib64/libncurses.so.6 /usr/lib64/libncurses.so.5
+
+# If WSL2 fails to start via MobaXterm after initial setup, adjust the session's Run Method setting by replacing Autodetection with Native Connector.
