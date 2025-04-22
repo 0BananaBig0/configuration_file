@@ -1076,11 +1076,22 @@ function! SetTitle()
       \ && &commentstring[0] != &commentstring[1] && &commentstring[1] != ' ')
     return
   endif
+  if &filetype=='sh'
+    call setline(1, '#!/usr/bin/env bash')
+  elseif &filetype=='perl'
+    call setline(1, '#!/usr/bin/env perl')
+  elseif &filetype=='tcl'
+    call setline(1, '#!/usr/bin/env tclsh')
+  endif
   let l:column_limit = split(&colorcolumn, ",")[0]
   let l:top_and_bottom = &commentstring[0].&commentstring[1]
       \ .repeat(&commentstring[0], l:column_limit - 4)
       \ .&commentstring[1].&commentstring[0]
-  call setline(1, l:top_and_bottom)
+  if &filetype=='sh' || &filetype=='perl' || &filetype=='tcl'
+    call append(line('$'), l:top_and_bottom)
+  else
+    call setline(1, l:top_and_bottom)
+  endif
   call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
   call AppendInfo('Author: Huaxiao Liang', l:column_limit)
   call AppendInfo('Mail: hxliang666@qq.com', l:column_limit)
@@ -1099,17 +1110,11 @@ function! SetTitle()
     call append(line('$'), '#include <cuda_runtime.h>')
   elseif &filetype=='make'
     call append(line('$'), '.PHONY:')
-  elseif &filetype=='sh'
-    call append(line('$'), '#!/usr/bin/env bash')
   elseif &filetype=='perl'
-    call append(line('$'), '#!/bin/perl')
     call append(line('$'), 'use strict;')
     call append(line('$'), 'use warnings;')
-  elseif &filetype=='tcl'
-    call append(line('$'), '#!/usr/bin/env tclsh')
   endif
   call append(line('$'), '')
-  exec 'normal! G'
 endfunction
 function! ShowCurrentModule()
   let l:module_line = search('module', 'bnWz')
