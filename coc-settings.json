@@ -53,7 +53,6 @@
       "--pch-storage=memory",
       "--pretty"
    ],
-   "coc.preferences.jumpCommand": "edit",
    "dialog.floatHighlight": "sym_hilight",
    "diagnostic.enable": false,
    "diagnostic.errorSign": "🌪",
@@ -69,9 +68,9 @@
       },
       "ignore_code_blocks": true
    },
-   "perl.p::ls.enable": true,
-   "perl.p::ls.logLevel": 2,
-   "perl.p::ls.logFile": "${HOME}/.vim/.coc-perl.log",
+   "perl.enable": true,
+   "perl.logLevel": 2,
+   "perl.logFile": "${HOME}/.vim/.coc-perl.log",
    "prettier.formatterPriority": -1,
    "prettier.printWidth": 80,
    "prettier.proseWrap": "always",
