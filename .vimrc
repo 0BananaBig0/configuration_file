@@ -331,11 +331,6 @@ function! ConfigureDelayedPlugin()
     endif
     return join(l:lines, " ")
   endfunction
-  function CheckPrimitivePtrType(selection)
-    echo system('cdecl explain ' . shellescape(a:selection))
-  endfunction
-  nnoremap <LocalLeader>p :call CheckPrimitivePtrType(getline('.'))<CR>
-  vnoremap <LocalLeader>p :<C-u>call CheckPrimitivePtrType(GetSelectedContent())<CR>
 
 
 
