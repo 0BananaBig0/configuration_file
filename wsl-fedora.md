@@ -22,6 +22,7 @@ ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
 ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
 ln -s ~/wsl_shared_folder/configuration_file ~
 ln -s ~/wsl_shared_folder/oasys_rtl_qs_ekit ~
+ln -s ~/wsl_shared_folder/NangateOpenCellLibrary_45nm ~
 rm install.sh
 cp /home/banana/configuration_file/.gdbinit ~
 cp /home/banana/configuration_file/coc-settings.json ~/.vim
@@ -30,6 +31,7 @@ cp /home/banana/configuration_file/.c_cpp ~/.vim -r
 cp /home/banana/configuration_file/.zshrc ~
 cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 cp /home/banana/configuration_file/init.vim ~/.config/nvim
+cp /home/banana/configuration_file/.tessent_startup ~
 
 sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
@@ -141,7 +143,10 @@ sudo dnf install -y verible
 
 # for a special tool
 sudo dnf install ksh ncurses-devel libXdmcp-devel
-sudo ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so.5
-sudo ln -s /usr/lib64/libncurses.so.6 /usr/lib64/libncurses.so.5
+# sudo ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so.5
+# sudo ln -s /usr/lib64/libncurses.so.6 /usr/lib64/libncurses.so.5
+sudo rm /usr/lib64/libtinfo.so.5
+sudo rm /usr/lib64/libncurses.so.5
+sudo dnf install ncurses-compat-libs
 
 # If WSL2 fails to start via MobaXterm after initial setup, adjust the session's Run Method setting by replacing Autodetection with Native Connector.

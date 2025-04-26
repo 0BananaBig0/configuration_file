@@ -61,6 +61,8 @@ Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
 Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
 " Multiple highlights
 Plug 'lfv89/vim-interestingwords', {'on': []}
+" Multiple cursors
+Plug 'mg979/vim-visual-multi', {'on':[]}
 " Git command
 Plug 'tpope/vim-fugitive', {'on': []}
 " Git status show
@@ -587,17 +589,42 @@ function! ConfigureManualLoadPlugin()
 
 
 
-  " Vim-interestingwords setting
+  " Vim-interestingwords and vim-visual-multi setting
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
+  nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
+  vnoremap <Leader>wh :<C-u>call MultipleWordsHighlight('v')<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
     call plug#load('vim-interestingwords')
-    nnoremap <Leader>wh :call InterestingWords('n')<CR>
-    vnoremap <Leader>wh :<C-u>call InterestingWords('v')<CR>
     noremap <Leader>w<S-h> :<C-u>call UncolorAllWords()<CR>
     noremap n :<C-u>call WordNavigation(1)<CR>
     noremap <S-n> :<C-u>call WordNavigation(0)<CR>
+  endfunction
+  function! MultipleWordsHighlight(mode)
+    if !exists('*InterestingWords')
+      call LoadAndSetVimInterestingwords()
+    endif
+    call InterestingWords(a:mode)
+  endfunction
+  noremap <C-n> :<C-u>call MultipleCursors()<CR>
+  function! MultipleCursors(key_map="\<C-n>")
+    if !empty(maparg(a:key_map, 'v', 0, 1))
+      call LoadVimVisualMulti()
+      break
+    endif
+    call feedkeys(a:key_map, "!")
+  endfunction
+  function! LoadVimVisualMulti()
+    " 1. Save the current visual selection and load vim-viusal-multi
+    let l:original_visual_mode = visualmode()
+    let [l:start_line, l:start_col] = getpos("'<")[1:2]
+    let [l:end_line, l:end_col] = getpos("'>")[1:2]
+    call plug#load('vim-visual-multi')
+    " 2. Restore the visual selection
+    call cursor(l:start_line, l:start_col)
+    execute "normal! " . l:original_visual_mode
+    call cursor(l:end_line, l:end_col)
   endfunction
 
 
@@ -1425,10 +1452,10 @@ endfunction
 noremap <C-M-CR> :<C-u>put _<CR>
 inoremap <C-M-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
-inoremap <M-h> <Left>
-inoremap <M-j> <Down>
-inoremap <M-k> <Up>
-inoremap <M-l> <Right>
+noremap <M-h> <Left>
+noremap <M-j> <Down>
+noremap <M-k> <Up>
+noremap <M-l> <Right>
 inoremap <M-p> <C-o>P
 inoremap <M-S-p> <C-o>p
 inoremap <M-u> <C-o>u
