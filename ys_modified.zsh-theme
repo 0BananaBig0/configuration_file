@@ -82,5 +82,5 @@ ${venv_info}\
 %{$terminfo[bold]$fg[blue]%}-\
 %{$terminfo[bold]$fg[cyan]%}%D{%H:%M:%S}\
 %{$terminfo[bold]$fg[blue]%}]%{$reset_color%}\
-$exit_code
+ $exit_code
 %{$terminfo[bold]$fg[yellow]%}$ %{$reset_color%}"
