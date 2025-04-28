@@ -1100,6 +1100,8 @@ function! SetTitle()
   endif
   if &filetype=='sh'
     call setline(1, '#!/usr/bin/env bash')
+  elseif &filetype=='csh'
+    call setline(1, '#!/usr/bin/env csh')
   elseif &filetype=='perl'
     call setline(1, '#!/usr/bin/env perl')
   elseif &filetype=='tcl'
@@ -1109,7 +1111,7 @@ function! SetTitle()
   let l:top_and_bottom = &commentstring[0].&commentstring[1]
       \ .repeat(&commentstring[0], l:column_limit - 4)
       \ .&commentstring[1].&commentstring[0]
-  if &filetype=='sh' || &filetype=='perl' || &filetype=='tcl'
+  if &filetype=='sh' || &filetype=='csh' || &filetype=='perl' || &filetype=='tcl'
     call append(line('$'), l:top_and_bottom)
   else
     call setline(1, l:top_and_bottom)
@@ -1246,6 +1248,8 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
       exec l:compile_exec.' python3 %'
     elseif &filetype=='sh'
       exec l:compile_exec.' sh %'
+    elseif &filetype=='csh'
+      exec l:compile_exec.' csh %'
     elseif &filetype=='verilog'
       let l:verilog_compilation = CPPCompilation()
       exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'

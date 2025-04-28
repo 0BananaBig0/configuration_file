@@ -151,4 +151,4 @@ sudo dnf install ncurses-compat-libs
 
 # If WSL2 fails to start via MobaXterm after initial setup, adjust the session's Run Method setting by replacing Autodetection with Native Connector.
 
-sudo dnf install -y libasan libubsan
+sudo dnf install -y libasan libubsan csh

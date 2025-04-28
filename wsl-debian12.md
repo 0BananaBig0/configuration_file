@@ -485,4 +485,4 @@ sudo apt install libxcb-xinerama0 libxcb-xinerama0-dev
 
 sudo cp ~/configuration_file/local.conf /etc/fonts/ # or modify 40-nonlatin.conf, but difficult
 sudo apt install shellcheck
-pipx install tclint
+pipx install tclint csh
