@@ -25,7 +25,7 @@ set prompt = "${USER_HOST}${WORKING_DIR} "
 set prompt = "${prompt}${TIMESTAMP}"
 
 # Complete the prompt
-set prompt = "${prompt}\n\n${YELLOW}%#${RESET} "
+set prompt = "${prompt}\r\n${YELLOW}%#${RESET} "
 
 # Prevent exe files from appearing in auto-completion
 set fignore = (.exe)

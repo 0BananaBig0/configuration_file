@@ -131,24 +131,51 @@ sudo dnf install -y code
 
 sudo dnf install -y gdouros-symbola-fonts # For special symbols or emojis, like 🌪.
 sudo cp ~/configuration_file/local.conf /etc/fonts/ # or modify 40-nonlatin.conf, but difficult
-sudo dnf install ocl-icd-devel ocl-icd opencl-headers clinfo pocl pocl-devel
+sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo pocl pocl-devel
 
 sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
 sudo dnf install -y verilator iverilog yosys
 sudo npm install -g @imc-trading/svlangserver
-sudo dnf copr enable lihaohong/bazel
-sudo dnf install -y bazel
 sudo dnf -y copr enable rezso/HDL
 sudo dnf install -y verible
 
 # for a special tool
-sudo dnf install ksh ncurses-devel libXdmcp-devel
-# sudo ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so.5
-# sudo ln -s /usr/lib64/libncurses.so.6 /usr/lib64/libncurses.so.5
-sudo rm /usr/lib64/libtinfo.so.5
-sudo rm /usr/lib64/libncurses.so.5
-sudo dnf install ncurses-compat-libs
+sudo dnf install -y ksh ncurses-devel libXdmcp-devel ncurses-compat-libs
+sudo dnf install -y libasan libubsan csh libXScrnSaver-devel
+sudo dnf install -y qt5-qtbase-devel-5.15.16
 
 # If WSL2 fails to start via MobaXterm after initial setup, adjust the session's Run Method setting by replacing Autodetection with Native Connector.
 
-sudo dnf install -y libasan libubsan csh
+# for calibre2023
+mkdir ~/wsl_shared_folder/fedora_pack -p
+cd ~/wsl_shared_folder/fedora_pack
+wget https://archives.boost.io/release/1.66.0/source/boost_1_66_0.tar.gz
+x boost_1_66_0.tar.gz
+rm boost_1_66_0.tar.gz
+cd boost_1_66_0
+./bootstrap.sh --with-python=/usr/bin/python3.13
+./b2 -j24
+sudo ./b2 install
+
+cd ~/wsl_shared_folder/fedora_pack
+wget https://github.com/unicode-org/icu/releases/download/release-60-3/icu4c-60_3-src.tgz
+tar xvf icu4c-60_3-src.tgz
+cd icu/source
+./configure
+make -j24
+sudo make install
+
+cd ~/wsl_shared_folder/fedora_pack
+wget https://github.com/thkukuk/libnsl/releases/download/v2.0.1/libnsl-2.0.1.tar.xz
+x libnsl-2.0.1.tar.xz
+cd libnsl
+./configure
+make -j24
+sudo make install
+
+# for calibre2024
+sudo ln -s /usr/lib64/libnsl.so.3 /usr/lib64/libnsl.so.2
+# for vcs2023
+sudo ln -s /usr/lib64/libnsl.so.3 /usr/lib64/libnsl.so.1
+# for verdi2024
+sudo dnf install libxslt-devel
