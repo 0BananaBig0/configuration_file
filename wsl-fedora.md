@@ -175,6 +175,8 @@ sudo make install
 
 # for calibre2024
 sudo ln -s /usr/lib64/libnsl.so.3 /usr/lib64/libnsl.so.2
+# for compiling libnsl-2.0.1
+sudo dnf install libtirpc-devel
 # for vcs2023
 sudo ln -s /usr/lib64/libnsl.so.3 /usr/lib64/libnsl.so.1
 # for verdi2024
