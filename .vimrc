@@ -1456,10 +1456,10 @@ endfunction
 noremap <C-M-CR> :<C-u>put _<CR>
 inoremap <C-M-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
-noremap <M-h> <Left>
-noremap <M-j> <Down>
-noremap <M-k> <Up>
-noremap <M-l> <Right>
+inoremap <M-h> <Left>
+inoremap <M-j> <Down>
+inoremap <M-k> <Up>
+inoremap <M-l> <Right>
 inoremap <M-p> <C-o>P
 inoremap <M-S-p> <C-o>p
 inoremap <M-u> <C-o>u
@@ -1468,3 +1468,5 @@ inoremap <M-S-d> <C-o>D
 inoremap <M-S-y> <C-o>Y
 inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
+" Disable Q in normal mode
+noremap Q <Nop>

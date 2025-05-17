@@ -22,7 +22,8 @@ ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
 ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
 ln -s ~/wsl_shared_folder/configuration_file ~
 ln -s ~/wsl_shared_folder/oasys_rtl_qs_ekit ~
-ln -s ~/wsl_shared_folder/NangateOpenCellLibrary_45nm ~
+ln -s ~/wsl_shared_folder/PDK/NangateOpenCellLibrary_45nm ~
+ln -s ~/wsl_shared_folder/PDK/tsmc28_pdk ~
 rm install.sh
 cp /home/banana/configuration_file/.gdbinit ~
 cp /home/banana/configuration_file/coc-settings.json ~/.vim
@@ -35,7 +36,7 @@ cp /home/banana/configuration_file/.tessent_startup ~
 
 sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
-sudo dnf install -y vim npm nodejs vim-X11 zsh bear git sqlite yarn neovim
+sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
 sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
 sudo dnf install -y p7zip.x86_64 p7zip-plugins.x86_64
 sudo dnf install -y ShellCheck cargo gem ruby-devel
@@ -50,9 +51,9 @@ sudo dnf install -y kmodtool akmods mokutil openssl dkms
 # sudo dnf provides */xxx.so
 
 cd ~
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/DejaVuSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/FantasqueSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/UbuntuMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/DejaVuSansMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FantasqueSansMono.zip
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/UbuntuMono.zip
 x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
 sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
 rm *.zip
@@ -99,7 +100,7 @@ sudo npm config set coc.nvim:registry https://registry.npmmirror.com
 sudo npm config set registry https://registry.npmmirror.com/ && \
 sudo npm cache clean --force
 sudo npm install -g neovim
-gem install neovim --user-install
+gem install neovim --bindir=$HOME/.local/bin
 
 cd ~/wsl_shared_folder/fedora_pack
 wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
@@ -140,44 +141,40 @@ sudo dnf -y copr enable rezso/HDL
 sudo dnf install -y verible
 
 # for a special tool
-sudo dnf install -y ksh ncurses-devel libXdmcp-devel ncurses-compat-libs
-sudo dnf install -y libasan libubsan csh libXScrnSaver-devel
-sudo dnf install -y qt5-qtbase-devel-5.15.16
+# sudo dnf install -y ksh ncurses-devel libXdmcp-devel ncurses-compat-libs
+# sudo dnf install -y libasan libubsan csh libXScrnSaver-devel
+# sudo dnf install -y qt5-qtbase-devel-5.15.16 pulseaudio-libs-glib2
 
 # If WSL2 fails to start via MobaXterm after initial setup, adjust the session's Run Method setting by replacing Autodetection with Native Connector.
 
 # for calibre2023
-mkdir ~/wsl_shared_folder/fedora_pack -p
-cd ~/wsl_shared_folder/fedora_pack
-wget https://archives.boost.io/release/1.66.0/source/boost_1_66_0.tar.gz
-x boost_1_66_0.tar.gz
-rm boost_1_66_0.tar.gz
-cd boost_1_66_0
-./bootstrap.sh --with-python=/usr/bin/python3.13
-./b2 -j24
-sudo ./b2 install
+# mkdir ~/wsl_shared_folder/fedora_pack -p
+# cd ~/wsl_shared_folder/fedora_pack
+# wget https://archives.boost.io/release/1.66.0/source/boost_1_66_0.tar.gz
+# x boost_1_66_0.tar.gz
+# rm boost_1_66_0.tar.gz
+# cd boost_1_66_0
+# ./bootstrap.sh --with-python=/usr/bin/python3.13
+# ./b2 -j24
+# sudo ./b2 install
 
-cd ~/wsl_shared_folder/fedora_pack
-wget https://github.com/unicode-org/icu/releases/download/release-60-3/icu4c-60_3-src.tgz
-tar xvf icu4c-60_3-src.tgz
-cd icu/source
-./configure
-make -j24
-sudo make install
+# cd ~/wsl_shared_folder/fedora_pack
+# wget https://github.com/unicode-org/icu/releases/download/release-60-3/icu4c-60_3-src.tgz
+# tar xvf icu4c-60_3-src.tgz
+# cd icu/source
+# ./configure
+# make -j24
+# sudo make install
 
-cd ~/wsl_shared_folder/fedora_pack
-wget https://github.com/thkukuk/libnsl/releases/download/v2.0.1/libnsl-2.0.1.tar.xz
-x libnsl-2.0.1.tar.xz
-cd libnsl
-./configure
-make -j24
-sudo make install
-
+# for compiling libnsl-1.3.0
 # for calibre2024
-sudo ln -s /usr/lib64/libnsl.so.3 /usr/lib64/libnsl.so.2
-# for compiling libnsl-2.0.1
-sudo dnf install libtirpc-devel
-# for vcs2023
-sudo ln -s /usr/lib64/libnsl.so.3 /usr/lib64/libnsl.so.1
-# for verdi2024
-sudo dnf install libxslt-devel
+# for vcs2023 and verdi2024
+# sudo dnf install -y libxslt-devel lsb_release
+# sudo dnf install -y libtirpc-devel
+# cd ~/wsl_shared_folder/fedora_pack
+# wget https://github.com/thkukuk/libnsl/releases/download/v1.3.0/libnsl-1.3.0.tar.xz
+# x libnsl-1.3.0.tar.xz
+# cd libnsl
+# ./configure --prefix=/EDA/library
+# make -j24
+# make install

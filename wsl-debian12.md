@@ -169,7 +169,7 @@ sudo dpkg -i nvim-linux64.deb
 rm nvim-linux64.deb
 sudo apt install python3-neovim -y
 sudo apt install ruby-dev -y
-gem install neovim --user-install
+gem install neovim --bindir=$HOME/.local/bin
 
 sudo apt purge -y clang* llvm*
 sudo apt update
