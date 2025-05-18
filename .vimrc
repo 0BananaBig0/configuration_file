@@ -1065,19 +1065,19 @@ set expandtab                 " 把Tab字符用空格代替，和tabstop相关
 set list                      " Enable special character display
 set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
 function! SetIndent()
-  if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl' || &filetype=='json'
-        \ || &filetype=='python' || &filetype=='verilog'
-    set tabstop=3     " Tab键的显示宽度
-    set softtabstop=3 " 按下Tab键时输入的宽度
-    set shiftwidth=3  " 设置自动缩进时的缩进长度
+  let l:indent_val=2
+  if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl'
+        \ || &filetype=='verilog' || &filetype=='json'
+    let l:indent_val = 3     " Tab键的显示宽度
     if &filetype=='c' || &filetype=='cpp'
       set cindent     " 设置使用C/C++语言的自动缩进方式
     endif
-  else
-    set tabstop=2
-    set softtabstop=2
-    set shiftwidth=2
+  elseif &filetype=='python'
+    let l:indent_val = 4
   endif
+  let &tabstop = l:indent_val
+  let &softtabstop = l:indent_val
+  let &shiftwidth = l:indent_val
 endfunction
 function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3

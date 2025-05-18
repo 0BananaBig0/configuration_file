@@ -56,6 +56,8 @@ wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FantasqueS
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/UbuntuMono.zip
 x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
 sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
+sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
+sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 rm *.zip
 cd /usr/share/fonts
 sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
