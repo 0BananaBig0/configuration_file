@@ -1139,6 +1139,7 @@ function! SetTitle()
     call append(line('$'), 'use warnings;')
   endif
   call append(line('$'), '')
+  call setpos('.', [0, line('$'), 0, 0])
 endfunction
 function! ShowCurrentModule()
   let l:module_line = search('module', 'bnWz')
