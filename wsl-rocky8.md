@@ -39,6 +39,7 @@ cp /home/banana/configuration_file/.zshrc ~
 cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 cp /home/banana/configuration_file/init.vim ~/.config/nvim
 cp /home/banana/configuration_file/.tessent_startup ~
+cp /home/banana/configuration_file/.perltidyrc ~
 
 sudo dnf group install -y "Development Tools"  # 注意首字母大写和空格
 sudo dnf install -y make cmake valgrind gcc gcc-c++ llvm clang clang-tools-extra
@@ -109,7 +110,7 @@ echo '[global]' > ~/.config/pip/pip.conf
 echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.config/pip/pip.conf
 python3 -m pip install --upgrade pip --user
 python3 -m pip install scons ipdb pylint yapf pygments cmakelang cmake-language-server pyright --user
-python3 -m pip install cppman you-get sphinx sphinx-rtd-theme --include-deps autopep8 vim-vint --user
+python3 -m pip install cppman you-get sphinx sphinx-rtd-theme autopep8 vim-vint --user
 python3 -m pip install pysnooper futures --user
 
 sudo dnf config-manager --set-enabled powertools

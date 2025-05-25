@@ -69,8 +69,6 @@
       "ignore_code_blocks": true
    },
    "perl.enable": true,
-   "perl.format.enable": true,
-   "perl.format.profile": "perltidy",
    "perl.logLevel": 2,
    "perl.logFile": "${HOME}/.vim/.coc-perl.log",
    "prettier.formatterPriority": -1,

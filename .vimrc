@@ -1072,7 +1072,7 @@ function! SetIndent()
     if &filetype=='c' || &filetype=='cpp'
       set cindent     " 设置使用C/C++语言的自动缩进方式
     endif
-  elseif &filetype=='python'
+  elseif &filetype=='python' || &filetype=='perl'
     let l:indent_val = 4
   endif
   let &tabstop = l:indent_val
