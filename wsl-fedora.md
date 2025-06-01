@@ -41,7 +41,7 @@ sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptoo
 sudo dnf install -y p7zip.x86_64 p7zip-plugins.x86_64
 sudo dnf install -y ShellCheck cargo gem ruby-devel
 sudo dnf install -y boost-devel tcl-devel xauth
-sudo dnf install -y fd-find eza zoxide ripgrep bat hyperfine httpie procs
+sudo dnf install -y fd-find zoxide ripgrep bat hyperfine httpie procs
 sudo dnf install -y libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel libxcb-devel xcb-util-cursor-devel
 sudo dnf install -y gstreamer1-plugins-base-devel gstreamer1-devel xcb-util-wm xcb-util-keysyms
 sudo dnf install -y zlib-devel libpng-devel libjpeg-devel libsecret-devel
@@ -82,7 +82,7 @@ pipx install autopep8
 pipx install vim-vint
 pipx install tclint
 pip3 install pysnooper futures neovim --break-system-packages #not do for root
-cargo install du-dust bottom cargo-cache asm-lsp
+cargo install du-dust bottom cargo-cache asm-lsp eza
 
 # also for root
 yarn config set registry https://registry.npmmirror.com/ --global  && \

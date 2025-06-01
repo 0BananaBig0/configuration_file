@@ -160,6 +160,7 @@ sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
   --with-luajit
 make -j24
 sudo make install
+sudo ln -s /usr/local/bin/vim /usr/bin/vim
 
 # compile iveriolog:
 cd ~/wsl_shared_folder/rocky_pack/
