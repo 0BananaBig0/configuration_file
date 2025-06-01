@@ -161,6 +161,7 @@ sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
 make -j24
 sudo make install
 sudo ln -s /usr/local/bin/vim /usr/bin/vim
+sudo ln -s /usr/local/bin/gvim /usr/bin/gvim
 
 # compile iveriolog:
 cd ~/wsl_shared_folder/rocky_pack/
