@@ -110,7 +110,7 @@ echo '[global]' > ~/.config/pip/pip.conf
 echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.config/pip/pip.conf
 python3 -m pip install --upgrade pip --user
 python3 -m pip install scons ipdb pylint yapf pygments cmakelang cmake-language-server pyright --user
-python3 -m pip install cppman you-get sphinx sphinx-rtd-theme autopep8 vim-vint --user
+python3 -m pip install cppman you-get sphinx sphinx-rtd-theme autopep8 vim-vint black --user
 python3 -m pip install pysnooper futures --user
 
 sudo dnf config-manager --set-enabled powertools
