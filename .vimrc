@@ -128,7 +128,6 @@ let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
   exec 'CocStart'
   call plug#load('vim-which-key')
-  call ConfigureMarkdownPlugin()
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
   call plug#load('nerdcommenter')
@@ -177,6 +176,7 @@ function! ConfigureMarkdownPlugin()
     let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
     call setpos('.', [0, l:new_line, l:previous_column, 0])
   endfunction
+  let g:leader_key_map.m = {'name':"Markdown"}
 endfunction
 
 
@@ -184,10 +184,15 @@ endfunction
 function! ConfigureDelayedPlugin()
   " Vim-which-key setting
   let g:which_key_fallback_to_native_key = 0
-  noremap <Leader> :<C-u>WhichKey '<Leader>'<CR>
+  noremap <Leader> :<C-u>WhichKey '\'<CR>
   noremap <LocalLeader> :<C-u>WhichKey '<LocalLeader>'<CR>
   noremap [ :<C-u>WhichKey '['<CR>
   noremap ] :<C-u>WhichKey ']'<CR>
+  let g:leader_key_map = {}
+  call which_key#register('\', "g:leader_key_map")
+  let g:right_bracket_key_map = {}
+  call which_key#register(']', "g:right_bracket_key_map")
+  call ConfigureMarkdownPlugin()
 
 
 
@@ -514,6 +519,7 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
   noremap <Leader>qb :<C-u>call QuickuiListBuffer()<CR>
   noremap <Leader>qt :<C-u>call QuickuiPreviewTag()<CR>
+  let g:leader_key_map.q = {'name':"Quickui"}
 
 
 
@@ -529,6 +535,7 @@ function! ConfigureManualLoadPlugin()
   let g:NERDTreeDirArrowExpandable = '+'
   let g:NERDTreeDirArrowCollapsible = '-'
   let g:NERDTreeHidden = 0
+  let g:leader_key_map.n = {'name':"NERDTree"}
 
 
 
@@ -543,6 +550,7 @@ function! ConfigureManualLoadPlugin()
   let g:vista_echo_cursor_strategy = 'echo'
   noremap <Leader>vt :<C-u>Vista!!<CR>
   noremap <Leader>vf :<C-u>Vista focus<CR>
+  let g:leader_key_map.v = {'name':"Vista"}
 
 
 
@@ -586,10 +594,11 @@ function! ConfigureManualLoadPlugin()
   nmap <Leader>bu <Plug>BookmarkMoveUp
   nmap <Leader>bd <Plug>BookmarkMoveDown
   nmap <Leader>bl <Plug>BookmarkMoveToLine
+  let g:leader_key_map.b = {'name':"Bookmark"}
 
 
 
-  " Vim-interestingwords and vim-visual-multi setting
+  " vim-interestingwords
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
   vnoremap <Leader>wh :<C-u>call MultipleWordsHighlight('v')<CR>
@@ -607,6 +616,11 @@ function! ConfigureManualLoadPlugin()
     endif
     call InterestingWords(a:mode)
   endfunction
+  let g:leader_key_map.w = {'name':"multi-highligh"}
+
+
+
+  " vim-visual-multi setting
   noremap <C-n> :<C-u>call MultipleCursors()<CR>
   function! MultipleCursors(key_map="\<C-n>")
     if !empty(maparg(a:key_map, 'v', 0, 1))
@@ -651,6 +665,7 @@ function! ConfigureManualLoadPlugin()
     let [a,m,r] = GitGutterGetHunkSummary()
     return printf('+%d ~%d -%d', a, m, r)
   endfunction
+  let g:leader_key_map.g = { 'name':"git", 'i':{'name':"load git plugins"}}
 
 
 
@@ -915,6 +930,8 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
+  let g:right_bracket_key_map.p = {'name':"processes"}
+  let g:right_bracket_key_map.t = {'name':"backtraces and threads"}
 
 
 
