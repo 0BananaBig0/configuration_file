@@ -11,14 +11,24 @@ nnoremap <silent> <localleader> :<c-u>WhichKey  ','<CR>
 
 nnoremap <Leader>a<Tab> :echom "Hello, World"<cr>
 nnoremap <Leader>1 :echom "THis is one"<cr>
+noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
+noremap <Leader>ppy :echom "THis is ppy"<cr>
 
 let g:which_key_map = {}
+call which_key#register('<Space>', "g:which_key_map")
 
 let g:which_key_map.a = {
             \ 'name':"Test",
-            \ '<Tab>':"Hello world"
+            \ '<Tab>':"Hello world",
             \}
+let g:which_key_map.p = {
+            \ 'name':"PPT",
+            \ 'p':{
+                 \  'name':"PPT",
+                 \  't':"ppt",
+                 \},
+            \}
+let g:which_key_map.p.p.y = "ppy"
 
-let g:which_key_map.1 = "One"
+let g:which_key_map['1'] = "One"
 
-call which_key#register('<Space>', "g:which_key_map")
