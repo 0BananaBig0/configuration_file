@@ -1,0 +1,24 @@
+set nocompatible
+
+call plug#begin()
+Plug 'liuchengxu/vim-which-key'
+call plug#end()
+
+let g:mapleader="\<Space>"
+
+nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
+nnoremap <silent> <localleader> :<c-u>WhichKey  ','<CR>
+
+nnoremap <Leader>a<Tab> :echom "Hello, World"<cr>
+nnoremap <Leader>1 :echom "THis is one"<cr>
+
+let g:which_key_map = {}
+
+let g:which_key_map.a = {
+            \ 'name':"Test",
+            \ '<Tab>':"Hello world"
+            \}
+
+let g:which_key_map.1 = "One"
+
+call which_key#register('<Space>', "g:which_key_map")

@@ -1075,9 +1075,9 @@ function! SetIndent()
   elseif &filetype=='python' || &filetype=='perl'
     let l:indent_val = 4
   endif
-  let &tabstop = l:indent_val
-  let &softtabstop = l:indent_val
-  let &shiftwidth = l:indent_val
+  let &tabstop = l:indent_val      " Tab键的显示宽度 and its practical width
+  let &softtabstop = l:indent_val  " 按下Tab键时输入的宽度
+  let &shiftwidth = l:indent_val   " 设置自动缩进时的缩进长度
 endfunction
 function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3
