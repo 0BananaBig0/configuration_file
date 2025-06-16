@@ -109,8 +109,8 @@ mkdir ~/.config/pip -p
 echo '[global]' > ~/.config/pip/pip.conf
 echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.config/pip/pip.conf
 python3 -m pip install --upgrade pip --user
-python3 -m pip install scons ipdb pylint yapf pygments cmakelang cmake-language-server pyright --user
-python3 -m pip install cppman you-get sphinx sphinx-rtd-theme autopep8 vim-vint black --user
+python3 -m pip install scons pylint cmakelang cmake-language-server pyright --user
+python3 -m pip install cppman you-get sphinx sphinx-rtd-theme vim-vint black --user
 python3 -m pip install pysnooper futures --user
 
 sudo dnf config-manager --set-enabled powertools
@@ -156,6 +156,7 @@ sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
   --with-luajit \
   --enable-python3interp=yes \
   --with-python3-config-dir=/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu \
+  --with-python3-command=/usr/bin/python3 \
   --enable-gpm \
   --with-luajit
 make -j24
@@ -189,7 +190,7 @@ python3 -m pip install distro  # 针对 Python3
 cd verilator
 git reset --hard v5.026
 unset VERILATOR_ROOT
-make clean
+make distclean
 autoconf
 ./configure
 make -j24
@@ -232,3 +233,4 @@ sudo dnf install -y ksh ncurses-devel libXdmcp-devel ncurses-compat-libs
 sudo dnf install -y libasan libubsan csh libXScrnSaver-devel
 sudo dnf install -y qt5-qtbase-devel libgfortran libpng12
 sudo dnf install -y libxslt-devel pulseaudio-libs-glib2
+python3.11 -m pip install tclint --user

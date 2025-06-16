@@ -1,8 +1,10 @@
+sudo dnf install epel-release -y
+sudo dnf config-manager --set-enabled powertools
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo dnf clean all
+sudo dnf update -y
 sudo dnf group install -y "Development Tools"  # 注意首字母大写和空格
 sudo dnf install -y make cmake valgrind gcc gcc-c++ llvm clang clang-tools-extra
-curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-sudo dnf install epel-release -y
-sudo dnf clean all
 sudo dnf update -y
 sudo dnf install -y nodejs git sqlite
 sudo dnf install -y python3 python3-pip perl flex java python3-setuptools
@@ -19,7 +21,6 @@ sudo dnf install -y wayland-devel libxkbcommon-devel openssl-devel mesa-libGL-de
 sudo dnf install -y kernel-headers kernel-devel
 sudo dnf install -y kmodtool akmods mokutil openssl dkms
 sudo dnf install -y redhat-lsb-core
-sudo dnf install -y xorg*fonts*
 sudo npm install -g yarn
 cd ~/wsl_shared_folder/font
 sudo cp DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts -r
@@ -49,8 +50,7 @@ sudo npm install -g @imc-trading/svlangserver
 
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-sudo dnf update
-sudo dnf config-manager --set-enabled powertools
+sudo dnf update -y
 sudo dnf install -y code
 sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo
 sudo dnf install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
@@ -80,10 +80,20 @@ sudo dnf install -y libasan libubsan csh libXScrnSaver-devel
 sudo dnf install -y qt5-qtbase-devel libgfortran libpng12
 sudo dnf install -y libxslt-devel pulseaudio-libs-glib2
 sudo dnf install -y llvm-devel clang-devel
+sudo dnf install -y xorg*fonts*
+cp /home/banana/configuration_file/.gdbinit ~
+cp /home/banana/configuration_file/coc-settings.json ~/.vim
+cp /home/banana/configuration_file/.vimrc ~
+cp /home/banana/configuration_file/.c_cpp ~/.vim -r
+cp /home/banana/configuration_file/.zshrc ~
+cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+cp /home/banana/configuration_file/init.vim ~/.config/nvim
+cp /home/banana/configuration_file/.tessent_startup ~
+cp /home/banana/configuration_file/.perltidyrc ~
 
 mkdir ~/.config/pip -p
 echo '[global]' > ~/.config/pip/pip.conf
-echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.config/pip/pip.conf
+echo 'index-url = http://mirrors.cloud.tencent.com/pypi/simple' >> ~/.config/pip/pip.conf
 python3 -m pip install --upgrade pip --user
 python3 -m pip install scons ipdb pylint yapf pygments cmakelang cmake-language-server pyright --user
 python3 -m pip install cppman you-get sphinx sphinx-rtd-theme autopep8 vim-vint --user
@@ -91,6 +101,7 @@ python3 -m pip install pysnooper futures --user
 python3 -m pip install distro  # 针对 Python3
 python3.11 -m pip install --upgrade pip --user
 python3.11 -m pip install neovim --user
+python3.11 -m pip install tclint --user
 
 cpanm --local-lib=~/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer
 cargo install du-dust@1.1.2

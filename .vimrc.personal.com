@@ -30,35 +30,14 @@ Plug 'dracula/vim', {'as': 'dracula'}
 Plug 'luochen1990/rainbow'
 " 缩进显示
 Plug 'nathanaelkane/vim-indent-guides'
-" Highlight opencl 2.0 syntax
-Plug 'brgmnn/vim-opencl', {'for': ['opencl']}
-" 高亮c++类模板等插件
-Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 " Python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
-" Verilog
-Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
-Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
-" Highlight qmake syntax
-Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
-" Markdown目录构建插件, Manual-load and Delay-load
-Plug 'mzlogin/vim-markdown-toc', {'on': []}
-" 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Vim快捷键管理和提示插件
 Plug 'liuchengxu/vim-which-key', {'on': []}
 " Nerdcommenter快速注释插件
 Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件
 Plug 'skywind3000/asyncrun.vim', {'on': []}
-" 菜单栏插件
-Plug 'skywind3000/vim-quickui', {'on': []}
-" 文件目录插件
-Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
-" 标签窗口列表插件
-Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
-" 书签插件，用于写代码注解等等
-Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
 " Multiple highlights
 Plug 'lfv89/vim-interestingwords', {'on': []}
 " Multiple cursors
@@ -71,16 +50,11 @@ Plug 'airblade/vim-gitgutter', {'on': []}
 Plug 'zivyangll/git-blame.vim', {'on': []}
 " c/cpp debug
 Plug 'puremourning/vimspector', {'on': []}
-" 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
-Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
-" LeaderF extension for navigate the marks
-Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
   autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
-  autocmd BufNewFile,BufRead *.v set filetype=verilog
   autocmd BufNewFile,BufRead *.tessent_startup,*.dofile set filetype=tcl
 augroup END
 
@@ -106,13 +80,6 @@ let g:indent_guides_default_mapping = 0
 
 
 
-" Vim-c-cpp-modern
-let g:cpp_attributes_highlight = 1
-let g:cpp_member_highlight = 1
-let g:cpp_operator_highlight = 1
-
-
-
 " Python-syntax setting
 let g:python_highlight_builtins = 1
 let g:python_highlight_string_formatting = 1
@@ -123,10 +90,7 @@ let g:python_highlight_file_headers_as_comments = 1
 
 
 
-" After 333ms, call the coc.nvim, markdown-preview and so on
-let g:coc_start_at_startup = 0
-function! CocTimerStart(timer)
-  exec 'CocStart'
+function! TimerStart(timer)
   call plug#load('vim-which-key')
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
@@ -134,50 +98,7 @@ function! CocTimerStart(timer)
   call plug#load('asyncrun.vim')
   call InitializeTabPos()
 endfunction
-call timer_start(333,'CocTimerStart',{'repeat':1})
-
-
-
-function! ConfigureMarkdownPlugin()
-  " Coc-markmap, coc-markdownlint setting
-  " Watch workflow from the whole file
-  noremap <Leader>mm :<C-u>CocCommand markmap.watch<CR>
-  " Create markmap html file
-  noremap <Leader>mc :<C-u>CocCommand markmap.create --offline<CR>
-  nnoremap <Leader>mh <Plug>(coc-markmap-create)
-  vnoremap <Leader>mh <Plug>(coc-markmap-create-v)
-  noremap <Leader>mf :<C-u>CocCommand markdownlint.fixAll<CR>
-
-
-
-  " Vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
-  " If you want to go to the last line of the menu, you can press `` in normal mode
-  noremap <Leader>mg :<C-u>call CreateMarkdownMenu()<CR>
-  noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
-  let g:vmt_auto_update_on_save = 0
-  let g:vmt_list_item_char = '-'
-  function! CreateMarkdownMenu()
-    exec 'normal! ms'
-    if !exists(':GenTocGFM')
-      call plug#load('vim-markdown-toc')
-    endif
-    exec "normal! ggO\<ESC>"
-    exec ':GenTocGFM'
-    exec 'normal! ggdd`s'
-  endfunction
-  function! UpdateMarkdownMenu()
-    let l:previous_column = col('.')
-    let l:previous_line = line('.')
-    let l:previous_total_line_count = line('$')
-    if !exists(':UpdateToc')
-      call plug#load('vim-markdown-toc')
-    endif
-    exec ':UpdateToc'
-    let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
-    call setpos('.', [0, l:new_line, l:previous_column, 0])
-  endfunction
-  let g:leader_key_map.m = {'name':"Markdown"}
-endfunction
+call timer_start(333,'TimerStart',{'repeat':1})
 
 
 
@@ -192,152 +113,6 @@ function! ConfigureDelayedPlugin()
   call which_key#register('\', "g:leader_key_map")
   let g:right_bracket_key_map = {}
   call which_key#register(']', "g:right_bracket_key_map")
-  call ConfigureMarkdownPlugin()
-
-
-
-  " coc.nvim setting, ':verbose imap <tab>'
-  " Use tab for trigger completion with characters ahead and navigate.
-  inoremap <expr> <TAB>
-        \ coc#pum#visible() ? coc#pum#next(1):
-        \ CheckBackspace() ? "\<Tab>" :
-        \ coc#refresh()
-  inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-  " Make <CR> to accept selected completion item or notify coc.nvim to format
-  " <C-g>u breaks current undo, please make your own choice.
-  inoremap <expr> <CR> coc#pum#visible() ? coc#_select_confirm()
-                      \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-  function! CheckBackspace() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~# '\s'
-  endfunction
-  nmap <LocalLeader>c <Plug>(coc-declaration)
-  nmap <LocalLeader>d <Plug>(coc-definition)
-  nmap <LocalLeader>f <Plug>(coc-refactor)
-  vmap <LocalLeader>f <Plug>(coc-refactor-selected)
-  nmap <LocalLeader>i <Plug>(coc-implementation)
-  nmap <LocalLeader>j <Plug>(coc-diagnostic-next-error)
-  nmap <LocalLeader>k <Plug>(coc-diagnostic-prev-error)
-  nmap <LocalLeader>n <Plug>(coc-rename)
-  nmap <LocalLeader>r <Plug>(coc-references)
-  nmap [a <Plug>(coc-codeaction)
-  vmap [a <Plug>(coc-codeaction-selected)
-  nmap [l <Plug>(coc-codeaction-line)
-  noremap [c :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
-  noremap [d :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
-  noremap [i :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
-  nmap [j <Plug>(coc-diagnostic-next)
-  nmap [k <Plug>(coc-diagnostic-prev)
-  nmap [o <Plug>(coc-diagnostic-info)
-  noremap [b :<C-u>call CocActionAsync('diagnosticToggleBuffer')<CR>
-  noremap [t :<C-u>call CocActionAsync('diagnosticToggle', 1)<CR>
-  noremap [h :<C-u>CocCommand document.toggleInlayHint<CR>
-  nmap <F7> <Plug>(coc-format)
-  vmap <F7> <Plug>(coc-format-selected)
-  let g:coc_filetype_map = {'opencl': 'c', 'cuda': 'cpp', 'lex':'cpp', 'yacc':'cpp'}
-  " If some LSPs fail to start, navigate to ~/.config/coc/extensions to check if they require downloading any JAR files.
-  " If they do, delete the problematic extension and open a new file; it will automatically download the necessary files again.
-  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets','coc-prettier',
-           \ 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-clang-format-style-options', 'coc-perl', 'coc-vimlsp',
-           \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
-           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
-  let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
-  function! FindRootPatternPath(target_path)
-    let l:root_pattern_path = []
-    " Access target_path
-    let l:target_path = a:target_path.'/'
-    for l:pattern in g:root_patterns
-      for l:str_id in range(strlen(l:target_path) - 1, 0, -1)
-        if l:target_path[l:str_id]=='/'
-          let l:possible_path = strpart(a:target_path, 0, l:str_id)
-          if l:possible_path==$HOME || l:possible_path=='/home/'.$SUDO_USER || l:possible_path=='/'
-            break
-          endif
-          let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
-          if !empty(l:root_pattern_path)
-            return l:root_pattern_path
-          endif
-        endif
-      endfor
-    endfor
-    return l:root_pattern_path
-  endfunction
-  function! JumpToTheMainWin()
-    let l:target_win = win_getid()
-    let l:cur_tab = tabpagenr()
-    for l:win in getwininfo()
-      if l:win['tabnr'] == l:cur_tab && l:win['winid'] < l:target_win
-        let l:target_win = l:win['winid']
-      endif
-    endfor
-    call win_gotoid(l:target_win )
-  endfunction
-  function! WorkspaceRoot()
-    if &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
-        \ || &filetype=='vista' || &buftype=='nofile' || &filetype=='nerdtree'
-      call JumpToTheMainWin() " Avoid potential bugs
-    endif
-    let l:workspace_root = FindRootPatternPath(expand('%:p:h')) " Where we store the opened file
-    if empty(l:workspace_root)
-      echo 'You had better create a root-pattern file like .git in your project.'
-      return expand('%:p:h')
-    endif
-    for l:str_id in range(strlen(l:workspace_root[0]) - 1, 0, -1)
-      if l:workspace_root[0][l:str_id]=='/'
-        let l:workspace_root[0] = strpart(l:workspace_root[0], 0, l:str_id)
-        break
-      endif
-    endfor
-    return l:workspace_root[0]
-  endfunction
-  function! CopyFileRelToCPP(cpp_workspace_root, file_name)
-    let l:source_file = $HOME.'/.vim/.c_cpp/'.a:file_name
-    let l:target_file = a:cpp_workspace_root.'/'.a:file_name
-    if filereadable(l:target_file)
-      echo 'File '.l:target_file.' has existed.'
-    elseif filereadable(l:source_file)
-      let l:source_file_content = readfile(l:source_file)
-      call writefile(l:source_file_content, l:target_file, 's')
-    else
-      echo 'File '.l:source_file.' and file '.l:target_file.' do not exist.'
-      return 0
-    endif
-    return 1
-  endfunction
-  function! ConfigureClangTools()
-    let l:cpp_workspace_root = WorkspaceRoot()
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.clangd')
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
-  endfunction
-  noremap <Leader><F7> :<C-u>call ConfigureClangTools()<CR>
-  noremap K :<C-u>call ShowDocumentation()<CR>
-  function! ShowDocumentation()
-    if CocAction('hasProvider', 'hover')
-      call CocActionAsync('doHover')
-    else
-      call feedkeys('K', 'in')
-    endif
-  endfunction
-  " Highlight the symbol and its references when holding the cursor
-  augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
-  hi sym_hilight guifg='White' guibg='Black'
-  function! GetSelectedContent()
-    " Get the start and end positions of the visual selection
-    let l:start_pos = getpos("'<")
-    let l:end_pos = getpos("'>")
-    " Get the l:lines in the selected range
-    let l:lines = getline(l:start_pos[1], l:end_pos[1])
-    " Handle single-line selection
-    if len(l:lines) == 1
-        let l:lines = [strpart(l:lines[0], l:start_pos[2] - 1, l:end_pos[2] - l:start_pos[2] + 1)]
-    else
-        " Adjust the first and last l:lines based on the selection
-        let l:lines[0] = strpart(l:lines[0], l:start_pos[2] - 1)
-        let l:lines[-1] = strpart(l:lines[-1], 0, l:end_pos[2])
-    endif
-    return join(l:lines, " ")
-  endfunction
 
 
 
@@ -353,10 +128,8 @@ function! ConfigureDelayedPlugin()
           \ 'c': {'left': '//'},
           \ 'cpp': {'left': '//'},
           \ 'cu': {'left': '//'},
-          \ 'opencl': {'left': '//'},
           \ 'lex': {'left': '//'},
           \ 'yacc': {'left': '//'},
-          \ 'qmake': {'left': '#'},
           \ 'qml': {'left': '//'}
           \ } " Use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
@@ -459,145 +232,6 @@ endfunction
 
 
 function! ConfigureManualLoadPlugin()
-  " Vim-quickui setting
-  function! QuickuiConfiguration()
-    call plug#load('vim-quickui')
-    " Clear all the menus
-    call quickui#menu#reset()
-    " Install a 'File' menu, use [text, command] to represent an item.
-    call quickui#menu#install('&File', [
-          \ [ "&Save\tCtrl+s", 'w'],
-          \ [ 'Save &As', 'call feedkey(":saveas ")' ],
-          \ [ 'Save All', 'wa' ],
-          \ [ '--', '' ],
-          \ [ 'LeaderF &File', 'Leaderf file', 'Open file with leaderf'],
-          \ [ 'LeaderF &Mru', 'Leaderf mru --regexMode', 'Open recently accessed files'],
-          \ [ 'LeaderF &Buffer', 'Leaderf buffer', 'List current buffers in leaderf'],
-          \ [ '--', '' ],
-          \ [ "E&xit\tAlt+x", 'q' ],
-          \ ])
-    " Script inside %{...} will be evaluated and expanded in the string
-    call quickui#menu#install('&Option', [
-          \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
-          \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
-          \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
-          \ ])
-    " Register HELP menu with weight 10000
-    call quickui#menu#install('H&elp', [
-          \ ['&Cheatsheet', 'help index', ''],
-          \ ['T&ips', 'help tips', ''],
-          \ ['--',''],
-          \ ['&Tutorial', 'help tutor', ''],
-          \ ['&Quick Reference', 'help quickref', ''],
-          \ ['&Summary', 'help summary', ''],
-          \ ['--',''],
-          \ ['&Vim Script', 'help eval', ''],
-          \ ['&Function List', 'help function-list', ''],
-          \ ], 10000)
-  endfunction
-  function! QuickuiOpenMenu()
-    if !exists('quickui#menu#open')
-      call QuickuiConfiguration()
-    endif
-    call quickui#menu#open()
-  endfunction
-  function! QuickuiListBuffer()
-    if !exists('quickui#tools#list_buffer')
-      call QuickuiConfiguration()
-    endif
-    call quickui#tools#list_buffer('e')
-  endfunction
-  function! QuickuiPreviewTag()
-    if !exists('quickui#tools#preview_tag')
-      call QuickuiConfiguration()
-    endif
-    call quickui#tools#preview_tag('')
-  endfunction
-  " Enable to display tips in the cmdline
-  let g:quickui_show_tip = 1
-  let g:quickui_color_scheme = 'system'
-  noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
-  noremap <Leader>qb :<C-u>call QuickuiListBuffer()<CR>
-  noremap <Leader>qt :<C-u>call QuickuiPreviewTag()<CR>
-  let g:leader_key_map.q = {'name':"Quickui"}
-
-
-
-  " NERDTree Setting
-  noremap <Leader>nt :<C-u>NERDTreeToggle<CR>
-  noremap <Leader>nc :<C-u>NERDTreeCWD<CR>
-  let g:NERDTreeFileExtensionHighlightFullName = 1
-  let g:NERDTreeExactMatchHighlightFullName = 1
-  let g:NERDTreePatternMatchHighlightFullName = 1
-  let g:NERDTreeHighlightFolders = 1
-  let g:NERDTreeHighlightFoldersFullName = 1
-  let g:NERDTreeQuitOnOpen = 1
-  let g:NERDTreeDirArrowExpandable = '+'
-  let g:NERDTreeDirArrowCollapsible = '-'
-  let g:NERDTreeHidden = 0
-  let g:leader_key_map.n = {'name':"NERDTree"}
-
-
-
-  " Vista setting
-  let g:vista_no_mappings = 0
-  let g:vista_default_executive = 'coc'
-  let g:vista#renderer#enable_icon = 1
-  let g:vista_close_on_jump = 1
-  let g:vista_cursor_delay = 0
-  let g:vista_blink = [0,0]
-  let g:vista_top_level_blink = [0,0]
-  let g:vista_echo_cursor_strategy = 'echo'
-  noremap <Leader>vt :<C-u>Vista!!<CR>
-  noremap <Leader>vf :<C-u>Vista focus<CR>
-  let g:leader_key_map.v = {'name':"Vista"}
-
-
-
-  " Vim-bookmarks setting
-  let g:bookmark_no_default_key_mappings = 1
-  let g:bookmark_auto_close = 1
-  let g:bookmark_auto_save = 1
-  " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
-  let g:bookmark_save_per_working_dir = 1
-  function! g:BMWorkDirFileLocation()
-    let l:bookmark_extension = 'bookmarks'
-    if empty($SUDO_USER)
-      let l:bookmark_root_location = $HOME.'/.vim/.vim-bookmarks'
-    else
-      let l:bookmark_root_location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'
-    endif
-    let l:bookmark_path = l:bookmark_root_location.expand('%:p:h')
-    let l:bookmark_file = simplify(l:bookmark_path.'/'.expand('%:t').'.'.l:bookmark_extension)
-    if !isdirectory(l:bookmark_path)
-      call mkdir(l:bookmark_path, 'p')
-      if !empty($SUDO_USER)
-        call system('chown -R $SUDO_USER:$SUDO_USER '.shellescape(l:bookmark_root_location))
-      endif
-    endif
-    if !filereadable(l:bookmark_file)
-      call system('touch '.shellescape(l:bookmark_file))
-      if !empty($SUDO_USER)
-        call system('chown $SUDO_USER:$SUDO_USER '.shellescape(l:bookmark_file))
-      endif
-    endif
-    return l:bookmark_path
-  endfunction
-  noremap <Leader>bo :<C-u>call plug#load('vim-bookmarks')<CR>
-  noremap <Leader>bt :<C-u>BookmarkToggle<CR>
-  noremap <Leader>ba :<C-u>BookmarkAnnotate<CR>
-  noremap <Leader>bs :<C-u>BookmarkShowAll<CR>
-  noremap <Leader>bn :<C-u>BookmarkNext<CR>
-  noremap <Leader>bp :<C-u>BookmarkPrev<CR>
-  noremap <Leader>bc :<C-u>BookmarkClear<CR>
-  noremap <Leader>br :<C-u>BookmarkClearAll<CR>
-  nmap <Leader>bu <Plug>BookmarkMoveUp
-  nmap <Leader>bd <Plug>BookmarkMoveDown
-  nmap <Leader>bl <Plug>BookmarkMoveToLine
-  let g:leader_key_map.b = {'name':"Bookmark"}
-
-
-
   " vim-interestingwords
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
@@ -932,32 +566,6 @@ function! ConfigureManualLoadPlugin()
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
   let g:right_bracket_key_map.p = {'name':"processes"}
   let g:right_bracket_key_map.t = {'name':"backtraces and threads"}
-
-
-
-  " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
-  " ctrl+j/k上下选择显示查找结果，ctrl+上/下键上下移动被显示的查找结果的内容
-  let g:Lf_WindowPosition = 'popup'
-  if empty($SUDO_USER)
-    let g:Lf_CacheDirectory = expand($HOME.'/.vim/cache')
-  else
-    let g:Lf_CacheDirectory = expand('/home/'.$SUDO_USER.'/.vim/cache')
-  endif
-  let g:Lf_GtagsAutoGenerate = 0
-  let g:Lf_Gtagslabel = 'native-pygments'
-  let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
-  let g:Lf_RootMarkers = g:root_patterns
-  let g:Lf_WorkingDirectoryMode = 'Ac'
-  let g:Lf_CursorBlink = 0
-  let g:Lf_RgConfig = [
-          \ '--max-columns=150',
-          \ '--type-add web:*.{html,css,js}*',
-          \ '--glob=!git/*',
-          \ '--hidden'
-      \ ]
-  let g:Lf_PreviewInPopup = 1
-  " Open the preview window automatically
-  let g:Lf_PreviewResult = {'Rg': 1}
 endfunction
 " Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
@@ -1157,6 +765,7 @@ function! SetTitle()
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
+noremap <Leader>` :<C-u>call ShowCurrentModule()<CR>
 function! ShowCurrentModule()
   let l:module_line = search('module', 'bnWz')
   let l:module_name = getline(l:module_line)
@@ -1170,95 +779,8 @@ function! ShowCurrentModule()
   endwhile
   echo 'module -->' l:module_name
 endfunction
-function! ShowNearestClassOrStruct()
-  let l:class_line = search('\n'.'class', 'bnWz')
-  let l:struct_line = search('\n'.'struct', 'bnWz')
-  if(l:class_line > l:struct_line)
-    let l:nearest_name = getline(l:class_line+1)
-  elseif(l:class_line < l:struct_line)
-    let l:nearest_name = getline(l:struct_line+1)
-  else
-    let l:nearest_name = 'No class/struct can be found.'
-  endif
-  let l:nearest_end_poisition = strridx(l:nearest_name, '{')
-  if(l:nearest_end_poisition > 0)
-    let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
-  endif
-  echo l:nearest_name
-endfunction
-noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
-function! CallShowNearestFunction()
-  if &filetype=='cpp' || &filetype=='c'
-     call ShowNearestClassOrStruct()
-  elseif &filetype=='verilog'
-     call ShowCurrentModule()
-  endif
-endfunction
 noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
-noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
-function! CPPCompilation()
-  let l:cpp_workspace_root = WorkspaceRoot()
-  let l:cur_file_path = expand('%:p:h')
-  let l:all_possible_paths = [l:cpp_workspace_root]
-  for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
-    if l:cur_file_path[l:str_id]=='/'
-      call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
-    endif
-  endfor
-  call add(l:all_possible_paths, l:cur_file_path)
-  let l:cmakelist_path = []
-  let l:qmakepro_path = []
-  let l:makefile_path = []
-  let l:sconstruct_path = []
-  for l:possible_path in l:all_possible_paths
-    let l:pattern = l:possible_path."/CMakeLists.txt"
-    " Get the list of matching files (non-recursive)
-    let l:cmakelist_path = glob(l:pattern, 0, 1)
-    if !empty(l:cmakelist_path)
-      let l:cmakelist_path = ' cd '.l:possible_path
-          \ .' && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON'
-      call system('ccache --version')
-      if v:shell_error " Not use ccache
-        echo "ccache is not installed."
-      else
-        let l:cmakelist_path = l:cmakelist_path
-              \ .' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
-              \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
-      endif
-      return l:cmakelist_path.' -S . -B build'
-          \ .' && bear --append -- make -C build -j12'
-    endif
-    let l:pattern = l:possible_path."/*.pro"
-    let l:qmakepro_path = glob(l:pattern, 0, 1)
-    if !empty(l:qmakepro_path)
-      return ' cd '.l:possible_path.' && qmake -o build/Makefile'
-          \ .' && bear --append -- make -C build -j12'
-    endif
-    let l:pattern = l:possible_path."/[m,M]akefile"
-    let l:makefile_path = glob(l:pattern, 0, 1)
-    if !empty(l:makefile_path)
-      return ' cd '.l:possible_path.' && bear --append -- make -j12'
-    endif
-    let l:pattern = l:possible_path."/SConstruct"
-    let l:sconstruct_path = glob(l:pattern, 0, 1)
-    if !empty(l:sconstruct_path)
-      return ' cd '.l:possible_path.' && bear --append -- scons -j12'
-    endif
-  endfor
-  let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
-        \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
-        \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
-  if &filetype=='cpp'
-    return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
-  elseif &filetype=='cuda'
-    return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
-        \ .fnamemodify(expand('%'), ':t:r').'.exe'
-  elseif &filetype=='verilog' || &filetype=='systemverilog'
-    return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out'
-  else
-    return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
-  endif
-endfunction
+noremap <Leader><F2> :<C-u>call CompileAndExcute()<CR>
 if !(exists('*CompileAndExcute') && &filetype=='vim')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
@@ -1268,62 +790,19 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
       exec l:compile_exec.' /usr/bin/env sh %'
     elseif &filetype=='csh'
       exec l:compile_exec.' /usr/bin/env csh %'
-    elseif &filetype=='verilog'
-      let l:verilog_compilation = CPPCompilation()
-      exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
     elseif &filetype=='perl'
       exec l:compile_exec.' /usr/bin/env perl %'
     elseif &filetype=='tcl'
       exec l:compile_exec.' /usr/bin/env tclsh %'
-    elseif &filetype=='markdown'
-      exec ':CocCommand markdown-preview-enhanced.openPreview'
     elseif &filetype=='vim'
       exec ':source ~/.vimrc'
     elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
         \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin()
       call CompileAndExcute()
-    else
-      let l:cpp_compilation = CPPCompilation()
-      if stridx(l:cpp_compilation, 'bear') != -1
-        exec l:compile_exec.l:cpp_compilation
-              \.' && if [ -e build/'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
-              \.' build/'.fnamemodify(expand('%'), ':t:r').'.exe;'
-              \.'  elif [ -e ./'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
-              \.' ./'.fnamemodify(expand('%'), ':t:r').'.exe;'
-              \.'  elif [ -e '.fnamemodify(expand('%:r'), ':p').'.exe ]; then'
-              \.' '.fnamemodify(expand('%:r'), ':p').'.exe;'
-              \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
-              \.' build/*.exe;'
-              \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
-              \.' ./*.exe;'
-              \.' else'
-              \.' '.expand('%:p:h').'/*.exe;'
-              \.' fi'
-      elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
-        exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
-      endif
     endif
   endfunction
 endif
-function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
-  if &filetype=='verilog'
-      let l:verilog_compilation = CPPCompilation()
-      exec l:compile_exec.l:verilog_compilation
-  elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
-      \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
-    call JumpToTheMainWin()
-    call CompileCommand()
-  else
-    let l:cpp_compilation = CPPCompilation()
-    if stridx(l:cpp_compilation, 'bear') != -1
-          \ || ((&filetype=='c' || &filetype=='cpp')
-          \   && expand('%:e')!~'^h.*')
-      exec l:compile_only.l:cpp_compilation
-    endif
-  endif
-endfunction
 noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
