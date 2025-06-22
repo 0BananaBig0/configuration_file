@@ -53,8 +53,6 @@ Plug 'puremourning/vimspector', {'on': []}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
-  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
   autocmd BufNewFile,BufRead *.tessent_startup,*.dofile set filetype=tcl
 augroup END
 
@@ -62,8 +60,7 @@ augroup END
 
 colorscheme dracula
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
-                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
-                  \ :IndentGuidesDisable<CR>
+                  \ :set guifont=Monospace\ 13<CR>
 
 
 
@@ -327,7 +324,7 @@ function! ConfigureManualLoadPlugin()
   noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   noremap <F5> :<C-u>call plug#load('vimspector')<CR>
   silent noremap <S-F5> :<C-u>VimspectorReset<CR>
-  noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
+  noremap ]<F5> :<C-u>set guifont=Monospace\ 11<CR>
               \ :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
   map <F6> <Plug>VimspectorStepOver
@@ -588,7 +585,7 @@ endfunction
 
 " 会使vim看起来不友好的命令
 if has('gui_running')
-  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21
+  set guifont=Monospace\ 12
   " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
   set guicursor=c-i:ver33-Cursor
   set guicursor+=a:blinkon0
@@ -659,7 +656,7 @@ set wildmode=list:longest
 " Prevent exe files from appearing in auto-completion
 set wildignore=*.exe
 " 使回格键（backspace）正常处理indent, eol, nostop等
-set backspace=indent,eol,nostop
+set backspace=2
 " 允许backspace和光标键跨越行边界
 set whichwrap+=<,>,h,l,[,]
 " 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
@@ -812,9 +809,13 @@ noremap <M-S-l> :<C-u>call MoveTabL()<CR>
 inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
 inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
 noremap <C-M-h> gT
+noremap <C-M-j> gT
 noremap <C-M-l> gt
+noremap <C-M-k> gt
 inoremap <C-M-h> <C-o>gT
+inoremap <C-M-j> <C-o>gT
 inoremap <C-M-l> <C-o>gt
+inoremap <C-M-k> <C-o>gt
 function! CloseAndBackTab()
   while winnr('$') > 1 " Prevent the function from closing multiple tabs
     call QuitWin()
@@ -871,7 +872,7 @@ endfunction
 function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
-noremap <LocalLeader><F4> :<C-u>vert diffsplit
+noremap <LocalLeader><F4> :<C-u>vert diffsplit<Space>
 noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
   exec 'normal! m"'

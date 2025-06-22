@@ -1072,6 +1072,7 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
+  autocmd FileType c,cpp,verilog noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
   " Disable automatic word wrap which is enabled by filetype plugin indent on
   autocmd FileType vim,cmake set textwidth=0
 augroup END
@@ -1186,7 +1187,6 @@ function! ShowNearestClassOrStruct()
   endif
   echo l:nearest_name
 endfunction
-noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
 function! CallShowNearestFunction()
   if &filetype=='cpp' || &filetype=='c'
      call ShowNearestClassOrStruct()
@@ -1263,18 +1263,18 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
-      exec l:compile_exec.' /usr/bin/env python3 %'
+      exec l:compile_exec.' python3 %'
     elseif &filetype=='sh'
-      exec l:compile_exec.' /usr/bin/env sh %'
+      exec l:compile_exec.' sh %'
     elseif &filetype=='csh'
-      exec l:compile_exec.' /usr/bin/env csh %'
+      exec l:compile_exec.' csh %'
     elseif &filetype=='verilog'
       let l:verilog_compilation = CPPCompilation()
       exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
     elseif &filetype=='perl'
-      exec l:compile_exec.' /usr/bin/env perl %'
+      exec l:compile_exec.' perl %'
     elseif &filetype=='tcl'
-      exec l:compile_exec.' /usr/bin/env tclsh %'
+      exec l:compile_exec.' tclsh %'
     elseif &filetype=='markdown'
       exec ':CocCommand markdown-preview-enhanced.openPreview'
     elseif &filetype=='vim'
@@ -1392,7 +1392,7 @@ endfunction
 function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
-noremap <LocalLeader><F4> :<C-u>vert diffsplit
+noremap <LocalLeader><F4> :<C-u>vert diffsplit<Space>
 noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
   exec 'normal! m"'
