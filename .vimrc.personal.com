@@ -301,12 +301,75 @@ function! ConfigureManualLoadPlugin()
 
 
   " Vimspector setting
+  let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
+  function! FindRootPatternPath(target_path)
+    let l:root_pattern_path = []
+    " Access target_path
+    let l:target_path = a:target_path.'/'
+    for l:pattern in g:root_patterns
+      for l:str_id in range(strlen(l:target_path) - 1, 0, -1)
+        if l:target_path[l:str_id]=='/'
+          let l:possible_path = strpart(a:target_path, 0, l:str_id)
+          if l:possible_path==$HOME || l:possible_path=='/home/'.$SUDO_USER || l:possible_path=='/'
+            break
+          endif
+          let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
+          if !empty(l:root_pattern_path)
+            return l:root_pattern_path
+          endif
+        endif
+      endfor
+    endfor
+    return l:root_pattern_path
+  endfunction
+  function! JumpToTheMainWin()
+    let l:target_win = win_getid()
+    let l:cur_tab = tabpagenr()
+    for l:win in getwininfo()
+      if l:win['tabnr'] == l:cur_tab && l:win['winid'] < l:target_win
+        let l:target_win = l:win['winid']
+      endif
+    endfor
+    call win_gotoid(l:target_win )
+  endfunction
+  function! WorkspaceRoot()
+    if &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
+        \ || &filetype=='vista' || &buftype=='nofile' || &filetype=='nerdtree'
+      call JumpToTheMainWin() " Avoid potential bugs
+    endif
+    let l:workspace_root = FindRootPatternPath(expand('%:p:h')) " Where we store the opened file
+    if empty(l:workspace_root)
+      echo 'You had better create a root-pattern file like .git in your project.'
+      return expand('%:p:h')
+    endif
+    for l:str_id in range(strlen(l:workspace_root[0]) - 1, 0, -1)
+      if l:workspace_root[0][l:str_id]=='/'
+        let l:workspace_root[0] = strpart(l:workspace_root[0], 0, l:str_id)
+        break
+      endif
+    endfor
+    return l:workspace_root[0]
+  endfunction
+  function! CopyFileRelToCPP(cpp_workspace_root, file_name)
+    let l:source_file = $HOME.'/.vim/.c_cpp/'.a:file_name
+    let l:target_file = a:cpp_workspace_root.'/'.a:file_name
+    if filereadable(l:target_file)
+      echo 'File '.l:target_file.' has existed.'
+    elseif filereadable(l:source_file)
+      let l:source_file_content = readfile(l:source_file)
+      call writefile(l:source_file_content, l:target_file, 's')
+    else
+      echo 'File '.l:source_file.' and file '.l:target_file.' do not exist.'
+      return 0
+    endif
+    return 1
+  endfunction
   function! ConfigureCppDebug()
     let l:cpp_workspace_root = WorkspaceRoot()
-    if !isdirectory(l:cpp_workspace_root.'/.vscode')
-      call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
-    endif
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
+    " if !isdirectory(l:cpp_workspace_root.'/.vscode')
+    "   call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
+    " endif
+    " call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     if CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
       call NUpdateTabTermBuf()
       exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
