@@ -63,5 +63,17 @@
     "workbench.action.tasks.configureTaskRunner",
     "workbench.action.tasks.runTask"
   ],
-  "git.openRepositoryInParentFolders": "always"
+  "git.openRepositoryInParentFolders": "always",
+  "clients": {
+    "svlangserver": {
+      "enabled": true,
+      "command": [
+        "svlangserver"
+      ],
+      "settings": {
+        "systemverilog.launchConfiguration": "/tools/verilator -sv --lint-only -Wall",
+        "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=3 --wrap_spaces=3"
+      }
+    }
+  }
 }
