@@ -65,7 +65,7 @@ Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuf
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile set filetype=tcl
+  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
 augroup END
 
 
@@ -986,7 +986,7 @@ function! SetTitle()
     call setline(1, '#!/usr/bin/env csh')
   elseif &filetype=='perl'
     call setline(1, '#!/usr/bin/env perl')
-  elseif &filetype=='tcl'
+  elseif expand('%:e')=='tcl'
     call setline(1, '#!/usr/bin/env tclsh')
   endif
   let l:column_limit = split(&colorcolumn, ",")[0]
@@ -1024,40 +1024,39 @@ function! SetTitle()
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
 noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
-function! ShowCurrentModule()
-  let l:module_line = search('module', 'bnWz')
-  let l:module_name = getline(l:module_line)
-  let l:module_end_poisition = strridx(l:module_name, '(')
-  if(l:module_end_poisition > 0)
-    let l:module_name = strpart(l:module_name, 0, l:module_end_poisition)
-  endif
-  let l:module_name = strpart(l:module_name, stridx(l:module_name, 'module')+7)
-  while(strpart(l:module_name, 0 , 1)==' ')
-    let l:module_name = strpart(l:module_name, 1)
-  endwhile
-  echo 'module -->' l:module_name
-endfunction
-function! ShowNearestClassOrStruct()
-  let l:class_line = search('\n'.'class', 'bnWz')
-  let l:struct_line = search('\n'.'struct', 'bnWz')
-  if(l:class_line > l:struct_line)
-    let l:nearest_name = getline(l:class_line+1)
-  elseif(l:class_line < l:struct_line)
-    let l:nearest_name = getline(l:struct_line+1)
+function! ShowCurrentCodeBlockName()
+  if &filetype=='tcl'
+    if expand('%:e')=='tcl'
+      let l:name_keyword = 'proc'
+      let l:show_name = 'proc'
+    else
+      let l:name_keyword = '^iProc'
+      let l:show_name = 'iProc'
+    endif
   else
-    let l:nearest_name = 'No class/struct can be found.'
+    let l:name_keyword = '^module'
+    let l:show_name = 'module'
   endif
-  let l:nearest_end_poisition = strridx(l:nearest_name, '{')
-  if(l:nearest_end_poisition > 0)
-    let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
+  if &filetype=='verilog'
+    let l:end_keyword = '('
+  else
+    let l:end_keyword = '{'
   endif
-  echo l:nearest_name
+  let l:block_name_line = search(l:name_keyword, 'bcnWz')
+  let l:block_name = getline(l:block_name_line)
+  let l:block_end_poisition = strridx(l:block_name, l:end_keyword)
+  if(l:block_end_poisition > 0)
+    let l:block_name = strpart(l:block_name, 0, l:block_end_poisition)
+  endif
+  let l:block_name = strpart(l:block_name, stridx(l:block_name, l:show_name) + len(l:show_name) + 1)
+  while(strpart(l:block_name, 0 , 1)==' ')
+    let l:block_name = strpart(l:block_name, 1)
+  endwhile
+  echo l:show_name '-->' l:block_name
 endfunction
 function! CallShowNearestFunction()
-  if &filetype=='cpp' || &filetype=='c'
-     call ShowNearestClassOrStruct()
-  elseif &filetype=='verilog'
-     call ShowCurrentModule()
+  if &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
+     call ShowCurrentCodeBlockName()
   endif
 endfunction
 noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
@@ -1237,6 +1236,8 @@ endfunction
 " Ctrl-Alt-Enter新建空行
 noremap <C-M-CR> :<C-u>put _<CR>
 inoremap <C-M-CR> <C-o>:put _<CR>
+noremap <C-S-CR> :<C-u>put _<CR>
+inoremap <C-S-CR> <C-o>:put _<CR>
 " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
 inoremap <M-h> <Left>
 inoremap <M-j> <Down>
