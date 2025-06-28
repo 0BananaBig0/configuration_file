@@ -1072,7 +1072,6 @@ set incsearch
 augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
-  autocmd FileType c,cpp,verilog noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
   " Disable automatic word wrap which is enabled by filetype plugin indent on
   autocmd FileType vim,cmake set textwidth=0
 augroup END
@@ -1158,6 +1157,7 @@ function! SetTitle()
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
+noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
 function! ShowCurrentModule()
   let l:module_line = search('module', 'bnWz')
   let l:module_name = getline(l:module_line)
@@ -1263,18 +1263,18 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
   function! CompileAndExcute()
     let l:compile_exec = ':AsyncRun -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
-      exec l:compile_exec.' python3 %'
+      exec l:compile_exec.' /usr/bin/env python3 %'
     elseif &filetype=='sh'
-      exec l:compile_exec.' sh %'
+      exec l:compile_exec.' /usr/bin/env sh %'
     elseif &filetype=='csh'
-      exec l:compile_exec.' csh %'
+      exec l:compile_exec.' /usr/bin/env csh %'
     elseif &filetype=='verilog'
       let l:verilog_compilation = CPPCompilation()
       exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
     elseif &filetype=='perl'
-      exec l:compile_exec.' perl %'
+      exec l:compile_exec.' /usr/bin/env perl %'
     elseif &filetype=='tcl'
-      exec l:compile_exec.' tclsh %'
+      exec l:compile_exec.' /usr/bin/env tclsh %'
     elseif &filetype=='markdown'
       exec ':CocCommand markdown-preview-enhanced.openPreview'
     elseif &filetype=='vim'
@@ -1333,9 +1333,13 @@ noremap <M-S-l> :<C-u>call MoveTabL()<CR>
 inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
 inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
 noremap <C-M-h> gT
+noremap <C-M-j> gT
 noremap <C-M-l> gt
+noremap <C-M-k> gt
 inoremap <C-M-h> <C-o>gT
+inoremap <C-M-j> <C-o>gT
 inoremap <C-M-l> <C-o>gt
+inoremap <C-M-k> <C-o>gt
 function! CloseAndBackTab()
   while winnr('$') > 1 " Prevent the function from closing multiple tabs
     call QuitWin()
