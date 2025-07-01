@@ -234,3 +234,9 @@ sudo dnf install -y libasan libubsan csh libXScrnSaver-devel
 sudo dnf install -y qt5-qtbase-devel libgfortran libpng12
 sudo dnf install -y libxslt-devel pulseaudio-libs-glib2
 python3.11 -m pip install tclint --user
+
+# vimspector(gadgets, debugpy)
+python3.5 debugpy1.5.1: 9575ac1565a0bc03fdb41be3dab3b89754437ac6
+python3.6 debugpy1.6.7: be68c930568a189ca156f8d170383fe2febbe470
+python3.7 debugpy1.7.0: 8fecfde4379af186574286c6cc38cb77f0ef584e
+python3.8 debugpy1.8.11: The latest
