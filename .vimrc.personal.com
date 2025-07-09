@@ -1,7 +1,7 @@
 " 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
 set nocompatible
-" 开启256色支持
-set t_Co=256
+" 开启24bits RGB支持
+set termguicolors
 " 不少插件的信息更新都会需要这个时间
 set updatetime=33
 " 设置<ESC>键响应时间
@@ -73,7 +73,7 @@ augroup END
 colorscheme dracula
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
                   \ :set guifont=Monospace\ 13<CR>
-                  \ :IndentGuidesDisable<CR>
+                  \ :set colorcolumn=0<CR>
 
 
 

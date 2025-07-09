@@ -89,7 +89,7 @@ augroup END
 colorscheme dracula
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
-                  \ :IndentGuidesDisable<CR>
+                  \ :set colorcolumn=0<CR>
 
 
 
