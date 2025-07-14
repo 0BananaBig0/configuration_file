@@ -1157,7 +1157,8 @@ function! SetTitle()
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
-noremap <Leader>` :<C-u>call CallShowNearestFunction()<CR>
+noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
+noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
 function! ShowNearestClassOrStruct()
   let l:class_line = search('^class', 'bcnWz')
   let l:struct_line = search('^struct', 'bcnWz')
@@ -1174,7 +1175,7 @@ function! ShowNearestClassOrStruct()
   endif
   echo l:nearest_name
 endfunction
-function! ShowCurrentCodeBlockName()
+function! ShowCurrentFuncCodeBlockName()
   if &filetype=='tcl'
     if expand('%:e')=='tcl'
       let l:name_keyword = 'proc'
@@ -1183,12 +1184,53 @@ function! ShowCurrentCodeBlockName()
       let l:name_keyword = '^iProc'
       let l:show_name = 'iProc'
     endif
+  elseif &filetype=='perl'
+      let l:name_keyword = 'sub'
+      let l:show_name = 'sub'
+  elseif &filetype=='python'
+      let l:name_keyword = 'def'
+      let l:show_name = 'def'
+  elseif &filetype=='make'
+      let l:name_keyword = '^define'
+      let l:show_name = 'define'
   else
     let l:name_keyword = '^module'
     let l:show_name = 'module'
   endif
   if &filetype=='verilog'
     let l:end_keyword = '('
+  elseif &filetype=='python'
+    let l:end_keyword = ':'
+  elseif &filetype=='make'
+    let l:end_keyword = ''
+  else
+    let l:end_keyword = '{'
+  endif
+  let l:block_name_line = search(l:name_keyword, 'bcnWz')
+  let l:block_name = getline(l:block_name_line)
+  let l:block_end_poisition = strridx(l:block_name, l:end_keyword)
+  if(l:block_end_poisition > 0)
+    let l:block_name = strpart(l:block_name, 0, l:block_end_poisition)
+  endif
+  let l:block_name = strpart(l:block_name, stridx(l:block_name, l:show_name) + len(l:show_name) + 1)
+  while(strpart(l:block_name, 0 , 1)==' ')
+    let l:block_name = strpart(l:block_name, 1)
+  endwhile
+  echo l:show_name '-->' l:block_name
+endfunction
+function! ShowCurrentNoneFuncCodeBlockName()
+  if &filetype=='tcl'
+      let l:name_keyword = 'namespace eval'
+      let l:show_name = 'namespace eval'
+  elseif &filetype=='perl'
+      let l:name_keyword = 'package'
+      let l:show_name = 'package'
+  elseif &filetype=='python'
+      let l:name_keyword = 'class'
+      let l:show_name = 'class'
+  endif
+  if &filetype=='python'
+    let l:end_keyword = ':'
   else
     let l:end_keyword = '{'
   endif
@@ -1208,7 +1250,15 @@ function! CallShowNearestFunction()
   if &filetype=='cpp' || &filetype=='c'
      call ShowNearestClassOrStruct()
   elseif &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
-     call ShowCurrentCodeBlockName()
+        \ || &filetype=='perl' || &filetype=='python' || &filetype=='make'
+     call ShowCurrentFuncCodeBlockName()
+  endif
+endfunction
+function! CallShowNearestFunctionNone()
+  if &filetype=='cpp' || &filetype=='c'
+     call ShowNearestClassOrStruct()
+  elseif &filetype=='tcl' || &filetype=='perl' || &filetype=='python'
+     call ShowCurrentNoneFuncCodeBlockName()
   endif
 endfunction
 noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
