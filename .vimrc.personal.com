@@ -1041,6 +1041,23 @@ function! ShowNearestClassOrStruct()
   endif
   echo l:nearest_name
 endfunction
+function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword)
+  if getline('.') =~ a:name_keyword
+    let l:block_name = getline('.')
+  else
+    let l:block_name_line = search(a:name_keyword, 'bcnWz')
+    let l:block_name = getline(l:block_name_line)
+  endif
+  let l:block_end_position = strridx(l:block_name, a:end_keyword)
+  if(l:block_end_position > 0)
+    let l:block_name = strpart(l:block_name, 0, l:block_end_position)
+  endif
+  let l:block_name = strpart(l:block_name, stridx(l:block_name, a:show_name) + len(a:show_name) + 1)
+  while(strpart(l:block_name, 0 , 1)==' ')
+    let l:block_name = strpart(l:block_name, 1)
+  endwhile
+  echo a:show_name '-->' l:block_name
+endfunction
 function! ShowCurrentFuncCodeBlockName()
   if &filetype=='tcl'
     if expand('%:e')=='tcl'
@@ -1072,17 +1089,7 @@ function! ShowCurrentFuncCodeBlockName()
   else
     let l:end_keyword = '{'
   endif
-  let l:block_name_line = search(l:name_keyword, 'bcnWz')
-  let l:block_name = getline(l:block_name_line)
-  let l:block_end_poisition = strridx(l:block_name, l:end_keyword)
-  if(l:block_end_poisition > 0)
-    let l:block_name = strpart(l:block_name, 0, l:block_end_poisition)
-  endif
-  let l:block_name = strpart(l:block_name, stridx(l:block_name, l:show_name) + len(l:show_name) + 1)
-  while(strpart(l:block_name, 0 , 1)==' ')
-    let l:block_name = strpart(l:block_name, 1)
-  endwhile
-  echo l:show_name '-->' l:block_name
+  call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
 endfunction
 function! ShowCurrentNoneFuncCodeBlockName()
   if &filetype=='tcl'
@@ -1100,17 +1107,7 @@ function! ShowCurrentNoneFuncCodeBlockName()
   else
     let l:end_keyword = '{'
   endif
-  let l:block_name_line = search(l:name_keyword, 'bcnWz')
-  let l:block_name = getline(l:block_name_line)
-  let l:block_end_poisition = strridx(l:block_name, l:end_keyword)
-  if(l:block_end_poisition > 0)
-    let l:block_name = strpart(l:block_name, 0, l:block_end_poisition)
-  endif
-  let l:block_name = strpart(l:block_name, stridx(l:block_name, l:show_name) + len(l:show_name) + 1)
-  while(strpart(l:block_name, 0 , 1)==' ')
-    let l:block_name = strpart(l:block_name, 1)
-  endwhile
-  echo l:show_name '-->' l:block_name
+  call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
 endfunction
 function! CallShowNearestFunction()
   if &filetype=='cpp' || &filetype=='c'
