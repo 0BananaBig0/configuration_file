@@ -1081,15 +1081,15 @@ set expandtab                 " 把Tab字符用空格代替，和tabstop相关
 set list                      " Enable special character display
 set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
 function! SetIndent()
-  let l:indent_val=2
+  let l:indent_val=4
   if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl'
         \ || &filetype=='verilog' || &filetype=='json'
     let l:indent_val = 3     " Tab键的显示宽度
     if &filetype=='c' || &filetype=='cpp'
       set cindent     " 设置使用C/C++语言的自动缩进方式
     endif
-  elseif &filetype=='python' || &filetype=='perl'
-    let l:indent_val = 4
+  elseif &filetype=='vim'
+    let l:indent_val = 2
   endif
   let &tabstop = l:indent_val      " Tab键的显示宽度 and its practical width
   let &softtabstop = l:indent_val  " 按下Tab键时输入的宽度
