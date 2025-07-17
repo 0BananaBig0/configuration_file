@@ -967,8 +967,8 @@ function! AppendInfo(info, column_limit)
       \ .repeat(&commentstring[0], l:padding_str_len - 2)
   let l:rpadding_strs = repeat(&commentstring[0], l:padding_str_len - 2)
       \ .&commentstring[1].&commentstring[0]
-  let l:start_space_len = (a:column_limit - strlen(a:info) - l:padding_str_len * 2) / 2
-  let l:end_space_len = a:column_limit - l:start_space_len - strlen(a:info) - l:padding_str_len * 2
+  let l:start_space_len = (a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2) / 2
+  let l:end_space_len = a:column_limit - l:start_space_len - strdisplaywidth(a:info) - l:padding_str_len * 2
   call append(line('$'), l:lpadding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:rpadding_strs)
 endfunction
 function! SetTitle()
@@ -999,8 +999,20 @@ function! SetTitle()
     call setline(1, l:top_and_bottom)
   endif
   call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
-  call AppendInfo('Author: Huaxiao Liang', l:column_limit)
-  call AppendInfo('Mail: hxliang666@qq.com', l:column_limit)
+  let l:author = 'Huaxiao Liang'
+  let l:email = 'hxliang666@qq.com'
+  if exists('$GIT_AUTHOR_NAME')
+    let l:author = '$GIT_AUTHOR_NAME'
+  elseif exists('$LOG_NAME')
+    let l:author = '$LOG_NAME'
+  endif
+  if exists('$GIT_AUTHOR_EMAIL')
+    let l:email = '$GIT_AUTHOR_EMAIL'
+  elseif exists('$LOG_NAME')
+    let l:email = '$LOG_NAME'
+  endif
+  call AppendInfo('Author: '.l:author, l:column_limit)
+  call AppendInfo('Mail: '.l:email, l:column_limit)
   call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
   call append(line('$'), l:top_and_bottom)
   call append(line('$'), '')
