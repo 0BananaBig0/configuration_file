@@ -240,3 +240,56 @@ python3.5 debugpy1.5.1: 9575ac1565a0bc03fdb41be3dab3b89754437ac6
 python3.6 debugpy1.6.7: be68c930568a189ca156f8d170383fe2febbe470
 python3.7 debugpy1.7.0: 8fecfde4379af186574286c6cc38cb77f0ef584e
 python3.8 debugpy1.8.11: The latest
+git clone --recurse-submodules https://github.com/microsoft/debugpy.git
+cd debugpy
+sudo dnf install python3.11-devel
+python3.11 -m pip install wheel setuptools --user
+python3.11 setup.py build_ext --inplace
+python3.11 -m pip install -e .
+sudo dnf install python38-devel python38
+python3.8 -m pip install wheel setuptools --user
+python3.8 setup.py build_ext --inplace
+python3.8 -m pip install -e .
+
+###### ONLY FOR ME
+sudo dnf install glibc
+wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
+x Python-3.7.3.tgz
+cd python3.7
+./configure \
+  --prefix=/mtkoss/Python3/python3.7.3-rhel8 \
+  --enable-optimizations \
+  --enable-shared \
+  --with-system-ffi \
+  --with-ensurepip=install \
+  CC=gcc \
+  LDFLAGS="-Wl,-rpath=/usr/lib64 -Wl,-rpath=/mtkoss/Python3/python3.7.3-rhel8/lib"
+make -j$(nproc) EXTRA_CFLAGS="-O3"
+
+cd vim_mtk
+make distclean
+export PYTHON377_HOME=/mtkoss/Python3/python3.7.3-rhel8
+./configure \
+  --prefix=/usr/local \
+  --with-features=huge \
+  --enable-multibyte \
+  --enable-python3interp=dynamic \
+  --with-python3-command=$PYTHON377_HOME/bin/python3.7 \
+  --with-python3-config-dir=$PYTHON377_HOME/lib/python3.7/config-3.7m-x86_64-linux-gnu \
+  --enable-rubyinterp=yes \
+  --enable-luainterp=yes \
+  --enable-gui=gtk3 \
+  --enable-cscope \
+  --enable-fontset \
+  --enable-tclinterp=yes \
+  --enable-perlinterp=yes \
+  --enable-gpm \
+  --with-luajit \
+  LDFLAGS="-L$PYTHON377_HOME/lib -Wl,-rpath=$PYTHON377_HOME/lib" \
+  CPPFLAGS="-I$PYTHON377_HOME/include/python3.7m"
+export PATH="$PYTHON377_HOME/bin:$PATH"
+export LD_LIBRARY_PATH="$PYTHON377_HOME/lib:$LD_LIBRARY_PATH"
+make -j24
+sudo make install
+LD_LIBRARY_PATH="$PYTHON377_HOME/lib" vim --version | grep python
+###### ONLY FOR ME
