@@ -1,0 +1,24 @@
+{
+  "name": "Vimium C",
+  "@time": "12/19/2024, 6:19:10 PM",
+  "time": 1734603550788,
+  "environment": {
+    "extension": "1.99.997",
+    "platform": "win",
+    "firefox": 133
+  },
+  "keyLayout": 2,
+  "keyMappings": ["#!no-check", "mapKey <a-c-h> J", "mapKey <a-c-l> K", ""],
+  "userDefinedCss": [
+    ".LH{color:black;",
+    "    border:0px;",
+    "    border-radius:3px;",
+    "    box-shadow:0 0px 0px;",
+    "    box-sizing:border-box;",
+    "    overflow:hidden;",
+    "    padding:0px 0px 0px;",
+    "    position:absolute}",
+    ""
+  ],
+  "vimSync": true
+}

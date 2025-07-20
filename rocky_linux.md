@@ -1,0 +1,1 @@
+rocky_linux是centos8的分支，由centos8的创始人发起，宗旨是百分百和centos的bug兼容,所以用法基本可以参考centos8，同时还有8年的维护。

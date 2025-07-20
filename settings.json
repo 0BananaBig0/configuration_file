@@ -1,0 +1,79 @@
+{
+  "clangd.arguments": [
+    "--all-scopes-completion",
+    "--background-index",
+    "--clang-tidy",
+    "--completion-style=detailed",
+    "--fallback-style=none",
+    "--function-arg-placeholders=1",
+    "--header-insertion=never",
+    "--header-insertion-decorators",
+    "--enable-config",
+    "--j=12",
+    "--pch-storage=memory",
+    "--pretty"
+  ],
+  "clangd.virtualText": true,
+  "clangd.diagnostics.virtualText": true,
+  "inlayHint.enable": true,
+  "clangd.inlayHints.parameterNames": true,
+  "clangd.inlayHints.returnTypes": true,
+  "clangd.inlayHints.alignWithPadding": true,
+  "clangd.inlayHints.spacing": "1",
+  "C_Cpp.codeFolding": "disabled",
+  "C_Cpp.suggestSnippets": false,
+  "C_Cpp.enhancedColorization": "disabled",
+  "C_Cpp.autocomplete": "disabled",
+  "C_Cpp.hover": "disabled",
+  "C_Cpp.default.enableConfigurationSquiggles": false,
+  "C_Cpp.configurationWarnings": "disabled",
+  "C_Cpp.errorSquiggles": "disabled",
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,
+  "C_Cpp.renameRequiresIdentifier": false,
+  "C_Cpp.codeAnalysis.runAutomatically": false,
+  "C_Cpp.formatting": "disabled",
+  "C_Cpp.debugger.useBacktickCommandSubstitution": true,
+  "C_Cpp.clang_format_sortIncludes": false,
+  "C_Cpp.codeAnalysis.clangTidy.codeAction.showClear": "None",
+  "OpenCL.server.enable": false,
+  "vscode-neovim.neovimExecutablePaths.darwin": "/usr/bin/nvim",
+  "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
+  "editor.minimap.enabled": false,
+  "git.enableSmartCommit": true,
+  "[python]": {
+    "editor.formatOnType": true
+  },
+  "editor.fontSize": 18,
+  "editor.fontFamily": "'FantasqueSansM Nerd Font Mono', 'DejaVuSansM Nerd Font Mono', 'UbuntuMono Nerd Font Mono'",
+  "debug.console.fontSize": 0,
+  "scm.inputFontSize": 0,
+  "terminal.integrated.fontSize": 18,
+  "chat.editor.fontSize": 0,
+  "markdown.preview.fontSize": 18,
+  "editor.cursorBlinking": "solid",
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+  "window.zoomLevel": 1.5,
+  "cmake.pinnedCommands": [
+    "workbench.action.tasks.configureTaskRunner",
+    "workbench.action.tasks.runTask"
+  ],
+  "git.openRepositoryInParentFolders": "always",
+  "clients": {
+    "svlangserver": {
+      "enabled": true,
+      "command": [
+        "svlangserver"
+      ],
+      "settings": {
+        "systemverilog.launchConfiguration": "/tools/verilator -sv --lint-only -Wall",
+        "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=3 --wrap_spaces=3"
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+   "languageserver": {
+      "assembly": {
+         "command": "asm-lsp",
+         "filetypes": [
+            "asm"
+         ]
+      },
+      "qml": {
+         "command": "qmlls",
+         "filetypes": [
+            "qml"
+         ]
+      },
+      "svlangserver": {
+         "command": "svlangserver",
+         "filetypes": [
+            "systemverilog",
+            "vhdl",
+            "verilog"
+         ],
+         "settings": {
+            "systemverilog.includeIndexing": [
+               "**/*.{v,sv,svh}"
+            ],
+            "systemverilog.excludeIndexing": [],
+            "systemverilog.launchConfiguration": "verilator --lint-only --language 1364-2005",
+            "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=3 --wrap_spaces=3"
+         }
+      }
+   },
+   "workspace.rootPatterns": [
+      ".git",
+      ".hg",
+      ".projections.json",
+      ".project",
+      ".svn",
+      ".root",
+      ".vscode",
+      "SConstruct"
+   ],
+   "clangd.arguments": [
+      "--all-scopes-completion",
+      "--background-index",
+      "--clang-tidy",
+      "--completion-style=detailed",
+      "--fallback-style=none",
+      "--function-arg-placeholders=1",
+      "--header-insertion=never",
+      "--header-insertion-decorators",
+      "--enable-config",
+      "--j=12",
+      "--pch-storage=memory",
+      "--pretty"
+   ],
+   "dialog.floatHighlight": "sym_hilight",
+   "diagnostic.enable": false,
+   "diagnostic.errorSign": "🌪",
+   "diagnostic.hintSign": "💡",
+   "diagnostic.infoSign": "📄",
+   "diagnostic.messageTarget": "echo",
+   "diagnostic.virtualText": true,
+   "diagnostic.warningSign": "⚡",
+   "inlayHint.enable": true,
+   "markdownlint.config": {
+      "MD013": {
+         "line_length": 100
+      },
+      "ignore_code_blocks": true
+   },
+   "perl.enable": true,
+   "perl.logLevel": 2,
+   "perl.logFile": "${HOME}/.vim/.coc-perl.log",
+   "prettier.formatterPriority": -1,
+   "prettier.printWidth": 80,
+   "prettier.proseWrap": "always",
+   "signature.target": "echo",
+   "suggest.autoTrigger": "none",
+   "suggest.defaultSortMethod": "alphabetical",
+   "suggest.detailField": "preview",
+   "suggest.maxCompleteItemCount": 18,
+   "suggest.noselect": true,
+   "suggest.selection": "recentlyUsedByPrefix",
+   "suggest.virtualText": true,
+   "suggest.triggerAfterInsertEnter": true
+}

@@ -1,0 +1,78 @@
+{
+   "version": "0.3.0",
+   "configurations": [
+      {
+         "name": "C/C++",
+         "type": "cppdbg",
+         "request": "launch",
+         "program": "${workspaceFolder}/.exe",
+         "args": [
+            "",
+            ""
+         ],
+         "stopAtEntry": true,
+         "cwd": "${workspaceFolder}",
+         "environment": [],
+         "externalConsole": false,
+         "MIMode": "gdb",
+         "setupCommands": [
+            {
+               "description": "Enable pretty-printing for gdb",
+               "text": "-enable-pretty-printing",
+               "ignoreFailures": true
+            }
+         ],
+         "breakpoints": {
+            "exception": {
+               "all": "Y"
+            }
+         }
+      },
+      {
+         "name": "Perl",
+         "type": "perl",
+         "request": "launch",
+         "program": "${file}",
+         "args": [
+            "",
+            "",
+            ""
+         ],
+         "stopOnEntry": true,
+         "cwd": "${workspaceFolder}",
+         "perlPath": "perl",
+         "perlArgs": [
+            "-d"
+         ]
+      },
+      {
+         "name": "Python",
+         "type": "python",
+         "request": "launch",
+         "program": "${file}",
+         "args": [
+            "",
+            "",
+            ""
+         ],
+         "stopOnEntry": true,
+         "cwd": "${workspaceFolder}",
+         "console": "integratedTerminal"
+      },
+      {
+         "name": "Bash",
+         "type": "bashdb",
+         "request": "launch",
+         "program": "${file}",
+         "showDebugOutput": true,
+         "terminalKind": "integrated",
+         "args": [
+            "",
+            "",
+            ""
+         ],
+         "stopOnEntry": true,
+         "cwd": "${workspaceFolder}"
+      }
+   ]
+}

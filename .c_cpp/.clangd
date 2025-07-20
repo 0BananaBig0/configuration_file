@@ -1,0 +1,18 @@
+################################################################################
+###                            File Name: .clangd                            ###
+###                          Author: Huaxiao Liang                           ###
+###                         Mail: 1184903633@qq.com                          ###
+###                         02/10/2025-Mon-21:19:22                          ###
+################################################################################
+
+CompileFlags:
+  Add:
+    - -pedantic-errors
+    - -Wall
+    - -Wextra
+    - -Wconversion
+    - -Wsign-conversion
+    - -fsanitize=address,undefined,leak
+    - -fno-omit-frame-pointer
+    - -Wshadow
+    - -Wtype-limits

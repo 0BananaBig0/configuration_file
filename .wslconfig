@@ -1,0 +1,12 @@
+[wsl2]
+swap=4GB          # Disable swap
+memory=32GB     # Customize WSL memory size based on your machine's configuration
+dnsTunneling=true                 # 开启 DNS Tunneling
+firewall=true                     # 开启 Windows 防火墙
+autoProxy=true                    # 开启自动同步代理
+networkingMode=mirrored           # 开启镜像网络
+localhostForwarding=true
+# guiApplications=false             # Disable X11. Wayland is more efficient. But the vim paste function during visual mode does not work correctly.
+
+[experimental]
+autoMemoryReclaim=gradual         # 开启自动回收内存，可在 gradual, dropcache, disabled 之间选择

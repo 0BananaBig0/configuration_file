@@ -1,0 +1,75 @@
+{
+   "languageserver": {
+      "clangd": {
+         "command": "clangd",
+         "rootPatterns": [
+            "compile_flags.txt",
+            "compile_commands.json",
+            ".git"
+         ],
+         "filetypes": [
+            "c",
+            "cc",
+            "cpp",
+            "c++",
+            "objc",
+            "objcpp",
+            "opencl"
+         ],
+         "args": [
+            "--background-index",
+            "--completion-style=detailed",
+            "--header-insertion=never",
+            "--inlay-hints"
+         ]
+      },
+      "svlangserver": {
+         "command": "svlangserver",
+         "rootPatterns": [
+            ".git"
+         ],
+         "module": "/usr/lib/node_modules/@imc-trading/svlangserver/lib/svlangserver.js",
+         "filetypes": [
+            "systemverilog",
+            "vhdl",
+            "verilog"
+         ],
+         "settings": {
+            "systemverilog.includeIndexing": [
+               "**/*.{v,sv,svh}"
+            ],
+            "systemverilog.excludeIndexing": [
+               "test/**/*.sv*"
+            ],
+            "systemverilog.defines": [],
+            "systemverilog.launchConfiguration": "/usr/local/bin/verilator --lint-only --language 1364-2005",
+            "systemverilog.formatCommand": "/usr/local/bin/verible-verilog-format"
+         }
+      }
+   },
+   "workspace.rootPatterns": [
+      ".git",
+      ".hg",
+      ".projections.json",
+      ".project",
+      ".svn",
+      ".root"
+   ],
+   "coc.preferences.jumpCommand": "edit",
+   "diagnostic.enable": false,
+   "diagnostic.errorSign": "✗ ",
+   "diagnostic.messageTarget": "echo",
+   "diagnostic.virtualText": true,
+   "diagnostic.warningSign": "⚡",
+   "markdownlint.onChange": false,
+   "markdownlint.onOpen": false,
+   "markdownlint.onSave": false,
+   "signature.target": "echo",
+   "suggest.autoTrigger": "none",
+   "suggest.detailField": "preview",
+   "suggest.maxCompleteItemCount": 9,
+   "suggest.noselect": true,
+   "suggest.selection": "recentlyUsedByPrefix",
+   "suggest.snippetIndicator": "",
+   "suggest.triggerAfterInsertEnter": true
+}

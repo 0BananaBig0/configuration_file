@@ -1,0 +1,20 @@
+-l=120      # Line Length Setting
+-i=4        # Indentation in Code Blocks
+-ci=2       # Continuation Indentation, like assignment and label
+-bar        # Opening Braces Right
+-ce         # Cuddled Else
+-nsbl       # Opening Sub Braces
+-bbvt=2     # Block Brace Vertical Tightness
+-wn         # Welding
+-lp         # Opening Vertical Tightness and Closing Token Placement
+-vt=2       # Opening Vertical Tightness
+-vtc=2      # Closing Token Placement
+-sot        # Stack Opening Tokens
+-sct        # Stack Closing Tokens
+-pt=2       # Define Horizontal Tightness
+-sbt=2      # Define Horizontal Tightness
+-bt=2       # Define Horizontal Tightness
+-bbt=1      # Define Horizontal Tightness
+-nsfs       # For Loop Semicolon Spaces
+-nolq       # Outdenting Long Quotes
+-kbl=2      # keep old blank lines? 0=no, 1=some, 2=all

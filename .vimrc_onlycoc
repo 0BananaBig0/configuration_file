@@ -1,0 +1,106 @@
+" 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+set nocompatible
+" 开启256色支持
+set t_Co=256
+" 不少插件的信息更新都会需要这个时间
+set updatetime=33
+" 打开文件时进行解码的猜测列表
+set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
+" 把当前文件转换为当前系统编码进行处理，这里为utf-8
+set encoding=utf-8
+scriptencoding utf-8
+" 禁止生成临时文件
+set nobackup
+set nowritebackup
+set noswapfile
+set shortmess+=c
+set showcmd
+set foldmethod=manual
+set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
+set statusline+=%=\ [%{strftime(\"%d/%m/%y-%H:%M\")}]%<
+" 当窗口多于一个时显示状态行(1),总是显示状态行(2)
+set laststatus=2
+" 命令行（在状态行下）的高度，默认为1，这里是2
+set cmdheight=2
+" 显示行号
+set number
+" merge signcolumn and number column into one
+set signcolumn=number
+let g:plug_url_format = 'https://githubfast.com/%s.git'
+call plug#begin('~/.vim/plugged')
+" 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Layz
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
+" After 333ms, call the coc.nvim, markdown-preview and so on
+let g:coc_start_at_startup = 0
+function! CocTimerStart(timer)
+  exec 'CocStart'
+  call LazyPluginConfiguration()
+  if &filetype==?'vim'
+    " Disable automatic word wrapping
+    set textwidth=0
+  endif
+  " call CocActionAsync('diagnosticToggle')
+endfunction
+call timer_start(333,'CocTimerStart',{'repeat':1})
+
+function! LazyPluginConfiguration()
+  " coc setting
+  " Use tab for trigger completion with characters ahead and navigate.
+  " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped
+  " by other plugin before putting this into your config.
+  inoremap <expr> <TAB>
+        \ coc#pum#visible() ? coc#pum#next(1):
+        \ CheckBackspace() ? "\<Tab>" :
+        \ coc#refresh()
+  inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+  " Make <CR> to accept selected completion item or notify coc.nvim to format
+  " <C-g>u breaks current undo, please make your own choice.
+  inoremap <expr> <CR> coc#pum#visible() ? coc#_select_confirm()
+                      \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+  function! CheckBackspace() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+  endfunction
+  nmap <Space>c <Plug>(coc-declaration)
+  nmap <Space>d <Plug>(coc-definition)
+  nmap <Space>f <Plug>(coc-refactor)
+  nmap <Space>i <Plug>(coc-implementation)
+  nmap <Space>j <Plug>(coc-diagnostic-next-error)
+  nmap <Space>k <Plug>(coc-diagnostic-prev-error)
+  nmap <Space>n <Plug>(coc-rename)
+  nmap <Space>r <Plug>(coc-references)
+  nmap [a <Plug>(coc-codeaction)
+  nmap [b <Plug>(coc-codeaction-line)
+  nnoremap [c <CR>:call CocAction('jumpDeclaration', 'tabe')<CR>
+  nnoremap [d <CR>:call CocAction('jumpDefinition', 'tabe')<CR>
+  nnoremap [e :call CocAction('diagnosticToggleBuffer')<CR>
+  nnoremap [i :call CocAction('jumpImplementation', 'tabe')<CR>
+  nmap [j <Plug>(coc-diagnostic-next)
+  nmap [k <Plug>(coc-diagnostic-prev)
+  nmap [l <Plug>(coc-diagnostic-info)
+  nmap [s <Plug>(coc-codeaction-selected)
+  vmap [s <Plug>(coc-codeaction-selected)
+  nnoremap [t :call CocActionAsync('diagnosticToggle')<CR>
+  let g:coc_filetype_map = {'opencl': 'cpp'}
+  let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets',
+           \ 'coc-prettier', 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-perl', 'coc-vimlsp',
+           \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
+           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver']
+  nmap <F7>  <Plug>(coc-format)
+  vmap <F7>  <Plug>(coc-format-selected)
+  " Use K to show documentation in preview window
+  function! ShowDocumentation()
+    if CocAction('hasProvider', 'hover')
+      call CocActionAsync('doHover')
+    else
+      call feedkeys('K', 'in')
+    endif
+  endfunction
+  nnoremap K :call ShowDocumentation()<CR>
+  " Highlight the symbol and its references when holding the cursor
+  augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
+  hi sym_hilight guifg='White' guibg='Black'
+endfunction
+  set guicursor=c-i:ver33-Cursor
+  set guicursor+=a:blinkon0
