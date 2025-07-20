@@ -6,7 +6,6 @@ git config --global alias.logline "log --graph --abbrev-commit"
 git config --global core.editor gvim
 git config --global protocol.https.allow always
 git config --global push.default "current"
-git config --global diff.tool gvimdiff
 # git config --global url."https://githubfast.com/".insteadOf "https://github.com/"
 wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
 sh install.sh

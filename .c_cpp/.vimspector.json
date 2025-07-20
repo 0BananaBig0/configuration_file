@@ -58,6 +58,23 @@
                "userUnhandled": "Y"
             }
          }
+      },
+      "tcl: launch": {
+         "adapter": "tclpro",
+         "variables": {
+            "args": "Useless args"
+         },
+         "configuration": {
+            "request": "launch",
+            "tclsh": "/usr/bin/tclsh",
+            "cwd": "${workspaceRoot}",
+            "target": "${file}",
+            "args": [
+               "",
+               "",
+               ""
+            ]
+         }
       }
    }
 }
