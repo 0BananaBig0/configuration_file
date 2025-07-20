@@ -252,23 +252,39 @@ python3.8 setup.py build_ext --inplace
 python3.8 -m pip install -e .
 
 ###### ONLY FOR ME
-sudo dnf install glibc
+sudo dnf install glibc -y
+ sudo dnf install -y zlib-devel bzip2-devel openssl-devel ncurses-devel \
+libffi-devel readline-devel sqlite-devel tk-devel gdbm-devel xz-devel
+
+tar -zxvf openssl-1.1.1w.tar.gz
+cd openssl-1.1.1w
+./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
+make && sudo make install
+sudo mv /usr/bin/openssl /usr/bin/openssl.bak
+sudo mv /usr/include/openssl /usr/include/openssl.bak
+sudo ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl
+sudo ln -s /usr/local/openssl/include/openssl /usr/include/openssl
+echo "/usr/local/openssl/lib" | sudo tee /etc/ld.so.conf.d/openssl.conf
+sudo ldconfig -v
+
 wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz
 x Python-3.7.3.tgz
-cd python3.7
+cd Python-3.7.3
 ./configure \
-  --prefix=/mtkoss/Python3/python3.7.3-rhel8 \
+  --prefix=/mtkoss/Python3/3.7.3-rhel8/x86_64 \
   --enable-optimizations \
   --enable-shared \
   --with-system-ffi \
   --with-ensurepip=install \
+  --disable-ipv6 \
   CC=gcc \
-  LDFLAGS="-Wl,-rpath=/usr/lib64 -Wl,-rpath=/mtkoss/Python3/python3.7.3-rhel8/lib"
-make -j$(nproc) EXTRA_CFLAGS="-O3"
+  LDFLAGS="-Wl,-rpath=/usr/lib64 -Wl,-rpath=/mtkoss/Python3/3.7.3-rhel8/x86_64/lib"
+make -j$(nproc)
+sudo make install
 
 cd vim_mtk
 make distclean
-export PYTHON377_HOME=/mtkoss/Python3/python3.7.3-rhel8
+export PYTHON377_HOME=/mtkoss/Python3/3.7.3-rhel8/x86_64
 ./configure \
   --prefix=/usr/local \
   --with-features=huge \
