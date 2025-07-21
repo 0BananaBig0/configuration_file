@@ -815,7 +815,7 @@ function! ConfigureManualLoadPlugin()
       call vimspector#LaunchWithSettings(#{configuration: 'python: launch', Test: 'python: launch'})
     elseif &filetype=='tcl'
       call vimspector#LaunchWithSettings(#{configuration: 'tcl: launch', Test: 'tcl: launch'})
-    else
+    elseif &filetype=='c' || &filetype=='cpp'
       call vimspector#LaunchWithSettings(#{configuration: 'cpp: launch', Test: 'cpp: launch'})
     endif
   endfunction
