@@ -686,13 +686,13 @@ function! ConfigureManualLoadPlugin()
   map ]<F2> <Plug>VimspectorRunToCursor
   map ]<S-F2> <Plug>VimspectorStop
   map ]<C-F2> <Plug>VimspectorPause
-  map <F4> <Plug>VimspectorToggleBreakpoint
+  noremap <F4> :<C-u>call ToggleBreakpoint()<CR>
   noremap <S-F4> :<C-u>call vimspector#ClearBreakpoints()<CR>
   map ]<F4> <Plug>VimspectorToggleConditionalBreakpoint
   noremap ]<S-F4> :<C-u>call vimspector#SetAdvancedLineBreakpoint()<CR>
   noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   noremap <F5> :<C-u>call plug#load('vimspector')<CR>
-  silent noremap <S-F5> :<C-u>VimspectorReset<CR>
+  noremap <S-F5> :<C-u>VimspectorReset<CR>
   noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
               \ :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
@@ -790,6 +790,12 @@ function! ConfigureManualLoadPlugin()
       let l:quit_success = 1
     endif
     return l:quit_success
+  endfunction
+  function! ToggleBreakpoint()
+    if !exists("VimspectorShowOutput")
+      call plug#load('vimspector')
+    endif
+    call vimspector#ToggleBreakpoint()
   endfunction
   function! RestartVimspector()
     call QuitVimspectorWins()

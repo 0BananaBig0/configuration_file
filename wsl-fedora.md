@@ -80,6 +80,7 @@ pipx install sphinx-rtd-theme --include-deps
 pipx install autopep8
 pipx install vim-vint
 pipx install tclint
+pipx install black
 pip3 install pysnooper futures neovim --break-system-packages #not do for root
 cargo install du-dust bottom cargo-cache asm-lsp eza
 

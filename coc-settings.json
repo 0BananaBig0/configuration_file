@@ -74,6 +74,7 @@
    "prettier.formatterPriority": -1,
    "prettier.printWidth": 80,
    "prettier.proseWrap": "always",
+   "python.formatting.provider": "black",
    "signature.target": "echo",
    "suggest.autoTrigger": "none",
    "suggest.defaultSortMethod": "alphabetical",
