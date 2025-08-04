@@ -111,6 +111,7 @@ python3 -m pip install --upgrade pip --user
 python3 -m pip install scons pylint cmakelang cmake-language-server pyright --user
 python3 -m pip install cppman you-get sphinx sphinx-rtd-theme vim-vint black --user
 python3 -m pip install pysnooper futures --user
+python3 -m pip install black --user
 
 sudo dnf config-manager --set-enabled powertools
 sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo

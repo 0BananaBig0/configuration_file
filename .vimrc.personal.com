@@ -618,7 +618,7 @@ function! ConfigureManualLoadPlugin()
   sign define vimspectorPCBP          text=●>  texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentThread text=>   texthl=MatchParen linehl=CursorLine
   sign define vimspectorCurrentFrame  text=>   texthl=Special    linehl=CursorLine
-  function! ReshapeVimspectorWins(var = 40)
+  function! ReshapeVimspectorWins(var = 60, enable_stack_trace = 0)
     let l:cur_winid = win_getid()
     call win_gotoid(g:vimspector_session_windows.code)
     nunmenu WinBar
@@ -628,14 +628,17 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.terminal)
     36wincmd |
     call win_gotoid(g:vimspector_session_windows.variables)
+    setlocal wrap
     nunmenu WinBar
     exec a:var.'wincmd |'
     wincmd _
     call win_gotoid(g:vimspector_session_windows.watches)
     nunmenu WinBar
     16wincmd _
-    call win_gotoid(g:vimspector_session_windows.stack_trace)
-    3wincmd _
+    if a:enable_stack_trace
+      call win_gotoid(g:vimspector_session_windows.stack_trace)
+      3wincmd _
+    endif
     call win_gotoid(l:cur_winid)
   endfunction
   function! s:SetUpTerminal()
