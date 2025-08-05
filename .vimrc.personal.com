@@ -474,6 +474,7 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
   vnoremap <Leader>wh :<C-u>call MultipleWordsHighlight('v')<CR>
+  noremap <Leader>wu :<C-u>call UncolorAllWords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
@@ -488,7 +489,7 @@ function! ConfigureManualLoadPlugin()
     endif
     call InterestingWords(a:mode)
   endfunction
-  let g:leader_key_map.w = {'name':"multi-highligh"}
+  let g:leader_key_map.w = {'name':"multi-highlight"}
 
 
 
@@ -1271,6 +1272,7 @@ function! DeleteBlankLine()
   exec 'normal! `"'
 endfunction
 noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
+noremap <LocalLeader>wn :<C-u>nohlsearch<CR>
 function! RetabAndDeleteTraillingUselessChars()
   exec 'normal! ms'
   exec ':%retab!'
