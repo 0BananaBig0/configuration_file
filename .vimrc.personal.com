@@ -474,7 +474,6 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
   vnoremap <Leader>wh :<C-u>call MultipleWordsHighlight('v')<CR>
-  noremap <Leader>wu :<C-u>call UncolorAllWords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
@@ -498,7 +497,6 @@ function! ConfigureManualLoadPlugin()
   function! MultipleCursors(key_map="\<C-n>")
     if !empty(maparg(a:key_map, 'v', 0, 1))
       call LoadVimVisualMulti()
-      break
     endif
     call feedkeys(a:key_map, "!")
   endfunction
@@ -634,6 +632,7 @@ function! ConfigureManualLoadPlugin()
     exec a:var.'wincmd |'
     wincmd _
     call win_gotoid(g:vimspector_session_windows.watches)
+    setlocal wrap
     nunmenu WinBar
     16wincmd _
     if a:enable_stack_trace
@@ -814,9 +813,8 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
-  let g:right_bracket_key_map.p = {'name':"processes"}
-  let g:right_bracket_key_map.t = {'name':"backtraces and threads"}
-
+  let g:right_bracket_key_map.p = {'name':"VimspectorProcesses"}
+  let g:right_bracket_key_map.t = {'name':"VimspectorBacktracesAndThreads"}
 
 
   " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
@@ -967,7 +965,9 @@ set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as 
 function! SetIndent()
   let l:indent_val=4
   if &filetype=='vim'
-    let l:indent_val = 2     " Tab键的显示宽度
+    let l:indent_val = 2
+  elseif expand('%:e')=='icl'
+    let l:indent_val = 3
   endif
   let &tabstop = l:indent_val      " Tab键的显示宽度 and its practical width
   let &softtabstop = l:indent_val  " 按下Tab键时输入的宽度
@@ -1047,6 +1047,19 @@ function! SetTitle()
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
+noremap <LocalLeader>a :<C-u>call AutoWrap()<CR>
+function! AutoWrap()
+  let original_win = winnr()
+  " 遍历两个 diff 窗口
+  for win in range(1, winnr('$'))
+    " 切换到目标窗口
+    execute win . 'wincmd w'
+    setlocal wrap
+    setlocal diffopt+=context:3
+  endfor
+  " 返回原始窗口
+  execute original_win . 'wincmd w'
+endfunction
 noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
 noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
 function! ShowNearestClassOrStruct()
@@ -1100,6 +1113,9 @@ function! ShowCurrentFuncCodeBlockName()
   elseif &filetype=='make'
       let l:name_keyword = '^define'
       let l:show_name = 'define'
+  elseif &filetype=='vim'
+      let l:name_keyword = 'function\|function!'
+      let l:show_name = 'function'
   else
     let l:name_keyword = '^module'
     let l:show_name = 'module'
@@ -1108,7 +1124,7 @@ function! ShowCurrentFuncCodeBlockName()
     let l:end_keyword = '('
   elseif &filetype=='python'
     let l:end_keyword = ':'
-  elseif &filetype=='make'
+  elseif &filetype=='make' || &filetype=='vim'
     let l:end_keyword = ''
   else
     let l:end_keyword = '{'
@@ -1138,6 +1154,7 @@ function! CallShowNearestFunction()
      call ShowNearestClassOrStruct()
   elseif &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
         \ || &filetype=='perl' || &filetype=='python' || &filetype=='make'
+        \ || &filetype=='vim'
      call ShowCurrentFuncCodeBlockName()
   endif
 endfunction
@@ -1272,7 +1289,7 @@ function! DeleteBlankLine()
   exec 'normal! `"'
 endfunction
 noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
-noremap <LocalLeader>wn :<C-u>nohlsearch<CR>
+noremap <LocalLeader>u :<C-u>nohlsearch<CR>
 function! RetabAndDeleteTraillingUselessChars()
   exec 'normal! ms'
   exec ':%retab!'
@@ -1323,7 +1340,7 @@ function! EnterWithoutTraillingComment()
   call setline(l:new_line, l:cur_indent.getline(l:new_line))
   call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
 endfunction
-" Ctrl-Alt-Enter新建空行
+" Ctrl-Alt/Shift-Enter新建空行
 noremap <C-M-CR> :<C-u>put _<CR>
 inoremap <C-M-CR> <C-o>:put _<CR>
 noremap <C-S-CR> :<C-u>put _<CR>

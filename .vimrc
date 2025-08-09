@@ -602,7 +602,6 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
   vnoremap <Leader>wh :<C-u>call MultipleWordsHighlight('v')<CR>
-  noremap <Leader>wu :<C-u>call UncolorAllWords()<CR>
   function! LoadAndSetVimInterestingwords()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
@@ -761,6 +760,7 @@ function! ConfigureManualLoadPlugin()
     exec a:var.'wincmd |'
     wincmd _
     call win_gotoid(g:vimspector_session_windows.watches)
+    setlocal wrap
     nunmenu WinBar
     16wincmd _
     if a:enable_stack_trace
@@ -794,15 +794,15 @@ function! ConfigureManualLoadPlugin()
     endif
     return l:quit_success
   endfunction
+  function! RestartVimspector()
+    call QuitVimspectorWins()
+    call vimspector#Restart()
+  endfunction
   function! ToggleBreakpoint()
     if !exists("VimspectorShowOutput")
       call plug#load('vimspector')
     endif
     call vimspector#ToggleBreakpoint()
-  endfunction
-  function! RestartVimspector()
-    call QuitVimspectorWins()
-    call vimspector#Restart()
   endfunction
   function! ContinueInVimspector()
     if !exists("g:vimspector_session_windows.code")
@@ -941,8 +941,8 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
-  let g:right_bracket_key_map.p = {'name':"processes"}
-  let g:right_bracket_key_map.t = {'name':"backtraces and threads"}
+  let g:right_bracket_key_map.p = {'name':"VimspectorProcesses"}
+  let g:right_bracket_key_map.t = {'name':"VimspectorBacktracesAndThreads"}
 
 
 
@@ -1094,8 +1094,8 @@ set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as 
 function! SetIndent()
   let l:indent_val=4
   if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl'
-        \ || &filetype=='verilog' || &filetype=='json'
-    let l:indent_val = 3     " Tab键的显示宽度
+        \ || &filetype=='verilog' || &filetype=='json' || expand('%:e')=='icl'
+    let l:indent_val = 3
     if &filetype=='c' || &filetype=='cpp'
       set cindent     " 设置使用C/C++语言的自动缩进方式
     endif
@@ -1112,8 +1112,8 @@ function! AppendInfo(info, column_limit)
       \ .repeat(&commentstring[0], l:padding_str_len - 2)
   let l:rpadding_strs = repeat(&commentstring[0], l:padding_str_len - 2)
       \ .&commentstring[1].&commentstring[0]
-  let l:start_space_len = (a:column_limit - strlen(a:info) - l:padding_str_len * 2) / 2
-  let l:end_space_len = a:column_limit - l:start_space_len - strlen(a:info) - l:padding_str_len * 2
+  let l:start_space_len = (a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2) / 2
+  let l:end_space_len = a:column_limit - l:start_space_len - strdisplaywidth(a:info) - l:padding_str_len * 2
   call append(line('$'), l:lpadding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:rpadding_strs)
 endfunction
 function! SetTitle()
@@ -1144,8 +1144,20 @@ function! SetTitle()
     call setline(1, l:top_and_bottom)
   endif
   call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
-  call AppendInfo('Author: Huaxiao Liang', l:column_limit)
-  call AppendInfo('Mail: hxliang666@qq.com', l:column_limit)
+  let l:author = 'Huaxiao Liang'
+  let l:email = 'hxliang666@qq.com'
+  if exists('$GIT_AUTHOR_NAME')
+    let l:author = '$GIT_AUTHOR_NAME'
+  elseif exists('$LOG_NAME')
+    let l:author = '$LOG_NAME'
+  endif
+  if exists('$GIT_AUTHOR_EMAIL')
+    let l:email = '$GIT_AUTHOR_EMAIL'
+  elseif exists('$LOG_NAME')
+    let l:email = '$LOG_NAME'
+  endif
+  call AppendInfo('Author: '.l:author, l:column_limit)
+  call AppendInfo('Mail: '.l:email, l:column_limit)
   call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
   call append(line('$'), l:top_and_bottom)
   call append(line('$'), '')
@@ -1167,6 +1179,19 @@ function! SetTitle()
   endif
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
+endfunction
+noremap <LocalLeader>a :<C-u>call AutoWrap()<CR>
+function! AutoWrap()
+  let original_win = winnr()
+  " 遍历两个 diff 窗口
+  for win in range(1, winnr('$'))
+    " 切换到目标窗口
+    execute win . 'wincmd w'
+    setlocal wrap
+    setlocal diffopt+=context:3
+  endfor
+  " 返回原始窗口
+  execute original_win . 'wincmd w'
 endfunction
 noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
 noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
@@ -1221,6 +1246,9 @@ function! ShowCurrentFuncCodeBlockName()
   elseif &filetype=='make'
       let l:name_keyword = '^define'
       let l:show_name = 'define'
+  elseif &filetype=='vim'
+      let l:name_keyword = 'function\|function!'
+      let l:show_name = 'function'
   else
     let l:name_keyword = '^module'
     let l:show_name = 'module'
@@ -1229,7 +1257,7 @@ function! ShowCurrentFuncCodeBlockName()
     let l:end_keyword = '('
   elseif &filetype=='python'
     let l:end_keyword = ':'
-  elseif &filetype=='make'
+  elseif &filetype=='make' || &filetype=='vim'
     let l:end_keyword = ''
   else
     let l:end_keyword = '{'
@@ -1259,6 +1287,7 @@ function! CallShowNearestFunction()
      call ShowNearestClassOrStruct()
   elseif &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
         \ || &filetype=='perl' || &filetype=='python' || &filetype=='make'
+        \ || &filetype=='vim'
      call ShowCurrentFuncCodeBlockName()
   endif
 endfunction
@@ -1499,7 +1528,7 @@ function! DeleteBlankLine()
   exec 'normal! `"'
 endfunction
 noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
-noremap <LocalLeader>wn :<C-u>nohlsearch<CR>
+noremap <LocalLeader>u :<C-u>nohlsearch<CR>
 function! RetabAndDeleteTraillingUselessChars()
   exec 'normal! ms'
   exec ':%retab!'

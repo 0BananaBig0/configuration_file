@@ -309,3 +309,4 @@ make -j24
 sudo make install
 LD_LIBRARY_PATH="$PYTHON377_HOME/lib" vim --version | grep python
 ###### ONLY FOR ME
+sudo dnf install konsole -y
