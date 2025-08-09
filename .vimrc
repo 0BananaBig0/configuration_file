@@ -1147,14 +1147,14 @@ function! SetTitle()
   let l:author = 'Huaxiao Liang'
   let l:email = 'hxliang666@qq.com'
   if exists('$GIT_AUTHOR_NAME')
-    let l:author = '$GIT_AUTHOR_NAME'
+    let l:author = $GIT_AUTHOR_NAME
   elseif exists('$LOG_NAME')
-    let l:author = '$LOG_NAME'
+    let l:author = $LOG_NAME
   endif
   if exists('$GIT_AUTHOR_EMAIL')
-    let l:email = '$GIT_AUTHOR_EMAIL'
+    let l:email = $GIT_AUTHOR_EMAIL
   elseif exists('$LOG_NAME')
-    let l:email = '$LOG_NAME'
+    let l:email = $LOG_NAME
   endif
   call AppendInfo('Author: '.l:author, l:column_limit)
   call AppendInfo('Mail: '.l:email, l:column_limit)
