@@ -1196,12 +1196,13 @@ endfunction
 noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
 noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
 function! ShowNearestClassOrStruct()
-  let l:class_line = search('^class', 'bcnWz')
-  let l:struct_line = search('^struct', 'bcnWz')
+  let l:class_line = search('^class\s\+.\+', 'bcnWz')
+  let l:struct_line = search('^struct\s\+.\+', 'bcnWz')
+    let l:nearest_name = 'No class/struct can be found.'
   if(l:class_line > l:struct_line)
-    let l:nearest_name = getline(l:class_line+1)
+    let l:nearest_name = getline(l:class_line)
   elseif(l:class_line < l:struct_line)
-    let l:nearest_name = getline(l:struct_line+1)
+    let l:nearest_name = getline(l:struct_line)
   else
     let l:nearest_name = 'No class/struct can be found.'
   endif
@@ -1231,26 +1232,26 @@ endfunction
 function! ShowCurrentFuncCodeBlockName()
   if &filetype=='tcl'
     if expand('%:e')=='tcl'
-      let l:name_keyword = 'proc'
+      let l:name_keyword = 'proc\s\+.\+\s*{'
       let l:show_name = 'proc'
     else
-      let l:name_keyword = '^iProc'
+      let l:name_keyword = '^iProc\s\+.\+\s*{'
       let l:show_name = 'iProc'
     endif
   elseif &filetype=='perl'
-      let l:name_keyword = 'sub'
+      let l:name_keyword = 'sub\s\+.\+\s*{'
       let l:show_name = 'sub'
   elseif &filetype=='python'
-      let l:name_keyword = 'def'
+      let l:name_keyword = 'def\s\+.\+(.*'
       let l:show_name = 'def'
   elseif &filetype=='make'
-      let l:name_keyword = '^define'
+      let l:name_keyword = '^define\s\+.\+'
       let l:show_name = 'define'
   elseif &filetype=='vim'
-      let l:name_keyword = 'function\|function!'
+      let l:name_keyword = 'function\s\+.\+(\|function!\s\+.\+('
       let l:show_name = 'function'
   else
-    let l:name_keyword = '^module'
+    let l:name_keyword = '^module\s\+.\+\s*(\|^Module\s\+.\+\s*{'
     let l:show_name = 'module'
   endif
   if &filetype=='verilog'
@@ -1258,7 +1259,7 @@ function! ShowCurrentFuncCodeBlockName()
   elseif &filetype=='python'
     let l:end_keyword = ':'
   elseif &filetype=='make' || &filetype=='vim'
-    let l:end_keyword = ''
+    let l:end_keyword = '\n'
   else
     let l:end_keyword = '{'
   endif
@@ -1266,13 +1267,13 @@ function! ShowCurrentFuncCodeBlockName()
 endfunction
 function! ShowCurrentNoneFuncCodeBlockName()
   if &filetype=='tcl'
-      let l:name_keyword = 'namespace eval'
+      let l:name_keyword = 'namespace\s\+eval.\+{'
       let l:show_name = 'namespace eval'
   elseif &filetype=='perl'
-      let l:name_keyword = 'package'
+      let l:name_keyword = 'package\s\+.\+{'
       let l:show_name = 'package'
   elseif &filetype=='python'
-      let l:name_keyword = 'class'
+      let l:name_keyword = 'class\s\+.\+:'
       let l:show_name = 'class'
   endif
   if &filetype=='python'
