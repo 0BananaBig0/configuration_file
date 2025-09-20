@@ -49,7 +49,10 @@
             "console": "externalTerminal",
             "cwd": "${workspaceRoot}",
             "stopOnEntry": true,
-            "debugOptions": []
+            "debugOptions": [],
+            "env": {
+               "var_example": "value_example"
+            }
          },
          "breakpoints": {
             "exception": {
