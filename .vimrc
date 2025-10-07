@@ -82,6 +82,7 @@ augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
   autocmd BufNewFile,BufRead *.v set filetype=verilog
   autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
+  autocmd BufNewFile,BufRead *.stil set filetype=stil
 augroup END
 
 
@@ -357,7 +358,8 @@ function! ConfigureDelayedPlugin()
           \ 'lex': {'left': '//'},
           \ 'yacc': {'left': '//'},
           \ 'qmake': {'left': '#'},
-          \ 'qml': {'left': '//'}
+          \ 'qml': {'left': '//'},
+          \ 'stil': {'left': '/*', 'right': '*/'}
           \ } " Use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
   map <F3> <plug>NERDCommenterComment

@@ -66,6 +66,7 @@ call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
   autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
+  autocmd BufNewFile,BufRead *.stil set filetype=stil
 augroup END
 
 
@@ -274,7 +275,8 @@ function! ConfigureDelayedPlugin()
   let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
   let g:NERDCustomDelimiters = {
           \ 'c': {'left': '//'},
-          \ 'cpp': {'left': '//'}
+          \ 'cpp': {'left': '//'},
+          \ 'stil': {'left': '/*', 'right': '*/'}
           \ } " Use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
   map <F3> <plug>NERDCommenterComment
