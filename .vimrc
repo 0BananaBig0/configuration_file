@@ -36,9 +36,6 @@ Plug 'brgmnn/vim-opencl', {'for': ['opencl']}
 Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 " Python 语法高亮插件
 Plug 'vim-python/python-syntax', {'for': ['python']}
-" Verilog
-Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
-Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
 " Highlight qmake syntax
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
 " Markdown目录构建插件, Manual-load and Delay-load
@@ -75,6 +72,9 @@ Plug 'puremourning/vimspector', {'on': []}
 Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
 " LeaderF extension for navigate the marks
 Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
+" Verilog
+Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
+Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
 call plug#end()
 " 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
 augroup Call_Highlight_Plugin
@@ -971,6 +971,16 @@ function! ConfigureManualLoadPlugin()
   let g:Lf_PreviewInPopup = 1
   " Open the preview window automatically
   let g:Lf_PreviewResult = {'Rg': 1}
+
+  " automatic-verilog
+  noremap <Leader>ai :call g:AutoInst(0)<ESC>
+  noremap <Leader>aa :call g:AutoArg()<ESC>
+  noremap <Leader>app :call g:AutoPara(0)<ESC>
+  noremap <Leader>apv :call g:AutoParaValue(0)<ESC>
+  noremap <Leader>ar :call g:AutoReg()<ESC>
+  noremap <Leader>aw :call g:AutoWire()<ESC>
+  noremap <Leader>ad :call g:AutoDef()<ESC>
+  " vim-verilog-instance
 endfunction
 " Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
