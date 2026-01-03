@@ -1363,3 +1363,7 @@ inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
 " Disable Q in normal mode
 noremap Q <Nop>
+" When pressing <Shift-*>, the $character should not be included in the selection.
+set iskeyword-=$
+" When pressing <Shift-*>, the $character should be included in the selection.
+set iskeyword+=/
