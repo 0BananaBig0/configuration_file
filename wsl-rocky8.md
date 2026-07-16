@@ -134,7 +134,7 @@ sudo dnf install -y perl-Devel-CheckCompiler perl-Test-Requires perl-Cwd-Guard p
 sudo dnf install -y perl-File-Copy-Recursive-Reduced perl-Future perl-Term-Table perl-Test-Simple
 sudo dnf install -y perl-Devel-Symdump perl-Class-Inspector perl-Class-Unload
 sudo dnf install -y perl-Pod-Coverage perl-Test-Pod-Coverage perl-Test-Pod perl-Class-Accessor
-cpanm --local-lib=~/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer Neovim::Ext
+cpanm --local-lib=~/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer
 cargo install du-dust@1.1.2
 cargo install bottom@0.8.0 cargo-cache@0.8.3 eza@0.20.24 asm-lsp@0.9.0 --locked
 
