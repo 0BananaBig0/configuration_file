@@ -91,6 +91,9 @@ colorscheme dracula
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                   \ :set colorcolumn=0<CR>
+noremap <Leader>per :<C-u>colorscheme dracula<CR>
+                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21<CR>
+                  \ :set colorcolumn=80,120,160<CR>
 
 
 
@@ -1114,7 +1117,7 @@ function! SetIndent()
   elseif &filetype=='vim'
     let l:indent_val = 2
   endif
-  let &tabstop = l:indent_val      " Tab键的显示宽度 and its practical width
+  let &tabstop = 8      " Tab键的显示宽度 and its practical width
   let &softtabstop = l:indent_val  " 按下Tab键时输入的宽度
   let &shiftwidth = l:indent_val   " 设置自动缩进时的缩进长度
 endfunction
@@ -1612,7 +1615,9 @@ inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
 " Disable Q in normal mode
 noremap Q <Nop>
-" When pressing <Shift-*>, the $character should not be included in the selection.
+" When pressing <Shift-*>, the $ and # should not be included in the selection.
 set iskeyword-=$
-" When pressing <Shift-*>, the $character should be included in the selection.
+set iskeyword-=#
+" When pressing <Shift-*>, the / should be included in the selection.
 set iskeyword+=/
+
