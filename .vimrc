@@ -3,7 +3,7 @@ set nocompatible
 " 开启24bits RGB支持
 set termguicolors
 " 不少插件的信息更新都会需要这个时间
-set updatetime=33
+set updatetime=333
 " 设置<ESC>键响应时间
 set ttimeoutlen=0
 " Setting keymapping timeout
@@ -11,7 +11,7 @@ set timeoutlen=666
 " 匹配括号高亮的时间（单位是十分之一秒）
 set matchtime=1
 " 打开文件时进行解码的猜测列表
-set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,big5,latin1
+set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,big5,latin1
 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
 set encoding=utf-8
 scriptencoding utf-8
@@ -23,6 +23,7 @@ let maplocalleader = ","
 
 
 
+let g:coc_start_at_startup = 0
 call plug#begin('~/.vim/plugged')
 " Vim theme, No_Lazy
 Plug 'dracula/vim', {'as': 'dracula'}
@@ -38,18 +39,20 @@ Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 Plug 'vim-python/python-syntax', {'for': ['python']}
 " Highlight qmake syntax
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
-" Markdown目录构建插件, Manual-load and Delay-load
-Plug 'mzlogin/vim-markdown-toc', {'on': []}
+" Vim快捷键管理和提示插件, Delay-load
+Plug 'liuchengxu/vim-which-key', {'on': []}
 " 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" Vim快捷键管理和提示插件
-Plug 'liuchengxu/vim-which-key', {'on': []}
-" Nerdcommenter快速注释插件
+" Markdown目录构建插件, Manual-load and Delay-load
+Plug 'mzlogin/vim-markdown-toc', {'on': []}
+" Nerdcommenter快速注释插件, Delay-load
 Plug 'preservim/nerdcommenter', {'on': []}
-" 异步执行shell命令插件
+" 异步执行shell命令插件, Delay-load
 Plug 'skywind3000/asyncrun.vim', {'on': []}
-" 菜单栏插件
+" 菜单栏插件, Delay-load
 Plug 'skywind3000/vim-quickui', {'on': []}
+" % match plugins, Delay-load
+Plug 'andymass/vim-matchup', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
@@ -128,14 +131,10 @@ let g:python_highlight_file_headers_as_comments = 1
 
 
 " After 333ms, call the coc.nvim, markdown-preview and so on
-let g:coc_start_at_startup = 0
 function! CocTimerStart(timer)
   exec 'CocStart'
-  call plug#load('vim-which-key')
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
-  call plug#load('nerdcommenter')
-  call plug#load('asyncrun.vim')
   call InitializeTabPos()
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
@@ -187,6 +186,7 @@ endfunction
 
 function! ConfigureDelayedPlugin()
   " Vim-which-key setting
+  call plug#load('vim-which-key')
   let g:which_key_fallback_to_native_key = 0
   noremap <Leader> :<C-u>WhichKey '\'<CR>
   noremap <LocalLeader> :<C-u>WhichKey '<LocalLeader>'<CR>
@@ -346,6 +346,7 @@ function! ConfigureDelayedPlugin()
 
 
   " nerdcommenter插件快速注释
+  call plug#load('nerdcommenter')
   let g:NERDSpaceDelims            = 1      " 在注释符号后加一个空格
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
   let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
@@ -371,6 +372,7 @@ function! ConfigureDelayedPlugin()
 
 
   " Asyncrun setting
+  call plug#load('asyncrun.vim')
   let g:tab_term_buf_size = 33
   function! JumpToTerm(go_to_top = 0, height = 18)
     if !exists('g:tab_term_buf')
@@ -458,6 +460,68 @@ function! ConfigureDelayedPlugin()
   let g:asyncrun_mode = 'term'
   noremap <F8> :<C-u>call ToggleTerminal()<CR>
   noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
+
+
+
+  " vim-matchup configuration
+  call plug#load('vim-matchup')
+  " --------------------------------------------------------------------------
+  " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
+  " --------------------------------------------------------------------------
+  let g:matchup_enabled = 1                " 总开关
+  let g:matchup_motions_enabled = 1        " [% ]% g% 等，便宜，开着
+  let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
+  let g:matchup_surround_enabled = 1       " ds% cs%，可选
+
+  " --- matchparen 模块（这是性能大头）---
+  let g:matchup_matchparen_enabled = 1     " 开高亮，但用下面选项把它压稳
+  let g:matchup_matchparen_deferred = 1    " ★★★ 关键：延迟高亮，CursorMoved 不再同步算
+  let g:matchup_matchparen_deferred_show_delay = 50   " 光标停 50ms 后出高亮
+  let g:matchup_matchparen_deferred_hide_delay = 500  " 移走 500ms 后消高亮
+  let g:matchup_matchparen_timeout = 150   " ★ 从默认 300 压到 150ms，超时放弃不重算
+  let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
+  let g:matchup_matchparen_stopline = 400   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
+  let g:matchup_matchparen_max_matches = 80 " 缓存上限，防大文件膨胀
+  let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
+
+  " --- 分隔符引擎（影响 motion/text-obj 速度）---
+  let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
+  let g:matchup_delim_noskips = 1          " ★ 不在 comment/string 里做 keyword 匹配，C++ 大文件省不少
+
+  " --- off-screen 提示（屏幕外匹配的状态栏/弹窗） ---
+  " 要性能就关：let g:matchup_matchparen_offscreen = {}
+  " 要功能选 status（轻）：
+  let g:matchup_matchparen_offscreen = {'method': 'status'}
+  " popup 好看但贵（要创建浮动窗），性能向不推荐
+
+  " --- 不需要的功能关掉 ---
+  let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
+  let g:matchup_transmute_enabled = 0      " 实验性的，关
+
+  " --------------------------------------------------------------------------
+  " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
+  " --------------------------------------------------------------------------
+  augroup matchup_large_file
+    autocmd!
+    " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
+    autocmd FileType c,cpp,opencl,verilog
+          \ if line('$') > 2000 |
+          \   let b:matchup_matchparen_enabled = 0 |
+          \ endif
+    " tex 是 match-up 作者自己举例的关掉场景（嵌套太多）
+    autocmd FileType tex
+          \ let b:matchup_matchparen_enabled = 0 |
+          \ let b:matchup_matchparen_fallback = 0
+  augroup END
+
+  let g:matchup_matchparen_offscreen = {
+        \ 'method':    'popup',
+        \ 'fullwidth': 1,
+        \ 'highlight': 'Pmenu',
+        \ 'border':    1,
+        \ 'syntax_hl': 1,
+        \ 'scrolloff': 1,
+        \ }
 endfunction
 
 
