@@ -1677,8 +1677,7 @@ inoremap <M-S-a> <C-o>A
 inoremap <M-S-i> <C-o>I
 " Disable Q in normal mode
 noremap Q <Nop>
-" When pressing <Shift-*>, the $ and # should not be included in the selection.
-set iskeyword-=$
-set iskeyword-=#
-" When pressing <Shift-*>, the / should be included in the selection.
-set iskeyword+=/
+" When pressing <Shift-*>, the $, #, : and @ should not be included in the selection.
+set iskeyword-='$,#,:,@'
+" When pressing <Shift-*>, the / and . should be included in the selection.
+set iskeyword+='/,.'
