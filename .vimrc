@@ -472,30 +472,23 @@ function! ConfigureDelayedPlugin()
   " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
   " --------------------------------------------------------------------------
   let g:matchup_enabled = 1                " 总开关
-  let g:matchup_motions_enabled = 1        " [% ]% g% 等，便宜，开着
+  let g:matchup_motion_enabled = 1        " [% ]% g% 等，便宜，开着
   let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
   let g:matchup_surround_enabled = 1       " ds% cs%，可选
 
   " --- matchparen 模块（这是性能大头）---
   let g:matchup_matchparen_enabled = 1     " 开高亮，但用下面选项把它压稳
   let g:matchup_matchparen_deferred = 1    " ★★★ 关键：延迟高亮，CursorMoved 不再同步算
-  let g:matchup_matchparen_deferred_show_delay = 50   " 光标停 50ms 后出高亮
-  let g:matchup_matchparen_deferred_hide_delay = 500  " 移走 500ms 后消高亮
-  let g:matchup_matchparen_timeout = 150   " ★ 从默认 300 压到 150ms，超时放弃不重算
+  let g:matchup_matchparen_deferred_show_delay = 60   " 光标停 60ms 后出高亮
+  let g:matchup_matchparen_deferred_hide_delay = 600  " 移走 600ms 后消高亮
+  let g:matchup_matchparen_timeout = 160   " ★ 从默认 300 压到 160ms，超时放弃不重算
   let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
-  let g:matchup_matchparen_stopline = 400   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
-  let g:matchup_matchparen_max_matches = 80 " 缓存上限，防大文件膨胀
+  let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
   let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
 
   " --- 分隔符引擎（影响 motion/text-obj 速度）---
   let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
   let g:matchup_delim_noskips = 1          " ★ 不在 comment/string 里做 keyword 匹配，C++ 大文件省不少
-
-  " --- off-screen 提示（屏幕外匹配的状态栏/弹窗） ---
-  " 要性能就关：let g:matchup_matchparen_offscreen = {}
-  " 要功能选 status（轻）：
-  let g:matchup_matchparen_offscreen = {'method': 'status'}
-  " popup 好看但贵（要创建浮动窗），性能向不推荐
 
   " --- 不需要的功能关掉 ---
   let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
@@ -509,12 +502,9 @@ function! ConfigureDelayedPlugin()
     " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
     autocmd FileType c,cpp,opencl,verilog
           \ if line('$') > 2000 |
-          \   let b:matchup_matchparen_enabled = 0 |
+            \ let b:matchup_matchparen_enabled = 0 |
+            \ let b:matchup_matchparen_fallback = 0
           \ endif
-    " tex 是 match-up 作者自己举例的关掉场景（嵌套太多）
-    autocmd FileType tex
-          \ let b:matchup_matchparen_enabled = 0 |
-          \ let b:matchup_matchparen_fallback = 0
   augroup END
 
   let g:matchup_matchparen_offscreen = {
