@@ -23,6 +23,43 @@ let maplocalleader = ","
 
 
 
+augroup Auto_Set_FileType
+  autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
+  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
+  autocmd BufNewFile,BufRead *.v set filetype=verilog
+  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
+  autocmd BufNewFile,BufRead *.stil set filetype=stil
+augroup END
+
+
+
+" Rainbow setting
+" Set to 0 if you want to enable it later via :RainbowToggle
+let g:rainbow_active = 1
+
+
+
+" Vim-indent-guides
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_tab_guides = 0
+let g:indent_guides_default_mapping = 0
+
+
+
+" Vim-c-cpp-modern
+let g:cpp_attributes_highlight = 1
+let g:cpp_member_highlight = 1
+let g:cpp_operator_highlight = 1
+
+
+
+" Python-syntax setting
+let g:python_highlight_builtins = 1
+let g:python_highlight_string_formatting = 1
+let g:python_highlight_func_calls = 1
+let g:python_highlight_class_vars = 1
+let g:python_highlight_operators = 1
+let g:python_highlight_file_headers_as_comments = 1
 let g:coc_start_at_startup = 0
 call plug#begin('~/.vim/plugged')
 " Vim theme, No_Lazy
@@ -79,14 +116,6 @@ Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuf
 Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
 Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
 call plug#end()
-" 插件疑似不支持按文件类型加载，手动添加autocmd判断，也不支持利用vim的特性延迟加载
-augroup Call_Highlight_Plugin
-  autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
-  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
-  autocmd BufNewFile,BufRead *.v set filetype=verilog
-  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
-  autocmd BufNewFile,BufRead *.stil set filetype=stil
-augroup END
 
 
 
@@ -97,36 +126,6 @@ noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
 noremap <Leader>per :<C-u>colorscheme dracula<CR>
                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21<CR>
                   \ :set colorcolumn=80,120,160<CR>
-
-
-
-" Rainbow setting
-" Set to 0 if you want to enable it later via :RainbowToggle
-let g:rainbow_active = 1
-
-
-
-" Vim-indent-guides
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_tab_guides = 0
-let g:indent_guides_default_mapping = 0
-
-
-
-" Vim-c-cpp-modern
-let g:cpp_attributes_highlight = 1
-let g:cpp_member_highlight = 1
-let g:cpp_operator_highlight = 1
-
-
-
-" Python-syntax setting
-let g:python_highlight_builtins = 1
-let g:python_highlight_string_formatting = 1
-let g:python_highlight_func_calls = 1
-let g:python_highlight_class_vars = 1
-let g:python_highlight_operators = 1
-let g:python_highlight_file_headers_as_comments = 1
 
 
 
@@ -159,10 +158,15 @@ function! ConfigureMarkdownPlugin()
   noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
   let g:vmt_auto_update_on_save = 0
   let g:vmt_list_item_char = '-'
+  function! LoadMarkdownToc(function_name)
+      call plug#load('vim-markdown-toc')
+      while !exists(a:function_name)
+      endwhile
+  endfunction
   function! CreateMarkdownMenu()
     exec 'normal! ms'
     if !exists(':GenTocGFM')
-      call plug#load('vim-markdown-toc')
+      call LoadMarkdownToc(':GenTocGFM')
     endif
     exec "normal! ggO\<ESC>"
     exec ':GenTocGFM'
@@ -173,7 +177,7 @@ function! ConfigureMarkdownPlugin()
     let l:previous_line = line('.')
     let l:previous_total_line_count = line('$')
     if !exists(':UpdateToc')
-      call plug#load('vim-markdown-toc')
+      call LoadMarkdownToc(':UpdateToc')
     endif
     exec ':UpdateToc'
     let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
@@ -186,15 +190,15 @@ endfunction
 
 function! ConfigureDelayedPlugin()
   " Vim-which-key setting
-  call plug#load('vim-which-key')
   let g:which_key_fallback_to_native_key = 0
+  let g:leader_key_map = {}
+  let g:right_bracket_key_map = {}
+  call plug#load('vim-which-key')
   noremap <Leader> :<C-u>WhichKey '\'<CR>
   noremap <LocalLeader> :<C-u>WhichKey '<LocalLeader>'<CR>
   noremap [ :<C-u>WhichKey '['<CR>
   noremap ] :<C-u>WhichKey ']'<CR>
-  let g:leader_key_map = {}
   call which_key#register('\', "g:leader_key_map")
-  let g:right_bracket_key_map = {}
   call which_key#register(']', "g:right_bracket_key_map")
   call ConfigureMarkdownPlugin()
 
@@ -346,7 +350,6 @@ function! ConfigureDelayedPlugin()
 
 
   " nerdcommenter插件快速注释
-  call plug#load('nerdcommenter')
   let g:NERDSpaceDelims            = 1      " 在注释符号后加一个空格
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
   let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
@@ -366,14 +369,17 @@ function! ConfigureDelayedPlugin()
           \ 'stil': {'left': '/*', 'right': '*/'}
           \ } " Use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
+  call plug#load('nerdcommenter')
   map <F3> <plug>NERDCommenterComment
   map <S-F3> <plug>NERDCommenterUncomment
 
 
 
   " Asyncrun setting
-  call plug#load('asyncrun.vim')
+  let g:asyncrun_save = 1
+  let g:asyncrun_mode = 'term'
   let g:tab_term_buf_size = 33
+  call plug#load('asyncrun.vim')
   function! JumpToTerm(go_to_top = 0, height = 18)
     if !exists('g:tab_term_buf')
       let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
@@ -456,15 +462,12 @@ function! ConfigureDelayedPlugin()
       let g:tab_term_buf[tabpagenr() + 1] = - 1
     endif
   endfunction
-  let g:asyncrun_save = 1
-  let g:asyncrun_mode = 'term'
   noremap <F8> :<C-u>call ToggleTerminal()<CR>
   noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 
 
 
   " vim-matchup configuration
-  call plug#load('vim-matchup')
   " --------------------------------------------------------------------------
   " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
   " --------------------------------------------------------------------------
@@ -522,6 +525,7 @@ function! ConfigureDelayedPlugin()
         \ 'syntax_hl': 1,
         \ 'scrolloff': 1,
         \ }
+  call plug#load('vim-matchup')
 endfunction
 
 
@@ -529,6 +533,9 @@ endfunction
 
 function! ConfigureManualLoadPlugin()
   " Vim-quickui setting
+  let g:quickui_show_tip = 1
+  let g:quickui_color_scheme = 'system'
+  let g:leader_key_map.q = {'name':"Quickui"}
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
     " Clear all the menus
@@ -583,12 +590,9 @@ function! ConfigureManualLoadPlugin()
     call quickui#tools#preview_tag('')
   endfunction
   " Enable to display tips in the cmdline
-  let g:quickui_show_tip = 1
-  let g:quickui_color_scheme = 'system'
   noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
   noremap <Leader>qb :<C-u>call QuickuiListBuffer()<CR>
   noremap <Leader>qt :<C-u>call QuickuiPreviewTag()<CR>
-  let g:leader_key_map.q = {'name':"Quickui"}
 
 
 
@@ -609,6 +613,8 @@ function! ConfigureManualLoadPlugin()
 
 
   " Vista setting
+  noremap <Leader>vt :<C-u>Vista!!<CR>
+  noremap <Leader>vf :<C-u>Vista focus<CR>
   let g:vista_no_mappings = 0
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
@@ -617,8 +623,6 @@ function! ConfigureManualLoadPlugin()
   let g:vista_blink = [0,0]
   let g:vista_top_level_blink = [0,0]
   let g:vista_echo_cursor_strategy = 'echo'
-  noremap <Leader>vt :<C-u>Vista!!<CR>
-  noremap <Leader>vf :<C-u>Vista focus<CR>
   let g:leader_key_map.v = {'name':"Vista"}
 
 
@@ -629,6 +633,7 @@ function! ConfigureManualLoadPlugin()
   let g:bookmark_auto_save = 1
   " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
+  let g:leader_key_map.b = {'name':"Bookmark"}
   function! g:BMWorkDirFileLocation()
     let l:bookmark_extension = 'bookmarks'
     if empty($SUDO_USER)
@@ -663,7 +668,6 @@ function! ConfigureManualLoadPlugin()
   nmap <Leader>bu <Plug>BookmarkMoveUp
   nmap <Leader>bd <Plug>BookmarkMoveDown
   nmap <Leader>bl <Plug>BookmarkMoveToLine
-  let g:leader_key_map.b = {'name':"Bookmark"}
 
 
 
@@ -675,6 +679,8 @@ function! ConfigureManualLoadPlugin()
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
     call plug#load('vim-interestingwords')
+    while !exists('*UncolorAllWords')
+    endwhile
     noremap <Leader>w<S-h> :<C-u>call UncolorAllWords()<CR>
     noremap n :<C-u>call WordNavigation(1)<CR>
     noremap <S-n> :<C-u>call WordNavigation(0)<CR>
@@ -724,6 +730,8 @@ function! ConfigureManualLoadPlugin()
     call plug#load('vim-fugitive')
     call plug#load('vim-gitgutter')
     call plug#load('git-blame.vim')
+    while !exists('*FugitiveStatusline')
+    endwhile
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
@@ -1684,4 +1692,3 @@ set iskeyword-=$
 set iskeyword-=#
 " When pressing <Shift-*>, the / should be included in the selection.
 set iskeyword+=/
-
