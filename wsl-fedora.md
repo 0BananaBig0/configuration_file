@@ -16,6 +16,9 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 echo 'E:\\Users\11849\Downloads\wsl_shared_folder /home/banana/wsl_shared_folder drvfs defaults,uid=1000,gid=1000,metadata 0 0' | sudo tee -a /etc/fstab > /dev/null
+
+# reboot
+sudo shutdown -h now
 ln -s ~/wsl_shared_folder/cpp_workspace ~
 ln -s ~/wsl_shared_folder/from_gcc_to_cpp ~
 ln -s ~/wsl_shared_folder/ubuntu18_zsh_configure ~
@@ -23,16 +26,8 @@ ln -s ~/wsl_shared_folder/configuration_file ~
 ln -s ~/wsl_shared_folder/oasys_rtl_qs_ekit ~
 ln -s ~/wsl_shared_folder/PDK/NangateOpenCellLibrary_45nm ~
 ln -s ~/wsl_shared_folder/PDK/tsmc28_pdk ~
-rm install.sh
-cp /home/banana/configuration_file/.gdbinit ~
-cp /home/banana/configuration_file/coc-settings.json ~/.vim
-cp /home/banana/configuration_file/.vimrc ~
-cp /home/banana/configuration_file/.c_cpp ~/.vim -r
-cp /home/banana/configuration_file/.zshrc ~
-cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
-cp /home/banana/configuration_file/init.vim ~/.config/nvim
-cp /home/banana/configuration_file/.tessent_startup ~
 
+# ==================== 第三阶段：字体安装 ====================
 sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
@@ -48,41 +43,47 @@ sudo dnf install -y wayland-devel libxkbcommon-devel openssl-devel mesa-libGL-de
 sudo dnf install -y kernel-headers kernel-devel
 sudo dnf install -y kmodtool akmods mokutil openssl dkms
 # sudo dnf provides */xxx.so
+sudo dnf install -y python3-devel libxml2-devel libxslt-devel
+mkdir -p ~/wsl_shared_folder/font
+cd ~/wsl_shared_folder/font
 
-cd ~
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/DejaVuSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FantasqueSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/UbuntuMono.zip
-x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
-sudo mv DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts
-sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
-sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
-rm *.zip
-cd /usr/share/fonts
-sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
-sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
+for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do
+  if [ ! -f "${font}.zip" ]; then
+    echo "下载 ${font}.zip..."
+    curl -fL --retry 3 --connect-timeout 10 \
+      "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font}.zip" \
+      -o "${font}.zip" || echo "⚠️ ${font}.zip 下载失败，跳过"
+  fi
+done
+
+for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do
+  [ -f "${font}.zip" ] && unzip -o "${font}.zip" -d "${font}" 2>/dev/null || true
+done
+
+if [ -d "DejaVuSansMono" ] || [ -d "FantasqueSansMono" ] || [ -d "UbuntuMono" ]; then
+  sudo cp -r DejaVuSansMono FantasqueSansMono UbuntuMono /usr/share/fonts/ 2>/dev/null || true
+  sudo chown -R root:root /usr/share/fonts/DejaVuSansMono /usr/share/fonts/FantasqueSansMono /usr/share/fonts/UbuntuMono 2>/dev/null || true
+  sudo chmod -R 755 /usr/share/fonts/DejaVuSansMono /usr/share/fonts/FantasqueSansMono /usr/share/fonts/UbuntuMono 2>/dev/null || true
+fi
+
+sudo mkdir -p /usr/share/fonts/win11
+sudo ln -sf /mnt/c/Windows/Fonts/* /usr/share/fonts/win11/ 2>/dev/null || true
 sudo fc-cache -fv
+cp /home/banana/configuration_file/.gdbinit ~
+cp /home/banana/configuration_file/coc-settings.json ~/.vim
+cp /home/banana/configuration_file/.vimrc ~
+cp /home/banana/configuration_file/.c_cpp ~/.vim -r
+cp /home/banana/configuration_file/.zshrc ~
+cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+cp /home/banana/configuration_file/init.vim ~/.config/nvim
+cp /home/banana/configuration_file/.tessent_startup ~
+source ~/.zshrc
 
-
-pip3 config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
-pipx install scons
-pipx install ipdb
-pipx install pylint
-pipx install yapf
-pipx install pygments
-pipx install cmakelang
-pipx install cmake-language-server
-pipx install pyright
-pipx install cppman
-pipx install you-get
-pipx install sphinx
-pipx install sphinx-rtd-theme --include-deps
-pipx install autopep8
-pipx install vim-vint
-pipx install tclint
-pipx install black
-pip3 install pysnooper futures neovim --break-system-packages #not do for root
-cargo install du-dust bottom cargo-cache asm-lsp eza
+python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+python3 -m pip install --user scons ipdb pylint yapf pygments cmakelang cmake-language-server \
+                       pyright cppman you-get sphinx sphinx-rtd-theme autopep8 \
+                       vim-vint tclint black pysnooper futures neovim #not do for root
+cargo install du-dust bottom cargo-cache asm-lsp eza --locked
 
 # also for root
 yarn config set registry https://registry.npmmirror.com/ --global  && \
