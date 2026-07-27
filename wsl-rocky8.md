@@ -320,3 +320,46 @@ sudo make install
 LD_LIBRARY_PATH="$PYTHON377_HOME/lib" vim --version | grep python
 ###### ONLY FOR ME
 sudo dnf install konsole -y
+
+# install docker
+## 1) enable systemd
+sudo tee /etc/wsl.conf <<'EOF'
+[boot]
+systemd=true
+EOF
+## 2) delete something that maybe conflict with docker
+sudo dnf remove -y podman buildah docker*
+## 3) replace docker source
+#### 安装仓库管理工具
+sudo dnf install -y dnf-plugins-core
+#### 添加阿里云 docker-ce 仓库（CentOS 兼容，Rocky 8 直接用）
+sudo dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+#### 刷新缓存
+sudo dnf makecache
+## 4) install docker family
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+## 5) reboot wsl
+sudo shutdown -h now
+## 6) bypass iptable(only for wsl2-rocky-linux8)
+sudo systemctl stop docker 2>/dev/null
+sudo rm -rf /var/lib/docker/network/
+sudo tee /etc/docker/daemon.json > /dev/null <<'EOF'
+{
+  "exec-opts": ["native.cgroupdriver=cgroupfs"],
+  "storage-driver": "overlay2",
+  "iptables": false,
+  "ip-forward": false,
+  "bridge": "none",
+  "registry-mirrors": [
+    "https://docker.m.daocloud.io",
+    "https://hub-mirror.c.163.com"
+  ]
+}
+EOF
+## 7) enable docker using without sudo
+sudo usermod -aG docker $USER
+## 8) enable docker
+sudo systemctl enable --now docker
+systemctl status docker
+## 9) run docker
+docker run --rm --network=host xxx
