@@ -363,3 +363,7 @@ sudo systemctl enable --now docker
 systemctl status docker
 ## 9) run docker
 docker run --rm --network=host xxx
+
+
+# For tessent open_vi
+sudo dnf install -y xcb-util-wm libxkbcommon xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil libxkbcommon-x11
