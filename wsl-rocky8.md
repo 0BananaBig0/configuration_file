@@ -361,7 +361,8 @@ sudo usermod -aG docker $USER
 ## 8) enable docker
 sudo systemctl enable --now docker
 systemctl status docker
-## 9) run docker
+## 9) reopen terminal
+## 10) run docker
 docker run --rm --network=host xxx
 
 
