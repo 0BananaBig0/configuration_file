@@ -1,0 +1,235 @@
+# ############################################################################ #
+# #                          File Name: dockerfile                           # #
+# #                          Author: Huaxiao Liang                           # #
+# #                         Mail: hxliang666@qq.com                          # #
+# #                         07/29/2026-Wed-23:36:56                          # #
+# ############################################################################ #
+FROM fedora:latest
+
+# ==================== 基础配置 ====================
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV TERM=xterm-256color
+ENV SHELL=/bin/zsh
+ENV USER=banana
+ENV HOME=/home/banana
+
+# 避免交互式提示
+ENV DEBIAN_FRONTEND=noninteractive
+ENV RUNZSH=no
+ENV CHSH=no
+ENV ZSH_DISABLE_COMPILED_COMPLETIONS=true
+
+# ==================== 换国内镜像源 ====================
+# RUN sed -i 's|^metalink=|#metalink=|g' /etc/yum.repos.d/fedora*.repo && \
+#     sed -i 's|^#baseurl=https://|baseurl=https://|g' /etc/yum.repos.d/fedora*.repo && \
+#     sed -i 's|https://download.fedoraproject.org/pub|https://mirrors.ustc.edu.cn/fedora|g' /etc/yum.repos.d/fedora*.repo
+
+# ==================== 第一阶段：基础工具 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    git zsh wget curl which findutils tree \
+    && dnf clean all
+
+# ==================== 创建用户 ====================
+RUN useradd -m -u 1000 -s /bin/zsh banana && \
+    echo "banana ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER banana
+WORKDIR /home/banana
+
+# ==================== Git 配置 ====================
+RUN git config --global user.name "Huaxiao Liang" && \
+    git config --global user.email "1184903633@qq.com" && \
+    git config --global alias.logline "log --graph --abbrev-commit" && \
+    git config --global core.editor "vim" && \
+    git config --global protocol.https.allow always && \
+    git config --global push.default "current" && \
+    git config --global url."https://githubfast.com/".insteadOf "https://github.com/"
+
+# ==================== Oh My Zsh ====================
+RUN wget -q https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && \
+    sh ~/install.sh && \
+    rm -f ~/install.sh
+
+# ==================== Zinit ====================
+RUN bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+
+# ==================== Neovim + Vim-Plug ====================
+RUN mkdir -p ~/.config/nvim ~/.local/share/nvim/site/autoload ~/.vim/autoload && \
+    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim && \
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# ==================== 切换回 root 装开发工具 ====================
+USER root
+
+# ==================== 编译工具链 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    @development-tools make cmake valgrind gcc gcc-c++ clang clangd \
+    llvm clang-tools-extra kernel-headers kernel-devel \
+    && dnf clean all
+
+# ==================== 语言运行时 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    npm nodejs python3 python3-pip python3-devel python3-setuptools \
+    ruby-devel perl cargo gem \
+    java java-devel \
+    && dnf clean all
+
+# ==================== 开发工具 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    neovim vim vim-X11 yarn \
+    bear sqlite ripgrep fd-find zoxide bat hyperfine httpie procs \
+    duf pipx \
+    ShellCheck cargo \
+    boost-devel tcl-devel libxml2-devel libxslt-devel \
+    && dnf clean all
+
+# ==================== 图形/X11/Wayland 依赖（容器里保留头文件即可）=                  
+RUN dnf install -y --setopt=install_weak_deps=False \
+    libX11-devel libXext-devel libXrandr-devel libXcursor-devel \
+    libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel \
+    libxcb-devel xcb-util-cursor-devel xcb-util-wm xcb-util-keysyms \
+    gstreamer1-plugins-base-devel gstreamer1-devel ps \
+    zlib-devel libpng-devel libjpeg-devel libsecret-devel \
+    wayland-devel libxkbcommon-devel openssl-devel mesa-libGL-devel \
+    && dnf clean all
+
+# ==================== 压缩工具 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    p7zip p7zip-plugins \
+    && dnf clean all
+
+# ==================== Perl 生态 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker \
+    perl-Scalar-List-Utils perl-App-cpanminus perl-Coro perl-YAML \
+    perl-IO-AIO perl-Mo-Moose perl-CPAN perl-Path-Tiny perl-IO-Async \
+    perl-Module-Build perl-Module-Build-XSUtil perl-Module-Build-Tiny \
+    perl-ExtUtils-Config perl-ExtUtils-Install perl-ExtUtils-Helpers \
+    perl-Devel-CheckCompiler perl-Test-Requires perl-Cwd-Guard \
+    perl-Capture-Tiny perl-File-Copy-Recursive-Reduced perl-Future \
+    perl-Struct-Dumb perl-Metrics-Any perl-Devel-Symdump \
+    perl-Pod-Coverage perl-Test-Pod-Coverage perl-Test-Pod \
+    perl-Class-Accessor perl-LWP-Protocol-https \
+    perl-Spreadsheet-ParseExcel perl-Spreadsheet-WriteExcel \
+    perl-Spreadsheet-XLSX \
+    && dnf clean all
+
+# ==================== 字体 ====================
+RUN dnf install -y --setopt=install_weak_deps=False \
+    gdouros-symbola-fonts \
+    && dnf clean all
+
+# 创建字体目录
+RUN mkdir -p /usr/share/fonts/nerd /usr/share/fonts/win11
+
+# Nerd Fonts（带重试，网络不稳时不会直接炸）
+RUN cd /tmp && \
+    for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
+        echo "Downloading $$font..." && \
+        curl -fL --retry 5 --connect-timeout 15 \
+            "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/$$font.zip" \
+            -o "$$font.zip" || echo "⚠️ $$font.zip download failed, skipping"; \
+    done && \
+    for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
+        [ -f "$$font.zip" ] && unzip -o "$$font.zip" -d "/usr/share/fonts/nerd/$$font" 2>/dev/null || true; \
+    done && \
+    fc-cache -fv && \
+    rm -f /tmp/*.zip
+
+# ==================== Python 包 ====================
+USER banana
+RUN python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple && \
+    python3 -m pip install --user --no-cache-dir \
+    scons ipdb pylint yapf pygments cmakelang cmake-language-server \
+    pyright cppman you-get sphinx sphinx-rtd-theme autopep8 \
+    vim-vint tclint black pysnooper futures neovim
+
+# ==================== Rust 包 ====================
+RUN cargo install du-dust bottom cargo-cache asm-lsp eza --locked || echo "Some cargo packages failed, continuing..."
+
+# ==================== Node/Yarn/NPM 配置 ====================
+
+USER banana
+RUN yarn config set registry https://registry.npmmirror.com/ --global && \
+    yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global && \
+    yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global && \
+    yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global && \
+    yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global && \
+    yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global && \
+    yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global && \
+    yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global && \
+    yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
+# RUN npm config set registry https://registry.npmmirror.com/
+RUN npm config set coc.nvim:registry https://registry.npmmirror.com
+USER root
+# RUN npm config set coc.nvim:registry https://registry.npmmirror.com
+RUN npm config set registry https://registry.npmmirror.com/ && \
+    npm cache clean --force && \
+    npm install -g neovim && \
+    npm install -g @imc-trading/svlangserver
+
+# ==================== Ruby Gem ====================
+RUN gem install neovim --bindir=/home/banana/.local/bin || echo "Gem install failed, continuing..."
+
+# ==================== CPAN 包 ====================
+RUN cpanm --local-lib=/home/banana/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer && \
+    cpanm --local-lib=/home/banana/.local/perl5 --force Neovim::Ext || echo "CPAN packages partially failed, continuing..."
+
+# ==================== HDL/Verilog 工具链 ====================
+USER root
+# COPR 仓库 + Verible + 其他 HDL 工具
+RUN dnf install -y --setopt=install_weak_deps=False \
+    dnf-plugins-core \
+    && dnf copr enable -y rezso/HDL \
+    && dnf install -y --setopt=install_weak_deps=False \
+    verible verilator iverilog yosys \
+    && dnf clean all
+
+# ==================== 配置文件（需要你提供）====================
+USER banana
+# 把你的 configuration_file 目录放在 Dockerfile 同级目录
+WORKDIR /home/banana
+# 1. 复制 .ssh 时直接指定所有者（避免默认归 root 所有）
+# 假设你的 .ssh 在宿主机的 config_files 目录下（之前建议的目录结构）
+COPY --chown=banana:banana .ssh /home/banana/.ssh
+# 2. 修改权限（加 2>/dev/null || true 防止文件不存在时报错）
+RUN chmod 700 /home/banana/.ssh && \
+    chmod 600 /home/banana/.ssh/id_rsa 2>/dev/null || true && \
+    chmod 644 /home/banana/.ssh/id_rsa.pub 2>/dev/null || true && \
+    chmod 600 /home/banana/.ssh/config 2>/dev/null || true && \
+    chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
+RUN git  clone git@gitee.com:banana33/configuration_file.git
+RUN cp /home/banana/configuration_file/.gdbinit ~
+RUN cp /home/banana/configuration_file/coc-settings.json ~/.vim
+RUN cp /home/banana/configuration_file/.vimrc_only_plug ~/.vimrc
+RUN cp /home/banana/configuration_file/.c_cpp ~/.vim -r
+RUN cp /home/banana/configuration_file/.zshrc ~
+RUN cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+RUN cp /home/banana/configuration_file/init.vim ~/.config/nvim
+RUN cp /home/banana/configuration_file/.tessent_startup ~
+
+# ==================== 预安装 zinit 插件 ====================
+RUN zsh -i -c 'source ~/.zshrc && @zinit-scheduler burst && zinit update --all'
+# ==================== 预生成 zsh 补全 ====================
+RUN zsh -i -c 'source ~/.zshrc && autoload -U compinit && compinit' || true
+# ==================== 默认 shell ====================
+CMD ["/bin/zsh"]
+RUN    vim -c "PlugInstall --sync" \
+        -c "qall!"
+RUN cp /home/banana/configuration_file/.vimrc ~
+
+RUN vim -es -i NONE -c "CocInstall -sync coc-word coc-tag coc-dictionary coc-snippets coc-prettier coc-yaml coc-cmake coc-clangd coc-clang-format-style-options coc-perl coc-vimlsp coc-sh coc-pyright coc-webview coc-markmap coc-markdown-preview-enhanced coc-markdownlint coc-json coc-css coc-tsserver coc-xml" -c "qa" || echo "Some Coc plugins failed, continuing..."
+RUN fc-cache -fv
+# ===== Clear Cache =====
+RUN gem cleanup && \
+    rm -rf ~/.gem/cache/*
+RUN cargo cache --autoclean
+USER root
+RUN dnf clean all \
+    && rm -rf /var/cache/dnf/* /var/cache/libdnf5/* \
+    && dnf autoremove -y \
+    && dnf clean all
+RUN npm cache clean --force
