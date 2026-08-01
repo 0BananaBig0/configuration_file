@@ -26,6 +26,12 @@ ln -s ~/wsl_shared_folder/configuration_file ~
 ln -s ~/wsl_shared_folder/oasys_rtl_qs_ekit ~
 ln -s ~/wsl_shared_folder/PDK/NangateOpenCellLibrary_45nm ~
 ln -s ~/wsl_shared_folder/PDK/tsmc28_pdk ~
+cp ~/wsl_shared_folder/.ssh -r ~
+chmod 700 /home/banana/.ssh && \
+chmod 600 /home/banana/.ssh/id_rsa 2>/dev/null || true && \
+chmod 644 /home/banana/.ssh/id_rsa.pub 2>/dev/null || true && \
+chmod 600 /home/banana/.ssh/config 2>/dev/null || true && \
+chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
 
 # ==================== 第三阶段：字体安装 ====================
 sudo dnf install -y @development-tools
