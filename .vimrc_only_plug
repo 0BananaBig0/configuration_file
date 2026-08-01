@@ -1,0 +1,118 @@
+" 去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
+set nocompatible
+" 开启24bits RGB支持
+set termguicolors
+" 不少插件的信息更新都会需要这个时间
+set updatetime=333
+" 设置<ESC>键响应时间
+set ttimeoutlen=0
+" Setting keymapping timeout
+set timeoutlen=666
+" 匹配括号高亮的时间（单位是十分之一秒）
+set matchtime=1
+" 打开文件时进行解码的猜测列表
+set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,big5,latin1
+" 把当前文件转换为当前系统编码进行处理，这里为utf-8
+set encoding=utf-8
+scriptencoding utf-8
+" 禁止生成临时文件
+set nobackup
+set nowritebackup
+set noswapfile
+let maplocalleader = ","
+
+
+
+augroup Auto_Set_FileType
+  autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
+  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
+  autocmd BufNewFile,BufRead *.v set filetype=verilog
+  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
+  autocmd BufNewFile,BufRead *.stil set filetype=stil
+augroup END
+
+
+
+" Rainbow setting
+" Set to 0 if you want to enable it later via :RainbowToggle
+let g:rainbow_active = 1
+
+
+
+" Vim-indent-guides
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_tab_guides = 0
+let g:indent_guides_default_mapping = 0
+
+
+
+" Vim-c-cpp-modern
+let g:cpp_attributes_highlight = 1
+let g:cpp_member_highlight = 1
+let g:cpp_operator_highlight = 1
+
+
+
+" Python-syntax setting
+let g:python_highlight_builtins = 1
+let g:python_highlight_string_formatting = 1
+let g:python_highlight_func_calls = 1
+let g:python_highlight_class_vars = 1
+let g:python_highlight_operators = 1
+let g:python_highlight_file_headers_as_comments = 1
+let g:coc_start_at_startup = 0
+call plug#begin('~/.vim/plugged')
+" Vim theme, No_Lazy
+Plug 'dracula/vim', {'as': 'dracula'}
+" 彩虹括号
+Plug 'luochen1990/rainbow'
+" 缩进显示
+Plug 'nathanaelkane/vim-indent-guides'
+" Highlight opencl 2.0 syntax
+Plug 'brgmnn/vim-opencl', {'for': ['opencl']}
+" 高亮c++类模板等插件
+Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
+" Python 语法高亮插件
+Plug 'vim-python/python-syntax', {'for': ['python']}
+" Highlight qmake syntax
+Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
+" Vim快捷键管理和提示插件, Delay-load
+Plug 'liuchengxu/vim-which-key', {'on': []}
+" 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Markdown目录构建插件, Manual-load and Delay-load
+Plug 'mzlogin/vim-markdown-toc', {'on': []}
+" Nerdcommenter快速注释插件, Delay-load
+Plug 'preservim/nerdcommenter', {'on': []}
+" 异步执行shell命令插件, Delay-load
+Plug 'skywind3000/asyncrun.vim', {'on': []}
+" 菜单栏插件, Delay-load
+Plug 'skywind3000/vim-quickui', {'on': []}
+" % match plugins, Delay-load
+Plug 'andymass/vim-matchup', {'on': []}
+" 文件目录插件
+Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
+" 标签窗口列表插件
+Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
+" 书签插件，用于写代码注解等等
+Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
+" Multiple highlights
+Plug 'lfv89/vim-interestingwords', {'on': []}
+" Multiple cursors
+Plug 'mg979/vim-visual-multi', {'on':[]}
+" Git command
+Plug 'tpope/vim-fugitive', {'on': []}
+" Git status show
+Plug 'airblade/vim-gitgutter', {'on': []}
+" Git blame info
+Plug 'zivyangll/git-blame.vim', {'on': []}
+" c/cpp debug
+Plug 'puremourning/vimspector', {'on': []}
+" 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
+Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
+" LeaderF extension for navigate the marks
+Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
+" Verilog
+Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
+Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
+call plug#end()
