@@ -31,7 +31,7 @@ RUN useradd -m -u 1000 -s /bin/zsh banana && \
 
 USER banana
 WORKDIR /home/banana
-
+RUN ln -s ~/host_folder/.zsh_history ~/.zsh_history
 # ==================== Git 配置 ====================
 RUN git config --global user.name "Huaxiao Liang" && \
     git config --global user.email "1184903633@qq.com" && \
@@ -117,23 +117,6 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     gdouros-symbola-fonts \
     && dnf clean all
 
-# 创建字体目录
-RUN mkdir -p /usr/share/fonts/nerd /usr/share/fonts/win11
-
-# Nerd Fonts（带重试，网络不稳时不会直接炸）
-RUN cd /tmp && \
-    for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
-        echo "Downloading $$font..." && \
-        curl -fL --retry 5 --connect-timeout 15 \
-            "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/$$font.zip" \
-            -o "$$font.zip" || echo "⚠️ $$font.zip download failed, skipping"; \
-    done && \
-    for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
-        [ -f "$$font.zip" ] && unzip -o "$$font.zip" -d "/usr/share/fonts/nerd/$$font" 2>/dev/null || true; \
-    done && \
-    fc-cache -fv && \
-    rm -f /tmp/*.zip
-
 # ==================== Python 包 ====================
 USER banana
 RUN python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple && \
@@ -146,8 +129,6 @@ RUN python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu
 RUN cargo install du-dust bottom cargo-cache asm-lsp eza --locked || echo "Some cargo packages failed, continuing..."
 
 # ==================== Node/Yarn/NPM 配置 ====================
-
-USER banana
 RUN yarn config set registry https://registry.npmmirror.com/ --global && \
     yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global && \
     yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global && \
@@ -187,15 +168,6 @@ RUN chmod 700 /home/banana/.ssh && \
     chmod 644 /home/banana/.ssh/id_rsa.pub 2>/dev/null || true && \
     chmod 600 /home/banana/.ssh/config 2>/dev/null || true && \
     chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
-RUN git  clone git@gitee.com:banana33/configuration_file.git
-RUN cp /home/banana/configuration_file/.gdbinit ~
-RUN cp /home/banana/configuration_file/coc-settings.json ~/.vim
-RUN cp /home/banana/configuration_file/.vimrc_only_plug ~/.vimrc
-RUN cp /home/banana/configuration_file/.c_cpp ~/.vim -r
-RUN cp /home/banana/configuration_file/.zshrc ~
-RUN cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
-RUN cp /home/banana/configuration_file/init.vim ~/.config/nvim
-RUN cp /home/banana/configuration_file/.tessent_startup ~
 
 # ==================== 预安装 zinit 插件 ====================
 RUN zsh -i -c 'source ~/.zshrc && @zinit-scheduler burst && zinit update --all'
@@ -267,6 +239,38 @@ RUN gem install neovim logger --bindir=/home/banana/.local/bin || echo "Gem inst
 # ==================== CPAN 包 ====================
 RUN cpanm --local-lib=/home/banana/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer && \
     cpanm --local-lib=/home/banana/.local/perl5 --force Neovim::Ext || echo "CPAN packages partially failed, continuing..."
+
+# ===================== Nerd Font ======================
+RUN sudo dnf install -y unzip
+RUN for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
+      if [ ! -f "${font}.zip" ]; then \
+        echo "下载 ${font}.zip..."; \
+        curl -fL --retry 3 --connect-timeout 10 "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font}.zip" -o "${font}.zip"; \
+      fi; \
+    done; \
+    for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
+      [ -f "${font}.zip" ] && unzip -o "${font}.zip" -d "${font}" 2>/dev/null || true; \
+    done; \
+    if [ -d "DejaVuSansMono" ] || [ -d "FantasqueSansMono" ] || [ -d "UbuntuMono" ]; then \
+      sudo cp -r DejaVuSansMono FantasqueSansMono UbuntuMono /usr/share/fonts/ 2>/dev/null || true; \
+      sudo chown -R root:root /usr/share/fonts/DejaVuSansMono /usr/share/fonts/FantasqueSansMono /usr/share/fonts/UbuntuMono 2>/dev/null || true; \
+      sudo chmod -R 755 /usr/share/fonts/DejaVuSansMono /usr/share/fonts/FantasqueSansMono /usr/share/fonts/UbuntuMono 2>/dev/null || true; \
+    fi; \
+    sudo fc-cache -fv; \
+    rm *.zip
+RUN rm DejaVuSansMono FantasqueSansMono UbuntuMono -rf
+RUN git clone git@gitee.com:banana33/configuration_file.git
+RUN cp /home/banana/configuration_file/.gdbinit ~
+RUN cp /home/banana/configuration_file/coc-settings.json ~/.vim
+RUN cp /home/banana/configuration_file/.vimrc_only_plug ~/.vimrc
+RUN cp /home/banana/configuration_file/.c_cpp ~/.vim -r
+RUN cp /home/banana/configuration_file/.zshrc ~
+RUN cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
+RUN cp /home/banana/configuration_file/init.vim ~/.config/nvim
+RUN cp /home/banana/configuration_file/.tessent_startup ~
+RUN cp -af ~/configuration_file/terminal-backup/terminator ~/.config/ && \
+    cp -af ~/configuration_file/terminal-backup/konsolerc ~/.config/ && \
+    cp -af ~/configuration_file/terminal-backup/konsole ~/.local/share/
 # ===== Clear Cache =====
 RUN gem cleanup && \
     rm -rf ~/.gem/cache/*
@@ -283,3 +287,4 @@ USER banana
 WORKDIR /home/banana
 RUN rm ~/configuration_file .zcompdump-* -rf
 RUN sudo chown banana:banana ~/.viminfo
+RUN mkdir ~/.Xauthority -p && sudo chown -R banana:banana ~/.Xauthority

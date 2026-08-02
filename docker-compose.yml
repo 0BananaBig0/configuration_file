@@ -1,0 +1,35 @@
+# ############################################################################ #
+# #                      File Name: docker-compose.yml                       # #
+# #                          Author: Huaxiao Liang                           # #
+# #                         Mail: hxliang666@qq.com                          # #
+# #                         08/02/2026-Sun-12:59:28                          # #
+# ############################################################################ #
+
+services:
+  dev:
+    image: fedora:gvim
+    container_name: Banana-fedora # Docker 管理名
+    hostname: Banana-fedora # 容器内机器名
+    user: banana
+    working_dir: /home/banana
+    restart: unless-stopped
+    volumes:
+      - /home/banana:/home/banana/host_folder
+    command: zsh
+  wsl:
+    image: fedora:gvim
+    container_name: banana-fedora
+    hostname: banana-fedora
+    user: banana
+    working_dir: /home/banana
+    environment:
+      - DISPLAY=${DISPLAY}          # 关键：把宿主机的 DISPLAY 传进去
+      - TZ=Asia/Shanghai
+    volumes:
+      # 关键：挂载 X11 socket
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # 如果需要剪贴板共享，挂载 Xauthority
+      - ${HOME}/.Xauthority:/home/banana/.Xauthority:rw
+      # 其他挂载
+      - /home/banana:/home/banana/host_folder
+    command: zsh
