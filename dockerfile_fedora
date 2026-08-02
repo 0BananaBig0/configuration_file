@@ -20,11 +20,6 @@ ENV RUNZSH=no
 ENV CHSH=no
 ENV ZSH_DISABLE_COMPILED_COMPLETIONS=true
 
-# ==================== 换国内镜像源 ====================
-# RUN sed -i 's|^metalink=|#metalink=|g' /etc/yum.repos.d/fedora*.repo && \
-#     sed -i 's|^#baseurl=https://|baseurl=https://|g' /etc/yum.repos.d/fedora*.repo && \
-#     sed -i 's|https://download.fedoraproject.org/pub|https://mirrors.ustc.edu.cn/fedora|g' /etc/yum.repos.d/fedora*.repo
-
 # ==================== 第一阶段：基础工具 ====================
 RUN dnf install -y --setopt=install_weak_deps=False \
     git zsh wget curl which findutils tree \
@@ -86,7 +81,7 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     boost-devel tcl-devel libxml2-devel libxslt-devel \
     && dnf clean all
 
-# ==================== 图形/X11/Wayland 依赖（容器里保留头文件即可）=                  
+# ==================== 图形/X11/Wayland 依赖（容器里保留头文件即可）=
 RUN dnf install -y --setopt=install_weak_deps=False \
     libX11-devel libXext-devel libXrandr-devel libXcursor-devel \
     libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel \
@@ -170,16 +165,7 @@ RUN npm config set registry https://registry.npmmirror.com/ && \
     npm cache clean --force && \
     npm install -g neovim && \
     npm install -g @imc-trading/svlangserver
-
-# ==================== Ruby Gem ====================
-RUN gem install neovim --bindir=/home/banana/.local/bin || echo "Gem install failed, continuing..."
-
-# ==================== CPAN 包 ====================
-RUN cpanm --local-lib=/home/banana/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer && \
-    cpanm --local-lib=/home/banana/.local/perl5 --force Neovim::Ext || echo "CPAN packages partially failed, continuing..."
-
 # ==================== HDL/Verilog 工具链 ====================
-USER root
 # COPR 仓库 + Verible + 其他 HDL 工具
 RUN dnf install -y --setopt=install_weak_deps=False \
     dnf-plugins-core \
@@ -219,10 +205,68 @@ RUN zsh -i -c 'source ~/.zshrc && autoload -U compinit && compinit' || true
 CMD ["/bin/zsh"]
 RUN    vim -c "PlugInstall --sync" \
         -c "qall!"
+RUN sudo chown -R 1000:1000 "/home/banana/.npm"
+RUN mkdir -p /home/banana/.config/coc/extensions && \
+    cd /home/banana/.config/coc/extensions && \
+    echo '{"dependencies":{}}' > package.json && \
+    npm install --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod \
+        coc-word \
+        coc-tag \
+        coc-dictionary \
+        coc-snippets \
+        coc-prettier \
+        coc-yaml \
+        coc-cmake \
+        coc-clangd \
+        coc-clang-format-style-options \
+        coc-perl \
+        coc-vimlsp \
+        coc-sh \
+        coc-pyright \
+        coc-webview \
+        coc-markmap \
+        coc-markdown-preview-enhanced \
+        coc-markdownlint \
+        coc-json \
+        coc-css \
+        coc-tsserver \
+        coc-xml
 RUN cp /home/banana/configuration_file/.vimrc ~
-
-RUN vim -es -i NONE -c "CocInstall -sync coc-word coc-tag coc-dictionary coc-snippets coc-prettier coc-yaml coc-cmake coc-clangd coc-clang-format-style-options coc-perl coc-vimlsp coc-sh coc-pyright coc-webview coc-markmap coc-markdown-preview-enhanced coc-markdownlint coc-json coc-css coc-tsserver coc-xml" -c "qa" || echo "Some Coc plugins failed, continuing..."
 RUN fc-cache -fv
+RUN sudo dnf install -y @development-tools
+RUN sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
+RUN sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
+RUN sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
+RUN sudo dnf install -y p7zip p7zip-plugins
+RUN sudo dnf install -y ShellCheck cargo gem ruby-devel
+RUN sudo dnf install -y boost-devel tcl-devel xauth
+RUN sudo dnf install -y fd-find zoxide ripgrep bat hyperfine httpie procs
+RUN sudo dnf install -y libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXinerama-devel libXi-devel libXtst-devel libxkbcommon-x11-devel libxcb-devel xcb-util-cursor-devel
+RUN sudo dnf install -y gstreamer1-plugins-base-devel gstreamer1-devel xcb-util-wm xcb-util-keysyms
+RUN sudo dnf install -y zlib-devel libpng-devel libjpeg-devel libsecret-devel
+RUN sudo dnf install -y wayland-devel libxkbcommon-devel openssl-devel mesa-libGL-devel
+RUN sudo dnf install -y kernel-headers kernel-devel
+RUN sudo dnf install -y kmodtool akmods mokutil openssl dkms
+RUN sudo dnf install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
+RUN sudo dnf install -y perl-App-cpanminus perl-Coro perl-AnyEvent perl-Class-Refresh perl-YAML perl-Data-Dump
+RUN sudo dnf install -y perl-IO-AIO perl-JSON perl-Mo-Moose perl-PadWalker perl-Scalar-List-Utils perl-CPAN-DistnameInfo
+RUN sudo dnf install -y perl-CPAN perl-Spreadsheet-ParseExcel perl-Spreadsheet-WriteExcel perl-Spreadsheet-XLSX
+RUN sudo dnf install -y perl-LWP-Protocol-https perl-Path-Tiny perl-IO-Async perl-Module-Build perl-Module-Build-XSUtil
+RUN sudo dnf install -y perl-Module-Build-Tiny perl-ExtUtils-Config perl-ExtUtils-Install perl-ExtUtils-Helpers
+RUN sudo dnf install -y perl-Devel-CheckCompiler perl-Test-Requires perl-Cwd-Guard perl-Capture-Tiny
+RUN sudo dnf install -y perl-File-Copy-Recursive-Reduced perl-Future perl-Struct-Dumb perl-Metrics-Any
+RUN sudo dnf install -y perl-Test-Metrics-Any perl-Test-Future-IO-Impl perl-Devel-Symdump
+RUN sudo dnf install -y perl-Pod-Coverage perl-Test-Pod-Coverage perl-Test-Pod perl-Class-Accessor
+RUN sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo pocl pocl-devel
+RUN sudo dnf install -y konsole terminator xclip
+RUN sudo dnf update -y
+
+# ==================== Ruby Gem ====================
+RUN gem install neovim logger --bindir=/home/banana/.local/bin || echo "Gem install failed, continuing..."
+
+# ==================== CPAN 包 ====================
+RUN cpanm --local-lib=/home/banana/.local/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer && \
+    cpanm --local-lib=/home/banana/.local/perl5 --force Neovim::Ext || echo "CPAN packages partially failed, continuing..."
 # ===== Clear Cache =====
 RUN gem cleanup && \
     rm -rf ~/.gem/cache/*
@@ -233,3 +277,9 @@ RUN dnf clean all \
     && dnf autoremove -y \
     && dnf clean all
 RUN npm cache clean --force
+# switch to banana as the default user.
+USER banana
+# 把你的 configuration_file 目录放在 Dockerfile 同级目录
+WORKDIR /home/banana
+RUN rm ~/configuration_file .zcompdump-* -rf
+RUN sudo chown banana:banana ~/.viminfo
