@@ -27,6 +27,10 @@ ln -s ~/wsl_shared_folder/oasys_rtl_qs_ekit ~
 ln -s ~/wsl_shared_folder/PDK/NangateOpenCellLibrary_45nm ~
 ln -s ~/wsl_shared_folder/PDK/tsmc28_pdk ~
 cp ~/wsl_shared_folder/.ssh -r ~
+[ -d ~/configuration_file/terminal-backup ] && \
+cp -af ~/configuration_file/terminal-backup/terminator ~/.config/ && \
+cp -af ~/configuration_file/terminal-backup/konsolerc ~/.config/ && \
+cp -af ~/configuration_file/terminal-backup/konsole ~/.local/share/
 chmod 700 /home/banana/.ssh && \
 chmod 600 /home/banana/.ssh/id_rsa 2>/dev/null || true && \
 chmod 644 /home/banana/.ssh/id_rsa.pub 2>/dev/null || true && \
@@ -38,7 +42,7 @@ sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
 sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
-sudo dnf install -y p7zip.x86_64 p7zip-plugins.x86_64
+sudo dnf install -y p7zip p7zip-plugins
 sudo dnf install -y ShellCheck cargo gem ruby-devel
 sudo dnf install -y boost-devel tcl-devel xauth
 sudo dnf install -y fd-find zoxide ripgrep bat hyperfine httpie procs
