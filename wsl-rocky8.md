@@ -173,7 +173,6 @@ sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
 --with-python3-config-dir=/usr/lib64/python3.12/config-3.12-x86_64-linux-gnu  \
 --with-python3-command=/usr/bin/python3  \
 --enable-gpm  \
---with-luajit \
 --enable-terminal \
 --enable-xim \
 --enable-xsmp

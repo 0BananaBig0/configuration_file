@@ -13,7 +13,6 @@ sh install.sh
 bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-mkdir -p ~/wsl_shared_folder
 rm install.sh
 
 git clone git@gitee.com:banana33/configuration_file.git
@@ -25,6 +24,10 @@ cp ~/configuration_file/.zshrc ~
 cp ~/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 cp ~/configuration_file/.tessent_startup ~
 cp ~/configuration_file/.perltidyrc ~
+[ -d ~/configuration_file/terminal-backup ] && \
+cp -af ~/configuration_file/terminal-backup/terminator ~/.config/ && \
+cp -af ~/configuration_file/terminal-backup/konsolerc ~/.config/ && \
+cp -af ~/configuration_file/terminal-backup/konsole ~/.local/share/
 
 sudo dnf install -y curl
 sudo dnf group install -y "Development Tools"  # 注意首字母大写和空格
@@ -47,7 +50,7 @@ sudo dnf install -y kernel-headers kernel-devel
 sudo dnf install -y kmodtool akmods mokutil openssl dkms
 sudo dnf install -y redhat-lsb-core
 sudo dnf install -y xorg-x11-fonts-misc libyaml-devel
-sudo dnf install konsole -y
+sudo dnf install konsole terminator -y
 sudo dnf install -y python3.12 python3.12-pip perl flex python3.12-setuptools
 
 mkdir ~/font -p
@@ -55,50 +58,26 @@ cd ~/font
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/DejaVuSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FantasqueSansMono.zip
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/UbuntuMono.zip
-unzip DejaVuSansMono.zip
-unzip FantasqueSansMono.zip
-unzip UbuntuMono.zip
-sudo cp DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts -r
+unzip DejaVuSansMono.zip -d DejaVuSansMono
+unzip FantasqueSansMono.zip -d FantasqueSansMono
+unzip UbuntuMono.zip -d UbuntuMono
+sudo cp DejaVuSansMono FantasqueSansMono UbuntuMono /usr/share/fonts -r
 cd /usr/share/fonts
 sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
 sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
-sudo cp ~/configuration_file/local.conf /etc/fonts/ # or modify 40-nonlatin.conf, but difficult
-sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
-sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11
 sudo fc-cache -fv
 cd ~
 rm font -rf
 
-sudo npm install yarn --prefix /data/bosios
-sudo npm install @imc-trading/svlangserver --prefix /data/bosios
-BOSIOS="${BOSIOS}"
-for os_item in ${BOSIOS}/*/*; do
-    OS_PATH="${BOSIOS}/${os_item}"
-    [[ -d "${OS_PATH}/bin" && ":$PATH:" != *":${OS_PATH}/bin:"* ]] && export PATH="${OS_PATH}/bin:$PATH"
-    [[ -d "${OS_PATH}/lib" && ":$LD_LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && export LD_LIBRARY_PATH="${OS_PATH}/lib:$LD_LIBRARY_PATH"
-    [[ -d "${OS_PATH}/lib" && ":$LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && export LIBRARY_PATH="${OS_PATH}/lib:$LIBRARY_PATH"
-    [[ -d "${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":${OS_PATH}/share:"* ]] && export XDG_DATA_DIRS="${OS_PATH}/share:$XDG_DATA_DIRS"
-done
-yarn config set registry https://registry.npmmirror.com/ --global  && \
-yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
-yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
-yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global  && \
-yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global  && \
-yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global  && \
-yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
-yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
-yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
-
 mkdir ~/.config/pip -p
 echo '[global]' > ~/.config/pip/pip.conf
 echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.config/pip/pip.conf
-sudo python3.12 -m pip install --upgrade pip --target=/data/bosios/python/site-packages
+sudo python3.12 -m pip install --upgrade pip --prefix=/data/bosios/python
 sudo python3.12 -m pip install scons pylint cmakelang cmake-language-server pyright \
                        cppman you-get sphinx sphinx-rtd-theme vim-vint black \
-                       pysnooper futures tclint distro --target=/data/bosios/python/site-packages
+                       pysnooper futures tclint distro --prefix=/data/bosios/python
 
 sudo dnf config-manager --set-enabled powertools
-sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo
 sudo dnf install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
 sudo dnf install -y perl-App-cpanminus perl-Coro perl-AnyEvent perl-YAML perl-Data-Dump
 sudo dnf install -y perl-IO-AIO perl-JSON perl-PadWalker perl-Scalar-List-Utils perl-CPAN-DistnameInfo
@@ -111,21 +90,36 @@ sudo dnf install -y perl-Devel-Symdump perl-Class-Inspector perl-Class-Unload
 sudo dnf install -y perl-Pod-Coverage perl-Test-Pod-Coverage perl-Test-Pod perl-Class-Accessor
 sudo cpanm --local-lib=/data/bosios/perl5 Perl::LanguageServer Hash::SafeKeys Compiler::Lexer
 sudo cargo install du-dust@1.1.2 bottom@0.8.0 cargo-cache@0.8.3 eza@0.20.24 asm-lsp@0.9.0 --locked --root /data/bosios/cargo
+sudo su
+BOSIOS="/data/bosios"
+for OS_PATH in ${BOSIOS}/*; do
+    [[ -d "${OS_PATH}/bin" && ":$PATH:" != *":${OS_PATH}/bin:"* ]] && PATH="${OS_PATH}/bin:$PATH"
+    [[ -d "${OS_PATH}/lib" && ":$LD_LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && LD_LIBRARY_PATH="${OS_PATH}/lib:$LD_LIBRARY_PATH"
+    [[ -d "${OS_PATH}/lib" && ":$LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && LIBRARY_PATH="${OS_PATH}/lib:$LIBRARY_PATH"
+    [[ -d "${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":${OS_PATH}/share:"* ]] && XDG_DATA_DIRS="${OS_PATH}/share:$XDG_DATA_DIRS"
+done
+cargo cache --remove-dir all
+exit
 
 # install verible:
 cd ~/rocky_pack
-wget https://github.com/chipsalliance/verible/releases/download/v0.0-4080-ga0a8d8eb/verible-v0.0-4080-ga0a8d8eb-linux-static-x86_64.tar.gz
-x verible-v0.0-4080-ga0a8d8eb-linux-static-x86_64.tar.gz
-mkdir -p /data/bosios/verible/bin
-sudo cp verible-v0.0-4080-ga0a8d8eb/bin/* /data/bosios/verible/bin
+wget https://github.com/chipsalliance/verible/releases/download/v0.0-4117-gdd17e7fe/verible-v0.0-4117-gdd17e7fe-linux-static-x86_64.tar.gz
+tar -xzvf verible-v0.0-4117-gdd17e7fe-linux-static-x86_64.tar.gz
+sudo mkdir -p /data/bosios/verible/bin
+sudo cp verible-v0.0-4117-gdd17e7fe/bin/* /data/bosios/verible/bin
 
 # compile vim(option):
 cd ~/rocky_pack/
 git clone https://github.com/vim/vim.git
-cd vim
+cd ~/rocky_pack/vim
 sudo dnf install -y luajit-devel luajit libXdmcp-devel mesa-dri-drivers
-sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext python3-devel
-sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
+sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext python3.12-devel
+sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel ncurses-devel
+export CFLAGS="-I/usr/include/ncursesw -I/usr/include"
+export LDFLAGS="-L/usr/lib64"
+git reset --hard v9.1.0000
+git clean -fdx
+make distclean
 ./configure \
 --prefix=/data/bosios/vim \
 --with-features=huge  \
@@ -136,14 +130,11 @@ sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
 --enable-cscope=yes \
 --enable-fontset=yes  \
 --enable-tclinterp=yes  \
---enable-perlinterp=yes  \
 --with-luajit  \
 --enable-python3interp=yes  \
 --with-python3-config-dir=/usr/lib64/python3.12/config-3.12-x86_64-linux-gnu  \
 --with-python3-command=/usr/bin/python3.12  \
 --enable-gpm  \
---with-luajit \
---enable-terminal \
 --enable-xim \
 --enable-xsmp
 make -j24
@@ -165,14 +156,13 @@ git clone https://github.com/muesli/duf.git
 sudo dnf install -y go # Should open a new terminal
 cd duf
 go build
-GOBIN=/data/bosios/go/bin go install
+sudo GOBIN=/data/bosios/go/bin go install
 
 # compile verilator:
 cd ~/rocky_pack/
 git clone https://github.com/verilator/verilator.git
 sudo dnf install -y ccache numactl autoconf flex flex-devel bison bison-devel help2man
 cd verilator
-#git reset --hard v5.026
 unset VERILATOR_ROOT
 make distclean
 autoconf
@@ -203,3 +193,25 @@ export NVM_DIR="/data/bosios/nvm" && \
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
 nvm install 24.14.0
+
+BOSIOS="/data/bosios"
+if [ -s "${BOSIOS}/node_modules" ]; then
+    for os_item in ${BOSIOS}/node_modules/*; do
+        OS_PATH="${BOSIOS}/${os_item}"
+        [[ -d "${OS_PATH}/bin" && ":$PATH:" != *":${OS_PATH}/bin:"* ]] && PATH="${OS_PATH}/bin:$PATH"
+        [[ -d "${OS_PATH}/lib" && ":$LD_LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && LD_LIBRARY_PATH="${OS_PATH}/lib:$LD_LIBRARY_PATH"
+        [[ -d "${OS_PATH}/lib" && ":$LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && LIBRARY_PATH="${OS_PATH}/lib:$LIBRARY_PATH"
+        [[ -d "${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":${OS_PATH}/share:"* ]] && XDG_DATA_DIRS="${OS_PATH}/share:$XDG_DATA_DIRS"
+    done
+fi
+npm install yarn --prefix /data/bosios
+npm install @imc-trading/svlangserver --prefix /data/bosios
+yarn config set registry https://registry.npmmirror.com/ --global  && \
+yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
+yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
+yarn config set puppeteer_download_host https://registry.npmmirror.com/binary.html --global  && \
+yarn config set chromedriver_cdnurl https://cdn.npmmirror.com/binaries/chromedriver --global  && \
+yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadriver --global  && \
+yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
+yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
+yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
