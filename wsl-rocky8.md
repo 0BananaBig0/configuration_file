@@ -155,7 +155,7 @@ cd ~/wsl_shared_folder/rocky_pack/
 git clone https://github.com/vim/vim.git
 cd vim
 sudo dnf install -y luajit-devel luajit libXdmcp-devel mesa-dri-drivers
-sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext python3-devel
+sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext python3.12-devel
 sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
 ./configure \
 --prefix=/usr/local  \
@@ -171,7 +171,7 @@ sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel
 --with-luajit  \
 --enable-python3interp=yes  \
 --with-python3-config-dir=/usr/lib64/python3.12/config-3.12-x86_64-linux-gnu  \
---with-python3-command=/usr/bin/python3  \
+--with-python3-command=/usr/bin/python3.12  \
 --enable-gpm  \
 --enable-terminal \
 --enable-xim \

@@ -165,6 +165,7 @@ cd duf
 go build
 GOBIN=/data/bosios/go/bin go install
 go clean -cache -modcache
+sudo chown -R root:root /data/bosios/go
 
 # compile verilator:
 cd ~/rocky_pack/
@@ -214,8 +215,8 @@ if [ -s "${BOSIOS}/node_modules" ]; then
         [[ -d "${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":${OS_PATH}/share:"* ]] && XDG_DATA_DIRS="${OS_PATH}/share:$XDG_DATA_DIRS"
     done
 fi
-npm install yarn --prefix /data/bosios
-npm install @imc-trading/svlangserver --prefix /data/bosios
+sudo npm install yarn --prefix /data/bosios
+sudo npm install @imc-trading/svlangserver --prefix /data/bosios
 yarn config set registry https://registry.npmmirror.com/ --global  && \
 yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
 yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
