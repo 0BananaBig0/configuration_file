@@ -71,12 +71,13 @@ rm font -rf
 
 sudo npm install yarn --prefix /data/bosios
 sudo npm install @imc-trading/svlangserver --prefix /data/bosios
+BOSIOS="${BOSIOS}"
 for os_item in ${BOSIOS}/*/*; do
     OS_PATH="${BOSIOS}/${os_item}"
-    [[ -d "/${OS_PATH}/bin" && ":$PATH:" != *":/${OS_PATH}/bin:"* ]] && PATH="$PATH:/${OS_PATH}/bin"
-    [[ -d "/${OS_PATH}/lib" && ":$LD_LIBRARY_PATH:" != *":/${OS_PATH}/lib:"* ]] && LD_LIBRARY_PATH="/${OS_PATH}/lib:$LD_LIBRARY_PATH"
-    [[ -d "/${OS_PATH}/lib" && ":$LIBRARY_PATH:" != *":/${OS_PATH}/lib:"* ]] && LIBRARY_PATH="/${OS_PATH}/lib:$LIBRARY_PATH"
-    [[ -d "/${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":/${OS_PATH}/share:"* ]] && XDG_DATA_DIRS="/${OS_PATH}/share:$XDG_DATA_DIRS"
+    [[ -d "${OS_PATH}/bin" && ":$PATH:" != *":${OS_PATH}/bin:"* ]] && export PATH="${OS_PATH}/bin:$PATH"
+    [[ -d "${OS_PATH}/lib" && ":$LD_LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && export LD_LIBRARY_PATH="${OS_PATH}/lib:$LD_LIBRARY_PATH"
+    [[ -d "${OS_PATH}/lib" && ":$LIBRARY_PATH:" != *":${OS_PATH}/lib:"* ]] && export LIBRARY_PATH="${OS_PATH}/lib:$LIBRARY_PATH"
+    [[ -d "${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":${OS_PATH}/share:"* ]] && export XDG_DATA_DIRS="${OS_PATH}/share:$XDG_DATA_DIRS"
 done
 yarn config set registry https://registry.npmmirror.com/ --global  && \
 yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
