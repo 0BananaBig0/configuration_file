@@ -153,10 +153,18 @@ sudo make install
 # compile duf to replace df
 cd ~/rocky_pack/
 git clone https://github.com/muesli/duf.git
+unset GOPROXY
+unset GONOPROXY
+unset GOSUMDB
+export GOPROXY=https://goproxy.cn,direct
+export GOSUMDB=sum.golang.google.cn
 sudo dnf install -y go # Should open a new terminal
+sudo mkdir -p /data/bosios/go
+sudo chown lianghuaxiao:lianghuaxiao /data/bosios/go
 cd duf
 go build
-sudo GOBIN=/data/bosios/go/bin go install
+GOBIN=/data/bosios/go/bin go install
+go clean -cache -modcache
 
 # compile verilator:
 cd ~/rocky_pack/
@@ -165,6 +173,8 @@ sudo dnf install -y ccache numactl autoconf flex flex-devel bison bison-devel he
 cd verilator
 unset VERILATOR_ROOT
 make distclean
+git clean -fdx
+mkdir -p obj_dbg obj_opt
 autoconf
 ./configure \
 --prefix=/data/bosios/verilator
