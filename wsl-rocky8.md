@@ -29,6 +29,10 @@ ln -s ~/wsl_shared_folder/oasys_rtl_qs_ekit ~
 ln -s ~/wsl_shared_folder/PDK/NangateOpenCellLibrary_45nm ~
 ln -s ~/wsl_shared_folder/PDK/tsmc28_pdk ~
 cp ~/wsl_shared_folder/.ssh -r ~
+[ -d ~/configuration_file/terminal-backup ] && \
+cp -af ~/configuration_file/terminal-backup/terminator ~/.config/ && \
+cp -af ~/configuration_file/terminal-backup/konsolerc ~/.config/ && \
+cp -af ~/configuration_file/terminal-backup/konsole ~/.local/share/
 chmod 700 /home/banana/.ssh && \
 chmod 600 /home/banana/.ssh/id_rsa 2>/dev/null || true && \
 chmod 644 /home/banana/.ssh/id_rsa.pub 2>/dev/null || true && \
@@ -324,7 +328,7 @@ make -j24
 sudo make install
 LD_LIBRARY_PATH="$PYTHON377_HOME/lib" vim --version | grep python
 ###### ONLY FOR ME
-sudo dnf install konsole -y
+sudo dnf install konsole terminator -y
 
 # install docker
 ## 1) enable systemd

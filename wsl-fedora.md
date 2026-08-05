@@ -191,4 +191,4 @@ sudo dnf install -y verible
 # ./configure --prefix=/EDA/library
 # make -j24
 # make install
-sudo dnf install konsole -y
+sudo dnf install konsole terminator -y
