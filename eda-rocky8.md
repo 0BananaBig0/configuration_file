@@ -115,9 +115,9 @@ cd ~/rocky_pack/vim
 sudo dnf install -y luajit-devel luajit libXdmcp-devel mesa-dri-drivers
 sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext python3.12-devel
 sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel ncurses-devel
-export CFLAGS="-I/usr/include/ncursesw -I/usr/include"
-export LDFLAGS="-L/usr/lib64"
-git reset --hard v9.2.0897 # After this version, the pango library in rocky8 is too old to support gvim.
+# After patch 9.2.0898, gvim enables hardcopy by default but the pango library in rocky8 is too old to support gvim.
+# Therefore, we should disable it with --disable-hardcopy-pango
+git reset --hard v9.2.0897
 git clean -fdx
 make distclean
 ./configure \
@@ -136,7 +136,7 @@ make distclean
 --with-python3-command=/usr/bin/python3.12  \
 --enable-gpm  \
 --enable-xim \
---enable-xsmp
+--disable-xsmp
 make -j24
 sudo make install
 
