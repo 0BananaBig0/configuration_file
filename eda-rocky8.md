@@ -117,7 +117,7 @@ sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext pytho
 sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel ncurses-devel
 export CFLAGS="-I/usr/include/ncursesw -I/usr/include"
 export LDFLAGS="-L/usr/lib64"
-git reset --hard v9.1.0000
+git reset --hard v9.2.0897 # After this version, the pango library in rocky8 is too old to support gvim.
 git clean -fdx
 make distclean
 ./configure \
@@ -205,6 +205,7 @@ export NVM_DIR="/data/bosios/nvm" && \
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
 nvm install 24.14.0
 
+sudo su
 BOSIOS="/data/bosios"
 if [ -s "${BOSIOS}/node_modules" ]; then
     for os_item in ${BOSIOS}/node_modules/*; do
@@ -215,8 +216,8 @@ if [ -s "${BOSIOS}/node_modules" ]; then
         [[ -d "${OS_PATH}/share" && ":$XDG_DATA_DIRS:" != *":${OS_PATH}/share:"* ]] && XDG_DATA_DIRS="${OS_PATH}/share:$XDG_DATA_DIRS"
     done
 fi
-sudo npm install yarn --prefix /data/bosios
-sudo npm install @imc-trading/svlangserver --prefix /data/bosios
+npm install yarn --prefix /data/bosios
+npm install @imc-trading/svlangserver --prefix /data/bosios
 yarn config set registry https://registry.npmmirror.com/ --global  && \
 yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass --global  && \
 yarn config set electron_mirror https://registry.npmmirror.com/binary.html?path=electron/ --global  && \
