@@ -498,13 +498,13 @@ function! ConfigureDelayedPlugin()
   " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
   " --------------------------------------------------------------------------
   augroup matchup_large_file
-    autocmd!
-    " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
-    autocmd FileType c,cpp,opencl,verilog
-          \ if line('$') > 2000 |
-            \ let b:matchup_matchparen_enabled = 0 |
-            \ let b:matchup_matchparen_fallback = 0
-          \ endif
+      autocmd!
+      " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
+      autocmd FileType c,cpp,opencl,verilog
+            \ if line('$') > 2000
+              \ | let b:matchup_matchparen_enabled = 0
+              \ | let b:matchup_matchparen_fallback = 0
+            \ endif
   augroup END
 
   let g:matchup_matchparen_offscreen = {
