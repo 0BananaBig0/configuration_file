@@ -504,7 +504,7 @@ function! ConfigureDelayedPlugin()
             \ if line('$') > 2000
               \ | let b:matchup_matchparen_enabled = 0
               \ | let b:matchup_matchparen_fallback = 0
-            \ endif
+            \ | endif
   augroup END
 
   let g:matchup_matchparen_offscreen = {
