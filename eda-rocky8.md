@@ -172,8 +172,9 @@ cd ~/rocky_pack/
 git clone https://github.com/verilator/verilator.git
 sudo dnf install -y ccache numactl autoconf flex flex-devel bison bison-devel help2man
 cd verilator
-unset VERILATOR_ROOT
 make distclean
+git reset --hard v5.040
+unset VERILATOR_ROOT
 git clean -fdx
 mkdir -p obj_dbg obj_opt
 autoconf
