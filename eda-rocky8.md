@@ -228,3 +228,6 @@ yarn config set operadriver_cdnurl https://cdn.npmmirror.com/binaries/operadrive
 yarn config set phantomjs_cdnurl https://cdn.npmmirror.com/binaries/phantomjs --global  && \
 yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --global  && \
 yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
+
+# For coc-xml
+sudo dnf intall java-latest-openjdk-devel -y
