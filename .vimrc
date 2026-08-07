@@ -24,6 +24,7 @@ let maplocalleader = ","
 
 
 augroup Auto_Set_FileType
+  autocmd!
   autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
   autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
   autocmd BufNewFile,BufRead *.v set filetype=verilog
@@ -328,7 +329,7 @@ function! ConfigureDelayedPlugin()
     endif
   endfunction
   " Highlight the symbol and its references when holding the cursor
-  augroup Plugin_Configuration | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
+  augroup Plugin_Configuration | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg='White' guibg='Black'
   function! GetSelectedContent()
     " Get the start and end positions of the visual selection
@@ -494,19 +495,6 @@ function! ConfigureDelayedPlugin()
   let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
   let g:matchup_transmute_enabled = 0      " 实验性的，关
 
-  " --------------------------------------------------------------------------
-  " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
-  " --------------------------------------------------------------------------
-  augroup matchup_large_file
-      autocmd!
-      " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
-      autocmd FileType c,cpp,opencl,verilog
-            \ if line('$') > 2000
-              \ | let b:matchup_matchparen_enabled = 0
-              \ | let b:matchup_matchparen_fallback = 0
-            \ | endif
-  augroup END
-
   let g:matchup_matchparen_offscreen = {
         \ 'method':    'popup',
         \ 'fullwidth': 1,
@@ -515,7 +503,41 @@ function! ConfigureDelayedPlugin()
         \ 'syntax_hl': 1,
         \ 'scrolloff': 1,
         \ }
-  call plug#load('vim-matchup')
+  let s:matchup_loaded = 0
+
+  function! s:EnsureMatchupForCurrentBuffer() abort
+      if !s:matchup_loaded
+          call plug#load('vim-matchup')
+          let s:matchup_loaded = 1
+      endif
+
+      " if buffer does not exist
+      if empty(&l:filetype)
+          return
+      endif
+
+      " Each buffer and filetype only execute duautocmd onece.
+      if get(b:, 'matchup_lazy_replayed_ft', '') ==# &l:filetype
+          return
+      endif
+      let b:matchup_lazy_replayed_ft = &l:filetype
+      execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
+  endfunction
+
+  augroup Vim-Matchup_Augroup
+    autocmd!
+    " --------------------------------------------------------------------------
+    " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
+    " --------------------------------------------------------------------------
+    " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
+    autocmd FileType c,cpp,opencl,verilog
+          \ if line('$') > 2000
+            \ | let b:matchup_matchparen_enabled = 0
+            \ | let b:matchup_matchparen_fallback = 0
+          \ | endif
+    " 切换 buffer、打开分屏或 tab 时都会覆盖到
+    autocmd BufEnter * ++nested call <SID>EnsureMatchupForCurrentBuffer()
+  augroup END
 endfunction
 
 
@@ -1113,8 +1135,6 @@ set number
 set signcolumn=number
  " Column guide
 set colorcolumn=80,120,160
-" Uncomment the following to have Vim jump to the last position when reopening a file
-augroup Local_Autocmd_Group | autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif | augroup END
 " 设置当文件被改动时自动载入
 set autoread
 " 共享剪贴板
@@ -1158,10 +1178,13 @@ set smartcase
 set hlsearch
 set incsearch
 augroup Local_Autocmd_Group
+  autocmd!
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
   " Disable automatic word wrap which is enabled by filetype plugin indent on
   autocmd FileType vim,cmake set textwidth=0
+  " Uncomment the following to have Vim jump to the last position when reopening a file
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
 set autoindent
 set smartindent
