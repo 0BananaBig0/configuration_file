@@ -97,6 +97,7 @@ sudo apt update
 
 # 注意：没有 python3.12-distutils（这个包不存在）
 sudo apt install -y python3.12 python3.12-dev python3.12-venv python3.12-full
+sudo apt install openjdk-25-jdk
 
 # 手动引导 pip
 curl -sS --retry 3 https://bootstrap.pypa.io/get-pip.py | python3.12

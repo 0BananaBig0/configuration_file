@@ -230,4 +230,4 @@ yarn config set selenium_cdnurl https://cdn.npmmirror.com/binaries/selenium --gl
 yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-inspector --global
 
 # For coc-xml
-sudo dnf intall java-latest-openjdk-devel -y
+sudo dnf install java-latest-openjdk-devel -y

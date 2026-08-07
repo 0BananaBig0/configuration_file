@@ -377,3 +377,4 @@ docker run --rm --network=host xxx
 
 # For tessent open_vi
 sudo dnf install -y xcb-util-wm libxkbcommon xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil libxkbcommon-x11
+sudo dnf install java-latest-openjdk-devel -y
