@@ -116,8 +116,8 @@ sudo dnf install -y luajit-devel luajit libXdmcp-devel mesa-dri-drivers
 sudo dnf install -y gpm-devel libXft-devel gtk3-devel libX11-devel gettext python3.12-devel
 sudo dnf install -y libXt-devel ruby-devel ncurses-devel gettext-devel lua-devel ncurses-devel
 # After patch 9.2.0898, gvim enables hardcopy by default but the pango library in rocky8 is too old to support gvim.
-# Therefore, we should disable it with --disable-hardcopy-pango
-git reset --hard v9.2.0897
+# Therefore, we should disable it with --disable-hardcopy-pango, has been fixed after patch 9.2.0916
+# git reset --hard v9.2.0897
 git clean -fdx
 make distclean
 ./configure \
