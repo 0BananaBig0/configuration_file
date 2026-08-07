@@ -15,12 +15,14 @@
     cursor_shape = ibeam
     font = FantasqueSansM Nerd Font Mono 23
     foreground_color = "#ffffff"
+    show_titlebar = False
     use_system_font = False
   [[ppt]]
     background_color = "#ffffff"
     cursor_shape = ibeam
     font = FantasqueSansM Nerd Font Mono 23
     foreground_color = "#000000"
+    show_titlebar = False
     use_system_font = False
 [layouts]
   [[default]]
