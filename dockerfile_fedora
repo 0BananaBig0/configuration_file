@@ -169,10 +169,6 @@ RUN chmod 700 /home/banana/.ssh && \
     chmod 600 /home/banana/.ssh/config 2>/dev/null || true && \
     chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
 
-# ==================== 预安装 zinit 插件 ====================
-RUN zsh -i -c 'source ~/.zshrc && @zinit-scheduler burst && zinit update --all'
-# ==================== 预生成 zsh 补全 ====================
-RUN zsh -i -c 'source ~/.zshrc && autoload -U compinit && compinit' || true
 # ==================== 默认 shell ====================
 CMD ["/bin/zsh"]
 RUN    vim -c "PlugInstall --sync" \
@@ -260,17 +256,15 @@ RUN for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do \
     rm *.zip
 RUN rm DejaVuSansMono FantasqueSansMono UbuntuMono -rf
 RUN git clone git@gitee.com:banana33/configuration_file.git
-RUN cp /home/banana/configuration_file/.gdbinit ~
-RUN cp /home/banana/configuration_file/coc-settings.json ~/.vim
-RUN cp /home/banana/configuration_file/.vimrc_only_plug ~/.vimrc
-RUN cp /home/banana/configuration_file/.c_cpp ~/.vim -r
 RUN cp /home/banana/configuration_file/.zshrc ~
 RUN cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
-RUN cp /home/banana/configuration_file/init.vim ~/.config/nvim
-RUN cp /home/banana/configuration_file/.tessent_startup ~
-RUN cp -af ~/configuration_file/terminal-backup/terminator ~/.config/ && \
-    cp -af ~/configuration_file/terminal-backup/konsolerc ~/.config/ && \
-    cp -af ~/configuration_file/terminal-backup/konsole ~/.local/share/
+# ==================== 预安装 zinit 插件 ====================
+RUN zsh -i -c 'source ~/.zshrc && @zinit-scheduler burst && zinit update --all'
+# ==================== 预生成 zsh 补全 ====================
+RUN zsh -i -c 'source ~/.zshrc && autoload -U compinit && compinit' || true
+RUN zsh -c "source ~/.local/share/zinit/plugins/0BananaBig0---ubuntu18_zsh_configure/function/function.zsh && \
+            restore_terminal_config && \
+            restore_linux_config"
 # ===== Clear Cache =====
 RUN gem cleanup && \
     rm -rf ~/.gem/cache/*
