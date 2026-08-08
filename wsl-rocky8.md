@@ -378,3 +378,9 @@ docker run --rm --network=host xxx
 # For tessent open_vi
 sudo dnf install -y xcb-util-wm libxkbcommon xcb-util xcb-util-image xcb-util-keysyms xcb-util-renderutil libxkbcommon-x11
 sudo dnf install java-latest-openjdk-devel -y
+
+
+export CODEX_HOME="$HOME/.local/.codex_home/codex"
+mkdir -p $HOME/.local/bin
+curl -fsSL https://chatgpt.com/codex/install.sh -o $HOME/.local/bin/install_codex.sh
+sh $HOME/.local/bin/install_codex.sh
