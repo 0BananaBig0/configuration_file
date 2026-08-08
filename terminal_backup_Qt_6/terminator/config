@@ -1,16 +1,5 @@
 [global_config]
-  title_transmit_fg_color = "#282a36"
-  title_transmit_bg_color = "#50fa7b"
-  title_receive_fg_color = "#282a36"
-  title_receive_bg_color = "#ff79c6"
-  title_inactive_fg_color = "#f8f8f2"
-  title_inactive_bg_color = "#44475a"
   inactive_color_offset = 0.61
-  suppress_multiple_term_dialog = True
-  title_hide_sizetext = True
-  borderless = True
-  scroll_tabbar = True
-  homogeneous_tabbar = False
 [keybindings]
   switch_to_tab_1 = <Alt>1
   switch_to_tab_2 = <Alt>2
@@ -22,6 +11,23 @@
   switch_to_tab_8 = <Alt>8
   switch_to_tab_9 = <Alt>9
   switch_to_tab_10 = <Alt>0
+[profiles]
+  [[default]]
+    background_color = "#282a36"
+    background_image = None
+    cursor_shape = ibeam
+    font = FantasqueSansM Nerd Font Mono 23
+    foreground_color = "#f8f8f2"
+    show_titlebar = False
+    palette = "#262626:#e356a7:#42e66c:#e4f34a:#9b6bdf:#e64747:#75d7ec:#efa554:#7a7a7a:#ff79c6:#50fa7b:#f1fa8c:#bd93f9:#ff5555:#8be9fd:#ffb86c"
+    use_system_font = False
+  [[ppt]]
+    background_color = "#ffffff"
+    cursor_shape = ibeam
+    font = FantasqueSansM Nerd Font Mono 23
+    foreground_color = "#000000"
+    show_titlebar = False
+    use_system_font = False
 [layouts]
   [[default]]
     [[[child1]]]
@@ -31,21 +37,3 @@
       parent = ""
       type = Window
 [plugins]
-[profiles]
-  [[default]]
-    background_color = "#282a36"
-    background_image = None
-    foreground_color = "#f8f8f2"
-    palette = "#262626:#e356a7:#42e66c:#e4f34a:#9b6bdf:#e64747:#75d7ec:#efa554:#7a7a7a:#ff79c6:#50fa7b:#f1fa8c:#bd93f9:#ff5555:#8be9fd:#ffb86c"
-    cursor_shape = ibeam
-    font = FantasqueSansM Nerd Font Mono 23
-    show_titlebar = False
-    use_system_font = False
-  [[ppt]]
-    background_color = "#ffffff"
-    cursor_shape = ibeam
-    cursor_color = "#000000"
-    font = FantasqueSansM Nerd Font Mono 23
-    foreground_color = "#000000"
-    show_titlebar = False
-    use_system_font = False
