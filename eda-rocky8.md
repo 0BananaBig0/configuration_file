@@ -50,7 +50,8 @@ sudo dnf install -y kernel-headers kernel-devel
 sudo dnf install -y kmodtool akmods mokutil openssl dkms
 sudo dnf install -y redhat-lsb-core
 sudo dnf install -y xorg-x11-fonts-misc libyaml-devel
-sudo dnf install konsole terminator -y
+sudo dnf install -y konsole terminator
+sudo dnf install -y python3-notify2 libnotify python3-dbus python3-gobject gtk3
 sudo dnf install -y python3.12 python3.12-pip perl flex python3.12-setuptools
 
 mkdir ~/font -p
