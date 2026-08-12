@@ -232,3 +232,25 @@ yarn config set node_inspector_cdnurl https://cdn.npmmirror.com/binaries/node-in
 
 # For coc-xml
 sudo dnf install java-latest-openjdk-devel -y
+
+# install docker
+sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine podman buildah
+sudo dnf install -y dnf-plugins-core
+sudo dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+sudo systemctl status docker   # 看到 active (running) 就 OK
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.m.daocloud.io",
+    "https://dockerproxy.com",
+    "https://docker.nju.edu.cn"
+  ]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+sudo docker run hello-world
+sudo usermod -aG docker $USER
