@@ -249,7 +249,7 @@ function! ConfigureDelayedPlugin()
   let g:coc_global_extensions = ['coc-word', 'coc-tag', 'coc-dictionary', 'coc-snippets','coc-prettier',
            \ 'coc-yaml', 'coc-cmake', 'coc-clangd', 'coc-clang-format-style-options', 'coc-perl', 'coc-vimlsp',
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
-           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
+           \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml', 'https://github.com/Kuro96/coc-ai']
   let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
   function! FindRootPatternPath(target_path)
     let l:root_pattern_path = []
@@ -1708,4 +1708,6 @@ set iskeyword-=@
 " When pressing <Shift-*>, the / and . should be included in the selection.
 set iskeyword+=/
 set iskeyword+=.
-
+" <Ctrl-Shift-t> open a new terminal in a new tab
+noremap <C-S-t> :tab terminal<CR>
+inoremap <C-S-t> <C-o>:tab terminal<CR>
