@@ -224,3 +224,18 @@ ensure_dracula_konsole() {
     echo "Dracula theme installed at: $target"
 }
 ensure_dracula_konsole
+
+# for openai to call some tools
+sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress firefox autoconf
+
+# install podman to replace docker
+# 1. 更新元数据
+sudo dnf update -y
+# 2. 装 Podman 引擎 + 辅助包（rootless 网络/挂载用）
+sudo dnf install -y podman podman-compose fuse-overlayfs
+# 3. 验证
+podman --version
+podman run --rm docker.io/library/hello-world
+# 建系统级 symlink
+sudo ln -sf /usr/bin/podman /usr/local/bin/docker
+sudo ln -sf /usr/bin/podman-compose /usr/local/bin/docker-compose
