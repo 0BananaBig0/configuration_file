@@ -39,7 +39,7 @@ chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
 
 # ==================== 第三阶段：字体安装 ====================
 sudo dnf install -y @development-tools
-sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra
+sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
 sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
 sudo dnf install -y p7zip p7zip-plugins
@@ -226,7 +226,7 @@ ensure_dracula_konsole() {
 ensure_dracula_konsole
 
 # for openai to call some tools
-sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress firefox autoconf
+sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress firefox
 
 # install podman to replace docker
 # 1. 更新元数据
@@ -239,3 +239,10 @@ podman run --rm docker.io/library/hello-world
 # 建系统级 symlink
 sudo ln -sf /usr/bin/podman /usr/local/bin/docker
 sudo ln -sf /usr/bin/podman-compose /usr/local/bin/docker-compose
+
+# mount FedoraLinux into win11 persistently, execute the following commands in powershell
+net use F: \\wsl.localhost\FedoraLinux /persistent:yes
+# unmount FedoraLinux
+net use F: /delete
+# mount FedoraLinux into win11 temporarily, execute the following commands in powershell
+subst G: "\\wsl.localhost\FedoraLinux\home\banana"
