@@ -121,10 +121,12 @@ call plug#end()
 
 
 colorscheme dracula
+hi Terminal guibg=#282a36 guifg=#f8f8f2
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
                   \ :set colorcolumn=0<CR>
 noremap <Leader>per :<C-u>colorscheme dracula<CR>
+                  \ :<C-u>hi Terminal guibg=#282a36 guifg=#f8f8f2<CR>
                   \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21<CR>
                   \ :set colorcolumn=80,120,160<CR>
 

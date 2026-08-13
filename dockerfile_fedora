@@ -198,7 +198,8 @@ RUN mkdir -p /home/banana/.config/coc/extensions && \
         coc-json \
         coc-css \
         coc-tsserver \
-        coc-xml
+        coc-xml \
+        https://github.com/Kuro96/coc-ai
 RUN cp /home/banana/configuration_file/.vimrc ~
 RUN fc-cache -fv
 RUN sudo dnf install -y @development-tools
@@ -227,6 +228,7 @@ RUN sudo dnf install -y perl-Test-Metrics-Any perl-Test-Future-IO-Impl perl-Deve
 RUN sudo dnf install -y perl-Pod-Coverage perl-Test-Pod-Coverage perl-Test-Pod perl-Class-Accessor
 RUN sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo pocl pocl-devel
 RUN sudo dnf install -y konsole terminator xclip
+RUN sudo dnf install -y libreoffice-writer libreoffice-calc libreoffice-impress firefox
 RUN sudo dnf update -y
 
 # ==================== Ruby Gem ====================
