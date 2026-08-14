@@ -282,16 +282,8 @@ function! ConfigureWhichKey()
   let g:local_key_map = {
         \ 'a': 'Wrap all diff windows',
         \ 'b': 'Close tab and go back',
-        \ 'c': 'Go to declaration',
-        \ 'd': 'Go to definition',
-        \ 'f': 'Refactor selection or symbol',
-        \ 'i': 'Go to implementation',
-        \ 'j': 'Next error diagnostic',
-        \ 'k': 'Previous error diagnostic',
         \ 'm': 'Toggle GUI menu and toolbar',
-        \ 'n': 'Rename symbol',
         \ 'q': 'Quit window',
-        \ 'r': 'Show references',
         \ 't': 'Open new tab',
         \ 'u': 'Clear search highlight',
         \ 'w': 'Write file',
@@ -308,15 +300,29 @@ function! ConfigureWhichKey()
         \ ']': 'Previous function end',
         \ 'a': 'Code action',
         \ 'b': 'Toggle buffer diagnostics',
-        \ 'c': 'Open declaration in new tab',
-        \ 'd': 'Open definition in new tab',
+        \ 'c': 'Go to declaration',
+        \ 'd': 'Go to definition',
+        \ 'f': 'Refactor selection or symbol',
         \ 'h': 'Toggle inlay hints',
-        \ 'i': 'Open implementation in new tab',
-        \ 'j': 'Next diagnostic',
-        \ 'k': 'Previous diagnostic',
+        \ 'i': 'Go to implementation',
+        \ 'j': {
+          \ 'name': '+Next Diagnostic',
+          \ 'd': 'Next diagnostic',
+          \ 'e': 'Next error diagnostic',
+          \ },
+        \ 'k': {
+          \ 'name': '+Previous Diagnostic',
+          \ 'd': 'Previous diagnostic',
+          \ 'e': 'Previous error diagnostic',
+          \ },
         \ 'l': 'Line code action',
+        \ 'n': 'Rename symbol',
         \ 'o': 'Show diagnostic information',
+        \ 'r': 'Show references',
         \ 't': 'Toggle diagnostics globally',
+        \ 'tc': 'Open declaration in new tab',
+        \ 'td': 'Open definition in new tab',
+        \ 'ti': 'Open implementation in new tab',
         \ }
   let g:right_bracket_key_map = {
         \ '"': 'Next comment block',
@@ -376,7 +382,7 @@ function! ConfigureDelayedPlugin()
   let g:right_bracket_key_map = {}
   call plug#load('vim-which-key')
   noremap <Leader> :<C-u>WhichKey '\'<CR>
-  noremap <LocalLeader> :<C-u>WhichKey '<LocalLeader>'<CR>
+  noremap <LocalLeader> :<C-u>WhichKey ','<CR>
   noremap [ :<C-u>WhichKey '['<CR>
   noremap ] :<C-u>WhichKey ']'<CR>
   call which_key#register('\', "g:leader_key_map")
