@@ -191,6 +191,184 @@ endfunction
 
 
 
+function! ConfigureWhichKey()
+  let g:which_key_use_floating_win = 0
+  let g:leader_key_map = {
+        \ 'a': {
+          \ 'name': '+Automatic Verilog',
+          \ 'a': 'Generate arguments',
+          \ 'd': 'Generate definition',
+          \ 'i': 'Generate instance',
+          \ 'p': {
+            \ 'name': '+Parameters',
+            \ 'p': 'Generate parameters',
+            \ 'v': 'Generate parameter values',
+            \ },
+          \ 'r': 'Generate registers',
+          \ 'w': 'Generate wires',
+          \ },
+        \ 'b': {
+          \ 'name': '+Bookmarks',
+          \ 'a': 'Annotate bookmark',
+          \ 'c': 'Clear bookmark',
+          \ 'd': 'Move bookmark down',
+          \ 'l': 'Move bookmark to line',
+          \ 'n': 'Next bookmark',
+          \ 'o': 'Load bookmark plugin',
+          \ 'p': 'Previous bookmark',
+          \ 'r': 'Clear all bookmarks',
+          \ 's': 'Show all bookmarks',
+          \ 't': 'Toggle bookmark',
+          \ 'u': 'Move bookmark up',
+          \ },
+        \ 'g': {
+          \ 'name': '+Git',
+          \ 'b': 'Show line blame',
+          \ 'f': 'Fold unchanged lines',
+          \ 'i': {
+            \ 'name': '+Plugin',
+            \ 't': 'Load Git plugins',
+            \ },
+          \ 'j': 'Next hunk',
+          \ 'k': 'Previous hunk',
+          \ },
+        \ 'm': {
+          \ 'name': '+Markdown',
+          \ 'c': 'Create Markmap HTML',
+          \ 'f': 'Fix Markdown lint errors',
+          \ 'g': 'Generate table of contents',
+          \ 'h': 'Create Markmap',
+          \ 'm': 'Watch Markmap',
+          \ 'u': 'Update table of contents',
+          \ },
+        \ 'n': {
+          \ 'name': '+NERDTree',
+          \ 'c': 'Open tree at working directory',
+          \ 't': 'Toggle file tree',
+          \ },
+        \ 'p': {
+          \ 'name': '+Appearance',
+          \ 'e': {
+            \ 'name': '+Editor',
+            \ 'r': 'Restore editor appearance',
+            \ },
+          \ 'p': {
+            \ 'name': '+Presentation',
+            \ 't': 'Use presentation appearance',
+            \ },
+          \ },
+        \ 'q': {
+          \ 'name': '+QuickUI',
+          \ 'b': 'List buffers',
+          \ 'm': 'Open menu',
+          \ 't': 'Preview tag',
+          \ },
+        \ 'v': {
+          \ 'name': '+Vista',
+          \ 'f': 'Focus symbol window',
+          \ 't': 'Toggle symbol window',
+          \ },
+        \ 'w': {
+          \ 'name': '+Multiple Highlights',
+          \ 'h': 'Highlight word',
+          \ 'H': 'Clear all word highlights',
+          \ 't': 'Load highlight plugin',
+          \ },
+        \ '<F2>': 'Compile only',
+        \ '<F5>': 'Create C/C++ debug files',
+        \ '<F7>': 'Create Clang configuration files',
+        \ '`': 'Show nearest function or class',
+        \ }
+  let g:local_key_map = {
+        \ 'a': 'Wrap all diff windows',
+        \ 'b': 'Close tab and go back',
+        \ 'c': 'Go to declaration',
+        \ 'd': 'Go to definition',
+        \ 'f': 'Refactor selection or symbol',
+        \ 'i': 'Go to implementation',
+        \ 'j': 'Next error diagnostic',
+        \ 'k': 'Previous error diagnostic',
+        \ 'm': 'Toggle GUI menu and toolbar',
+        \ 'n': 'Rename symbol',
+        \ 'q': 'Quit window',
+        \ 'r': 'Show references',
+        \ 't': 'Open new tab',
+        \ 'u': 'Clear search highlight',
+        \ 'w': 'Write file',
+        \ '<F2>': 'Compile and execute',
+        \ '<F4>': 'Open vertical diff',
+        \ '<F5>': 'Delete blank lines',
+        \ '<F7>': 'Retab and clean trailing characters',
+        \ '<F8>': 'Run asynchronous command',
+        \ }
+  let g:left_bracket_key_map = {
+        \ '"': 'Previous comment block',
+        \ '%': 'Previous unmatched delimiter',
+        \ '[': 'Previous function start',
+        \ ']': 'Previous function end',
+        \ 'a': 'Code action',
+        \ 'b': 'Toggle buffer diagnostics',
+        \ 'c': 'Open declaration in new tab',
+        \ 'd': 'Open definition in new tab',
+        \ 'h': 'Toggle inlay hints',
+        \ 'i': 'Open implementation in new tab',
+        \ 'j': 'Next diagnostic',
+        \ 'k': 'Previous diagnostic',
+        \ 'l': 'Line code action',
+        \ 'o': 'Show diagnostic information',
+        \ 't': 'Toggle diagnostics globally',
+        \ }
+  let g:right_bracket_key_map = {
+        \ '"': 'Next comment block',
+        \ '%': 'Next unmatched delimiter',
+        \ '[': 'Next function end',
+        \ ']': 'Next function start',
+        \ 'a': 'Show assembly',
+        \ 'c': 'Jump to program counter',
+        \ 'd': 'Delete character',
+        \ 'e': 'Evaluate expression',
+        \ 'j': 'Next breakpoint',
+        \ 'k': 'Previous breakpoint',
+        \ 'p': {
+          \ 'name': '+Processes',
+          \ 'c': 'Control child processes',
+          \ 'd': 'Detach child processes',
+          \ 'f': 'Follow child processes',
+          \ 'i': 'List processes',
+          \ 'p': 'Follow parent process',
+          \ 's': 'Switch process',
+          \ },
+        \ 'r': 'Reshape debugger windows',
+        \ 's': 'Show disassembly',
+        \ 't': {
+          \ 'name': '+Threads and Backtraces',
+          \ 'a': 'Show all backtraces',
+          \ 'b': 'Show current backtrace',
+          \ 'c': 'Continue all threads',
+          \ 'l': 'Set backtrace limit',
+          \ 's': 'Switch thread',
+          \ 't': 'Stop all threads',
+          \ },
+        \ 'v': 'Add variable to watches',
+        \ '<F2>': 'Run to cursor',
+        \ '<S-F2>': 'Stop debugger',
+        \ '<C-F2>': 'Pause debugger',
+        \ '<F4>': 'Toggle conditional breakpoint',
+        \ '<S-F4>': 'Set advanced line breakpoint',
+        \ '<C-F4>': 'Add function breakpoint',
+        \ '<F5>': 'Launch debugger',
+        \ '<F7>': 'Move up stack frame',
+        \ '<S-F7>': 'Move down stack frame',
+        \ '<F8>': 'Show full variable values',
+        \ }
+  call which_key#register(get(g:, 'mapleader', "\\"), "g:leader_key_map")
+  call which_key#register(get(g:, 'maplocalleader', ','), "g:local_key_map")
+  call which_key#register('[', "g:left_bracket_key_map")
+  call which_key#register(']', "g:right_bracket_key_map")
+endfunction
+
+
+
 function! ConfigureDelayedPlugin()
   " Vim-which-key setting
   let g:which_key_fallback_to_native_key = 0
@@ -1070,6 +1248,7 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>aw :call g:AutoWire()<ESC>
   noremap <Leader>ad :call g:AutoDef()<ESC>
   " vim-verilog-instance
+  call ConfigureWhichKey()
 endfunction
 " Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
