@@ -400,23 +400,23 @@ function! ConfigureDelayedPlugin()
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
-  nmap <LocalLeader>c <Plug>(coc-declaration)
-  nmap <LocalLeader>d <Plug>(coc-definition)
-  nmap <LocalLeader>f <Plug>(coc-refactor)
-  vmap <LocalLeader>f <Plug>(coc-refactor-selected)
-  nmap <LocalLeader>i <Plug>(coc-implementation)
-  nmap <LocalLeader>j <Plug>(coc-diagnostic-next-error)
-  nmap <LocalLeader>k <Plug>(coc-diagnostic-prev-error)
-  nmap <LocalLeader>n <Plug>(coc-rename)
-  nmap <LocalLeader>r <Plug>(coc-references)
+  nmap [c <Plug>(coc-declaration)
+  noremap [tc :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
+  nmap [d <Plug>(coc-definition)
+  noremap [td :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
+  nmap [f <Plug>(coc-refactor)
+  vmap [f <Plug>(coc-refactor-selected)
+  nmap [i <Plug>(coc-implementation)
+  noremap [ti :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
+  nmap [je <Plug>(coc-diagnostic-next-error)
+  nmap [jd <Plug>(coc-diagnostic-next)
+  nmap [ke <Plug>(coc-diagnostic-prev-error)
+  nmap [kd <Plug>(coc-diagnostic-prev)
+  nmap [n <Plug>(coc-rename)
+  nmap [r <Plug>(coc-references)
   nmap [a <Plug>(coc-codeaction)
   vmap [a <Plug>(coc-codeaction-selected)
   nmap [l <Plug>(coc-codeaction-line)
-  noremap [c :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
-  noremap [d :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
-  noremap [i :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
-  nmap [j <Plug>(coc-diagnostic-next)
-  nmap [k <Plug>(coc-diagnostic-prev)
   nmap [o <Plug>(coc-diagnostic-info)
   noremap [b :<C-u>call CocActionAsync('diagnosticToggleBuffer')<CR>
   noremap [t :<C-u>call CocActionAsync('diagnosticToggle', 1)<CR>
