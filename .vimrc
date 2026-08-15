@@ -25,11 +25,11 @@ let maplocalleader = ","
 
 augroup Auto_Set_FileType
   autocmd!
-  autocmd BufNewFile,BufRead */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | set filetype=cpp | endif
-  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf set filetype=xml
-  autocmd BufNewFile,BufRead *.v set filetype=verilog
-  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* set filetype=tcl
-  autocmd BufNewFile,BufRead *.stil set filetype=stil
+  autocmd BufNewFile */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | setlocal filetype=cpp | endif
+  autocmd BufNewFile *.launch,*.qrc,*.conf setlocal filetype=xml
+  autocmd BufNewFile *.v setlocal filetype=verilog
+  autocmd BufNewFile *.tessent_startup,*.dofile,*.pdl,*.pdl.* setlocal filetype=tcl
+  autocmd BufNewFile *.stil setlocal filetype=stil
 augroup END
 
 
@@ -1378,14 +1378,14 @@ function! SetIndent()
         \ || &filetype=='verilog' || &filetype=='json' || expand('%:e')=='icl'
     let l:indent_val = 3
     if &filetype=='c' || &filetype=='cpp'
-      set cindent     " 设置使用C/C++语言的自动缩进方式
+      setlocal cindent     " 设置使用C/C++语言的自动缩进方式
     endif
   elseif &filetype=='vim'
     let l:indent_val = 2
   endif
-  let &tabstop = 8      " Tab键的显示宽度 and its practical width
-  let &softtabstop = l:indent_val  " 按下Tab键时输入的宽度
-  let &shiftwidth = l:indent_val   " 设置自动缩进时的缩进长度
+  let &l:tabstop = l:indent_val * 2      " Tab键的显示宽度 and its practical width
+  let &l:softtabstop = l:indent_val  " 按下Tab键时输入的宽度
+  let &l:shiftwidth = l:indent_val   " 设置自动缩进时的缩进长度
 endfunction
 function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3
