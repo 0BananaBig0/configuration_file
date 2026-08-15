@@ -246,3 +246,14 @@ net use F: \\wsl.localhost\FedoraLinux /persistent:yes
 net use F: /delete
 # mount FedoraLinux into win11 temporarily, execute the following commands in powershell
 subst G: "\\wsl.localhost\FedoraLinux\home\banana"
+
+# install ssh for connection from other devices in the internal network.
+# 1. 安装服务端（客户端一般已带）
+sudo dnf install -y openssh-server openssh-clients
+# 2. 启动并设置开机自启
+sudo systemctl enable --now sshd
+# 3. 确认服务状态
+sudo systemctl status sshd
+# 应看到 Active: active (running)
+# 4. 确认 22 端口在监听
+sudo ss -tlnp | grep :22
