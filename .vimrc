@@ -1070,6 +1070,29 @@ function! ConfigureManualLoadPlugin()
     call add(l:lines, '')
     return l:lines
   endfunction
+  function! QuickuiCheatsheetCategoryRows(width)
+    let l:group_count = len(g:quickui_keymap_groups)
+    let l:groups_per_row = (l:group_count + 1) / 2
+    let l:cell_width = (a:width - (l:groups_per_row - 1)) / l:groups_per_row
+    let l:rows = []
+    for l:row_id in [0, 1]
+      let l:cells = []
+      let l:first_group_id = l:row_id * l:groups_per_row
+      let l:last_group_id = min([
+            \ l:first_group_id + l:groups_per_row - 1, l:group_count - 1])
+      for l:group_id in range(l:first_group_id, l:last_group_id)
+        let l:group = g:quickui_keymap_groups[l:group_id]
+        let l:toggle_key = get(g:quickui_cheatsheet_toggle_keys, l:group_id, '?')
+        let l:fold_mark = get(g:quickui_cheatsheet_folded, l:group[0], 0) ? '+' : '-'
+        let l:cell = '['.l:toggle_key.']'.l:fold_mark.' '.l:group[0]
+        let l:cell = QuickuiCheatsheetTruncate(l:cell, l:cell_width)
+        let l:cell .= repeat(' ', max([0, l:cell_width - strdisplaywidth(l:cell)]))
+        call add(l:cells, l:cell)
+      endfor
+      call add(l:rows, substitute(join(l:cells, ' '), '\s\+$', '', ''))
+    endfor
+    return l:rows
+  endfunction
   function! QuickuiBuildKeyMapCheatsheet()
     let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefim', '\zs')
     if !exists('g:quickui_cheatsheet_folded')
@@ -1080,12 +1103,15 @@ function! ConfigureManualLoadPlugin()
     endif
     let l:window_width = max([40, &columns - 8])
     let l:window_width = min([180, l:window_width])
-    let l:lines = []
+    let l:lines = QuickuiCheatsheetCategoryRows(l:window_width)
+    call add(l:lines, '')
     let l:group_id = 0
     for l:group in g:quickui_keymap_groups
       let l:toggle_key = get(g:quickui_cheatsheet_toggle_keys, l:group_id, '?')
-      call extend(l:lines, QuickuiCheatsheetGroup(
-            \ l:group, l:window_width, l:toggle_key))
+      if !get(g:quickui_cheatsheet_folded, l:group[0], 0)
+        call extend(l:lines, QuickuiCheatsheetGroup(
+              \ l:group, l:window_width, l:toggle_key))
+      endif
       let l:group_id += 1
     endfor
     if get(g:, 'quickui_cheatsheet_search_active', 0)
