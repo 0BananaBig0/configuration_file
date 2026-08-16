@@ -1,0 +1,18 @@
+[wsl2]
+swap=4GB          # Disable swap
+memory=32GB     # Customize WSL memory size based on your machine's configuration
+dnsTunneling=true                 # 开启 DNS Tunneling
+firewall=true                     # 开启 Windows 防火墙
+autoProxy=true                    # 开启自动同步代理
+networkingMode=mirrored           # 开启镜像网络
+localhostForwarding=true
+# guiApplications=false             # Disable X11. Wayland is more efficient. But the vim paste function during visual mode does not work correctly.
+# WSL2 虚拟机空闲后永不自动关闭（默认 60000ms 即 60 秒）
+vmIdleTimeout = -1
+
+[experimental]
+autoMemoryReclaim=gradual         # 开启自动回收内存，可在 gradual, dropcache, disabled 之间选择
+
+[general]
+# 实例空闲后永不自动终止（默认 15000ms 约 15 秒就会关）
+instanceIdleTimeout = -1
