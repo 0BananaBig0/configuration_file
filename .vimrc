@@ -1052,11 +1052,20 @@ function! ConfigureManualLoadPlugin()
     let l:title = '['.a:toggle_key.'] '.a:group[0].': '.l:fold_mark
     let l:lines = [l:title, repeat('-', min([a:width, strlen(l:title)]))]
     if l:folded
-      call add(l:lines, '')
       return l:lines
     endif
-    for l:key_map in a:group[1]
-      call add(l:lines, QuickuiCheatsheetKeyMapLine(l:key_map, a:width))
+    let l:mapping_column_width = (a:width - 2) / 2
+    for l:key_map_id in range(0, len(a:group[1]) - 1, 2)
+      let l:left = QuickuiCheatsheetKeyMapLine(
+            \ a:group[1][l:key_map_id], l:mapping_column_width)
+      let l:left .= repeat(' ', max([0,
+            \ l:mapping_column_width - strdisplaywidth(l:left)]))
+      let l:right = ''
+      if l:key_map_id + 1 < len(a:group[1])
+        let l:right = QuickuiCheatsheetKeyMapLine(
+              \ a:group[1][l:key_map_id + 1], l:mapping_column_width)
+      endif
+      call add(l:lines, l:left.'  '.l:right)
     endfor
     call add(l:lines, '')
     return l:lines
@@ -1071,32 +1080,13 @@ function! ConfigureManualLoadPlugin()
     endif
     let l:window_width = max([40, &columns - 8])
     let l:window_width = min([180, l:window_width])
-    let l:column_count = l:window_width >= 150 ? 3 : l:window_width >= 82 ? 2 : 1
-    let l:column_width = (l:window_width - ((l:column_count - 1) * 3)) / l:column_count
-    let l:columns = []
-    let l:column_heights = []
-    for l:column_id in range(l:column_count - 1)
-      call add(l:columns, [])
-      call add(l:column_heights, 0)
-    endfor
+    let l:lines = []
     let l:group_id = 0
     for l:group in g:quickui_keymap_groups
-      let l:column_id = index(l:column_heights, min(l:column_heights))
       let l:toggle_key = get(g:quickui_cheatsheet_toggle_keys, l:group_id, '?')
-      let l:group_lines = QuickuiCheatsheetGroup(l:group, l:column_width, l:toggle_key)
-      call extend(l:columns[l:column_id], l:group_lines)
-      let l:column_heights[l:column_id] += len(l:group_lines)
+      call extend(l:lines, QuickuiCheatsheetGroup(
+            \ l:group, l:window_width, l:toggle_key))
       let l:group_id += 1
-    endfor
-    let l:lines = []
-    for l:line_id in range(max(l:column_heights) - 1)
-      let l:line_columns = []
-      for l:column_id in range(l:column_count - 1)
-        let l:line = get(l:columns[l:column_id], l:line_id, '')
-        let l:line .= repeat(' ', max([0, l:column_width - strdisplaywidth(l:line)]))
-        call add(l:line_columns, l:line)
-      endfor
-      call add(l:lines, substitute(join(l:line_columns, ' │ '), '\s\+$', '', ''))
     endfor
     if get(g:, 'quickui_cheatsheet_search_active', 0)
       let l:instructions = 'Search '.g:quickui_cheatsheet_search_direction
