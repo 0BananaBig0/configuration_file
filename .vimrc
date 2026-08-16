@@ -186,13 +186,18 @@ function! ConfigureMarkdownPlugin()
     let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
     call setpos('.', [0, l:new_line, l:previous_column, 0])
   endfunction
-  let g:leader_key_map.m = {'name':"Markdown"}
 endfunction
 
 
 
 function! ConfigureWhichKey()
   let g:which_key_use_floating_win = 0
+  let g:which_key_fallback_to_native_key = 0
+  call plug#load('vim-which-key')
+  noremap <Leader> :<C-u>WhichKey '\'<CR>
+  noremap <LocalLeader> :<C-u>WhichKey ','<CR>
+  noremap [ :<C-u>WhichKey '['<CR>
+  noremap ] :<C-u>WhichKey ']'<CR>
   let g:leader_key_map = {
         \ 'a': {
           \ 'name': '+Automatic Verilog',
@@ -372,16 +377,7 @@ endfunction
 
 function! ConfigureDelayedPlugin()
   " Vim-which-key setting
-  let g:which_key_fallback_to_native_key = 0
-  let g:leader_key_map = {}
-  let g:right_bracket_key_map = {}
-  call plug#load('vim-which-key')
-  noremap <Leader> :<C-u>WhichKey '\'<CR>
-  noremap <LocalLeader> :<C-u>WhichKey ','<CR>
-  noremap [ :<C-u>WhichKey '['<CR>
-  noremap ] :<C-u>WhichKey ']'<CR>
-  call which_key#register('\', "g:leader_key_map")
-  call which_key#register(']', "g:right_bracket_key_map")
+  call ConfigureWhichKey()
   call ConfigureMarkdownPlugin()
 
 
@@ -772,7 +768,6 @@ function! ConfigureManualLoadPlugin()
   " Vim-quickui setting
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
-  let g:leader_key_map.q = {'name':"Quickui"}
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
     " Clear all the menus
@@ -845,7 +840,6 @@ function! ConfigureManualLoadPlugin()
   let g:NERDTreeDirArrowExpandable = '+'
   let g:NERDTreeDirArrowCollapsible = '-'
   let g:NERDTreeHidden = 0
-  let g:leader_key_map.n = {'name':"NERDTree"}
 
 
 
@@ -860,7 +854,6 @@ function! ConfigureManualLoadPlugin()
   let g:vista_blink = [0,0]
   let g:vista_top_level_blink = [0,0]
   let g:vista_echo_cursor_strategy = 'echo'
-  let g:leader_key_map.v = {'name':"Vista"}
 
 
 
@@ -870,7 +863,6 @@ function! ConfigureManualLoadPlugin()
   let g:bookmark_auto_save = 1
   " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
-  let g:leader_key_map.b = {'name':"Bookmark"}
   function! g:BMWorkDirFileLocation()
     let l:bookmark_extension = 'bookmarks'
     if empty($SUDO_USER)
@@ -928,7 +920,6 @@ function! ConfigureManualLoadPlugin()
     endif
     call InterestingWords(a:mode)
   endfunction
-  let g:leader_key_map.w = {'name':"multi-highlight"}
 
 
 
@@ -978,7 +969,6 @@ function! ConfigureManualLoadPlugin()
     let [a,m,r] = GitGutterGetHunkSummary()
     return printf('+%d ~%d -%d', a, m, r)
   endfunction
-  let g:leader_key_map.g = { 'name':"git", 'i':{'name':"load git plugins"}}
 
 
 
@@ -1255,8 +1245,6 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(l:cur_winid)
   endfunction
   augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
-  let g:right_bracket_key_map.p = {'name':"VimspectorProcesses"}
-  let g:right_bracket_key_map.t = {'name':"VimspectorBacktracesAndThreads"}
 
 
 
@@ -1293,7 +1281,6 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>aw :call g:AutoWire()<ESC>
   noremap <Leader>ad :call g:AutoDef()<ESC>
   " vim-verilog-instance
-  call ConfigureWhichKey()
 endfunction
 " Alt+n跳到第n个tab，0<n<10
 function! TabPosActivateBuffer(index)
