@@ -123,8 +123,8 @@ BreakTemplateDeclarations: MultiLine
 ColumnLimit:     80
 CommentPragmas:  '^ IWYU pragma:'
 CompactNamespaces: false
-ConstructorInitializerIndentWidth: 3
-ContinuationIndentWidth: 3
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
 Cpp11BracedListStyle: false
 DerivePointerAlignment: false
 DisableFormat:   false
@@ -165,7 +165,7 @@ IndentExternBlock: Indent
 IndentGotoLabels: true
 IndentPPDirectives: BeforeHash
 IndentRequiresClause: false
-IndentWidth:     3
+IndentWidth:     4
 IndentWrappedFunctionNames: true
 InsertBraces:    false
 InsertNewlineAtEOF: false
@@ -191,13 +191,13 @@ MainIncludeChar: Quote
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 ObjCBinPackProtocolList: Never
-ObjCBlockIndentWidth: 3
+ObjCBlockIndentWidth: 4
 ObjCBreakBeforeNestedBlockParam: false
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false
 PackConstructorInitializers: CurrentLine
-PenaltyBreakAssignment: 3
-PenaltyBreakBeforeFirstCallParameter: 3
+PenaltyBreakAssignment: 4
+PenaltyBreakBeforeFirstCallParameter: 4
 PenaltyBreakComment: 10
 PenaltyBreakFirstLessLess: 120
 PenaltyBreakOpenParenthesis: 0
@@ -278,7 +278,7 @@ SpaceBeforeParensOptions:
 SpaceBeforeRangeBasedForLoopColon: false
 SpaceBeforeSquareBrackets: false
 SpaceInEmptyBlock: false
-SpacesBeforeTrailingComments: 3
+SpacesBeforeTrailingComments: 4
 SpacesInAngles:  Always
 SpacesInContainerLiterals: true
 SpacesInLineCommentPrefix:
@@ -299,7 +299,7 @@ StatementMacros:
   - Q_UNUSED
   - QT_REQUIRE_VERSION
 TableGenBreakInsideDAGArg: DontBreak
-TabWidth:        3
+TabWidth:        4
 UseTab:          Never
 VerilogBreakBetweenInstancePorts: true
 WhitespaceSensitiveMacros:

@@ -1918,16 +1918,12 @@ set list                      " Enable special character display
 set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
 function! SetIndent()
   let l:indent_val=4
-  if &filetype=='c' || &filetype=='cpp' || &filetype=='opencl'
-        \ || &filetype=='verilog' || &filetype=='json' || expand('%:e')=='icl'
-    let l:indent_val = 3
-    if &filetype=='c' || &filetype=='cpp'
-      setlocal cindent     " 设置使用C/C++语言的自动缩进方式
-    endif
+  if &filetype=='c' || &filetype=='cpp'
+    setlocal cindent     " 设置使用C/C++语言的自动缩进方式
   elseif &filetype=='vim'
     let l:indent_val = 2
   endif
-  let &l:tabstop = l:indent_val * 2      " Tab键的显示宽度 and its practical width
+  let &l:tabstop = l:indent_val      " Tab键的显示宽度 and its practical width
   let &l:softtabstop = l:indent_val  " 按下Tab键时输入的宽度
   let &l:shiftwidth = l:indent_val   " 设置自动缩进时的缩进长度
 endfunction
@@ -2436,4 +2432,3 @@ set iskeyword+=.
 " <Ctrl-Shift-t> open a new terminal in a new tab
 noremap <C-S-t> :tab terminal<CR>
 inoremap <C-S-t> <C-o>:tab terminal<CR>
-
