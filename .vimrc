@@ -87,10 +87,10 @@ Plug 'mzlogin/vim-markdown-toc', {'on': []}
 Plug 'preservim/nerdcommenter', {'on': []}
 " 异步执行shell命令插件, Delay-load
 Plug 'skywind3000/asyncrun.vim', {'on': []}
-" 菜单栏插件, Delay-load
-Plug 'skywind3000/vim-quickui', {'on': []}
 " % match plugins, Delay-load
 Plug 'andymass/vim-matchup', {'on': []}
+" 菜单栏插件, Manual-load
+Plug 'skywind3000/vim-quickui', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
