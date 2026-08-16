@@ -1062,9 +1062,12 @@ function! ConfigureManualLoadPlugin()
     return l:lines
   endfunction
   function! QuickuiBuildKeyMapCheatsheet()
-    let g:quickui_cheatsheet_toggle_keys = split('123456789ABCDEFGH', '\zs')
+    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefim', '\zs')
     if !exists('g:quickui_cheatsheet_folded')
       let g:quickui_cheatsheet_folded = {}
+      for l:group in g:quickui_keymap_groups
+        let g:quickui_cheatsheet_folded[l:group[0]] = 1
+      endfor
     endif
     let l:window_width = max([40, &columns - 8])
     let l:window_width = min([180, l:window_width])
@@ -1095,8 +1098,16 @@ function! ConfigureManualLoadPlugin()
       endfor
       call add(l:lines, substitute(join(l:line_columns, ' │ '), '\s\+$', '', ''))
     endfor
-    let l:instructions = '1-9/A-H: fold   z: fold all   r: unfold all   j/k/PgUp/PgDn: scroll   /: search   Esc/q: close'
-    return [[QuickuiCheatsheetTruncate(l:instructions, l:window_width), ''] + l:lines,
+    if get(g:, 'quickui_cheatsheet_search_active', 0)
+      let l:instructions = 'Search '.g:quickui_cheatsheet_search_direction
+            \ .g:quickui_cheatsheet_search_input.'_   Enter: search   Esc: cancel'
+      let l:instructions_second_line = ''
+    else
+      let l:instructions = '1-9/a-f/i/m: fold   z/r: fold/unfold all   gg/G: top/bottom   /?: search   n/N: next/prev'
+      let l:instructions_second_line = 'j/k/PgUp/PgDn: scroll   Space: page down   Esc/q: close'
+    endif
+    return [[QuickuiCheatsheetTruncate(l:instructions, l:window_width),
+          \ QuickuiCheatsheetTruncate(l:instructions_second_line, l:window_width), ''] + l:lines,
           \ l:window_width]
   endfunction
   function! QuickuiRefreshKeyMapCheatsheet(winid)
@@ -1110,9 +1121,72 @@ function! ConfigureManualLoadPlugin()
           \ 'maxheight': l:window_height,
           \ })
   endfunction
+  function! QuickuiRunKeyMapCheatsheetSearch(winid, backwards)
+    if !exists('g:quickui_cheatsheet_search_pattern')
+      return
+    endif
+    let l:pattern = '\V'.escape(g:quickui_cheatsheet_search_pattern, '\')
+    let l:flags = a:backwards ? 'bW' : 'W'
+    let l:command = 'call clearmatches()'
+          \ .' | call matchadd("Search", '.string(l:pattern).')'
+          \ .' | call search('.string(l:pattern).', '.string(l:flags).')'
+          \ .' | normal! zz'
+    call quickui#core#win_execute(a:winid, l:command)
+  endfunction
+  function! QuickuiStartKeyMapCheatsheetSearch(winid, direction)
+    let g:quickui_cheatsheet_folded = {}
+    let g:quickui_cheatsheet_search_active = 1
+    let g:quickui_cheatsheet_search_input = ''
+    let g:quickui_cheatsheet_search_direction = a:direction
+    call QuickuiRefreshKeyMapCheatsheet(a:winid)
+  endfunction
   function! QuickuiKeyMapCheatsheetFilter(winid, key)
+    if get(g:, 'quickui_cheatsheet_search_active', 0)
+      if a:key ==# "\<Esc>" || a:key ==# "\<C-C>"
+        let g:quickui_cheatsheet_search_active = 0
+        call QuickuiRefreshKeyMapCheatsheet(a:winid)
+      elseif a:key ==# "\<CR>"
+        let g:quickui_cheatsheet_search_active = 0
+        if !empty(g:quickui_cheatsheet_search_input)
+          let g:quickui_cheatsheet_search_pattern = g:quickui_cheatsheet_search_input
+          call QuickuiRefreshKeyMapCheatsheet(a:winid)
+          if g:quickui_cheatsheet_search_direction ==# '?'
+            call quickui#core#win_execute(a:winid, 'normal! G$')
+          else
+            call quickui#core#win_execute(a:winid, 'normal! gg0')
+          endif
+          call QuickuiRunKeyMapCheatsheetSearch(a:winid,
+                \ g:quickui_cheatsheet_search_direction ==# '?')
+        else
+          call QuickuiRefreshKeyMapCheatsheet(a:winid)
+        endif
+      elseif a:key ==# "\<BS>" || a:key ==# "\<C-H>"
+        let l:length = strchars(g:quickui_cheatsheet_search_input)
+        let g:quickui_cheatsheet_search_input = strcharpart(
+              \ g:quickui_cheatsheet_search_input, 0, max([0, l:length - 1]))
+        call QuickuiRefreshKeyMapCheatsheet(a:winid)
+      elseif a:key =~# '^[[:print:]]$'
+        let g:quickui_cheatsheet_search_input .= a:key
+        call QuickuiRefreshKeyMapCheatsheet(a:winid)
+      endif
+      return 1
+    endif
     if a:key ==# "\<Esc>" || a:key ==# "\<C-C>" || a:key ==# 'q' || a:key ==# 'x'
       call popup_close(a:winid, 0)
+      return 1
+    endif
+    if a:key ==# 'g'
+      if get(g:, 'quickui_cheatsheet_pending_g', 0)
+        let g:quickui_cheatsheet_pending_g = 0
+        call quickui#utils#scroll(a:winid, 'TOP')
+      else
+        let g:quickui_cheatsheet_pending_g = 1
+      endif
+      return 1
+    endif
+    let g:quickui_cheatsheet_pending_g = 0
+    if a:key ==# 'G'
+      call quickui#utils#scroll(a:winid, 'BOTTOM')
       return 1
     endif
     let l:group_id = index(g:quickui_cheatsheet_toggle_keys, a:key)
@@ -1133,7 +1207,16 @@ function! ConfigureManualLoadPlugin()
       call QuickuiRefreshKeyMapCheatsheet(a:winid)
       return 1
     elseif a:key ==# '/' || a:key ==# '?'
-      call quickui#utils#search_or_jump(a:winid, a:key)
+      call QuickuiStartKeyMapCheatsheetSearch(a:winid, a:key)
+      return 1
+    elseif a:key ==# 'n' || a:key ==# 'N'
+      if exists('g:quickui_cheatsheet_search_pattern')
+        let l:backwards = get(g:, 'quickui_cheatsheet_search_direction', '/') ==# '?'
+        if a:key ==# 'N'
+          let l:backwards = !l:backwards
+        endif
+        call QuickuiRunKeyMapCheatsheetSearch(a:winid, l:backwards)
+      endif
       return 1
     elseif a:key ==# ' '
       call quickui#utils#scroll(a:winid, 'PAGEDOWN')
@@ -1155,6 +1238,13 @@ function! ConfigureManualLoadPlugin()
     if !exists('g:quickui_keymap_groups')
       call QuickuiConfiguration()
     endif
+    let g:quickui_cheatsheet_folded = {}
+    for l:group in g:quickui_keymap_groups
+      let g:quickui_cheatsheet_folded[l:group[0]] = 1
+    endfor
+    let g:quickui_cheatsheet_search_active = 0
+    let g:quickui_cheatsheet_pending_g = 0
+    unlet! g:quickui_cheatsheet_search_pattern g:quickui_cheatsheet_search_direction
     let [l:lines, l:window_width] = QuickuiBuildKeyMapCheatsheet()
     let l:window_height = min([max([6, &lines - 6]), len(l:lines)])
     let l:options = {
