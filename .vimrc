@@ -1046,8 +1046,15 @@ function! ConfigureManualLoadPlugin()
     let l:description = QuickuiCheatsheetTruncate(a:key_map[1], l:description_width)
     return '  '.printf('%-'.l:key_width.'s', l:key).' '.l:description
   endfunction
-  function! QuickuiCheatsheetGroup(group, width)
-    let l:lines = [a:group[0].':', repeat('-', min([a:width, strlen(a:group[0]) + 1]))]
+  function! QuickuiCheatsheetGroup(group, width, toggle_key)
+    let l:folded = get(g:quickui_cheatsheet_folded, a:group[0], 0)
+    let l:fold_mark = l:folded ? '[+]' : '[-]'
+    let l:title = '['.a:toggle_key.'] '.a:group[0].': '.l:fold_mark
+    let l:lines = [l:title, repeat('-', min([a:width, strlen(l:title)]))]
+    if l:folded
+      call add(l:lines, '')
+      return l:lines
+    endif
     for l:key_map in a:group[1]
       call add(l:lines, QuickuiCheatsheetKeyMapLine(l:key_map, a:width))
     endfor
@@ -1055,6 +1062,10 @@ function! ConfigureManualLoadPlugin()
     return l:lines
   endfunction
   function! QuickuiBuildKeyMapCheatsheet()
+    let g:quickui_cheatsheet_toggle_keys = split('123456789ABCDEFGH', '\zs')
+    if !exists('g:quickui_cheatsheet_folded')
+      let g:quickui_cheatsheet_folded = {}
+    endif
     let l:window_width = max([40, &columns - 8])
     let l:window_width = min([180, l:window_width])
     let l:column_count = l:window_width >= 150 ? 3 : l:window_width >= 82 ? 2 : 1
@@ -1065,11 +1076,14 @@ function! ConfigureManualLoadPlugin()
       call add(l:columns, [])
       call add(l:column_heights, 0)
     endfor
+    let l:group_id = 0
     for l:group in g:quickui_keymap_groups
       let l:column_id = index(l:column_heights, min(l:column_heights))
-      let l:group_lines = QuickuiCheatsheetGroup(l:group, l:column_width)
+      let l:toggle_key = get(g:quickui_cheatsheet_toggle_keys, l:group_id, '?')
+      let l:group_lines = QuickuiCheatsheetGroup(l:group, l:column_width, l:toggle_key)
       call extend(l:columns[l:column_id], l:group_lines)
       let l:column_heights[l:column_id] += len(l:group_lines)
+      let l:group_id += 1
     endfor
     let l:lines = []
     for l:line_id in range(max(l:column_heights) - 1)
@@ -1081,7 +1095,61 @@ function! ConfigureManualLoadPlugin()
       endfor
       call add(l:lines, substitute(join(l:line_columns, ' │ '), '\s\+$', '', ''))
     endfor
-    return [l:lines, l:window_width]
+    let l:instructions = '1-9/A-H: fold   z: fold all   r: unfold all   j/k/PgUp/PgDn: scroll   /: search   Esc/q: close'
+    return [[QuickuiCheatsheetTruncate(l:instructions, l:window_width), ''] + l:lines,
+          \ l:window_width]
+  endfunction
+  function! QuickuiRefreshKeyMapCheatsheet(winid)
+    let [l:lines, l:window_width] = QuickuiBuildKeyMapCheatsheet()
+    call popup_settext(a:winid, l:lines)
+    let l:window_height = min([max([6, &lines - 6]), len(l:lines)])
+    call popup_move(a:winid, {
+          \ 'minwidth': l:window_width,
+          \ 'maxwidth': l:window_width,
+          \ 'minheight': l:window_height,
+          \ 'maxheight': l:window_height,
+          \ })
+  endfunction
+  function! QuickuiKeyMapCheatsheetFilter(winid, key)
+    if a:key ==# "\<Esc>" || a:key ==# "\<C-C>" || a:key ==# 'q' || a:key ==# 'x'
+      call popup_close(a:winid, 0)
+      return 1
+    endif
+    let l:group_id = index(g:quickui_cheatsheet_toggle_keys, a:key)
+    if l:group_id >= 0 && l:group_id < len(g:quickui_keymap_groups)
+      let l:group_name = g:quickui_keymap_groups[l:group_id][0]
+      let g:quickui_cheatsheet_folded[l:group_name]
+            \ = !get(g:quickui_cheatsheet_folded, l:group_name, 0)
+      call QuickuiRefreshKeyMapCheatsheet(a:winid)
+      return 1
+    elseif a:key ==# 'z'
+      for l:group in g:quickui_keymap_groups
+        let g:quickui_cheatsheet_folded[l:group[0]] = 1
+      endfor
+      call QuickuiRefreshKeyMapCheatsheet(a:winid)
+      return 1
+    elseif a:key ==# 'r'
+      let g:quickui_cheatsheet_folded = {}
+      call QuickuiRefreshKeyMapCheatsheet(a:winid)
+      return 1
+    elseif a:key ==# '/' || a:key ==# '?'
+      call quickui#utils#search_or_jump(a:winid, a:key)
+      return 1
+    elseif a:key ==# ' '
+      call quickui#utils#scroll(a:winid, 'PAGEDOWN')
+      return 1
+    endif
+    let l:keymap = quickui#utils#keymap()
+    if has_key(l:keymap, a:key)
+      let l:action = l:keymap[a:key]
+      if l:action ==# 'ESC'
+        call popup_close(a:winid, 0)
+      elseif l:action !=# 'ENTER' && l:action !=# 'NEXT' && l:action !=# 'PREV'
+        call quickui#utils#scroll(a:winid, l:action)
+      endif
+      return 1
+    endif
+    return popup_filter_yesno(a:winid, a:key)
   endfunction
   function! QuickuiOpenKeyMapCheatsheet()
     if !exists('g:quickui_keymap_groups')
@@ -1089,14 +1157,20 @@ function! ConfigureManualLoadPlugin()
     endif
     let [l:lines, l:window_width] = QuickuiBuildKeyMapCheatsheet()
     let l:window_height = min([max([6, &lines - 6]), len(l:lines)])
-    call quickui#textbox#open(l:lines, {
+    let l:options = {
           \ 'title': 'Keymap Cheatsheet',
           \ 'w': l:window_width,
           \ 'h': l:window_height,
           \ 'maxwidth': l:window_width,
           \ 'maxheight': max([6, &lines - 6]),
           \ 'resize': 1,
-          \ })
+          \ }
+    if has('nvim')
+      call quickui#textbox#open(l:lines, l:options)
+    else
+      let l:winid = quickui#textbox#create(l:lines, l:options)
+      call popup_setoptions(l:winid, {'filter': function('QuickuiKeyMapCheatsheetFilter')})
+    endif
   endfunction
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
