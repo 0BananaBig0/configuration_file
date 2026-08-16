@@ -2436,3 +2436,4 @@ set iskeyword+=.
 " <Ctrl-Shift-t> open a new terminal in a new tab
 noremap <C-S-t> :tab terminal<CR>
 inoremap <C-S-t> <C-o>:tab terminal<CR>
+
