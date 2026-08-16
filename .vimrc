@@ -265,6 +265,7 @@ function! ConfigureWhichKey()
         \ 'q': {
           \ 'name': '+QuickUI',
           \ 'b': 'List buffers',
+          \ 'c': 'Open keymap cheatsheet',
           \ 'm': 'Open menu',
           \ 't': 'Preview tag',
           \ },
@@ -768,6 +769,335 @@ function! ConfigureManualLoadPlugin()
   " Vim-quickui setting
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
+  function! QuickuiInstallKeyMapGroup(name, key_maps, weight)
+    let l:name = substitute(a:name, '&', '', 'g')
+    call add(g:quickui_keymap_groups, [l:name, deepcopy(a:key_maps)])
+  endfunction
+  function! QuickuiInstallKeyMapMenus()
+    let g:quickui_keymap_groups = []
+    let l:search_key_maps = [
+          \ ['<LocalLeader>ks', 'Previous function start', 'n'],
+          \ ['<LocalLeader>ke', 'Previous function end', 'n'],
+          \ ['<LocalLeader>kc', 'Previous comment block', 'n'],
+          \ ['<LocalLeader>js', 'Next function start', 'n'],
+          \ ['<LocalLeader>je', 'Next function end', 'n'],
+          \ ['<LocalLeader>jc', 'Next comment block', 'n'],
+          \ ['<Leader>`', 'Show nearest function or class', 'n'],
+          \ ['`<Leader>', 'Show nearest non-function block', 'n'],
+          \ ['<LocalLeader>u', 'Clear search highlight', 'n'],
+          \ ]
+    let l:general_key_maps = [
+          \ ['<LocalLeader>a', 'Wrap all diff windows', 'n'],
+          \ ['<LocalLeader><F5>', 'Delete blank lines', 'n'],
+          \ ['<LocalLeader><F7>', 'Retab and clean trailing characters', 'n'],
+          \ ['<C-CR>', 'Insert an indented line', 'n'],
+          \ ['<M-CR>', 'Enter without trailing comment', 'n'],
+          \ ['<M-CR>', 'Enter without trailing comment', 'i'],
+          \ ['<C-Space>', 'Insert one space', 'n'],
+          \ ['<C-M-CR>', 'Insert a blank line', 'n'],
+          \ ['<C-M-CR>', 'Insert a blank line', 'i'],
+          \ ['<C-S-CR>', 'Insert a blank line', 'n'],
+          \ ['<C-S-CR>', 'Insert a blank line', 'i'],
+          \ ['<M-h>', 'Move left', 'i'],
+          \ ['<M-j>', 'Move down', 'i'],
+          \ ['<M-k>', 'Move up', 'i'],
+          \ ['<M-l>', 'Move right', 'i'],
+          \ ['<M-p>', 'Put before cursor', 'i'],
+          \ ['<M-S-p>', 'Put after cursor', 'i'],
+          \ ['<M-u>', 'Undo', 'i'],
+          \ ['<M-r>', 'Redo', 'i'],
+          \ ['<M-S-d>', 'Delete to end of line', 'i'],
+          \ ['<M-S-y>', 'Yank line', 'i'],
+          \ ['<M-S-a>', 'Append at end of line', 'i'],
+          \ ['<M-S-i>', 'Insert at first non-blank', 'i'],
+          \ ['Q', 'Disabled Ex mode', 'n'],
+          \ ]
+    call extend(l:general_key_maps, [
+          \ ['<LocalLeader>w', 'Write file', 'n'],
+          \ ['<LocalLeader>q', 'Quit window', 'n'],
+          \ ['<LocalLeader>t', 'Open new tab', 'n'],
+          \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
+          \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
+          \ ['<M-S-h>', 'Move tab left', 'n'],
+          \ ['<M-S-h>', 'Move tab left', 'i'],
+          \ ['<M-S-l>', 'Move tab right', 'n'],
+          \ ['<M-S-l>', 'Move tab right', 'i'],
+          \ ['<C-M-h>', 'Go to previous tab', 'n'],
+          \ ['<C-M-h>', 'Go to previous tab', 'i'],
+          \ ['<C-M-j>', 'Go to previous tab', 'n'],
+          \ ['<C-M-j>', 'Go to previous tab', 'i'],
+          \ ['<C-M-l>', 'Go to next tab', 'n'],
+          \ ['<C-M-l>', 'Go to next tab', 'i'],
+          \ ['<C-M-k>', 'Go to next tab', 'n'],
+          \ ['<C-M-k>', 'Go to next tab', 'i'],
+          \ ['<M-1>', 'Go to tab 1', 'n', 'N/I'],
+          \ ['<M-2>', 'Go to tab 2', 'n', 'N/I'],
+          \ ['<M-3>', 'Go to tab 3', 'n', 'N/I'],
+          \ ['<M-4>', 'Go to tab 4', 'n', 'N/I'],
+          \ ['<M-5>', 'Go to tab 5', 'n', 'N/I'],
+          \ ['<M-6>', 'Go to tab 6', 'n', 'N/I'],
+          \ ['<M-7>', 'Go to tab 7', 'n', 'N/I'],
+          \ ['<M-8>', 'Go to tab 8', 'n', 'N/I'],
+          \ ['<M-9>', 'Go to tab 9', 'n', 'N/I'],
+          \ ['<M-0>', 'Go to tab 10', 'n', 'N/I'],
+          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I'],
+          \ ['<F8>', 'Toggle terminal', 'n'],
+          \ ['gf', 'Open file under cursor', 'n'],
+          \ ['<C-W>f', 'Open file in a split', 'n'],
+          \ ['<C-W>gf', 'Open file in a tab', 'n'],
+          \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
+          \ ])
+    call extend(l:general_key_maps, [
+          \ ['<Leader><F2>', 'Compile only', 'n'],
+          \ ['<LocalLeader><F2>', 'Compile and execute', 'n'],
+          \ ['<Leader><F7>', 'Create Clang configuration files', 'n'],
+          \ ])
+    call extend(l:general_key_maps, [
+          \ ['<Leader>ppt', 'Use presentation appearance', 'n'],
+          \ ['<Leader>per', 'Restore editor appearance', 'n'],
+          \ ['<LocalLeader>m', 'Toggle GUI menu and toolbar', 'n'],
+          \ ])
+    call QuickuiInstallKeyMapGroup('&General', l:general_key_maps, 300)
+    call QuickuiInstallKeyMapGroup('&Search', l:search_key_maps, 200)
+    call QuickuiInstallKeyMapGroup('&COC', [
+          \ ['<TAB>', 'Select next completion item', 'i'],
+          \ ['<S-TAB>', 'Select previous completion item', 'i'],
+          \ ['<CR>', 'Confirm completion', 'i'],
+          \ ['K', 'Show documentation', 'n'],
+          \ ['[c', 'Go to declaration', 'n'],
+          \ ['[tc', 'Open declaration in a new tab', 'n'],
+          \ ['[d', 'Go to definition', 'n'],
+          \ ['[td', 'Open definition in a new tab', 'n'],
+          \ ['[f', 'Refactor symbol', 'n'],
+          \ ['[f', 'Refactor selection', 'x'],
+          \ ['[i', 'Go to implementation', 'n'],
+          \ ['[ti', 'Open implementation in a new tab', 'n'],
+          \ ['[je', 'Next error diagnostic', 'n'],
+          \ ['[jd', 'Next diagnostic', 'n'],
+          \ ['[ke', 'Previous error diagnostic', 'n'],
+          \ ['[kd', 'Previous diagnostic', 'n'],
+          \ ['[n', 'Rename symbol', 'n'],
+          \ ['[r', 'Show references', 'n'],
+          \ ['[a', 'Code action', 'n'],
+          \ ['[a', 'Code action for selection', 'x'],
+          \ ['[l', 'Line code action', 'n'],
+          \ ['[o', 'Show diagnostic information', 'n'],
+          \ ['[b', 'Toggle buffer diagnostics', 'n'],
+          \ ['[g', 'Toggle diagnostics globally', 'n'],
+          \ ['[h', 'Toggle inlay hints', 'n'],
+          \ ['<F7>', 'Format document', 'n'],
+          \ ['<F7>', 'Format selection', 'x'],
+          \ ], 700)
+    call QuickuiInstallKeyMapGroup('&Matchup', [
+          \ ['%', 'Jump to matching delimiter', 'n', 'N/V/O'],
+          \ ['g%', 'Jump to matching delimiter from before cursor', 'n', 'N/V/O'],
+          \ ['z%', 'Jump inside next match', 'n', 'N/V/O'],
+          \ ['a%', 'Select around matching delimiters', 'x', 'V/O'],
+          \ ['i%', 'Select inside matching delimiters', 'x', 'V/O'],
+          \ ['cs%', 'Change surrounding delimiters', 'n'],
+          \ ['ds%', 'Delete surrounding delimiters', 'n'],
+          \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
+          \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
+          \ ], 800)
+    call QuickuiInstallKeyMapGroup('&Vimspector', [
+          \ ['<F2>', 'Continue debugging', 'n'],
+          \ ['<S-F2>', 'Restart debugging', 'n'],
+          \ [']<F2>', 'Run to cursor', 'n'],
+          \ [']<S-F2>', 'Stop debugger', 'n'],
+          \ [']<C-F2>', 'Pause debugger', 'n'],
+          \ ['<F4>', 'Toggle breakpoint', 'n'],
+          \ ['<S-F4>', 'Clear all breakpoints', 'n'],
+          \ [']<F4>', 'Toggle conditional breakpoint', 'n'],
+          \ [']<S-F4>', 'Set advanced line breakpoint', 'n'],
+          \ [']<C-F4>', 'Add function breakpoint', 'n'],
+          \ ['<F5>', 'Load Vimspector', 'n'],
+          \ ['<S-F5>', 'Reset Vimspector', 'n'],
+          \ [']<F5>', 'Launch debugger', 'n'],
+          \ ['<Leader><F5>', 'Create C/C++ debug files', 'n'],
+          \ ['<F6>', 'Step over', 'n'],
+          \ ['<C-F6>', 'Step into', 'n'],
+          \ ['<S-F6>', 'Step out', 'n'],
+          \ [']<F7>', 'Move up stack frame', 'n'],
+          \ [']<S-F7>', 'Move down stack frame', 'n'],
+          \ [']<F8>', 'Show full variable values', 'n'],
+          \ ['<C-1>', 'Focus variables window', 'n', 'N/I'],
+          \ ['<C-3>', 'Focus watches window', 'n', 'N/I'],
+          \ ['<C-5>', 'Focus stack trace window', 'n', 'N/I'],
+          \ ['<C-7>', 'Focus code window', 'n', 'N/I'],
+          \ ['<C-8>', 'Show debugger console', 'n', 'N/I'],
+          \ ['<C-9>', 'Focus debugger terminal', 'n', 'N/I'],
+          \ ['<C-0>', 'List all breakpoints', 'n', 'N/I'],
+          \ [']a', 'Show assembly', 'n'],
+          \ [']s', 'Show disassembly', 'n'],
+          \ [']c', 'Jump to program counter', 'n'],
+          \ [']d', 'Delete character', 'n'],
+          \ [']e', 'Evaluate expression', 'n'],
+          \ [']j', 'Next breakpoint', 'n'],
+          \ [']k', 'Previous breakpoint', 'n'],
+          \ [']pc', 'Control child processes', 'n'],
+          \ [']pd', 'Detach child processes', 'n'],
+          \ [']pf', 'Follow child processes', 'n'],
+          \ [']pp', 'Follow parent process', 'n'],
+          \ [']pi', 'List processes', 'n'],
+          \ [']ps', 'Switch process', 'n'],
+          \ [']r', 'Reshape debugger windows', 'n'],
+          \ [']ta', 'Show all backtraces', 'n'],
+          \ [']tb', 'Show current backtrace', 'n'],
+          \ [']tl', 'Set backtrace limit', 'n'],
+          \ [']ts', 'Switch thread', 'n'],
+          \ [']tc', 'Continue all threads', 'n'],
+          \ [']tt', 'Stop all threads', 'n'],
+          \ [']v', 'Add variable to watches', 'n', 'N/V'],
+          \ ], 900)
+    call QuickuiInstallKeyMapGroup('&QuickUI', [
+          \ ['<Leader>qc', 'Open keymap cheatsheet', 'n'],
+          \ ['<Leader>qm', 'Open menu', 'n'],
+          \ ['<Leader>qb', 'List buffers', 'n'],
+          \ ['<Leader>qt', 'Preview tag', 'n'],
+          \ ], 1000)
+    call QuickuiInstallKeyMapGroup('&NERDTree', [
+          \ ['<Leader>nt', 'Toggle file tree', 'n'],
+          \ ['<Leader>nc', 'Open tree at working directory', 'n'],
+          \ ], 1100)
+    call QuickuiInstallKeyMapGroup('&Vista', [
+          \ ['<Leader>vt', 'Toggle symbol window', 'n'],
+          \ ['<Leader>vf', 'Focus symbol window', 'n'],
+          \ ], 1200)
+    call QuickuiInstallKeyMapGroup('&Bookmarks', [
+          \ ['<Leader>bo', 'Load bookmark plugin', 'n'],
+          \ ['<Leader>bt', 'Toggle bookmark', 'n'],
+          \ ['<Leader>ba', 'Annotate bookmark', 'n'],
+          \ ['<Leader>bs', 'Show all bookmarks', 'n'],
+          \ ['<Leader>bn', 'Next bookmark', 'n'],
+          \ ['<Leader>bp', 'Previous bookmark', 'n'],
+          \ ['<Leader>bc', 'Clear bookmark', 'n'],
+          \ ['<Leader>br', 'Clear all bookmarks', 'n'],
+          \ ['<Leader>bu', 'Move bookmark up', 'n'],
+          \ ['<Leader>bd', 'Move bookmark down', 'n'],
+          \ ['<Leader>bl', 'Move bookmark to line', 'n'],
+          \ ], 1300)
+    call QuickuiInstallKeyMapGroup('&InterestingWords', [
+          \ ['<Leader>wt', 'Load highlight plugin', 'n'],
+          \ ['<Leader>wh', 'Highlight word', 'n'],
+          \ ['<Leader>wh', 'Highlight selection', 'x'],
+          \ ['<Leader>w<S-h>', 'Clear all word highlights', 'n'],
+          \ ['n', 'Next highlighted word', 'n'],
+          \ ['<S-n>', 'Previous highlighted word', 'n'],
+          \ ], 1400)
+    call QuickuiInstallKeyMapGroup('&VisualMulti', [
+          \ ['<C-n>', 'Start multiple cursors', 'n'],
+          \ ], 1500)
+    call QuickuiInstallKeyMapGroup('&Git', [
+          \ ['<Leader>git', 'Load Git plugins', 'n'],
+          \ ['<Leader>gk', 'Previous hunk', 'n'],
+          \ ['<Leader>gj', 'Next hunk', 'n'],
+          \ ['<Leader>gf', 'Fold unchanged lines', 'n'],
+          \ ['<Leader>gb', 'Show line blame', 'n'],
+          \ ], 1600)
+    call QuickuiInstallKeyMapGroup('&Markdown', [
+          \ ['<Leader>mm', 'Watch Markmap', 'n'],
+          \ ['<Leader>mc', 'Create Markmap HTML', 'n'],
+          \ ['<Leader>mh', 'Create Markmap', 'n'],
+          \ ['<Leader>mh', 'Create Markmap from selection', 'x'],
+          \ ['<Leader>mf', 'Fix Markdown lint errors', 'n'],
+          \ ['<Leader>mg', 'Generate table of contents', 'n'],
+          \ ['<Leader>mu', 'Update table of contents', 'n'],
+          \ ], 1700)
+    call QuickuiInstallKeyMapGroup('&NERDCommenter', [
+          \ ['<F3>', 'Comment', 'n', 'N/V/O'],
+          \ ['<S-F3>', 'Uncomment', 'n', 'N/V/O'],
+          \ ], 1800)
+    call QuickuiInstallKeyMapGroup('&AsyncRun', [
+          \ ['<LocalLeader><F8>', 'Run asynchronous command', 'n'],
+          \ ], 1900)
+    call QuickuiInstallKeyMapGroup('&AutoVerilog', [
+          \ ['<Leader>ai', 'Generate instance', 'n'],
+          \ ['<Leader>aa', 'Generate arguments', 'n'],
+          \ ['<Leader>app', 'Generate parameters', 'n'],
+          \ ['<Leader>apv', 'Generate parameter values', 'n'],
+          \ ['<Leader>ar', 'Generate registers', 'n'],
+          \ ['<Leader>aw', 'Generate wires', 'n'],
+          \ ['<Leader>ad', 'Generate definition', 'n'],
+          \ ], 2000)
+    call QuickuiInstallKeyMapGroup('&WhichKey', [
+          \ ['<Leader>', 'Show Leader mappings', 'n'],
+          \ ['<LocalLeader>', 'Show LocalLeader mappings', 'n'],
+          \ ['[', 'Show left-bracket mappings', 'n'],
+          \ [']', 'Show right-bracket mappings', 'n'],
+          \ ], 2100)
+  endfunction
+  function! QuickuiCheatsheetTruncate(text, width)
+    if a:width <= 0
+      return ''
+    endif
+    if strdisplaywidth(a:text) <= a:width
+      return a:text
+    endif
+    return strcharpart(a:text, 0, a:width - 1).'…'
+  endfunction
+  function! QuickuiCheatsheetKeyMapLine(key_map, width)
+    let l:mode_name = get({'n': 'N', 'x': 'V', 'i': 'I', 'o': 'O'},
+          \ a:key_map[2], toupper(a:key_map[2]))
+    let l:mode_name = len(a:key_map) > 3 ? a:key_map[3] : l:mode_name
+    let l:key = a:key_map[0].' ['.l:mode_name.']'
+    let l:key_width = min([22, max([12, a:width / 2])])
+    let l:description_width = a:width - l:key_width - 3
+    let l:key = QuickuiCheatsheetTruncate(l:key, l:key_width)
+    let l:description = QuickuiCheatsheetTruncate(a:key_map[1], l:description_width)
+    return '  '.printf('%-'.l:key_width.'s', l:key).' '.l:description
+  endfunction
+  function! QuickuiCheatsheetGroup(group, width)
+    let l:lines = [a:group[0].':', repeat('-', min([a:width, strlen(a:group[0]) + 1]))]
+    for l:key_map in a:group[1]
+      call add(l:lines, QuickuiCheatsheetKeyMapLine(l:key_map, a:width))
+    endfor
+    call add(l:lines, '')
+    return l:lines
+  endfunction
+  function! QuickuiBuildKeyMapCheatsheet()
+    let l:window_width = max([40, &columns - 8])
+    let l:window_width = min([180, l:window_width])
+    let l:column_count = l:window_width >= 150 ? 3 : l:window_width >= 82 ? 2 : 1
+    let l:column_width = (l:window_width - ((l:column_count - 1) * 3)) / l:column_count
+    let l:columns = []
+    let l:column_heights = []
+    for l:column_id in range(l:column_count - 1)
+      call add(l:columns, [])
+      call add(l:column_heights, 0)
+    endfor
+    for l:group in g:quickui_keymap_groups
+      let l:column_id = index(l:column_heights, min(l:column_heights))
+      let l:group_lines = QuickuiCheatsheetGroup(l:group, l:column_width)
+      call extend(l:columns[l:column_id], l:group_lines)
+      let l:column_heights[l:column_id] += len(l:group_lines)
+    endfor
+    let l:lines = []
+    for l:line_id in range(max(l:column_heights) - 1)
+      let l:line_columns = []
+      for l:column_id in range(l:column_count - 1)
+        let l:line = get(l:columns[l:column_id], l:line_id, '')
+        let l:line .= repeat(' ', max([0, l:column_width - strdisplaywidth(l:line)]))
+        call add(l:line_columns, l:line)
+      endfor
+      call add(l:lines, substitute(join(l:line_columns, ' │ '), '\s\+$', '', ''))
+    endfor
+    return [l:lines, l:window_width]
+  endfunction
+  function! QuickuiOpenKeyMapCheatsheet()
+    if !exists('g:quickui_keymap_groups')
+      call QuickuiConfiguration()
+    endif
+    let [l:lines, l:window_width] = QuickuiBuildKeyMapCheatsheet()
+    let l:window_height = min([max([6, &lines - 6]), len(l:lines)])
+    call quickui#textbox#open(l:lines, {
+          \ 'title': 'Keymap Cheatsheet',
+          \ 'w': l:window_width,
+          \ 'h': l:window_height,
+          \ 'maxwidth': l:window_width,
+          \ 'maxheight': max([6, &lines - 6]),
+          \ 'resize': 1,
+          \ })
+  endfunction
   function! QuickuiConfiguration()
     call plug#load('vim-quickui')
     " Clear all the menus
@@ -802,6 +1132,7 @@ function! ConfigureManualLoadPlugin()
           \ ['&Vim Script', 'help eval', ''],
           \ ['&Function List', 'help function-list', ''],
           \ ], 10000)
+    call QuickuiInstallKeyMapMenus()
   endfunction
   function! QuickuiOpenMenu()
     if !exists('quickui#menu#open')
@@ -822,6 +1153,7 @@ function! ConfigureManualLoadPlugin()
     call quickui#tools#preview_tag('')
   endfunction
   " Enable to display tips in the cmdline
+  noremap <Leader>qc :<C-u>call QuickuiOpenKeyMapCheatsheet()<CR>
   noremap <Leader>qm :<C-u>call QuickuiOpenMenu()<CR>
   noremap <Leader>qb :<C-u>call QuickuiListBuffer()<CR>
   noremap <Leader>qt :<C-u>call QuickuiPreviewTag()<CR>
