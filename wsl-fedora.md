@@ -260,3 +260,7 @@ sudo systemctl status sshd
 sudo ss -tlnp | grep :2222
 # 5. enable 2222 in win shell
 New-NetFirewallRule -DisplayName "WSL SSH (2222)" -Direction Inbound -Protocol TCP -LocalPort 2222 -Action Allow
+
+# For not warn that nothing depends on this file but can't be removed
+sudo dnf mark user grub2-tools-minimal
+sudo dnf autoremove
