@@ -251,9 +251,12 @@ subst G: "\\wsl.localhost\FedoraLinux\home\banana"
 # 1. 安装服务端（客户端一般已带）
 sudo dnf install -y openssh-server openssh-clients
 # 2. 启动并设置开机自启
+sudo sed -i 's/^#Port 22/Port 2222/' /etc/ssh/sshd_config
 sudo systemctl enable --now sshd
 # 3. 确认服务状态
 sudo systemctl status sshd
 # 应看到 Active: active (running)
-# 4. 确认 22 端口在监听
-sudo ss -tlnp | grep :22
+# 4. 确认 2222 端口在监听
+sudo ss -tlnp | grep :2222
+# 5. enable 2222 in win shell
+New-NetFirewallRule -DisplayName "WSL SSH (2222)" -Direction Inbound -Protocol TCP -LocalPort 2222 -Action Allow
