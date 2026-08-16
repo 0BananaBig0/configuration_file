@@ -282,6 +282,20 @@ function! ConfigureWhichKey()
   let g:local_key_map = {
         \ 'a': 'Wrap all diff windows',
         \ 'b': 'Close tab and go back',
+        \ 'j': {
+          \ 'name': '+Next',
+          \ 'c': 'Next comment block',
+          \ 'd': 'Next unmatched delimiter',
+          \ 'e': 'Next function end',
+          \ 's': 'Next function start',
+          \ },
+        \ 'k': {
+          \ 'name': '+Previous',
+          \ 'c': 'Previous comment block',
+          \ 'd': 'Previous unmatched delimiter',
+          \ 'e': 'Previous function end',
+          \ 's': 'Previous function start',
+          \ },
         \ 'm': 'Toggle GUI menu and toolbar',
         \ 'q': 'Quit window',
         \ 't': 'Open new tab',
@@ -294,10 +308,6 @@ function! ConfigureWhichKey()
         \ '<F8>': 'Run asynchronous command',
         \ }
   let g:left_bracket_key_map = {
-        \ '"': 'Previous comment block',
-        \ '%': 'Previous unmatched delimiter',
-        \ '[': 'Previous function start',
-        \ ']': 'Previous function end',
         \ 'a': 'Code action',
         \ 'b': 'Toggle buffer diagnostics',
         \ 'c': 'Go to declaration',
@@ -325,10 +335,6 @@ function! ConfigureWhichKey()
         \ 'ti': 'Open implementation in new tab',
         \ }
   let g:right_bracket_key_map = {
-        \ '"': 'Next comment block',
-        \ '%': 'Next unmatched delimiter',
-        \ '[': 'Next function end',
-        \ ']': 'Next function start',
         \ 'a': 'Show assembly',
         \ 'c': 'Jump to program counter',
         \ 'd': 'Delete character',
@@ -663,6 +669,19 @@ function! ConfigureDelayedPlugin()
   let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
   let g:matchup_surround_enabled = 1       " ds% cs%，可选
 
+  silent! nunmap [%
+  silent! xunmap [%
+  silent! ounmap [%
+  silent! nunmap ]%
+  silent! xunmap ]%
+  silent! ounmap ]%
+  nmap <silent> <LocalLeader>kd <Plug>(matchup-[%)
+  xmap <silent> <LocalLeader>kd <Plug>(matchup-[%)
+  omap <silent> <LocalLeader>kd <Plug>(matchup-[%)
+  nmap <silent> <LocalLeader>jd <Plug>(matchup-]%)
+  xmap <silent> <LocalLeader>jd <Plug>(matchup-]%)
+  omap <silent> <LocalLeader>jd <Plug>(matchup-]%)
+
   " --- matchparen 模块（这是性能大头）---
   let g:matchup_matchparen_enabled = 1     " 开高亮，但用下面选项把它压稳
   let g:matchup_matchparen_deferred = 1    " ★★★ 关键：延迟高亮，CursorMoved 不再同步算
@@ -690,6 +709,33 @@ function! ConfigureDelayedPlugin()
         \ 'scrolloff': 1,
         \ }
   let s:matchup_loaded = 0
+
+  function! ConfigureVimNavigationKeyMaps()
+    silent! nunmap <buffer> [[
+    silent! xunmap <buffer> [[
+    silent! nunmap <buffer> ]]
+    silent! xunmap <buffer> ]]
+    silent! nunmap <buffer> []
+    silent! xunmap <buffer> []
+    silent! nunmap <buffer> ][
+    silent! xunmap <buffer> ][
+    silent! nunmap <buffer> ["
+    silent! xunmap <buffer> ["
+    silent! nunmap <buffer> ]"
+    silent! xunmap <buffer> ]"
+    nnoremap <silent><buffer> <LocalLeader>ks m':call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>ks m':<C-U>exe "normal! gv"<Bar>call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
+    nnoremap <silent><buffer> <LocalLeader>js m':call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>js m':<C-U>exe "normal! gv"<Bar>call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
+    nnoremap <silent><buffer> <LocalLeader>ke m':call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>ke m':<C-U>exe "normal! gv"<Bar>call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
+    nnoremap <silent><buffer> <LocalLeader>je m':call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>je m':<C-U>exe "normal! gv"<Bar>call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
+    nnoremap <silent><buffer> <LocalLeader>jc :call search('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>jc :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
+    nnoremap <silent><buffer> <LocalLeader>kc :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>kc :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+  endfunction
 
   function! s:EnsureMatchupForCurrentBuffer() abort
       if !s:matchup_loaded
@@ -721,9 +767,13 @@ function! ConfigureDelayedPlugin()
             \ | let b:matchup_matchparen_enabled = 0
             \ | let b:matchup_matchparen_fallback = 0
           \ | endif
+    autocmd FileType vim call ConfigureVimNavigationKeyMaps()
     " 切换 buffer、打开分屏或 tab 时都会覆盖到
     autocmd BufEnter * ++nested call <SID>EnsureMatchupForCurrentBuffer()
   augroup END
+  if &filetype ==# 'vim'
+    call ConfigureVimNavigationKeyMaps()
+  endif
 endfunction
 
 
