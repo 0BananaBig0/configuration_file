@@ -826,6 +826,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<LocalLeader>w', 'Write file', 'n'],
           \ ['<LocalLeader>q', 'Quit window', 'n'],
           \ ['<LocalLeader>t', 'Open new tab', 'n'],
+          \ ['<M-S-t>', 'Open new tab', 't'],
           \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'n'],
@@ -2284,6 +2285,7 @@ function! CompileCommand()
   endif
 endfunction
 noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
+tnoremap <M-S-t> <C-w>:call NUpdateTabTermBuf()<CR>:tabnew<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
 noremap <LocalLeader>w :<C-u>w<CR>
