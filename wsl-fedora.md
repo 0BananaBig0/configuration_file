@@ -61,7 +61,7 @@ for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do
   if [ ! -f "${font}.zip" ]; then
     echo "下载 ${font}.zip..."
     curl -fL --retry 3 --connect-timeout 10 \
-      "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/${font}.zip" \
+      "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.0/${font}.zip" \
       -o "${font}.zip" || echo "⚠️ ${font}.zip 下载失败，跳过"
   fi
 done
