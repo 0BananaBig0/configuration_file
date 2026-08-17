@@ -2451,5 +2451,13 @@ set iskeyword-=@
 set iskeyword+=/
 set iskeyword+=.
 " <Ctrl-Shift-t> open a new terminal in a new tab
-noremap <C-S-t> :tab terminal<CR>
-inoremap <C-S-t> <C-o>:tab terminal<CR>
+function! OpenTerminalInNewTab()
+  if !exists('g:tab_term_buf')
+    let g:tab_term_buf = repeat([-1], get(g:, 'tab_term_buf_size', 33))
+  endif
+  call NUpdateTabTermBuf()
+  tab terminal
+  let g:tab_term_buf[tabpagenr()] = bufnr('%')
+endfunction
+noremap <C-S-t> :<C-u>call OpenTerminalInNewTab()<CR>
+inoremap <C-S-t> <C-o>:call OpenTerminalInNewTab()<CR>
