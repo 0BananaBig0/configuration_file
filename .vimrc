@@ -845,7 +845,9 @@ function! ConfigureManualLoadPlugin()
           \ ['gf', 'Open file under cursor', 'n'],
           \ ['<C-W>f', 'Open file in a split', 'n'],
           \ ['<C-W>gf', 'Open file in a tab', 'n'],
+          \ ['<C-W>"+', 'Paste clipboard in terminal', 't'],
           \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
+          \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ])
     call extend(l:general_key_maps, [
           \ ['<Leader><F2>', 'Compile only', 'n'],
