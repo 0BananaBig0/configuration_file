@@ -138,6 +138,9 @@ function! CocTimerStart(timer)
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
   call InitializeTabPos()
+  " Create an array to store the most recent terminal buffer for each tab
+  let g:tab_term_buf_size = 33
+  let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -674,12 +677,8 @@ function! ConfigureDelayedPlugin()
   " Asyncrun setting
   let g:asyncrun_save = 1
   let g:asyncrun_mode = 'term'
-  let g:tab_term_buf_size = 33
   call plug#load('asyncrun.vim')
   function! JumpToTerm(go_to_top = 0, height = 18)
-    if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-    endif
     let l:target_buf = -1
     let l:target_win = -1
     for l:win in getwininfo()
@@ -703,10 +702,6 @@ function! ConfigureDelayedPlugin()
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
     let l:terminal_directory = TerminalLaunchDirectory()
-    " Create an array to store the most recent terminal buffer for each tab
-    if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-    endif
     " Loop through all windows in the current tab to check for a terminal
     for l:win in getwininfo()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
@@ -2487,9 +2482,6 @@ function! TerminalLaunchDirectory()
 endfunction
 function! OpenTerminalInNewTab()
   let l:terminal_directory = TerminalLaunchDirectory()
-  if !exists('g:tab_term_buf')
-    let g:tab_term_buf = repeat([-1], get(g:, 'tab_term_buf_size', 33))
-  endif
   call NUpdateTabTermBuf()
   tabnew
   let l:terminal_options = {
