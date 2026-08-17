@@ -264,3 +264,5 @@ New-NetFirewallRule -DisplayName "WSL SSH (2222)" -Direction Inbound -Protocol T
 # For not warn that nothing depends on this file but can't be removed
 sudo dnf mark user grub2-tools-minimal
 sudo dnf autoremove
+
+sudo dnf install -y sshfs
