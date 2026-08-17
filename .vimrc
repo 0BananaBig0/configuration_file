@@ -2501,7 +2501,7 @@ function! OpenTerminalInNewTab()
   let l:terminal_options = {
         \ 'curwin': 1,
         \ 'norestore': 1,
-        \ 'term_finish': 'open',
+        \ 'term_finish': 'close',
         \ 'term_kill': 'term',
         \ 'cwd': l:terminal_directory,
         \ }
