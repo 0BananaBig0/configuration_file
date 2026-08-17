@@ -2474,13 +2474,38 @@ set iskeyword-=@
 set iskeyword+=/
 set iskeyword+=.
 " <Ctrl-Shift-t> open a new terminal in a new tab
+function! TerminalLaunchDirectory()
+  if &buftype ==# 'terminal'
+    let l:terminal_job = term_getjob(bufnr('%'))
+    if job_status(l:terminal_job) ==# 'run'
+      let l:terminal_pid = get(job_info(l:terminal_job), 'process', 0)
+      if l:terminal_pid > 0
+        let l:terminal_directory = resolve('/proc/'.l:terminal_pid.'/cwd')
+        if isdirectory(l:terminal_directory)
+          return l:terminal_directory
+        endif
+      endif
+    endif
+    return getcwd()
+  endif
+  let l:file_directory = expand('%:p:h')
+  return isdirectory(l:file_directory) ? l:file_directory : getcwd()
+endfunction
 function! OpenTerminalInNewTab()
+  let l:terminal_directory = TerminalLaunchDirectory()
   if !exists('g:tab_term_buf')
     let g:tab_term_buf = repeat([-1], get(g:, 'tab_term_buf_size', 33))
   endif
   call NUpdateTabTermBuf()
-  tab terminal
-  let g:tab_term_buf[tabpagenr()] = bufnr('%')
+  tabnew
+  let l:terminal_options = {
+        \ 'curwin': 1,
+        \ 'norestore': 1,
+        \ 'term_finish': 'open',
+        \ 'term_kill': 'term',
+        \ 'cwd': l:terminal_directory,
+        \ }
+  let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
 endfunction
 noremap <C-S-t> :<C-u>call OpenTerminalInNewTab()<CR>
 inoremap <C-S-t> <C-o>:call OpenTerminalInNewTab()<CR>
