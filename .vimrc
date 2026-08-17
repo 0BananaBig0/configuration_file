@@ -642,7 +642,26 @@ function! ConfigureDelayedPlugin()
       let g:tab_term_buf[tabpagenr() + 1] = - 1
     endif
   endfunction
-  noremap <F8> :<C-u>call ToggleTerminal()<CR>
+  function! TerminalHelpConfiguration()
+    let g:terminal_default_mapping = 0
+    let g:terminal_height = 18
+    call plug#load('vim-terminal-help')
+  endfunction
+  function! ToggleTerminalWithTerminalHelp()
+    if !exists('*TerminalToggle')
+      call TerminalHelpConfiguration()
+    endif
+    call TerminalToggle()
+    if !exists('g:tab_term_buf')
+      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+    endif
+    let l:terminal_buf = get(t:, '__terminal_bid__', -1)
+    if l:terminal_buf > 0 && bufexists(l:terminal_buf)
+      let g:tab_term_buf[tabpagenr()] = l:terminal_buf
+    endif
+  endfunction
+  noremap <F8> :<C-u>call ToggleTerminalWithTerminalHelp()<CR>
+  tnoremap <F8> <C-\><C-n>:call ToggleTerminalWithTerminalHelp()<CR>
   noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 
 
@@ -842,7 +861,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
           \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
           \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
-          \ ['<F8>', 'Toggle terminal', 'n'],
+          \ ['<F8>', 'Toggle terminal', 'n', 'N/T'],
           \ ['gf', 'Open file under cursor', 'n'],
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
