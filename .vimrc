@@ -662,7 +662,7 @@ function! ConfigureDelayedPlugin()
   endfunction
   noremap <F8> :<C-u>call ToggleTerminalWithTerminalHelp()<CR>
   tnoremap <F8> <C-\><C-n>:call ToggleTerminalWithTerminalHelp()<CR>
-  noremap <LocalLeader><F8> :<C-u>AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
+  noremap <LocalLeader><F8> :<C-u>AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 
 
 
@@ -2230,7 +2230,7 @@ function! CPPCompilation()
 endfunction
 if !(exists('*CompileAndExcute') && &filetype=='vim')
   function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+    let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
     if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
       exec l:compile_exec.' /usr/bin/env python3 %'
     elseif &filetype=='sh'
@@ -2276,7 +2276,7 @@ if !(exists('*CompileAndExcute') && &filetype=='vim')
   endfunction
 endif
 function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
+  let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
   if &filetype=='verilog'
       let l:verilog_compilation = CPPCompilation()
       exec l:compile_exec.l:verilog_compilation
