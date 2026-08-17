@@ -85,13 +85,14 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'mzlogin/vim-markdown-toc', {'on': []}
 " Nerdcommenter快速注释插件, Delay-load
 Plug 'preservim/nerdcommenter', {'on': []}
-" 异步执行shell命令插件, Delay-load
-Plug 'skywind3000/asyncrun.vim', {'on': []}
 " % match plugins, Delay-load
 Plug 'andymass/vim-matchup', {'on': []}
+" 异步执行shell命令插件, Delay-load
+Plug 'skywind3000/asyncrun.vim', {'on': []}
+" Manual-load, but configuration in ConfigureDelayedPlugin with asyncrun.vim
+Plug 'skywind3000/vim-terminal-help', {'on': []}
 " 菜单栏插件, Manual-load
 Plug 'skywind3000/vim-quickui', {'on': []}
-Plug 'skywind3000/vim-terminal-help', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
@@ -555,117 +556,6 @@ function! ConfigureDelayedPlugin()
 
 
 
-  " Asyncrun setting
-  let g:asyncrun_save = 1
-  let g:asyncrun_mode = 'term'
-  let g:tab_term_buf_size = 33
-  call plug#load('asyncrun.vim')
-  function! JumpToTerm(go_to_top = 0, height = 18)
-    if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-    endif
-    let l:target_buf = -1
-    let l:target_win = -1
-    for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['bufnr'] > l:target_buf
-        let l:target_buf = l:win['bufnr']
-        let l:target_win = l:win['winid']
-      endif
-    endfor
-    if l:target_buf != -1 && l:target_win != -1
-      call win_gotoid(l:target_win)
-      call feedkeys("\<C-\>\<C-n>", 'n')
-      let g:tab_term_buf[tabpagenr()] = l:target_buf
-      exec 'resize ' . a:height
-    endif
-    if a:go_to_top != 0
-      call feedkeys("gg", 'n')
-    endif
-  endfunction
-  function! ToggleTerminal(height = 18)
-    " Step 1: Check if there is a terminal window visible in the current tab
-    let l:terminal_shown = 0
-    let l:cur_tab = tabpagenr()
-    " Create an array to store the most recent terminal buffer for each tab
-    if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-    endif
-    " Loop through all windows in the current tab to check for a terminal
-    for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
-        " A terminal window is found, set the flag and get the buffer number
-        let l:terminal_shown = 1
-        if l:win['bufnr'] > g:tab_term_buf[l:cur_tab]
-          let g:tab_term_buf[l:cur_tab] = l:win['bufnr']
-        endif
-        " Switch to the terminal window to hide it
-        call win_gotoid(l:win['winid'])
-        hide
-      endif
-    endfor
-    " Step 2: If no terminal window is visible, check for a hidden terminal buffer
-    if l:terminal_shown == 0
-      let l:latest_terminal = g:tab_term_buf[l:cur_tab]
-      " Step 3: Open the latest terminal buffer if found, or open a new terminal
-      if l:latest_terminal != -1 && bufexists(l:latest_terminal)
-        " Open the terminal buffer in a new split at the bottom with the specified height
-        exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
-      else
-        " If no terminal buffer exists, open a new terminal at the bottom with the specified height
-        exec 'belowright ' . ' terminal'
-        exec 'resize ' . a:height
-        let g:tab_term_buf[l:cur_tab] = bufnr('%')
-      endif
-      call feedkeys("\<C-\>\<C-n>", 'n')
-    endif
-  endfunction
-  function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
-    for l:term_index in range(a:id_first, a:id_last, a:plus_or_minus_one[1])
-      if(g:tab_term_buf[l:term_index] != -1)
-        let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
-        let g:tab_term_buf[l:term_index] = - 1
-      endif
-    endfor
-  endfunction
-  function! CUpdateTabTermBuf()
-    if exists('g:tab_term_buf')
-      if bufexists(g:tab_term_buf[tabpagenr()])
-        exec 'silent bwipeout! ' . g:tab_term_buf[tabpagenr()]
-      endif
-      let g:tab_term_buf[tabpagenr()] = - 1
-      call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$'), [-1, +1])
-    endif
-  endfunction
-  function! NUpdateTabTermBuf()
-    if exists('g:tab_term_buf')
-      call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
-      let g:tab_term_buf[tabpagenr() + 1] = - 1
-    endif
-  endfunction
-  function! TerminalHelpConfiguration()
-    let g:terminal_default_mapping = 0
-    let g:terminal_height = 18
-    call plug#load('vim-terminal-help')
-  endfunction
-  function! ToggleTerminalWithTerminalHelp()
-    if !exists('*TerminalToggle')
-      call TerminalHelpConfiguration()
-    endif
-    call TerminalToggle()
-    if !exists('g:tab_term_buf')
-      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-    endif
-    let l:terminal_buf = get(t:, '__terminal_bid__', -1)
-    if l:terminal_buf > 0 && bufexists(l:terminal_buf)
-      let g:tab_term_buf[tabpagenr()] = l:terminal_buf
-    endif
-  endfunction
-  noremap <F8> :<C-u>call ToggleTerminalWithTerminalHelp()<CR>
-  tnoremap <F8> <C-\><C-n>:call ToggleTerminalWithTerminalHelp()<CR>
-  noremap <LocalLeader><F8> :<C-u>AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
-
-
-
   " vim-matchup configuration
   " --------------------------------------------------------------------------
   " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
@@ -780,6 +670,117 @@ function! ConfigureDelayedPlugin()
   if &filetype ==# 'vim'
     call ConfigureVimNavigationKeyMaps()
   endif
+
+
+
+  " Asyncrun setting
+  let g:asyncrun_save = 1
+  let g:asyncrun_mode = 'term'
+  let g:tab_term_buf_size = 33
+  call plug#load('asyncrun.vim')
+  function! JumpToTerm(go_to_top = 0, height = 18)
+    if !exists('g:tab_term_buf')
+      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+    endif
+    let l:target_buf = -1
+    let l:target_win = -1
+    for l:win in getwininfo()
+      if l:win['terminal'] == 1 && l:win['bufnr'] > l:target_buf
+        let l:target_buf = l:win['bufnr']
+        let l:target_win = l:win['winid']
+      endif
+    endfor
+    if l:target_buf != -1 && l:target_win != -1
+      call win_gotoid(l:target_win)
+      call feedkeys("\<C-\>\<C-n>", 'n')
+      let g:tab_term_buf[tabpagenr()] = l:target_buf
+      exec 'resize ' . a:height
+    endif
+    if a:go_to_top != 0
+      call feedkeys("gg", 'n')
+    endif
+  endfunction
+  function! ToggleTerminal(height = 18)
+    " Step 1: Check if there is a terminal window visible in the current tab
+    let l:terminal_shown = 0
+    let l:cur_tab = tabpagenr()
+    " Create an array to store the most recent terminal buffer for each tab
+    if !exists('g:tab_term_buf')
+      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+    endif
+    " Loop through all windows in the current tab to check for a terminal
+    for l:win in getwininfo()
+      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
+        " A terminal window is found, set the flag and get the buffer number
+        let l:terminal_shown = 1
+        if l:win['bufnr'] > g:tab_term_buf[l:cur_tab]
+          let g:tab_term_buf[l:cur_tab] = l:win['bufnr']
+        endif
+        " Switch to the terminal window to hide it
+        call win_gotoid(l:win['winid'])
+        hide
+      endif
+    endfor
+    " Step 2: If no terminal window is visible, check for a hidden terminal buffer
+    if l:terminal_shown == 0
+      let l:latest_terminal = g:tab_term_buf[l:cur_tab]
+      " Step 3: Open the latest terminal buffer if found, or open a new terminal
+      if l:latest_terminal != -1 && bufexists(l:latest_terminal)
+        " Open the terminal buffer in a new split at the bottom with the specified height
+        exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
+      else
+        " If no terminal buffer exists, open a new terminal at the bottom with the specified height
+        exec 'belowright ' . ' terminal'
+        exec 'resize ' . a:height
+        let g:tab_term_buf[l:cur_tab] = bufnr('%')
+      endif
+      call feedkeys("\<C-\>\<C-n>", 'n')
+    endif
+  endfunction
+  function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
+    for l:term_index in range(a:id_first, a:id_last, a:plus_or_minus_one[1])
+      if(g:tab_term_buf[l:term_index] != -1)
+        let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
+        let g:tab_term_buf[l:term_index] = - 1
+      endif
+    endfor
+  endfunction
+  function! CUpdateTabTermBuf()
+    if exists('g:tab_term_buf')
+      if bufexists(g:tab_term_buf[tabpagenr()])
+        exec 'silent bwipeout! ' . g:tab_term_buf[tabpagenr()]
+      endif
+      let g:tab_term_buf[tabpagenr()] = - 1
+      call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$'), [-1, +1])
+    endif
+  endfunction
+  function! NUpdateTabTermBuf()
+    if exists('g:tab_term_buf')
+      call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
+      let g:tab_term_buf[tabpagenr() + 1] = - 1
+    endif
+  endfunction
+  function! TerminalHelpConfiguration()
+    let g:terminal_default_mapping = 0
+    let g:terminal_height = 18
+    call plug#load('vim-terminal-help')
+  endfunction
+  function! ToggleTerminalWithTerminalHelp()
+    if !exists('*TerminalToggle')
+      call TerminalHelpConfiguration()
+    endif
+    call TerminalToggle()
+    if !exists('g:tab_term_buf')
+      let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+    endif
+    let l:terminal_buf = get(t:, '__terminal_bid__', -1)
+    if l:terminal_buf > 0 && bufexists(l:terminal_buf)
+      let g:tab_term_buf[tabpagenr()] = l:terminal_buf
+    endif
+  endfunction
+  noremap <F8> :<C-u>call ToggleTerminalWithTerminalHelp()<CR>
+  tnoremap <F8> <C-\><C-n>:call ToggleTerminalWithTerminalHelp()<CR>
+  noremap <LocalLeader><F8> :<C-u>AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
 
