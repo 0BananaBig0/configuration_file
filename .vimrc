@@ -843,9 +843,9 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I'],
           \ ['<F8>', 'Toggle terminal', 'n'],
           \ ['gf', 'Open file under cursor', 'n'],
-          \ ['<C-W>f', 'Open file in a split', 'n'],
-          \ ['<C-W>gf', 'Open file in a tab', 'n'],
-          \ ['<C-W>"+', 'Paste clipboard in terminal', 't'],
+          \ ['<C-w>f', 'Open file in a split', 'n'],
+          \ ['<C-w>gf', 'Open file in a tab', 'n'],
+          \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
           \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
           \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ])
@@ -861,6 +861,21 @@ function! ConfigureManualLoadPlugin()
           \ ])
     call QuickuiInstallKeyMapGroup('&General', l:general_key_maps, 300)
     call QuickuiInstallKeyMapGroup('&Search', l:search_key_maps, 200)
+    call QuickuiInstallKeyMapGroup('&Codex', [
+          \ ['<Ctrl-g>', 'Open editor for multiline prompt', 'n', 'CLI'],
+          \ ['@', 'Find a workspace file for the prompt', 'n', 'CLI'],
+          \ ['<Up>/<Down>', 'Restore draft history', 'n', 'CLI'],
+          \ ['<Ctrl-r>', 'Search prompt history', 'n', 'CLI'],
+          \ ['<Ctrl-o>', 'Copy latest completed output', 'n', 'CLI'],
+          \ ['!', 'Run a local shell command', 'n', 'CLI'],
+          \ ['<Tab>', 'Queue a follow-up while working', 'n', 'CLI'],
+          \ ['<Enter>', 'Steer the current turn while working', 'n', 'CLI'],
+          \ ['<Esc><Esc>', 'Edit previous message and fork', 'n', 'CLI'],
+          \ ['<Ctrl-c>', 'Close the Codex session', 'n', 'CLI'],
+          \ ['<Ctrl-l>', 'Clear view but keep current chat', 'n', 'CLI'],
+          \ ['<Alt-r>', 'Toggle raw scrollback', 'n', 'CLI'],
+          \ ['/', 'Open the slash-command menu', 'n', 'CLI'],
+          \ ], 600)
     call QuickuiInstallKeyMapGroup('&COC', [
           \ ['<TAB>', 'Select next completion item', 'i'],
           \ ['<S-TAB>', 'Select previous completion item', 'i'],
@@ -1096,7 +1111,7 @@ function! ConfigureManualLoadPlugin()
     return l:rows
   endfunction
   function! QuickuiBuildKeyMapCheatsheet()
-    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefim', '\zs')
+    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimo', '\zs')
     if !exists('g:quickui_cheatsheet_folded')
       let g:quickui_cheatsheet_folded = {}
       for l:group in g:quickui_keymap_groups
@@ -1121,7 +1136,7 @@ function! ConfigureManualLoadPlugin()
             \ .g:quickui_cheatsheet_search_input.'_   Enter: search   Esc: cancel'
       let l:instructions_second_line = ''
     else
-      let l:instructions = '1-9/a-f/i/m: fold   z/r: fold/unfold all   gg/G: top/bottom   /?: search   n/N: next/prev'
+      let l:instructions = '1-9/a-f/i/m/o: fold   z/r: fold/unfold all   gg/G: top/bottom   /?: search   n/N: next/prev'
       let l:instructions_second_line = 'j/k/PgUp/PgDn: scroll   Space: page down   Esc/q: close'
     endif
     return [[QuickuiCheatsheetTruncate(l:instructions, l:window_width),
