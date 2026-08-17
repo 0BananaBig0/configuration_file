@@ -779,7 +779,7 @@ function! ConfigureDelayedPlugin()
     endif
   endfunction
   noremap <F8> :<C-u>call ToggleTerminalWithTerminalHelp()<CR>
-  tnoremap <F8> <C-\><C-n>:call ToggleTerminalWithTerminalHelp()<CR>
+  tnoremap <F8> <C-w>:call ToggleTerminalWithTerminalHelp()<CR>
   noremap <LocalLeader><F8> :<C-u>AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
 endfunction
 
