@@ -1089,12 +1089,16 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! QuickuiCheatsheetCategoryRows(width)
     let l:group_count = len(g:quickui_keymap_groups)
-    let l:groups_per_row = (l:group_count + 1) / 2
+    let l:row_count = 3
+    let l:groups_per_row = (l:group_count + l:row_count - 1) / l:row_count
     let l:cell_width = (a:width - (l:groups_per_row - 1)) / l:groups_per_row
     let l:rows = []
-    for l:row_id in [0, 1]
+    for l:row_id in range(0, l:row_count - 1)
       let l:cells = []
       let l:first_group_id = l:row_id * l:groups_per_row
+      if l:first_group_id >= l:group_count
+        break
+      endif
       let l:last_group_id = min([
             \ l:first_group_id + l:groups_per_row - 1, l:group_count - 1])
       for l:group_id in range(l:first_group_id, l:last_group_id)
