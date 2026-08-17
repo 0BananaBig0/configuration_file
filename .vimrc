@@ -851,7 +851,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
           \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
           \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
-          \ ['<F8>', 'Toggle terminal', 'n', 'N/T'],
+          \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['gf', 'Open file under cursor', 'n'],
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
