@@ -91,6 +91,7 @@ Plug 'skywind3000/asyncrun.vim', {'on': []}
 Plug 'andymass/vim-matchup', {'on': []}
 " 菜单栏插件, Manual-load
 Plug 'skywind3000/vim-quickui', {'on': []}
+Plug 'skywind3000/vim-terminal-help', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
@@ -830,17 +831,17 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-M-l>', 'Go to next tab', 'i'],
           \ ['<C-M-k>', 'Go to next tab', 'n'],
           \ ['<C-M-k>', 'Go to next tab', 'i'],
-          \ ['<M-1>', 'Go to tab 1', 'n', 'N/I'],
-          \ ['<M-2>', 'Go to tab 2', 'n', 'N/I'],
-          \ ['<M-3>', 'Go to tab 3', 'n', 'N/I'],
-          \ ['<M-4>', 'Go to tab 4', 'n', 'N/I'],
-          \ ['<M-5>', 'Go to tab 5', 'n', 'N/I'],
-          \ ['<M-6>', 'Go to tab 6', 'n', 'N/I'],
-          \ ['<M-7>', 'Go to tab 7', 'n', 'N/I'],
-          \ ['<M-8>', 'Go to tab 8', 'n', 'N/I'],
-          \ ['<M-9>', 'Go to tab 9', 'n', 'N/I'],
-          \ ['<M-0>', 'Go to tab 10', 'n', 'N/I'],
-          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I'],
+          \ ['<M-1>', 'Go to tab 1', 'n', 'N/I/T'],
+          \ ['<M-2>', 'Go to tab 2', 'n', 'N/I/T'],
+          \ ['<M-3>', 'Go to tab 3', 'n', 'N/I/T'],
+          \ ['<M-4>', 'Go to tab 4', 'n', 'N/I/T'],
+          \ ['<M-5>', 'Go to tab 5', 'n', 'N/I/T'],
+          \ ['<M-6>', 'Go to tab 6', 'n', 'N/I/T'],
+          \ ['<M-7>', 'Go to tab 7', 'n', 'N/I/T'],
+          \ ['<M-8>', 'Go to tab 8', 'n', 'N/I/T'],
+          \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
+          \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
+          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
           \ ['<F8>', 'Toggle terminal', 'n'],
           \ ['gf', 'Open file under cursor', 'n'],
           \ ['<C-w>f', 'Open file in a split', 'n'],
@@ -1827,9 +1828,11 @@ function! InitializeTabPos()
   for l:i in range(1, 9)
       exec 'noremap <M-' . l:i . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
       exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'tnoremap <M-' . l:i . '> <C-\><C-n>:call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
   exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
   exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
+  exec 'tnoremap <M-0> <C-\><C-n>:call TabPosActivateBuffer(10)<CR>'
 endfunction
 
 
@@ -2461,3 +2464,4 @@ function! OpenTerminalInNewTab()
 endfunction
 noremap <C-S-t> :<C-u>call OpenTerminalInNewTab()<CR>
 inoremap <C-S-t> <C-o>:call OpenTerminalInNewTab()<CR>
+tnoremap <C-S-t> <C-\><C-n>:call OpenTerminalInNewTab()<CR>
