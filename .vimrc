@@ -1848,11 +1848,11 @@ function! InitializeTabPos()
   for l:i in range(1, 9)
       exec 'noremap <M-' . l:i . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
       exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
-      exec 'tnoremap <M-' . l:i . '> <C-\><C-n>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+      exec 'tnoremap <M-' . l:i . '> <C-w>:call TabPosActivateBuffer(' . l:i . ')<CR>'
   endfor
   exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
   exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
-  exec 'tnoremap <M-0> <C-\><C-n>:call TabPosActivateBuffer(10)<CR>'
+  exec 'tnoremap <M-0> <C-w>:call TabPosActivateBuffer(10)<CR>'
 endfunction
 
 
@@ -2484,4 +2484,4 @@ function! OpenTerminalInNewTab()
 endfunction
 noremap <C-S-t> :<C-u>call OpenTerminalInNewTab()<CR>
 inoremap <C-S-t> <C-o>:call OpenTerminalInNewTab()<CR>
-tnoremap <C-S-t> <C-\><C-n>:call OpenTerminalInNewTab()<CR>
+tnoremap <C-S-t> <C-w>:call OpenTerminalInNewTab()<CR>
