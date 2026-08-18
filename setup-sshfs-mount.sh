@@ -82,7 +82,6 @@ ExecStart=/usr/bin/sshfs \\
   -o ServerAliveCountMax=3 \\
   -o IdentityFile=${SSH_KEY} \\
   -o allow_other \\
-  -o default_permissions \\
   -o uid=$(id -u) -o gid=$(id -g) \\
   ${SSH_USER}@${SSH_HOST}:${REMOTE_PATH} \\
   ${MOUNT_POINT}
