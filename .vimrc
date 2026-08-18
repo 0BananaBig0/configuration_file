@@ -825,9 +825,13 @@ function! ConfigureManualLoadPlugin()
     call extend(l:general_key_maps, [
           \ ['<LocalLeader>w', 'Write file', 'n'],
           \ ['<LocalLeader>q', 'Quit window', 'n'],
+          \ ['<C-S-q>', 'Quit window', 't'],
           \ ['<LocalLeader>t', 'Open new tab', 'n'],
           \ ['<M-S-t>', 'Open new tab', 't'],
           \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
+          \ ['<C-S-b>', 'Close tab and go back', 't'],
+          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
+          \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'i'],
@@ -851,8 +855,6 @@ function! ConfigureManualLoadPlugin()
           \ ['<M-8>', 'Go to tab 8', 'n', 'N/I/T'],
           \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
           \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
-          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
-          \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['gf', 'Open file under cursor', 'n'],
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
@@ -2288,7 +2290,9 @@ endfunction
 noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
 tnoremap <M-S-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
+tnoremap <C-S-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
+tnoremap <C-S-q> <C-w>:<C-u>call QuitWin()<CR>
 noremap <LocalLeader>w :<C-u>w<CR>
 noremap <M-S-h> :<C-u>call MoveTabH()<CR>
 noremap <M-S-l> :<C-u>call MoveTabL()<CR>
