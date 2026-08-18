@@ -266,3 +266,6 @@ sudo dnf mark user grub2-tools-minimal
 sudo dnf autoremove
 
 sudo dnf install -y sshfs
+
+# install qwen
+curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
