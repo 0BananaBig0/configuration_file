@@ -2285,7 +2285,7 @@ function! CompileCommand()
   endif
 endfunction
 noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
-tnoremap <M-S-t> <C-w>:call NUpdateTabTermBuf()<CR>:tabnew<CR>
+tnoremap <M-S-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
 noremap <LocalLeader>w :<C-u>w<CR>
