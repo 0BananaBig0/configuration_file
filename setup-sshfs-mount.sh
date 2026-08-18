@@ -5,13 +5,13 @@
 # ============================================================
 
 # set -e
-
+sudo sed -i 's/^# user_allow_other/user_allow_other/' /etc/fuse.conf
 # ---------- 配置区（按需修改） ----------
 SSH_USER=""
 SSH_HOST=""
 REMOTE_PATH="/data/workspaces/lianghuaxiao"
 MOUNT_POINT="$HOME/remote_eda_lianghuaxiao"
-SSH_KEY="$HOME/.ssh/id_rsa"
+SSH_KEY="$HOME/.ssh/id_ed25519"
 SERVICE_NAME="sshfs-remote-eda"
 # --------------------------------------
 
