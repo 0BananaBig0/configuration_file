@@ -127,7 +127,7 @@ noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
                   \ :set colorcolumn=0<CR>
 noremap <Leader>per :<C-u>colorscheme dracula<CR>
                   \ :<C-u>hi Terminal guibg=#282a36 guifg=#f8f8f2<CR>
-                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21<CR>
+                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 18<CR>
                   \ :set colorcolumn=80,120,160<CR>
 
 
@@ -1540,7 +1540,7 @@ function! ConfigureManualLoadPlugin()
   noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   noremap <F5> :<C-u>call plug#load('vimspector')<CR>
   noremap <S-F5> :<C-u>VimspectorReset<CR>
-  noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 19<CR>
+  noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 16<CR>
               \ :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
   map <F6> <Plug>VimspectorStepOver
@@ -1849,7 +1849,7 @@ endfunction
 
 " 会使vim看起来不友好的命令
 if has('gui_running')
-  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 21
+  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 18
   " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
   set guicursor=c-i:ver33-Cursor
   set guicursor+=a:blinkon0
