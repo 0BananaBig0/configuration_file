@@ -5,7 +5,7 @@
 # ============================================================
 
 set -e
-
+sudo sed -i 's/^user_allow_other/# user_allow_other/' /etc/fuse.conf
 SERVICE_NAME="sshfs-remote-eda"
 MOUNT_POINT="$HOME/remote_eda_lianghuaxiao"
 
