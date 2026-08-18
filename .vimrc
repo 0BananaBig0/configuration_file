@@ -857,6 +857,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
           \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
+          \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
           \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
           \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ])
@@ -2498,3 +2499,5 @@ endfunction
 noremap <C-S-t> :<C-u>call OpenTerminalInNewTab()<CR>
 inoremap <C-S-t> <C-o>:call OpenTerminalInNewTab()<CR>
 tnoremap <C-S-t> <C-w>:call OpenTerminalInNewTab()<CR>
+" Paste clipboard in terminal with Ctrl-Shift-v
+tnoremap <C-S-v> <C-w>"+
