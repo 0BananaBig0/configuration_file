@@ -267,7 +267,7 @@ sudo dnf autoremove
 
 sudo dnf install -y sshfs
 
-# install qwen
+# install qwen, not good enough, always blinks ⚠ 
 curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
-# install Antigravity CLI
+# install Antigravity CLI, no a valid account to use it.
 curl -fsSL https://antigravity.google/cli/install.sh | bash
