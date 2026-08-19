@@ -2284,89 +2284,6 @@ function! CompileCommand()
     endif
   endif
 endfunction
-noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
-tnoremap <M-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
-noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
-tnoremap <C-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
-noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
-tnoremap <C-q> <C-w>:<C-u>call QuitWin()<CR>
-noremap <LocalLeader>w :<C-u>w<CR>
-noremap <M-S-h> :<C-u>call MoveTabH()<CR>
-noremap <M-S-l> :<C-u>call MoveTabL()<CR>
-inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
-inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
-noremap <C-M-h> gT
-noremap <C-M-j> gT
-noremap <C-M-l> gt
-noremap <C-M-k> gt
-inoremap <C-M-h> <C-o>gT
-inoremap <C-M-j> <C-o>gT
-inoremap <C-M-l> <C-o>gt
-inoremap <C-M-k> <C-o>gt
-function! CloseAndBackTab()
-  let l:exec_tabp='tabp'
-  if tabpagenr() == tabpagenr('$')
-    let l:exec_tabp=''
-  fi
-  while winnr('$') > 1 " Prevent the function from closing multiple tabs
-    call QuitWin()
-  endwhile
-  call QuitWin()
-  exec l:exec_tabp
-endfunction
-function! QuitWin()
-  let l:exec_quit='quit'
-  " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
-  " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
-  if getbufvar(winbufnr(winnr()), '&buftype')==#'terminal'
-    let l:exec_quit=''
-  elseif &filetype=='' " Close terms without warnings.
-    let l:exec_quit='quit!'
-  endif
-  if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
-    call CUpdateTabTermBuf()
-  elseif winnr('$') == 1 " Single win, single tab
-    for l:buf in range(1, bufnr('$')) " Clear term buffers without warnings.
-      if l:buf != bufnr('%') && bufexists(l:buf)
-        exec 'silent bwipeout! ' . l:buf
-      endif
-    endfor
-  endif
-  if exists("g:vimspector_session_windows.disassembly")
-    \ && g:vimspector_session_windows.disassembly == win_getid()
-    exec l:exec_quit
-    unlet g:vimspector_session_windows['disassembly']
-    call ReshapeVimspectorWins()
-    return
-  endif
-  exec l:exec_quit
-endfunction
-function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
-  let l:cur_tab=tabpagenr()
-  if l:cur_tab == a:boundary && tabpagenr('$') > 1
-    exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
-    if exists('g:tab_term_buf')
-      let l:tmp = g:tab_term_buf[l:cur_tab]
-      for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
-        let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
-      endfor
-      let g:tab_term_buf[a:last] = l:tmp
-    endif
-  elseif tabpagenr('$') > 1
-    exec ':tabmove '.a:plus_or_minus[1]
-    if exists('g:tab_term_buf')
-      let l:tmp = g:tab_term_buf[l:cur_tab]
-      let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
-      let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
-    endif
-  endif
-endfunction
-function! MoveTabH()
-  call MoveTab(1, ['+', '-'], [+1, -1], 1, tabpagenr('$'))
-endfunction
-function! MoveTabL()
-  call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
-endfunction
 noremap <LocalLeader><F4> :<C-u>vert diffsplit<Space>
 noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
 function! DeleteBlankLine()
@@ -2474,7 +2391,29 @@ set iskeyword-=@
 " When pressing <Shift-*>, the / and . should be included in the selection.
 set iskeyword+=/
 set iskeyword+=.
-" <Ctrl-Shift-t> open a new terminal in a new tab
+" <Ctrl-t> open a new terminal in a new tab
+noremap <C-t> :<C-u>call OpenTerminalInNewTab()<CR>
+inoremap <C-t> <C-o>:call OpenTerminalInNewTab()<CR>
+tnoremap <C-t> <C-w>:call OpenTerminalInNewTab()<CR>
+noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
+tnoremap <M-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
+noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
+tnoremap <C-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
+noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
+tnoremap <C-q> <C-w>:<C-u>call QuitWin()<CR>
+noremap <LocalLeader>w :<C-u>w<CR>
+noremap <M-S-h> :<C-u>call MoveTabH()<CR>
+noremap <M-S-l> :<C-u>call MoveTabL()<CR>
+inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
+inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
+noremap <C-M-h> gT
+noremap <C-M-j> gT
+noremap <C-M-l> gt
+noremap <C-M-k> gt
+inoremap <C-M-h> <C-o>gT
+inoremap <C-M-j> <C-o>gT
+inoremap <C-M-l> <C-o>gt
+inoremap <C-M-k> <C-o>gt
 function! TerminalLaunchDirectory()
   if &buftype ==# 'terminal'
     let l:terminal_job = term_getjob(bufnr('%'))
@@ -2505,8 +2444,69 @@ function! OpenTerminalInNewTab()
         \ }
   let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
 endfunction
-noremap <C-t> :<C-u>call OpenTerminalInNewTab()<CR>
-inoremap <C-t> <C-o>:call OpenTerminalInNewTab()<CR>
-tnoremap <C-t> <C-w>:call OpenTerminalInNewTab()<CR>
+function! CloseAndBackTab()
+  let l:exec_tabp='tabp'
+  if tabpagenr() == tabpagenr('$')
+    let l:exec_tabp=''
+  fi
+  while winnr('$') > 1 " Prevent the function from closing multiple tabs
+    call QuitWin()
+  endwhile
+  call QuitWin()
+  exec l:exec_tabp
+endfunction
+function! QuitWin()
+  let l:exec_quit='quit'
+  " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
+  " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
+  if &buftype=='terminal'
+    let l:exec_quit=''
+  elseif &filetype=='' " Close terms without warnings.
+    let l:exec_quit='quit!'
+  endif
+  if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
+    call CUpdateTabTermBuf()
+  elseif winnr('$') == 1 " Single win, single tab
+    for l:buf in range(1, bufnr('$')) " Clear term buffers without warnings.
+      if l:buf != bufnr('%') && bufexists(l:buf)
+        exec 'silent bwipeout! ' . l:buf
+      endif
+    endfor
+  endif
+  if exists("g:vimspector_session_windows.disassembly")
+    \ && g:vimspector_session_windows.disassembly == win_getid()
+    exec l:exec_quit
+    unlet g:vimspector_session_windows['disassembly']
+    call ReshapeVimspectorWins()
+    return
+  endif
+  exec l:exec_quit
+endfunction
+function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
+  let l:cur_tab=tabpagenr()
+  if l:cur_tab == a:boundary && tabpagenr('$') > 1
+    exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
+    if exists('g:tab_term_buf')
+      let l:tmp = g:tab_term_buf[l:cur_tab]
+      for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
+        let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
+      endfor
+      let g:tab_term_buf[a:last] = l:tmp
+    endif
+  elseif tabpagenr('$') > 1
+    exec ':tabmove '.a:plus_or_minus[1]
+    if exists('g:tab_term_buf')
+      let l:tmp = g:tab_term_buf[l:cur_tab]
+      let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
+      let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
+    endif
+  endif
+endfunction
+function! MoveTabH()
+  call MoveTab(1, ['+', '-'], [+1, -1], 1, tabpagenr('$'))
+endfunction
+function! MoveTabL()
+  call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
+endfunction
 " Paste clipboard in terminal with Ctrl-Shift-v
 tnoremap <C-v> <C-w>"+
