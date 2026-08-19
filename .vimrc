@@ -2392,11 +2392,11 @@ set iskeyword-=@
 set iskeyword+=/
 set iskeyword+=.
 " <Ctrl-t> open a new terminal in a new tab
-noremap <C-t> :<C-u>call OpenTerminalInNewTab()<CR>
-inoremap <C-t> <C-o>:call OpenTerminalInNewTab()<CR>
-tnoremap <C-t> <C-w>:call OpenTerminalInNewTab()<CR>
-noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
-tnoremap <M-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
+noremap <C-t> :<C-u>call NewTab('terminal')<CR>
+inoremap <C-t> <C-o>:call NewTab('terminal')<CR>
+tnoremap <C-t> <C-w>:call NewTab('terminal')<CR>
+noremap <LocalLeader>t :<C-u>call NewTab('empty_tab')<CR>
+tnoremap <M-t> <C-w>:call NewTab('empty_tab')<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
 tnoremap <C-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
@@ -2414,15 +2414,15 @@ inoremap <C-M-h> <C-o>gT
 inoremap <C-M-j> <C-o>gT
 inoremap <C-M-l> <C-o>gt
 inoremap <C-M-k> <C-o>gt
-function! TerminalLaunchDirectory()
+function! GetLaunchDir() abort
   if &buftype ==# 'terminal'
     let l:terminal_job = term_getjob(bufnr('%'))
     if job_status(l:terminal_job) ==# 'run'
       let l:terminal_pid = get(job_info(l:terminal_job), 'process', 0)
       if l:terminal_pid > 0
-        let l:terminal_directory = resolve('/proc/'.l:terminal_pid.'/cwd')
-        if isdirectory(l:terminal_directory)
-          return l:terminal_directory
+        let l:target_dir = resolve('/proc/'.l:terminal_pid.'/cwd')
+        if isdirectory(l:target_dir)
+          return l:target_dir
         endif
       endif
     endif
@@ -2431,18 +2431,22 @@ function! TerminalLaunchDirectory()
   let l:file_directory = expand('%:p:h')
   return isdirectory(l:file_directory) ? l:file_directory : getcwd()
 endfunction
-function! OpenTerminalInNewTab()
-  let l:terminal_directory = TerminalLaunchDirectory()
+function! NewTab(mode) abort
+  let l:target_dir = GetLaunchDir()
   call NUpdateTabTermBuf()
   tabnew
-  let l:terminal_options = {
-        \ 'curwin': 1,
-        \ 'norestore': 1,
-        \ 'term_finish': 'close',
-        \ 'term_kill': 'term',
-        \ 'cwd': l:terminal_directory,
-        \ }
-  let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
+  if a:mode ==# 'empty_tab'
+      exec 'tcd ' . l:target_dir
+  else
+    let l:terminal_options = {
+          \ 'curwin': 1,
+          \ 'norestore': 1,
+          \ 'term_finish': 'close',
+          \ 'term_kill': 'term',
+          \ 'cwd': l:target_dir,
+          \ }
+    let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
+  endif
 endfunction
 function! CloseAndBackTab()
   let l:exec_tabp='tabp'
@@ -2459,7 +2463,7 @@ function! QuitWin()
   let l:exec_quit='quit'
   " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
   " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
-  if &buftype=='terminal'
+  if &buftype=='terminal' && tabpagenr('$') > 1
     let l:exec_quit=''
   elseif &filetype=='' " Close terms without warnings.
     let l:exec_quit='quit!'
@@ -2467,7 +2471,7 @@ function! QuitWin()
   if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
     call CUpdateTabTermBuf()
   elseif winnr('$') == 1 " Single win, single tab
-    for l:buf in range(1, bufnr('$')) " Clear term buffers without warnings.
+    for l:buf in range(1, bufnr('$') + 1) " Clear term buffers without warnings.
       if l:buf != bufnr('%') && bufexists(l:buf)
         exec 'silent bwipeout! ' . l:buf
       endif
