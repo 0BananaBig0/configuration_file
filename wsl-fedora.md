@@ -148,7 +148,7 @@ sudo cp ~/configuration_file/local.conf /etc/fonts/ # or modify 40-nonlatin.conf
 sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo pocl pocl-devel
 
 sudo ln /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe /usr/bin/firefox -s
-sudo dnf install -y verilator iverilog yosys
+sudo dnf install -y verilator verilator-devel iverilog yosys
 sudo npm install -g @imc-trading/svlangserver
 sudo dnf -y copr enable rezso/HDL
 sudo dnf install -y verible
@@ -269,3 +269,5 @@ sudo dnf install -y sshfs
 
 # install qwen
 curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
+# install Antigravity CLI
+curl -fsSL https://antigravity.google/cli/install.sh | bash
