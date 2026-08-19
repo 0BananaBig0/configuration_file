@@ -746,19 +746,16 @@ function! ConfigureDelayedPlugin()
   endfunction
   function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
     for l:term_index in range(a:id_first, a:id_last, a:plus_or_minus_one[1])
-      if(g:tab_term_buf[l:term_index] != -1)
-        let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
-        let g:tab_term_buf[l:term_index] = - 1
-      endif
+      let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
     endfor
   endfunction
   function! CUpdateTabTermBuf()
     if exists('g:tab_term_buf')
-      if bufexists(g:tab_term_buf[tabpagenr()])
-        exec 'silent bwipeout! ' . g:tab_term_buf[tabpagenr()]
+      let l:tab_term_buf = g:tab_term_buf[tabpagenr()]
+      call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$') + 2, [-1, +1])
+      if bufexists(l:tab_term_buf)
+        exec 'silent bwipeout! ' . l:tab_term_buf
       endif
-      let g:tab_term_buf[tabpagenr()] = - 1
-      call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$'), [-1, +1])
     endif
   endfunction
   function! NUpdateTabTermBuf()
@@ -825,12 +822,12 @@ function! ConfigureManualLoadPlugin()
     call extend(l:general_key_maps, [
           \ ['<LocalLeader>w', 'Write file', 'n'],
           \ ['<LocalLeader>q', 'Quit window', 'n'],
-          \ ['<C-S-q>', 'Quit window', 't'],
+          \ ['<C-q>', 'Quit window', 't'],
           \ ['<LocalLeader>t', 'Open new tab', 'n'],
-          \ ['<M-S-t>', 'Open new tab', 't'],
+          \ ['<M-t>', 'Open new tab', 't'],
           \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
-          \ ['<C-S-b>', 'Close tab and go back', 't'],
-          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
+          \ ['<C-b>', 'Close tab and go back', 't'],
+          \ ['<C-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
           \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'n'],
@@ -859,7 +856,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
           \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
-          \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
+          \ ['<C-v>', 'Paste clipboard in terminal', 't'],
           \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
           \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ])
@@ -2288,11 +2285,11 @@ function! CompileCommand()
   endif
 endfunction
 noremap <LocalLeader>t :<C-u>call NUpdateTabTermBuf()<CR>:tabnew<CR>
-tnoremap <M-S-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
+tnoremap <M-t> <C-w>:call NUpdateTabTermBuf()<CR><C-w>:tabnew<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
-tnoremap <C-S-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
+tnoremap <C-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
-tnoremap <C-S-q> <C-w>:<C-u>call QuitWin()<CR>
+tnoremap <C-q> <C-w>:<C-u>call QuitWin()<CR>
 noremap <LocalLeader>w :<C-u>w<CR>
 noremap <M-S-h> :<C-u>call MoveTabH()<CR>
 noremap <M-S-l> :<C-u>call MoveTabL()<CR>
@@ -2315,7 +2312,11 @@ function! CloseAndBackTab()
 endfunction
 function! QuitWin()
   let l:exec_quit='quit'
-  if &filetype=='' " Close terms without warnings.
+  " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
+  " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
+  if getbufvar(winbufnr(winnr()), '&buftype')==#'terminal'
+    let l:exec_quit=''
+  elseif &filetype=='' " Close terms without warnings.
     let l:exec_quit='quit!'
   endif
   if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
@@ -2500,8 +2501,8 @@ function! OpenTerminalInNewTab()
         \ }
   let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
 endfunction
-noremap <C-S-t> :<C-u>call OpenTerminalInNewTab()<CR>
-inoremap <C-S-t> <C-o>:call OpenTerminalInNewTab()<CR>
-tnoremap <C-S-t> <C-w>:call OpenTerminalInNewTab()<CR>
+noremap <C-t> :<C-u>call OpenTerminalInNewTab()<CR>
+inoremap <C-t> <C-o>:call OpenTerminalInNewTab()<CR>
+tnoremap <C-t> <C-w>:call OpenTerminalInNewTab()<CR>
 " Paste clipboard in terminal with Ctrl-Shift-v
-tnoremap <C-S-v> <C-w>"+
+tnoremap <C-v> <C-w>"+
