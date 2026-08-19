@@ -2304,11 +2304,15 @@ inoremap <C-M-j> <C-o>gT
 inoremap <C-M-l> <C-o>gt
 inoremap <C-M-k> <C-o>gt
 function! CloseAndBackTab()
+  let l:exec_tabp='tabp'
+  if tabpagenr() == tabpagenr('$')
+    let l:exec_tabp=''
+  fi
   while winnr('$') > 1 " Prevent the function from closing multiple tabs
     call QuitWin()
   endwhile
   call QuitWin()
-  exec 'tabp'
+  exec l:exec_tabp
 endfunction
 function! QuitWin()
   let l:exec_quit='quit'
