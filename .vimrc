@@ -822,12 +822,12 @@ function! ConfigureManualLoadPlugin()
     call extend(l:general_key_maps, [
           \ ['<LocalLeader>w', 'Write file', 'n'],
           \ ['<LocalLeader>q', 'Quit window', 'n'],
-          \ ['<C-q>', 'Quit window', 't'],
+          \ ['<M-q>', 'Quit window', 'n', 'N/I/T'],
           \ ['<LocalLeader>t', 'Open new tab', 'n'],
-          \ ['<M-t>', 'Open new tab', 't'],
+          \ ['<M-t>', 'Open new tab', 'n', 'N/I/T'],
           \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
-          \ ['<C-b>', 'Close tab and go back', 't'],
-          \ ['<C-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
+          \ ['<M-b>', 'Close tab and go back', 'n', 'N/I/T'],
+          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
           \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'n'],
@@ -2391,16 +2391,21 @@ set iskeyword-=@
 " When pressing <Shift-*>, the / and . should be included in the selection.
 set iskeyword+=/
 set iskeyword+=.
-" <Ctrl-t> open a new terminal in a new tab
-noremap <C-t> :<C-u>call NewTab('terminal')<CR>
-inoremap <C-t> <C-o>:call NewTab('terminal')<CR>
-tnoremap <C-t> <C-w>:call NewTab('terminal')<CR>
+noremap <C-S-t> :<C-u>call NewTab('terminal')<CR>
+inoremap <C-S-t> <C-o>:call NewTab('terminal')<CR>
+tnoremap <C-S-t> <C-w>:call NewTab('terminal')<CR>
 noremap <LocalLeader>t :<C-u>call NewTab('empty_tab')<CR>
+noremap <M-t> :<C-u>call NewTab('empty_tab')<CR>
+inoremap <M-t> <C-o>:call NewTab('empty_tab')<CR>
 tnoremap <M-t> <C-w>:call NewTab('empty_tab')<CR>
 noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
-tnoremap <C-b> <C-w>:<C-u>call CloseAndBackTab()<CR>
+noremap <M-b> :<C-u>call CloseAndBackTab()<CR>
+inoremap <M-b> <C-o>:call CloseAndBackTab()<CR>
+tnoremap <M-b> <C-w>:call CloseAndBackTab()<CR>
 noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
-tnoremap <C-q> <C-w>:<C-u>call QuitWin()<CR>
+noremap <M-q> :<C-u>call QuitWin()<CR>
+inoremap <M-q> <C-o>:call QuitWin()<CR>
+tnoremap <M-q> <C-w>:call QuitWin()<CR>
 noremap <LocalLeader>w :<C-u>w<CR>
 noremap <M-S-h> :<C-u>call MoveTabH()<CR>
 noremap <M-S-l> :<C-u>call MoveTabL()<CR>
@@ -2512,5 +2517,4 @@ endfunction
 function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
-" Paste clipboard in terminal with Ctrl-Shift-v
 tnoremap <C-v> <C-w>"+
