@@ -2510,3 +2510,26 @@ function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
 tnoremap <C-S-v> <C-w>"+
+" -------------------------------------------------------------------
+" Custom :e replacement: auto-switch tab-local cwd to workspace root
+" Usage: :e /path/to/file   (via cabbrev)  OR  :E /path/to/file
+" -------------------------------------------------------------------
+" Define the main command (capital E) – safe and explicit
+command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
+" Abbreviation to replace :e with :E (optional – comment out if unwanted)
+cnoreabbrev e E
+function! s:EditWithWorkspaceCheck(filename) abort
+  " Step 1: Get workspace root (guaranteed to be a valid path)
+  let l:root = WorkspaceRoot()
+  " Step 2: Get current tab's local working directory
+  let l:tab_cwd = getcwd()
+  " Normalise paths (resolve symlinks, remove trailing slashes)
+  let l:root    = fnamemodify(l:root, ':p:h')
+  let l:tab_cwd = fnamemodify(l:tab_cwd, ':p:h')
+  " Step 3: Change tab-local cwd only if we're outside the workspace tree
+  if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
+    execute 'tcd ' . l:root
+  endif
+  " Step 4: Open the file
+  execute 'edit ' . a:filename
+endfunction
