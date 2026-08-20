@@ -703,7 +703,7 @@ function! ConfigureDelayedPlugin()
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
-    let l:terminal_directory = TerminalLaunchDirectory()
+    let l:terminal_directory = GetLaunchDir()
     " Loop through all windows in the current tab to check for a terminal
     for l:win in getwininfo()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
@@ -751,10 +751,10 @@ function! ConfigureDelayedPlugin()
       let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
     endfor
   endfunction
-  function! CUpdateTabTermBuf()
+  function! CUpdateTabTermBuf(auto_close_terminal=1)
     let l:tab_term_buf = g:tab_term_buf[tabpagenr()]
     call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$') + 2, [-1, +1])
-    if bufexists(l:tab_term_buf)
+    if bufexists(l:tab_term_buf) && a:auto_close_terminal == 1
       exec 'silent bwipeout! ' . l:tab_term_buf
     endif
   endfunction
@@ -1537,7 +1537,7 @@ function! ConfigureManualLoadPlugin()
   noremap ]<S-F4> :<C-u>call vimspector#SetAdvancedLineBreakpoint()<CR>
   noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   noremap <F5> :<C-u>call plug#load('vimspector')<CR>
-  noremap <S-F5> :<C-u>VimspectorReset<CR>
+  noremap <S-F5> :<C-u>call CUpdateTabTermBuf(0)<CR>:VimspectorReset<CR>
   noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 16<CR>
               \ :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
@@ -1599,6 +1599,7 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(g:vimspector_session_windows.output)
     9wincmd _
     call win_gotoid(g:vimspector_session_windows.terminal)
+    let g:tab_term_buf[tabpagenr()] = bufnr('%')
     36wincmd |
     call win_gotoid(g:vimspector_session_windows.variables)
     setlocal wrap
@@ -1662,10 +1663,6 @@ function! ConfigureManualLoadPlugin()
       call plug#load('vimspector')
     endif
     call JumpToTheMainWin()
-    let l:cur_win_id = win_getid()
-    if QuitVimspectorWins()
-      call win_gotoid(l:cur_win_id)
-    endif
     if &filetype=='python'
       call vimspector#LaunchWithSettings(#{configuration: 'python: launch', Test: 'python: launch'})
     elseif &filetype=='tcl'
@@ -1673,6 +1670,7 @@ function! ConfigureManualLoadPlugin()
     elseif &filetype=='c' || &filetype=='cpp'
       call vimspector#LaunchWithSettings(#{configuration: 'cpp: launch', Test: 'cpp: launch'})
     endif
+    call NUpdateTabTermBuf()
   endfunction
   function! AddVarToWatch(selection)
     let l:cur_winid = win_getid()
