@@ -140,7 +140,9 @@ function! CocTimerStart(timer)
   call InitializeTabPos()
   " Create an array to store the most recent terminal buffer for each tab
   let g:tab_term_buf_size = 33
-  let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+  if !exists('g:tab_term_buf')
+    let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+  endif
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
 
@@ -750,19 +752,15 @@ function! ConfigureDelayedPlugin()
     endfor
   endfunction
   function! CUpdateTabTermBuf()
-    if exists('g:tab_term_buf')
-      let l:tab_term_buf = g:tab_term_buf[tabpagenr()]
-      call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$') + 2, [-1, +1])
-      if bufexists(l:tab_term_buf)
-        exec 'silent bwipeout! ' . l:tab_term_buf
-      endif
+    let l:tab_term_buf = g:tab_term_buf[tabpagenr()]
+    call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$') + 2, [-1, +1])
+    if bufexists(l:tab_term_buf)
+      exec 'silent bwipeout! ' . l:tab_term_buf
     endif
   endfunction
   function! NUpdateTabTermBuf()
-    if exists('g:tab_term_buf')
-      call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
-      let g:tab_term_buf[tabpagenr() + 1] = - 1
-    endif
+    call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
+    let g:tab_term_buf[tabpagenr() + 1] = - 1
   endfunction
   noremap <F8> :<C-u>call ToggleTerminal()<CR>
   tnoremap <F8> <C-w>:call ToggleTerminal()<CR>
@@ -2495,20 +2493,16 @@ function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
   let l:cur_tab=tabpagenr()
   if l:cur_tab == a:boundary && tabpagenr('$') > 1
     exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
-    if exists('g:tab_term_buf')
-      let l:tmp = g:tab_term_buf[l:cur_tab]
-      for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
-        let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
-      endfor
-      let g:tab_term_buf[a:last] = l:tmp
-    endif
+    let l:tmp = g:tab_term_buf[l:cur_tab]
+    for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
+      let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
+    endfor
+    let g:tab_term_buf[a:last] = l:tmp
   elseif tabpagenr('$') > 1
     exec ':tabmove '.a:plus_or_minus[1]
-    if exists('g:tab_term_buf')
-      let l:tmp = g:tab_term_buf[l:cur_tab]
-      let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
-      let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
-    endif
+    let l:tmp = g:tab_term_buf[l:cur_tab]
+    let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
+    let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
   endif
 endfunction
 function! MoveTabH()
