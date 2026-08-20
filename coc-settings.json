@@ -1,127 +1,127 @@
 {
-   "languageserver": {
-      "assembly": {
-         "command": "asm-lsp",
-         "filetypes": [
-            "asm"
-         ]
-      },
-      "qml": {
-         "command": "qmlls",
-         "filetypes": [
-            "qml"
-         ]
-      },
-      "svlangserver": {
-         "command": "svlangserver",
-         "filetypes": [
-            "systemverilog",
-            "vhdl",
-            "verilog"
-         ],
-         "settings": {
-            "systemverilog.includeIndexing": [
-               "**/*.{v,sv,svh}"
+    "languageserver": {
+        "assembly": {
+            "command": "asm-lsp",
+            "filetypes": [
+                "asm"
+            ]
+        },
+        "qml": {
+            "command": "qmlls",
+            "filetypes": [
+                "qml"
+            ]
+        },
+        "svlangserver": {
+            "command": "svlangserver",
+            "filetypes": [
+                "systemverilog",
+                "vhdl",
+                "verilog"
             ],
-            "systemverilog.excludeIndexing": [],
-            "systemverilog.launchConfiguration": "verilator --lint-only --language 1364-2005",
-            "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=4 --wrap_spaces=4"
-         }
-      }
-   },
-   "workspace.rootPatterns": [
-      ".git",
-      ".hg",
-      ".projections.json",
-      ".project",
-      ".svn",
-      ".root",
-      ".vscode",
-      "SConstruct"
-   ],
-   "clangd.arguments": [
-      "--all-scopes-completion",
-      "--background-index",
-      "--clang-tidy",
-      "--completion-style=detailed",
-      "--fallback-style=none",
-      "--function-arg-placeholders=1",
-      "--header-insertion=never",
-      "--header-insertion-decorators",
-      "--enable-config",
-      "--j=12",
-      "--pch-storage=memory",
-      "--pretty"
-   ],
-   "coc-ai.global.model": "gpt-5-codex",
-   "coc-ai.tab.enabled": true,
-   "coc-ai.tab.model": "gpt-5-codex",
-   "coc-ai.tab.maxTokens": 160,
-   "coc-ai.tab.maxContextSize": 4096,
-   "coc-ai.tab.includeOpenBuffers": false,
-   "coc-ai.tab.temperature": 0.1,
-   "coc-ai.tab.requestTimeout": 8,
-   "coc-ai.global.authProvider": "openai-codex",
-   "coc-ai.complete.authProvider": "openai-codex",
-   "coc-ai.complete.model": "gpt-5-codex",
-   "coc-ai.complete.maxTokens": 2048,
-   "coc-ai.complete.temperature": 0.1,
-   "coc-ai.complete.requestTimeout": 30,
-   "coc-ai.chat.authProvider": "openai-codex",
-   "coc-ai.chat.model": "gpt-5-codex",
-   "coc-ai.chat.maxTokens": 4096,
-   "coc-ai.chat.requestTimeout": 60,
-   "coc-ai.chat.autoScroll": true,
-   "coc-ai.chat.preserveFocus": true,
-   "coc-ai.chat.scratchBufferKeepOpen": true,
-   "dialog.floatHighlight": "sym_hilight",
-   "diagnostic.enable": false,
-   "diagnostic.errorSign": "🌪",
-   "diagnostic.hintSign": "💡",
-   "diagnostic.infoSign": "📄",
-   "diagnostic.messageTarget": "echo",
-   "diagnostic.virtualText": true,
-   "diagnostic.warningSign": "⚡",
-   "inlayHint.enable": true,
-   "markdownlint.config": {
-      "MD013": {
-         "line_length": 100
-      },
-      "ignore_code_blocks": true
-   },
-   "perl.enable": true,
-   "perl.logLevel": 2,
-   "perl.logFile": "${HOME}/.vim/.coc-perl.log",
-   "prettier.formatterPriority": -1,
-   "prettier.printWidth": 80,
-   "prettier.proseWrap": "always",
-   "python.formatting.provider": "black",
-   "signature.target": "echo",
-   "suggest.autoTrigger": "none",
-   "suggest.defaultSortMethod": "alphabetical",
-   "suggest.detailField": "preview",
-   "suggest.maxCompleteItemCount": 18,
-   "suggest.noselect": true,
-   "suggest.selection": "recentlyUsedByPrefix",
-   "suggest.virtualText": true,
-   "suggest.triggerAfterInsertEnter": true,
-   "suggest.localityBonus": true,
-   "suggest.languageSourcePriority": 99,
-   "coc.source.snippets.priority": 95,
-   "coc.source.snippets.shortcut": "S",
-   "coc.source.around.priority": 80,
-   "coc.source.around.shortcut": "A",
-   "coc.source.buffer.priority": 70,
-   "coc.source.buffer.shortcut": "B",
-   "coc.source.file.priority": 60,
-   "coc.source.file.shortcut": "F",
-   "coc.source.dictionary.priority": 50,
-   "coc.source.dictionary.shortcut": "D",
-   "coc.source.tag.priority": 40,
-   "coc.source.tag.shortcut": "T",
-   "coc.source.word.priority": 30,
-   "coc.source.word.shortcut": "W",
-   "suggest.removeDuplicateItems": true,
-   "suggest.highPrioritySourceLimit": 50,
-   "suggest.lowPrioritySourceLimit": 20
+            "settings": {
+                "systemverilog.includeIndexing": [
+                    "**/*.{v,sv,svh}"
+                ],
+                "systemverilog.excludeIndexing": [],
+                "systemverilog.launchConfiguration": "verilator --lint-only --language 1364-2005",
+                "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=4 --wrap_spaces=4"
+            }
+        }
+    },
+    "workspace.rootPatterns": [
+        ".git",
+        ".hg",
+        ".projections.json",
+        ".project",
+        ".svn",
+        ".root",
+        ".vscode",
+        "SConstruct"
+    ],
+    "clangd.arguments": [
+        "--all-scopes-completion",
+        "--background-index",
+        "--clang-tidy",
+        "--completion-style=detailed",
+        "--fallback-style=none",
+        "--function-arg-placeholders=1",
+        "--header-insertion=never",
+        "--header-insertion-decorators",
+        "--enable-config",
+        "--j=12",
+        "--pch-storage=memory",
+        "--pretty"
+    ],
+    "coc-ai.global.model": "gpt-5-codex",
+    "coc-ai.tab.enabled": true,
+    "coc-ai.tab.model": "gpt-5-codex",
+    "coc-ai.tab.maxTokens": 160,
+    "coc-ai.tab.maxContextSize": 4096,
+    "coc-ai.tab.includeOpenBuffers": false,
+    "coc-ai.tab.temperature": 0.1,
+    "coc-ai.tab.requestTimeout": 8,
+    "coc-ai.global.authProvider": "openai-codex",
+    "coc-ai.complete.authProvider": "openai-codex",
+    "coc-ai.complete.model": "gpt-5-codex",
+    "coc-ai.complete.maxTokens": 2048,
+    "coc-ai.complete.temperature": 0.1,
+    "coc-ai.complete.requestTimeout": 30,
+    "coc-ai.chat.authProvider": "openai-codex",
+    "coc-ai.chat.model": "gpt-5-codex",
+    "coc-ai.chat.maxTokens": 4096,
+    "coc-ai.chat.requestTimeout": 60,
+    "coc-ai.chat.autoScroll": true,
+    "coc-ai.chat.preserveFocus": true,
+    "coc-ai.chat.scratchBufferKeepOpen": true,
+    "dialog.floatHighlight": "sym_hilight",
+    "diagnostic.enable": false,
+    "diagnostic.errorSign": "🌪",
+    "diagnostic.hintSign": "💡",
+    "diagnostic.infoSign": "📄",
+    "diagnostic.messageTarget": "echo",
+    "diagnostic.virtualText": true,
+    "diagnostic.warningSign": "⚡",
+    "inlayHint.enable": true,
+    "markdownlint.config": {
+        "MD013": {
+            "line_length": 100
+        },
+        "ignore_code_blocks": true
+    },
+    "perl.enable": true,
+    "perl.logLevel": 2,
+    "perl.logFile": "${HOME}/.vim/.coc-perl.log",
+    "prettier.formatterPriority": -1,
+    "prettier.printWidth": 80,
+    "prettier.proseWrap": "always",
+    "python.formatting.provider": "black",
+    "signature.target": "echo",
+    "suggest.autoTrigger": "none",
+    "suggest.defaultSortMethod": "alphabetical",
+    "suggest.detailField": "preview",
+    "suggest.maxCompleteItemCount": 18,
+    "suggest.noselect": true,
+    "suggest.selection": "recentlyUsedByPrefix",
+    "suggest.virtualText": true,
+    "suggest.triggerAfterInsertEnter": true,
+    "suggest.localityBonus": true,
+    "suggest.languageSourcePriority": 99,
+    "coc.source.snippets.priority": 95,
+    "coc.source.snippets.shortcut": "S",
+    "coc.source.around.priority": 80,
+    "coc.source.around.shortcut": "A",
+    "coc.source.buffer.priority": 70,
+    "coc.source.buffer.shortcut": "B",
+    "coc.source.file.priority": 60,
+    "coc.source.file.shortcut": "F",
+    "coc.source.dictionary.priority": 50,
+    "coc.source.dictionary.shortcut": "D",
+    "coc.source.tag.priority": 40,
+    "coc.source.tag.shortcut": "T",
+    "coc.source.word.priority": 30,
+    "coc.source.word.shortcut": "W",
+    "suggest.removeDuplicateItems": true,
+    "suggest.highPrioritySourceLimit": 50,
+    "suggest.lowPrioritySourceLimit": 20
 }
