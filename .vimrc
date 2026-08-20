@@ -854,7 +854,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
           \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
-          \ ['<C-v>', 'Paste clipboard in terminal', 't'],
+          \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
           \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
           \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ])
@@ -2511,4 +2511,4 @@ endfunction
 function! MoveTabL()
   call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
 endfunction
-tnoremap <C-v> <C-w>"+
+tnoremap <C-S-v> <C-w>"+
