@@ -2389,9 +2389,9 @@ set iskeyword-=@
 " When pressing <Shift-*>, the / and . should be included in the selection.
 set iskeyword+=/
 set iskeyword+=.
-noremap <C-S-t> :<C-u>call NewTab('terminal')<CR>
-inoremap <C-S-t> <C-o>:call NewTab('terminal')<CR>
-tnoremap <C-S-t> <C-w>:call NewTab('terminal')<CR>
+noremap <C-S-t> :<C-u>call NewTab()<CR>
+inoremap <C-S-t> <C-o>:call NewTab()<CR>
+tnoremap <C-S-t> <C-w>:call NewTab()<CR>
 noremap <LocalLeader>t :<C-u>call NewTab('empty_tab')<CR>
 noremap <M-t> :<C-u>call NewTab('empty_tab')<CR>
 inoremap <M-t> <C-o>:call NewTab('empty_tab')<CR>
@@ -2434,7 +2434,7 @@ function! GetLaunchDir() abort
   let l:file_directory = expand('%:p:h')
   return isdirectory(l:file_directory) ? l:file_directory : getcwd()
 endfunction
-function! NewTab(mode) abort
+function! NewTab(mode = 'terminal') abort
   let l:target_dir = GetLaunchDir()
   call NUpdateTabTermBuf()
   tabnew
