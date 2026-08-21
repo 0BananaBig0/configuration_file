@@ -293,6 +293,7 @@ function! ConfigureWhichKey()
   let g:local_key_map = {
         \ 'a': 'Wrap all diff windows',
         \ 'b': 'Close tab and go back',
+        \ 'f': 'Enter Into File Path',
         \ 'j': {'name': 'which_key_ignore'},
         \ 'jc': 'Next comment block',
         \ 'jd': 'Next unmatched delimiter',
@@ -305,6 +306,7 @@ function! ConfigureWhichKey()
         \ 'ks': 'Previous function start',
         \ 'm': 'Toggle GUI menu and toolbar',
         \ 'q': 'Quit window',
+        \ 'r': 'Enter Into Workspace Root',
         \ 't': 'Open new tab',
         \ 'u': 'Clear search highlight',
         \ 'w': 'Write file',
@@ -828,6 +830,8 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
           \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
+          \ ['<LocalLeader>r', 'Enter Into Workspace Root', 'n'],
+          \ ['<LocalLeader>f', 'Enter Into File Path', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'i'],
           \ ['<M-S-l>', 'Move tab right', 'n'],
@@ -2543,3 +2547,32 @@ function! s:EditWithWorkspaceCheck(filename) abort
   " Step 4: Open the file
   execute 'edit ' . a:filename
 endfunction
+function! EnterIntoWorkSpaceOrFilePath(into_work_space = 1) abort
+  " Get info of the current window in this tab
+  let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
+  let l:root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
+  let l:cwd_path  = getcwd()          " Working directory of this tab
+  " Normalize paths (resolve symlinks, strip trailing slashes)
+  let l:root     = fnamemodify(l:root, ':p')
+  let l:cwd_path = fnamemodify(l:cwd_path, ':p')
+  if !empty(l:file_path)
+    let l:file_path = fnamemodify(l:file_path, ':p')
+  endif
+  " Determine if the current working directory is valid:
+  " Valid if it equals root, is a subpath of root,
+  " or equals file_path, or is a subpath of file_path
+  let l:valid = (l:cwd_path ==# l:root) ||
+        \ (stridx(l:cwd_path, l:root . '/') == 0) ||
+        \ (!empty(l:file_path) && (l:cwd_path ==# l:file_path)) ||
+        \ (!empty(l:file_path) && (stridx(l:cwd_path, l:file_path . '/') == 0))
+  " If invalid, change tab-local working directory to workspace root
+  if !l:valid
+    if a:into_work_space == 1
+      execute 'tcd ' . l:root
+    else
+      execute 'tcd ' . l:file_path
+    endif
+  endif
+endfunction
+noremap <LocalLeader>r :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
+noremap <LocalLeader>f :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
