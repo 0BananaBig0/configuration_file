@@ -1670,7 +1670,6 @@ function! ConfigureManualLoadPlugin()
     elseif &filetype=='c' || &filetype=='cpp'
       call vimspector#LaunchWithSettings(#{configuration: 'cpp: launch', Test: 'cpp: launch'})
     endif
-    call NUpdateTabTermBuf()
   endfunction
   function! AddVarToWatch(selection)
     let l:cur_winid = win_getid()
