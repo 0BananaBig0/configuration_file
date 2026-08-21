@@ -1558,8 +1558,7 @@ function! ConfigureManualLoadPlugin()
   noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   noremap <F5> :<C-u>call plug#load('vimspector')<CR>
   noremap <S-F5> :<C-u>call CUpdateTabTermBuf(0)<CR>:VimspectorReset<CR>
-  noremap ]<F5> :<C-u>set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 16<CR>
-              \ :<C-u>call LaunchVimspector()<CR>
+  noremap ]<F5> :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
   map <F6> <Plug>VimspectorStepOver
   map <C-F6> <Plug>VimspectorStepInto
@@ -1680,6 +1679,7 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! LaunchVimspector()
     if !exists("VimspectorShowOutput")
+      set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 15
       call plug#load('vimspector')
     endif
     call JumpToTheMainWin()
