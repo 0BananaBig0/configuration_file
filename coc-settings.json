@@ -95,6 +95,10 @@
     "prettier.formatterPriority": -1,
     "prettier.printWidth": 80,
     "prettier.proseWrap": "always",
+    "prettier.disableLanguages": [
+        "json"
+    ],
+    "json.format.enable": true,
     "python.formatting.provider": "black",
     "signature.target": "echo",
     "suggest.autoTrigger": "none",
@@ -107,6 +111,9 @@
     "suggest.triggerAfterInsertEnter": true,
     "suggest.localityBonus": true,
     "suggest.languageSourcePriority": 99,
+    "suggest.removeDuplicateItems": true,
+    "suggest.highPrioritySourceLimit": 50,
+    "suggest.lowPrioritySourceLimit": 20
     "coc.source.snippets.priority": 95,
     "coc.source.snippets.shortcut": "S",
     "coc.source.around.priority": 80,
@@ -121,7 +128,4 @@
     "coc.source.tag.shortcut": "T",
     "coc.source.word.priority": 30,
     "coc.source.word.shortcut": "W",
-    "suggest.removeDuplicateItems": true,
-    "suggest.highPrioritySourceLimit": 50,
-    "suggest.lowPrioritySourceLimit": 20
 }
