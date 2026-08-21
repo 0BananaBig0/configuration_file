@@ -1515,15 +1515,34 @@ function! ConfigureManualLoadPlugin()
 
 
   " Vimspector setting
+  function! JumpToTabIfExists(filepath)
+    " 1. Get the buffer number for the absolute file path
+    let l:bufnr = bufnr(fnamemodify(a:filepath, ':p'))
+    " Return early and do nothing if the buffer does not exist
+    if l:bufnr == -1
+      return 0
+    endif
+    " 2. Find all window IDs displaying this buffer across all tabs
+    let l:winids = win_findbuf(l:bufnr)
+    " 3. Jump to the first matching window/tab if found
+    if !empty(l:winids)
+      call win_gotoid(l:winids[0])
+    endif
+    return 1
+  endfunction
   function! ConfigureCppDebug()
     let l:cpp_workspace_root = WorkspaceRoot()
+    let l:json_file_path = l:cpp_workspace_root.'/.vimspector.json'
+    if JumpToTabIfExists(l:json_file_path)
+      return
+    endif
     if !isdirectory(l:cpp_workspace_root.'/.vscode')
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
     endif
     call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     if CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
       call NUpdateTabTermBuf()
-      exec 'tabe ' . l:cpp_workspace_root.'/.vimspector.json'
+      exec 'tabe ' . l:json_file_path
     endif
   endfunction
   noremap <F2> :<C-u>call ContinueInVimspector()<CR>
@@ -2517,7 +2536,6 @@ function! s:EditWithWorkspaceCheck(filename) abort
   " Step 2: Get current tab's local working directory
   let l:tab_cwd = getcwd()
   " Normalise paths (resolve symlinks, remove trailing slashes)
-  let l:root    = fnamemodify(l:root, ':p:h')
   let l:tab_cwd = fnamemodify(l:tab_cwd, ':p:h')
   " Step 3: Change tab-local cwd only if we're outside the workspace tree
   if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
