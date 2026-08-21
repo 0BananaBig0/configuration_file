@@ -2536,8 +2536,6 @@ function! s:EditWithWorkspaceCheck(filename) abort
   let l:root = WorkspaceRoot()
   " Step 2: Get current tab's local working directory
   let l:tab_cwd = getcwd()
-  " Normalise paths (resolve symlinks, remove trailing slashes)
-  let l:tab_cwd = fnamemodify(l:tab_cwd, ':p:h')
   " Step 3: Change tab-local cwd only if we're outside the workspace tree
   if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
     execute 'tcd ' . l:root
