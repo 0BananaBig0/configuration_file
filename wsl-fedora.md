@@ -42,7 +42,7 @@ sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
 sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
-sudo dnf install -y p7zip p7zip-plugins
+sudo dnf install -y p7zip p7zip-plugins 7zip-standalone-all
 sudo dnf install -y ShellCheck cargo gem ruby-devel
 sudo dnf install -y boost-devel tcl-devel xauth
 sudo dnf install -y fd-find zoxide ripgrep bat hyperfine httpie procs
