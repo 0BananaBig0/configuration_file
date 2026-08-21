@@ -132,22 +132,6 @@ noremap <Leader>per :<C-u>colorscheme dracula<CR>
 
 
 
-" After 333ms, call the coc.nvim, markdown-preview and so on
-function! CocTimerStart(timer)
-  exec 'CocStart'
-  call ConfigureDelayedPlugin()
-  call ConfigureManualLoadPlugin()
-  call InitializeTabPos()
-  " Create an array to store the most recent terminal buffer for each tab
-  let g:tab_term_buf_size = 33
-  if !exists('g:tab_term_buf')
-    let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-  endif
-endfunction
-call timer_start(333,'CocTimerStart',{'repeat':1})
-
-
-
 function! ConfigureMarkdownPlugin()
   " Coc-markmap, coc-markdownlint setting
   " Watch workflow from the whole file
@@ -1845,24 +1829,6 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>ad :call g:AutoDef()<ESC>
   " vim-verilog-instance
 endfunction
-" Alt+n跳到第n个tab，0<n<10
-function! TabPosActivateBuffer(index)
-  if a:index <= tabpagenr('$')
-    exec 'tabnext' a:index
-  else
-    echo 'The index number(now, '.a:index.') must be less than the total number of tabs(now, '.tabpagenr('$').').'
-  endif
-endfunction
-function! InitializeTabPos()
-  for l:i in range(1, 9)
-      exec 'noremap <M-' . l:i . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
-      exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
-      exec 'tnoremap <M-' . l:i . '> <C-w>:call TabPosActivateBuffer(' . l:i . ')<CR>'
-  endfor
-  exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
-  exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
-  exec 'tnoremap <M-0> <C-w>:call TabPosActivateBuffer(10)<CR>'
-endfunction
 
 
 
@@ -1955,15 +1921,6 @@ set ignorecase
 set smartcase
 set hlsearch
 set incsearch
-augroup Local_Autocmd_Group
-  autocmd!
-  autocmd FileType * call SetIndent()
-  autocmd BufNewFile * call SetTitle()
-  " Disable automatic word wrap which is enabled by filetype plugin indent on
-  autocmd FileType vim,cmake set textwidth=0
-  " Uncomment the following to have Vim jump to the last position when reopening a file
-  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-augroup END
 set autoindent
 set smartindent
 set expandtab                 " 把Tab字符用空格代替，和tabstop相关
@@ -2054,525 +2011,573 @@ function! SetTitle()
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
-noremap <LocalLeader>a :<C-u>call AutoWrap()<CR>
-function! AutoWrap()
-  let original_win = winnr()
-  " 遍历两个 diff 窗口
-  for win in range(1, winnr('$'))
-    " 切换到目标窗口
-    execute win . 'wincmd w'
-    setlocal wrap
-    setlocal diffopt+=context:3
-  endfor
-  " 返回原始窗口
-  execute original_win . 'wincmd w'
-endfunction
-noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
-noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
-function! ShowNearestClassOrStruct()
-  let l:class_line = search('^class\s\+.\+', 'bcnWz')
-  let l:struct_line = search('^struct\s\+.\+', 'bcnWz')
-    let l:nearest_name = 'No class/struct can be found.'
-  if(l:class_line > l:struct_line)
-    let l:nearest_name = getline(l:class_line)
-  elseif(l:class_line < l:struct_line)
-    let l:nearest_name = getline(l:struct_line)
-  else
-    let l:nearest_name = 'No class/struct can be found.'
-  endif
-  let l:nearest_end_poisition = strridx(l:nearest_name, '{')
-  if(l:nearest_end_poisition > 0)
-    let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
-  endif
-  echo l:nearest_name
-endfunction
-function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword)
-  if getline('.') =~ a:name_keyword
-    let l:block_name = getline('.')
-  else
-    let l:block_name_line = search(a:name_keyword, 'bcnWz')
-    let l:block_name = getline(l:block_name_line)
-  endif
-  let l:block_end_position = strridx(l:block_name, a:end_keyword)
-  if(l:block_end_position > 0)
-    let l:block_name = strpart(l:block_name, 0, l:block_end_position)
-  endif
-  let l:block_name = strpart(l:block_name, stridx(l:block_name, a:show_name) + len(a:show_name) + 1)
-  while(strpart(l:block_name, 0 , 1)==' ')
-    let l:block_name = strpart(l:block_name, 1)
-  endwhile
-  echo a:show_name '-->' l:block_name
-endfunction
-function! ShowCurrentFuncCodeBlockName()
-  if &filetype=='tcl'
-    if expand('%:e')=='tcl'
-      let l:name_keyword = 'proc\s\+.\+\s*{'
-      let l:show_name = 'proc'
+augroup Local_Autocmd_Group
+  autocmd!
+  autocmd FileType * call SetIndent()
+  autocmd BufNewFile * call SetTitle()
+  " Disable automatic word wrap which is enabled by filetype plugin indent on
+  autocmd FileType vim,cmake set textwidth=0
+  " Uncomment the following to have Vim jump to the last position when reopening a file
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup END
+
+
+function! SetGeneralKeyMaps()
+  noremap <LocalLeader>a :<C-u>call AutoWrap()<CR>
+  function! AutoWrap()
+    let original_win = winnr()
+    " 遍历两个 diff 窗口
+    for win in range(1, winnr('$'))
+      " 切换到目标窗口
+      execute win . 'wincmd w'
+      setlocal wrap
+      setlocal diffopt+=context:3
+    endfor
+    " 返回原始窗口
+    execute original_win . 'wincmd w'
+  endfunction
+  noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
+  noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
+  function! ShowNearestClassOrStruct()
+    let l:class_line = search('^class\s\+.\+', 'bcnWz')
+    let l:struct_line = search('^struct\s\+.\+', 'bcnWz')
+      let l:nearest_name = 'No class/struct can be found.'
+    if(l:class_line > l:struct_line)
+      let l:nearest_name = getline(l:class_line)
+    elseif(l:class_line < l:struct_line)
+      let l:nearest_name = getline(l:struct_line)
     else
-      let l:name_keyword = '^iProc\s\+.\+\s*{'
-      let l:show_name = 'iProc'
+      let l:nearest_name = 'No class/struct can be found.'
     endif
-  elseif &filetype=='perl'
-      let l:name_keyword = 'sub\s\+.\+\s*{'
-      let l:show_name = 'sub'
-  elseif &filetype=='python'
-      let l:name_keyword = 'def\s\+.\+(.*'
-      let l:show_name = 'def'
-  elseif &filetype=='make'
-      let l:name_keyword = '^define\s\+.\+'
-      let l:show_name = 'define'
-  elseif &filetype=='vim'
-      let l:name_keyword = 'function\s\+.\+(\|function!\s\+.\+('
-      let l:show_name = 'function'
-  else
-    let l:name_keyword = '^module\s\+.\+\s*(\|^Module\s\+.\+\s*{'
-    let l:show_name = 'module'
-  endif
-  if &filetype=='verilog'
-    let l:end_keyword = '('
-  elseif &filetype=='python'
-    let l:end_keyword = ':'
-  elseif &filetype=='make' || &filetype=='vim'
-    let l:end_keyword = '\n'
-  else
-    let l:end_keyword = '{'
-  endif
-  call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
-endfunction
-function! ShowCurrentNoneFuncCodeBlockName()
-  if &filetype=='tcl'
-      let l:name_keyword = 'namespace\s\+eval.\+{'
-      let l:show_name = 'namespace eval'
-  elseif &filetype=='perl'
-      let l:name_keyword = 'package\s\+.\+{'
-      let l:show_name = 'package'
-  elseif &filetype=='python'
-      let l:name_keyword = 'class\s\+.\+:'
-      let l:show_name = 'class'
-  endif
-  if &filetype=='python'
-    let l:end_keyword = ':'
-  else
-    let l:end_keyword = '{'
-  endif
-  call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
-endfunction
-function! CallShowNearestFunction()
-  if &filetype=='cpp' || &filetype=='c'
-     call ShowNearestClassOrStruct()
-  elseif &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
-        \ || &filetype=='perl' || &filetype=='python' || &filetype=='make'
-        \ || &filetype=='vim'
-     call ShowCurrentFuncCodeBlockName()
-  endif
-endfunction
-function! CallShowNearestFunctionNone()
-  if &filetype=='cpp' || &filetype=='c'
-     call ShowNearestClassOrStruct()
-  elseif &filetype=='tcl' || &filetype=='perl' || &filetype=='python'
-     call ShowCurrentNoneFuncCodeBlockName()
-  endif
-endfunction
-noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
-noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
-function! CPPCompilation()
-  let l:cpp_workspace_root = WorkspaceRoot()
-  let l:cur_file_path = expand('%:p:h')
-  let l:all_possible_paths = [l:cpp_workspace_root]
-  for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
-    if l:cur_file_path[l:str_id]=='/'
-      call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
+    let l:nearest_end_poisition = strridx(l:nearest_name, '{')
+    if(l:nearest_end_poisition > 0)
+      let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
     endif
-  endfor
-  call add(l:all_possible_paths, l:cur_file_path)
-  let l:cmakelist_path = []
-  let l:qmakepro_path = []
-  let l:makefile_path = []
-  let l:sconstruct_path = []
-  for l:possible_path in l:all_possible_paths
-    let l:pattern = l:possible_path."/CMakeLists.txt"
-    " Get the list of matching files (non-recursive)
-    let l:cmakelist_path = glob(l:pattern, 0, 1)
-    if !empty(l:cmakelist_path)
-      let l:cmakelist_path = ' cd '.l:possible_path
-          \ .' && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON'
-      call system('ccache --version')
-      if v:shell_error " Not use ccache
-        echo "ccache is not installed."
+    echo l:nearest_name
+  endfunction
+  function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword)
+    if getline('.') =~ a:name_keyword
+      let l:block_name = getline('.')
+    else
+      let l:block_name_line = search(a:name_keyword, 'bcnWz')
+      let l:block_name = getline(l:block_name_line)
+    endif
+    let l:block_end_position = strridx(l:block_name, a:end_keyword)
+    if(l:block_end_position > 0)
+      let l:block_name = strpart(l:block_name, 0, l:block_end_position)
+    endif
+    let l:block_name = strpart(l:block_name, stridx(l:block_name, a:show_name) + len(a:show_name) + 1)
+    while(strpart(l:block_name, 0 , 1)==' ')
+      let l:block_name = strpart(l:block_name, 1)
+    endwhile
+    echo a:show_name '-->' l:block_name
+  endfunction
+  function! ShowCurrentFuncCodeBlockName()
+    if &filetype=='tcl'
+      if expand('%:e')=='tcl'
+        let l:name_keyword = 'proc\s\+.\+\s*{'
+        let l:show_name = 'proc'
       else
-        let l:cmakelist_path = l:cmakelist_path
-              \ .' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
-              \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+        let l:name_keyword = '^iProc\s\+.\+\s*{'
+        let l:show_name = 'iProc'
       endif
-      return l:cmakelist_path.' -S . -B build'
-          \ .' && bear --append -- make -C build -j12'
-    endif
-    let l:pattern = l:possible_path."/*.pro"
-    let l:qmakepro_path = glob(l:pattern, 0, 1)
-    if !empty(l:qmakepro_path)
-      return ' cd '.l:possible_path.' && qmake -o build/Makefile'
-          \ .' && bear --append -- make -C build -j12'
-    endif
-    let l:pattern = l:possible_path."/[m,M]akefile"
-    let l:makefile_path = glob(l:pattern, 0, 1)
-    if !empty(l:makefile_path)
-      return ' cd '.l:possible_path.' && bear --append -- make -j12'
-    endif
-    let l:pattern = l:possible_path."/SConstruct"
-    let l:sconstruct_path = glob(l:pattern, 0, 1)
-    if !empty(l:sconstruct_path)
-      return ' cd '.l:possible_path.' && bear --append -- scons -j12'
-    endif
-  endfor
-  let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
-        \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
-        \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
-  if &filetype=='cpp'
-    return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
-  elseif &filetype=='cuda'
-    return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
-        \ .fnamemodify(expand('%'), ':t:r').'.exe'
-  elseif &filetype=='verilog' || &filetype=='systemverilog'
-    return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out'
-  else
-    return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
-  endif
-endfunction
-if !(exists('*CompileAndExcute') && &filetype=='vim')
-  function! CompileAndExcute()
-    let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-    if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
-      exec l:compile_exec.' /usr/bin/env python3 %'
-    elseif &filetype=='sh'
-      exec l:compile_exec.' /usr/bin/env sh %'
-    elseif &filetype=='csh'
-      exec l:compile_exec.' /usr/bin/env csh %'
-    elseif &filetype=='verilog'
-      let l:verilog_compilation = CPPCompilation()
-      exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
     elseif &filetype=='perl'
-      exec l:compile_exec.' /usr/bin/env perl %'
-    elseif &filetype=='tcl'
-      exec l:compile_exec.' /usr/bin/env tclsh %'
-    elseif &filetype=='markdown'
-      exec ':CocCommand markdown-preview-enhanced.openPreview'
+        let l:name_keyword = 'sub\s\+.\+\s*{'
+        let l:show_name = 'sub'
+    elseif &filetype=='python'
+        let l:name_keyword = 'def\s\+.\+(.*'
+        let l:show_name = 'def'
+    elseif &filetype=='make'
+        let l:name_keyword = '^define\s\+.\+'
+        let l:show_name = 'define'
     elseif &filetype=='vim'
-      exec ':source ~/.vimrc'
+        let l:name_keyword = 'function\s\+.\+(\|function!\s\+.\+('
+        let l:show_name = 'function'
+    else
+      let l:name_keyword = '^module\s\+.\+\s*(\|^Module\s\+.\+\s*{'
+      let l:show_name = 'module'
+    endif
+    if &filetype=='verilog'
+      let l:end_keyword = '('
+    elseif &filetype=='python'
+      let l:end_keyword = ':'
+    elseif &filetype=='make' || &filetype=='vim'
+      let l:end_keyword = '\n'
+    else
+      let l:end_keyword = '{'
+    endif
+    call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
+  endfunction
+  function! ShowCurrentNoneFuncCodeBlockName()
+    if &filetype=='tcl'
+        let l:name_keyword = 'namespace\s\+eval.\+{'
+        let l:show_name = 'namespace eval'
+    elseif &filetype=='perl'
+        let l:name_keyword = 'package\s\+.\+{'
+        let l:show_name = 'package'
+    elseif &filetype=='python'
+        let l:name_keyword = 'class\s\+.\+:'
+        let l:show_name = 'class'
+    endif
+    if &filetype=='python'
+      let l:end_keyword = ':'
+    else
+      let l:end_keyword = '{'
+    endif
+    call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
+  endfunction
+  function! CallShowNearestFunction()
+    if &filetype=='cpp' || &filetype=='c'
+       call ShowNearestClassOrStruct()
+    elseif &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
+          \ || &filetype=='perl' || &filetype=='python' || &filetype=='make'
+          \ || &filetype=='vim'
+       call ShowCurrentFuncCodeBlockName()
+    endif
+  endfunction
+  function! CallShowNearestFunctionNone()
+    if &filetype=='cpp' || &filetype=='c'
+       call ShowNearestClassOrStruct()
+    elseif &filetype=='tcl' || &filetype=='perl' || &filetype=='python'
+       call ShowCurrentNoneFuncCodeBlockName()
+    endif
+  endfunction
+  noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
+  noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
+  function! CPPCompilation()
+    let l:cpp_workspace_root = WorkspaceRoot()
+    let l:cur_file_path = expand('%:p:h')
+    let l:all_possible_paths = [l:cpp_workspace_root]
+    for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
+      if l:cur_file_path[l:str_id]=='/'
+        call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
+      endif
+    endfor
+    call add(l:all_possible_paths, l:cur_file_path)
+    let l:cmakelist_path = []
+    let l:qmakepro_path = []
+    let l:makefile_path = []
+    let l:sconstruct_path = []
+    for l:possible_path in l:all_possible_paths
+      let l:pattern = l:possible_path."/CMakeLists.txt"
+      " Get the list of matching files (non-recursive)
+      let l:cmakelist_path = glob(l:pattern, 0, 1)
+      if !empty(l:cmakelist_path)
+        let l:cmakelist_path = ' cd '.l:possible_path
+            \ .' && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON'
+        call system('ccache --version')
+        if v:shell_error " Not use ccache
+          echo "ccache is not installed."
+        else
+          let l:cmakelist_path = l:cmakelist_path
+                \ .' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
+                \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+        endif
+        return l:cmakelist_path.' -S . -B build'
+            \ .' && bear --append -- make -C build -j12'
+      endif
+      let l:pattern = l:possible_path."/*.pro"
+      let l:qmakepro_path = glob(l:pattern, 0, 1)
+      if !empty(l:qmakepro_path)
+        return ' cd '.l:possible_path.' && qmake -o build/Makefile'
+            \ .' && bear --append -- make -C build -j12'
+      endif
+      let l:pattern = l:possible_path."/[m,M]akefile"
+      let l:makefile_path = glob(l:pattern, 0, 1)
+      if !empty(l:makefile_path)
+        return ' cd '.l:possible_path.' && bear --append -- make -j12'
+      endif
+      let l:pattern = l:possible_path."/SConstruct"
+      let l:sconstruct_path = glob(l:pattern, 0, 1)
+      if !empty(l:sconstruct_path)
+        return ' cd '.l:possible_path.' && bear --append -- scons -j12'
+      endif
+    endfor
+    let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
+          \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
+          \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
+    if &filetype=='cpp'
+      return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
+    elseif &filetype=='cuda'
+      return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
+          \ .fnamemodify(expand('%'), ':t:r').'.exe'
+    elseif &filetype=='verilog' || &filetype=='systemverilog'
+      return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out'
+    else
+      return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
+    endif
+  endfunction
+  if !(exists('*CompileAndExcute') && &filetype=='vim')
+    function! CompileAndExcute()
+      let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+      if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
+        exec l:compile_exec.' /usr/bin/env python3 %'
+      elseif &filetype=='sh'
+        exec l:compile_exec.' /usr/bin/env sh %'
+      elseif &filetype=='csh'
+        exec l:compile_exec.' /usr/bin/env csh %'
+      elseif &filetype=='verilog'
+        let l:verilog_compilation = CPPCompilation()
+        exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
+      elseif &filetype=='perl'
+        exec l:compile_exec.' /usr/bin/env perl %'
+      elseif &filetype=='tcl'
+        exec l:compile_exec.' /usr/bin/env tclsh %'
+      elseif &filetype=='markdown'
+        exec ':CocCommand markdown-preview-enhanced.openPreview'
+      elseif &filetype=='vim'
+        exec ':source ~/.vimrc'
+      elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
+          \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
+        call JumpToTheMainWin()
+        call CompileAndExcute()
+      else
+        let l:cpp_compilation = CPPCompilation()
+        if stridx(l:cpp_compilation, 'bear') != -1
+          exec l:compile_exec.l:cpp_compilation
+                \.' && if [ -e build/'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
+                \.' build/'.fnamemodify(expand('%'), ':t:r').'.exe;'
+                \.'  elif [ -e ./'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
+                \.' ./'.fnamemodify(expand('%'), ':t:r').'.exe;'
+                \.'  elif [ -e '.fnamemodify(expand('%:r'), ':p').'.exe ]; then'
+                \.' '.fnamemodify(expand('%:r'), ':p').'.exe;'
+                \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
+                \.' build/*.exe;'
+                \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
+                \.' ./*.exe;'
+                \.' else'
+                \.' '.expand('%:p:h').'/*.exe;'
+                \.' fi'
+        elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
+          exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
+        endif
+      endif
+    endfunction
+  endif
+  function! CompileCommand()
+    let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
+    if &filetype=='verilog'
+        let l:verilog_compilation = CPPCompilation()
+        exec l:compile_exec.l:verilog_compilation
     elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
         \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin()
-      call CompileAndExcute()
+      call CompileCommand()
     else
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'bear') != -1
-        exec l:compile_exec.l:cpp_compilation
-              \.' && if [ -e build/'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
-              \.' build/'.fnamemodify(expand('%'), ':t:r').'.exe;'
-              \.'  elif [ -e ./'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
-              \.' ./'.fnamemodify(expand('%'), ':t:r').'.exe;'
-              \.'  elif [ -e '.fnamemodify(expand('%:r'), ':p').'.exe ]; then'
-              \.' '.fnamemodify(expand('%:r'), ':p').'.exe;'
-              \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
-              \.' build/*.exe;'
-              \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
-              \.' ./*.exe;'
-              \.' else'
-              \.' '.expand('%:p:h').'/*.exe;'
-              \.' fi'
-      elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
-        exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
+            \ || ((&filetype=='c' || &filetype=='cpp')
+            \   && expand('%:e')!~'^h.*')
+        exec l:compile_only.l:cpp_compilation
       endif
     endif
   endfunction
-endif
-function! CompileCommand()
-  let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
-  if &filetype=='verilog'
-      let l:verilog_compilation = CPPCompilation()
-      exec l:compile_exec.l:verilog_compilation
-  elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
-      \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
-    call JumpToTheMainWin()
-    call CompileCommand()
-  else
-    let l:cpp_compilation = CPPCompilation()
-    if stridx(l:cpp_compilation, 'bear') != -1
-          \ || ((&filetype=='c' || &filetype=='cpp')
-          \   && expand('%:e')!~'^h.*')
-      exec l:compile_only.l:cpp_compilation
-    endif
-  endif
-endfunction
-noremap <LocalLeader><F4> :<C-u>vert diffsplit<Space>
-noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
-function! DeleteBlankLine()
-  exec 'normal! m"'
-  " Find the nearest line which contains at least one non-space character.
-  if getline('.') =~? '^\s*$' " The current line is empty.
-    let l:line_num = line('.')
-    let l:down_line_num = search('^\s*\S', 'nW')
-    let l:up_line_num = search('^\s*\S', 'bnW')
-    if l:up_line_num == 0 && l:down_line_num == 0 " All lines are empty.
-      let l:line_num = 1
-    elseif l:down_line_num == 0 || (l:up_line_num != 0
-          \ && l:line_num - l:up_line_num < l:down_line_num - l:line_num) " Closest to the up line.
-      let l:line_num = l:up_line_num
-    elseif l:line_num != l:down_line_num
-      let l:line_num = l:down_line_num
-    endif
-    let l:col_num = col('.')
-    if strlen(getline(l:line_num)) < l:col_num
-      let l:col_num = strlen(getline(l:line_num))
-    endif
-    call setpos('.', [0, l:line_num, l:col_num, 0])
+  noremap <LocalLeader><F4> :<C-u>vert diffsplit<Space>
+  noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
+  function! DeleteBlankLine()
     exec 'normal! m"'
-  endif
-  exec ':g/^\s*$/d'
-  exec 'normal! `"'
-endfunction
-noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
-noremap <LocalLeader>u :<C-u>nohlsearch<CR>
-function! RetabAndDeleteTraillingUselessChars()
-  exec 'normal! ms'
-  exec ':%retab!'
-  exec ':%s/\s\+$//e'
-  exec ':%s/\r//e'
-  exec 'normal! `s'
-endfunction
-" Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
-nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
-nnoremap <M-CR> :call EnterWithoutTraillingComment()<CR>
-inoremap <M-CR> <C-o>:call EnterWithoutTraillingComment()<CR>
-nnoremap <C-Space> i<Space><ESC>l
-function! InsertEnterInNormalMode()
-  " 1. 获取当前光标所在位置的行数
-  let l:cur_line = line('.')
-  let l:new_line = l:cur_line + 1
-  " 2. 获取 `l:cur_line` 中的缩进空格数，并生成 n 个空格
-  let l:cur_indent_count = indent(l:cur_line)
-  let l:cur_indent = repeat(' ', l:cur_indent_count)
-  " 3. 进入插入模式，输入回车，然后返回正常模式
-  " feedkeys() is an asynchronous function that causes some issues.
-  " call feedkeys("i\<CR>\<ESC>", 'n')
-  exec "normal! i\<CR>\<ESC>"
-  let l:new_column = col('.')
-  if l:new_column != 1
-    let l:new_column = l:new_column + 1
-  endif
-  " 4. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
-  if getline(l:new_line) =~? '^\s*$'
-    call setline(l:new_line, l:cur_indent)
-    let l:new_column = l:cur_indent_count + 1
-  endif
-  " 5. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
-  if getline(l:cur_line) =~? '^\s*$'
-    call setline(l:cur_line, '')
-  endif
-  " 6. 去到 `l:new_line` 行的l:new_column列
-  call setpos('.', [0, l:new_line, l:new_column, 0])
-endfunction
-function! EnterWithoutTraillingComment()
-  let l:cur_line = line('.')
-  let l:new_line = l:cur_line + 1
-  let l:cur_indent_count = indent(l:cur_line)
-  let l:cur_indent = repeat(" ", l:cur_indent_count)
-  set paste
-  exec "normal! i\<CR>\<ESC>"
-  set nopaste
-  call setline(l:new_line, l:cur_indent.getline(l:new_line))
-  call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
-endfunction
-" Ctrl-Alt/Shift-Enter新建空行
-noremap <C-M-CR> :<C-u>put _<CR>
-inoremap <C-M-CR> <C-o>:put _<CR>
-noremap <C-S-CR> :<C-u>put _<CR>
-inoremap <C-S-CR> <C-o>:put _<CR>
-" Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
-inoremap <M-h> <Left>
-inoremap <M-j> <Down>
-inoremap <M-k> <Up>
-inoremap <M-l> <Right>
-inoremap <M-p> <C-o>P
-inoremap <M-S-p> <C-o>p
-inoremap <M-u> <C-o>u
-inoremap <M-r> <C-o><C-r>
-inoremap <M-S-d> <C-o>D
-inoremap <M-S-y> <C-o>Y
-inoremap <M-S-a> <C-o>A
-inoremap <M-S-i> <C-o>I
-" Disable Q in normal mode
-noremap Q <Nop>
-" When pressing <Shift-*>, the $, #, : and @ should not be included in the selection.
-set iskeyword-=$
-set iskeyword-=#
-set iskeyword-=:
-set iskeyword-=@
-" When pressing <Shift-*>, the / and . should be included in the selection.
-set iskeyword+=/
-set iskeyword+=.
-noremap <C-S-t> :<C-u>call NewTab()<CR>
-inoremap <C-S-t> <C-o>:call NewTab()<CR>
-tnoremap <C-S-t> <C-w>:call NewTab()<CR>
-noremap <LocalLeader>t :<C-u>call NewTab('empty_tab')<CR>
-noremap <M-t> :<C-u>call NewTab('empty_tab')<CR>
-inoremap <M-t> <C-o>:call NewTab('empty_tab')<CR>
-tnoremap <M-t> <C-w>:call NewTab('empty_tab')<CR>
-noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
-noremap <M-b> :<C-u>call CloseAndBackTab()<CR>
-inoremap <M-b> <C-o>:call CloseAndBackTab()<CR>
-tnoremap <M-b> <C-w>:call CloseAndBackTab()<CR>
-noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
-noremap <M-q> :<C-u>call QuitWin()<CR>
-inoremap <M-q> <C-o>:call QuitWin()<CR>
-tnoremap <M-q> <C-w>:call QuitWin()<CR>
-noremap <LocalLeader>w :<C-u>w<CR>
-noremap <M-S-h> :<C-u>call MoveTabH()<CR>
-noremap <M-S-l> :<C-u>call MoveTabL()<CR>
-inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
-inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
-noremap <C-M-h> gT
-noremap <C-M-j> gT
-noremap <C-M-l> gt
-noremap <C-M-k> gt
-inoremap <C-M-h> <C-o>gT
-inoremap <C-M-j> <C-o>gT
-inoremap <C-M-l> <C-o>gt
-inoremap <C-M-k> <C-o>gt
-function! GetLaunchDir() abort
-  if &buftype ==# 'terminal'
-    let l:terminal_job = term_getjob(bufnr('%'))
-    if job_status(l:terminal_job) ==# 'run'
-      let l:terminal_pid = get(job_info(l:terminal_job), 'process', 0)
-      if l:terminal_pid > 0
-        let l:target_dir = resolve('/proc/'.l:terminal_pid.'/cwd')
-        if isdirectory(l:target_dir)
-          return l:target_dir
+    " Find the nearest line which contains at least one non-space character.
+    if getline('.') =~? '^\s*$' " The current line is empty.
+      let l:line_num = line('.')
+      let l:down_line_num = search('^\s*\S', 'nW')
+      let l:up_line_num = search('^\s*\S', 'bnW')
+      if l:up_line_num == 0 && l:down_line_num == 0 " All lines are empty.
+        let l:line_num = 1
+      elseif l:down_line_num == 0 || (l:up_line_num != 0
+            \ && l:line_num - l:up_line_num < l:down_line_num - l:line_num) " Closest to the up line.
+        let l:line_num = l:up_line_num
+      elseif l:line_num != l:down_line_num
+        let l:line_num = l:down_line_num
+      endif
+      let l:col_num = col('.')
+      if strlen(getline(l:line_num)) < l:col_num
+        let l:col_num = strlen(getline(l:line_num))
+      endif
+      call setpos('.', [0, l:line_num, l:col_num, 0])
+      exec 'normal! m"'
+    endif
+    exec ':g/^\s*$/d'
+    exec 'normal! `"'
+  endfunction
+  noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
+  noremap <LocalLeader>u :<C-u>nohlsearch<CR>
+  function! RetabAndDeleteTraillingUselessChars()
+    exec 'normal! ms'
+    exec ':%retab!'
+    exec ':%s/\s\+$//e'
+    exec ':%s/\r//e'
+    exec 'normal! `s'
+  endfunction
+  " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
+  nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
+  nnoremap <M-CR> :call EnterWithoutTraillingComment()<CR>
+  inoremap <M-CR> <C-o>:call EnterWithoutTraillingComment()<CR>
+  nnoremap <C-Space> i<Space><ESC>l
+  function! InsertEnterInNormalMode()
+    " 1. 获取当前光标所在位置的行数
+    let l:cur_line = line('.')
+    let l:new_line = l:cur_line + 1
+    " 2. 获取 `l:cur_line` 中的缩进空格数，并生成 n 个空格
+    let l:cur_indent_count = indent(l:cur_line)
+    let l:cur_indent = repeat(' ', l:cur_indent_count)
+    " 3. 进入插入模式，输入回车，然后返回正常模式
+    " feedkeys() is an asynchronous function that causes some issues.
+    " call feedkeys("i\<CR>\<ESC>", 'n')
+    exec "normal! i\<CR>\<ESC>"
+    let l:new_column = col('.')
+    if l:new_column != 1
+      let l:new_column = l:new_column + 1
+    endif
+    " 4. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
+    if getline(l:new_line) =~? '^\s*$'
+      call setline(l:new_line, l:cur_indent)
+      let l:new_column = l:cur_indent_count + 1
+    endif
+    " 5. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
+    if getline(l:cur_line) =~? '^\s*$'
+      call setline(l:cur_line, '')
+    endif
+    " 6. 去到 `l:new_line` 行的l:new_column列
+    call setpos('.', [0, l:new_line, l:new_column, 0])
+  endfunction
+  function! EnterWithoutTraillingComment()
+    let l:cur_line = line('.')
+    let l:new_line = l:cur_line + 1
+    let l:cur_indent_count = indent(l:cur_line)
+    let l:cur_indent = repeat(" ", l:cur_indent_count)
+    set paste
+    exec "normal! i\<CR>\<ESC>"
+    set nopaste
+    call setline(l:new_line, l:cur_indent.getline(l:new_line))
+    call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
+  endfunction
+  " Ctrl-Alt/Shift-Enter新建空行
+  noremap <C-M-CR> :<C-u>put _<CR>
+  inoremap <C-M-CR> <C-o>:put _<CR>
+  noremap <C-S-CR> :<C-u>put _<CR>
+  inoremap <C-S-CR> <C-o>:put _<CR>
+  " Alt-h/j/k/l/p/P/u/D/Y/I/A use h/j/k/l/p/P/u/D/Y/I/A in the insert mode like in the normal mode
+  inoremap <M-h> <Left>
+  inoremap <M-j> <Down>
+  inoremap <M-k> <Up>
+  inoremap <M-l> <Right>
+  inoremap <M-p> <C-o>P
+  inoremap <M-S-p> <C-o>p
+  inoremap <M-u> <C-o>u
+  inoremap <M-r> <C-o><C-r>
+  inoremap <M-S-d> <C-o>D
+  inoremap <M-S-y> <C-o>Y
+  inoremap <M-S-a> <C-o>A
+  inoremap <M-S-i> <C-o>I
+  " Disable Q in normal mode
+  noremap Q <Nop>
+  " When pressing <Shift-*>, the $, #, : and @ should not be included in the selection.
+  set iskeyword-=$
+  set iskeyword-=#
+  set iskeyword-=:
+  set iskeyword-=@
+  " When pressing <Shift-*>, the / and . should be included in the selection.
+  set iskeyword+=/
+  set iskeyword+=.
+  noremap <C-S-t> :<C-u>call NewTab()<CR>
+  inoremap <C-S-t> <C-o>:call NewTab()<CR>
+  tnoremap <C-S-t> <C-w>:call NewTab()<CR>
+  noremap <LocalLeader>t :<C-u>call NewTab('empty_tab')<CR>
+  noremap <M-t> :<C-u>call NewTab('empty_tab')<CR>
+  inoremap <M-t> <C-o>:call NewTab('empty_tab')<CR>
+  tnoremap <M-t> <C-w>:call NewTab('empty_tab')<CR>
+  noremap <LocalLeader>b :<C-u>call CloseAndBackTab()<CR>
+  noremap <M-b> :<C-u>call CloseAndBackTab()<CR>
+  inoremap <M-b> <C-o>:call CloseAndBackTab()<CR>
+  tnoremap <M-b> <C-w>:call CloseAndBackTab()<CR>
+  noremap <LocalLeader>q :<C-u>call QuitWin()<CR>
+  noremap <M-q> :<C-u>call QuitWin()<CR>
+  inoremap <M-q> <C-o>:call QuitWin()<CR>
+  tnoremap <M-q> <C-w>:call QuitWin()<CR>
+  noremap <LocalLeader>w :<C-u>w<CR>
+  noremap <M-S-h> :<C-u>call MoveTabH()<CR>
+  noremap <M-S-l> :<C-u>call MoveTabL()<CR>
+  inoremap <M-S-h> <C-o>:call MoveTabH()<CR>
+  inoremap <M-S-l> <C-o>:call MoveTabL()<CR>
+  noremap <C-M-h> gT
+  noremap <C-M-j> gT
+  noremap <C-M-l> gt
+  noremap <C-M-k> gt
+  inoremap <C-M-h> <C-o>gT
+  inoremap <C-M-j> <C-o>gT
+  inoremap <C-M-l> <C-o>gt
+  inoremap <C-M-k> <C-o>gt
+  function! GetLaunchDir() abort
+    if &buftype ==# 'terminal'
+      let l:terminal_job = term_getjob(bufnr('%'))
+      if job_status(l:terminal_job) ==# 'run'
+        let l:terminal_pid = get(job_info(l:terminal_job), 'process', 0)
+        if l:terminal_pid > 0
+          let l:target_dir = resolve('/proc/'.l:terminal_pid.'/cwd')
+          if isdirectory(l:target_dir)
+            return l:target_dir
+          endif
         endif
       endif
+      return getcwd()
     endif
-    return getcwd()
-  endif
-  let l:file_directory = expand('%:p:h')
-  return isdirectory(l:file_directory) ? l:file_directory : getcwd()
-endfunction
-function! NewTab(mode = 'terminal') abort
-  let l:target_dir = GetLaunchDir()
-  call NUpdateTabTermBuf()
-  tabnew
-  if a:mode ==# 'empty_tab'
-      exec 'tcd ' . l:target_dir
-  else
-    let l:terminal_options = {
-          \ 'curwin': 1,
-          \ 'norestore': 1,
-          \ 'term_finish': 'close',
-          \ 'term_kill': 'term',
-          \ 'cwd': l:target_dir,
-          \ }
-    let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
-  endif
-endfunction
-function! CloseAndBackTab()
-  let l:exec_tabp='tabp'
-  if tabpagenr() == tabpagenr('$')
-    let l:exec_tabp=''
-  endif
-  while winnr('$') > 1 " Prevent the function from closing multiple tabs
-    call QuitWin()
-  endwhile
-  call QuitWin()
-  exec l:exec_tabp
-endfunction
-function! QuitWin()
-  let l:exec_quit='quit'
-  " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
-  " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
-  if &buftype=='terminal' && tabpagenr('$') > 1
-    let l:exec_quit=''
-  elseif &filetype=='' " Close terms without warnings.
-    let l:exec_quit='quit!'
-  endif
-  if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
-    call CUpdateTabTermBuf()
-  elseif winnr('$') == 1 " Single win, single tab
-    for l:buf in range(1, bufnr('$') + 1) " Clear term buffers without warnings.
-      if l:buf != bufnr('%') && bufexists(l:buf)
-        exec 'silent bwipeout! ' . l:buf
-      endif
-    endfor
-  endif
-  if exists("g:vimspector_session_windows.disassembly")
-    \ && g:vimspector_session_windows.disassembly == win_getid()
-    exec l:exec_quit
-    unlet g:vimspector_session_windows['disassembly']
-    call ReshapeVimspectorWins()
-    return
-  endif
-  exec l:exec_quit
-endfunction
-function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
-  let l:cur_tab=tabpagenr()
-  if l:cur_tab == a:boundary && tabpagenr('$') > 1
-    exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
-    let l:tmp = g:tab_term_buf[l:cur_tab]
-    for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
-      let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
-    endfor
-    let g:tab_term_buf[a:last] = l:tmp
-  elseif tabpagenr('$') > 1
-    exec ':tabmove '.a:plus_or_minus[1]
-    let l:tmp = g:tab_term_buf[l:cur_tab]
-    let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
-    let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
-  endif
-endfunction
-function! MoveTabH()
-  call MoveTab(1, ['+', '-'], [+1, -1], 1, tabpagenr('$'))
-endfunction
-function! MoveTabL()
-  call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
-endfunction
-tnoremap <C-S-v> <C-w>"+
-" Define the main command (capital E) – safe and explicit
-command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
-function! s:EditWithWorkspaceCheck(filename) abort
-  " Step 1: Get workspace root (guaranteed to be a valid path)
-  let l:root = WorkspaceRoot()
-  " Step 2: Get current tab's local working directory
-  let l:tab_cwd = getcwd()
-  " Step 3: Change tab-local cwd only if we're outside the workspace tree
-  if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
-    execute 'tcd ' . l:root
-  endif
-  " Step 4: Open the file
-  execute 'edit ' . a:filename
-endfunction
-function! EnterIntoWorkSpaceOrFilePath(into_work_space = 1) abort
-  " Get info of the current window in this tab
-  let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
-  let l:root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
-  let l:cwd_path  = getcwd()          " Working directory of this tab
-  " Normalize paths (resolve symlinks, strip trailing slashes)
-  let l:root     = fnamemodify(l:root, ':p')
-  let l:cwd_path = fnamemodify(l:cwd_path, ':p')
-  if !empty(l:file_path)
-    let l:file_path = fnamemodify(l:file_path, ':p')
-  endif
-  " Determine if the current working directory is valid:
-  " Valid if it equals root, is a subpath of root,
-  " or equals file_path, or is a subpath of file_path
-  let l:valid = (l:cwd_path ==# l:root) ||
-        \ (stridx(l:cwd_path, l:root . '/') == 0) ||
-        \ (!empty(l:file_path) && (l:cwd_path ==# l:file_path)) ||
-        \ (!empty(l:file_path) && (stridx(l:cwd_path, l:file_path . '/') == 0))
-  " If invalid, change tab-local working directory to workspace root
-  if !l:valid
-    if a:into_work_space == 1
-      execute 'tcd ' . l:root
+    let l:file_directory = expand('%:p:h')
+    return isdirectory(l:file_directory) ? l:file_directory : getcwd()
+  endfunction
+  function! NewTab(mode = 'terminal') abort
+    let l:target_dir = GetLaunchDir()
+    call NUpdateTabTermBuf()
+    tabnew
+    if a:mode ==# 'empty_tab'
+        exec 'tcd ' . l:target_dir
     else
-      execute 'tcd ' . l:file_path
+      let l:terminal_options = {
+            \ 'curwin': 1,
+            \ 'norestore': 1,
+            \ 'term_finish': 'close',
+            \ 'term_kill': 'term',
+            \ 'cwd': l:target_dir,
+            \ }
+      let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
     endif
+  endfunction
+  function! CloseAndBackTab()
+    let l:exec_tabp='tabp'
+    if tabpagenr() == tabpagenr('$')
+      let l:exec_tabp=''
+    endif
+    while winnr('$') > 1 " Prevent the function from closing multiple tabs
+      call QuitWin()
+    endwhile
+    call QuitWin()
+    exec l:exec_tabp
+  endfunction
+  function! QuitWin()
+    let l:exec_quit='quit'
+    " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
+    " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
+    if &buftype=='terminal' && tabpagenr('$') > 1
+      let l:exec_quit=''
+    elseif &filetype=='' " Close terms without warnings.
+      let l:exec_quit='quit!'
+    endif
+    if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
+      call CUpdateTabTermBuf()
+    elseif winnr('$') == 1 " Single win, single tab
+      for l:buf in range(1, bufnr('$') + 1) " Clear term buffers without warnings.
+        if l:buf != bufnr('%') && bufexists(l:buf)
+          exec 'silent bwipeout! ' . l:buf
+        endif
+      endfor
+    endif
+    if exists("g:vimspector_session_windows.disassembly")
+      \ && g:vimspector_session_windows.disassembly == win_getid()
+      exec l:exec_quit
+      unlet g:vimspector_session_windows['disassembly']
+      call ReshapeVimspectorWins()
+      return
+    endif
+    exec l:exec_quit
+  endfunction
+  function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
+    let l:cur_tab=tabpagenr()
+    if l:cur_tab == a:boundary && tabpagenr('$') > 1
+      exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
+      let l:tmp = g:tab_term_buf[l:cur_tab]
+      for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
+        let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
+      endfor
+      let g:tab_term_buf[a:last] = l:tmp
+    elseif tabpagenr('$') > 1
+      exec ':tabmove '.a:plus_or_minus[1]
+      let l:tmp = g:tab_term_buf[l:cur_tab]
+      let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
+      let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
+    endif
+  endfunction
+  function! MoveTabH()
+    call MoveTab(1, ['+', '-'], [+1, -1], 1, tabpagenr('$'))
+  endfunction
+  function! MoveTabL()
+    call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
+  endfunction
+  tnoremap <C-S-v> <C-w>"+
+  " Define the main command (capital E) – safe and explicit
+  command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
+  function! s:EditWithWorkspaceCheck(filename) abort
+    " Step 1: Get workspace root (guaranteed to be a valid path)
+    let l:root = WorkspaceRoot()
+    " Step 2: Get current tab's local working directory
+    let l:tab_cwd = getcwd()
+    " Step 3: Change tab-local cwd only if we're outside the workspace tree
+    if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
+      execute 'tcd ' . l:root
+    endif
+    " Step 4: Open the file
+    execute 'edit ' . a:filename
+  endfunction
+  function! EnterIntoWorkSpaceOrFilePath(into_work_space = 1) abort
+    " Get info of the current window in this tab
+    let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
+    let l:root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
+    let l:cwd_path  = getcwd()          " Working directory of this tab
+    " Normalize paths (resolve symlinks, strip trailing slashes)
+    let l:root     = fnamemodify(l:root, ':p')
+    let l:cwd_path = fnamemodify(l:cwd_path, ':p')
+    if !empty(l:file_path)
+      let l:file_path = fnamemodify(l:file_path, ':p')
+    endif
+    " Determine if the current working directory is valid:
+    " Valid if it equals root, is a subpath of root,
+    " or equals file_path, or is a subpath of file_path
+    let l:valid = (l:cwd_path ==# l:root) ||
+          \ (stridx(l:cwd_path, l:root . '/') == 0) ||
+          \ (!empty(l:file_path) && (l:cwd_path ==# l:file_path)) ||
+          \ (!empty(l:file_path) && (stridx(l:cwd_path, l:file_path . '/') == 0))
+    " If invalid, change tab-local working directory to workspace root
+    if !l:valid
+      if a:into_work_space == 1
+        execute 'tcd ' . l:root
+      else
+        execute 'tcd ' . l:file_path
+      endif
+    endif
+  endfunction
+  noremap <LocalLeader>r :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
+  noremap <LocalLeader>f :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
+  " Alt+n跳到第n个tab，0<n<10
+  function! TabPosActivateBuffer(index)
+    if a:index <= tabpagenr('$')
+      exec 'tabnext' a:index
+    else
+      echo 'The index number(now, '.a:index.') must be less than the total number of tabs(now, '.tabpagenr('$').').'
+    endif
+  endfunction
+  function! InitializeTabPos()
+    for l:i in range(1, 9)
+        exec 'noremap <M-' . l:i . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
+        exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+        exec 'tnoremap <M-' . l:i . '> <C-w>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+    endfor
+    exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
+    exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
+    exec 'tnoremap <M-0> <C-w>:call TabPosActivateBuffer(10)<CR>'
+  endfunction
+endfunction
+
+
+
+" After 333ms, call the coc.nvim, markdown-preview and so on
+function! CocTimerStart(timer)
+  exec 'CocStart'
+  call SetGeneralKeyMaps()
+  call ConfigureDelayedPlugin()
+  call ConfigureManualLoadPlugin()
+  call InitializeTabPos()
+  " Create an array to store the most recent terminal buffer for each tab
+  let g:tab_term_buf_size = 33
+  if !exists('g:tab_term_buf')
+    let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
   endif
 endfunction
-noremap <LocalLeader>r :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
-noremap <LocalLeader>f :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
+call timer_start(333,'CocTimerStart',{'repeat':1})
