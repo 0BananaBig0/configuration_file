@@ -1517,8 +1517,8 @@ function! ConfigureManualLoadPlugin()
   " Vimspector setting
   function! JumpToTabIfExists(filepath)
     " 1. Get the buffer number for the absolute file path
-    let l:bufnr = bufnr(fnamemodify(a:filepath, ':p'))
-    " Return early and do nothing if the buffer does not exist
+    let l:bufnr = bufnr(a:filepath)
+    " If buffer doesn't exist at all, do nothing
     if l:bufnr == -1
       return 0
     endif
@@ -1527,13 +1527,14 @@ function! ConfigureManualLoadPlugin()
     " 3. Jump to the first matching window/tab if found
     if !empty(l:winids)
       call win_gotoid(l:winids[0])
+      return 1
     endif
-    return 1
+    return 0
   endfunction
   function! ConfigureCppDebug()
     let l:cpp_workspace_root = WorkspaceRoot()
     let l:json_file_path = l:cpp_workspace_root.'/.vimspector.json'
-    if JumpToTabIfExists(l:json_file_path)
+    if JumpToTabIfExists(l:json_file_path) == 1
       return
     endif
     if !isdirectory(l:cpp_workspace_root.'/.vscode')
