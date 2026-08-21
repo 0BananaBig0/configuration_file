@@ -23,7 +23,7 @@ let maplocalleader = ","
 
 
 
-augroup Auto_Set_FileType
+augroup Auto_Set_FileType_Group
   autocmd!
   autocmd BufNewFile */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | setlocal filetype=cpp | endif
   autocmd BufNewFile *.launch,*.qrc,*.conf setlocal filetype=xml
@@ -31,7 +31,6 @@ augroup Auto_Set_FileType
   autocmd BufNewFile *.tessent_startup,*.dofile,*.pdl,*.pdl.* setlocal filetype=tcl
   autocmd BufNewFile *.stil setlocal filetype=stil
 augroup END
-
 
 
 " Rainbow setting
@@ -498,7 +497,7 @@ function! ConfigureDelayedPlugin()
     endif
   endfunction
   " Highlight the symbol and its references when holding the cursor
-  augroup Plugin_Configuration | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
+  augroup Plugin_Configuration_Group | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg='White' guibg='Black'
   function! GetSelectedContent()
     " Get the start and end positions of the visual selection
@@ -641,7 +640,7 @@ function! ConfigureDelayedPlugin()
       execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
   endfunction
 
-  augroup Vim-Matchup_Augroup
+  augroup Vim-Matchup_Group
     autocmd!
     " --------------------------------------------------------------------------
     " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
@@ -1791,7 +1790,7 @@ function! ConfigureManualLoadPlugin()
     exec "normal! i"."-exec thread apply all stop\<CR>"
     call win_gotoid(l:cur_winid)
   endfunction
-  augroup Plugin_Configuration | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
+  augroup Plugin_Configuration_Group | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
 
 
@@ -2563,6 +2562,10 @@ function! SetGeneralKeyMaps()
     exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
     exec 'tnoremap <M-0> <C-w>:call TabPosActivateBuffer(10)<CR>'
   endfunction
+  function! InitializeCwdForEachTab()
+    tabdo windo silent! call EnterIntoWorkSpaceOrFilePath()
+    tabnext 1
+  endfunction
 endfunction
 
 
@@ -2578,6 +2581,13 @@ function! CocTimerStart(timer)
   let g:tab_term_buf_size = 33
   if !exists('g:tab_term_buf')
     let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
+  endif
+  if exists('v:vim_did_enter') && v:vim_did_enter
+    silent! call InitializeCwdForEachTab()
+  else
+    augroup Local_Autocmd_Group
+      autocmd VimEnter * silent! call InitializeCwdForEachTab()
+    augroup END
   endif
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
