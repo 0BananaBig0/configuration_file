@@ -2476,7 +2476,7 @@ function! CloseAndBackTab()
   let l:exec_tabp='tabp'
   if tabpagenr() == tabpagenr('$')
     let l:exec_tabp=''
-  fi
+  endif
   while winnr('$') > 1 " Prevent the function from closing multiple tabs
     call QuitWin()
   endwhile
