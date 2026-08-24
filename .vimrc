@@ -928,7 +928,9 @@ function! ConfigureManualLoadPlugin()
           \ ['<S-F5>', 'Reset Vimspector', 'n'],
           \ [']<F5>', 'Launch debugger', 'n'],
           \ ['<Leader><F5>', 'Create C/C++ debug files without .vscode', 'n'],
-          \ ['<Leader><F5>', 'Create C/C++ debug files with .vscode', 'n'],
+          \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n'],
+          \ ['<Leader><F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
+          \ ['<M-F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
           \ ['<F6>', 'Step over', 'n'],
           \ ['<C-F6>', 'Step into', 'n'],
           \ ['<S-F6>', 'Step out', 'n'],
@@ -1551,7 +1553,13 @@ function! ConfigureManualLoadPlugin()
   noremap <S-F5> :<C-u>call CUpdateTabTermBuf(0)<CR>:VimspectorReset<CR>
   noremap ]<F5> :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
+  noremap <M-F5> :<C-u>call ConfigureCppDebug()<CR>
+  inoremap <M-F5> <C-o>:call ConfigureCppDebug()<CR>
+  tnoremap <M-F5> <C-w>:call ConfigureCppDebug()<CR>
   noremap <Leader><F6> :<C-u>call ConfigureCppDebug(1)<CR>
+  noremap <M-F6> :<C-u>call ConfigureCppDebug(1)<CR>
+  inoremap <M-F6> <C-o>:call ConfigureCppDebug(1)<CR>
+  tnoremap <M-F6> <C-w>:call ConfigureCppDebug(1)<CR>
   map <F6> <Plug>VimspectorStepOver
   map <C-F6> <Plug>VimspectorStepInto
   map <S-F6> <Plug>VimspectorStepOut
