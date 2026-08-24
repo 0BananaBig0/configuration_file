@@ -1515,7 +1515,7 @@ function! ConfigureManualLoadPlugin()
     let l:winids = win_findbuf(l:bufnr)
     " 3. Jump to the first matching window/tab if found
     if !empty(l:winids)
-      " call win_gotoid(l:winids[0])
+      call win_gotoid(l:winids[0])
       return 1
     endif
     return 0
