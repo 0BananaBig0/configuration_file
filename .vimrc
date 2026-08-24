@@ -1515,7 +1515,7 @@ function! ConfigureManualLoadPlugin()
     let l:winids = win_findbuf(l:bufnr)
     " 3. Jump to the first matching window/tab if found
     if !empty(l:winids)
-      call win_gotoid(l:winids[0])
+      " call win_gotoid(l:winids[0])
       return 1
     endif
     return 0
@@ -1526,10 +1526,12 @@ function! ConfigureManualLoadPlugin()
     if JumpToTabIfExists(l:json_file_path) == 1
       return
     endif
-    if !isdirectory(l:cpp_workspace_root.'/.vscode') && a:config_vscode == 1
-      call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
+    if a:config_vscode == 1
+      if !isdirectory(l:cpp_workspace_root.'/.vscode')
+        call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
+      endif
+      call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     endif
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     if CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
       call NUpdateTabTermBuf()
       exec 'tabe ' . l:json_file_path
