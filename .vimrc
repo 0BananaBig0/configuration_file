@@ -2431,7 +2431,7 @@ function! SetGeneralKeyMaps()
     call NUpdateTabTermBuf()
     tabnew
     if a:mode ==# 'empty_tab'
-        exec 'tcd ' . l:target_dir
+        exec 'lcd ' . l:target_dir
     else
       let l:terminal_options = {
             \ 'curwin': 1,
@@ -2513,7 +2513,7 @@ function! SetGeneralKeyMaps()
     let l:tab_cwd = getcwd()
     " Step 3: Change tab-local cwd only if we're outside the workspace tree
     if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
-      execute 'tcd ' . l:root
+      execute 'lcd ' . l:root
     endif
     " Step 4: Open the file
     execute 'edit ' . a:filename
@@ -2539,9 +2539,9 @@ function! SetGeneralKeyMaps()
     " If invalid, change tab-local working directory to workspace root
     if !l:valid
       if a:into_work_space == 1
-        execute 'tcd ' . l:root
+        execute 'lcd ' . l:root
       else
-        execute 'tcd ' . l:file_path
+        execute 'lcd ' . l:file_path
       endif
     endif
   endfunction
