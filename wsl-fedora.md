@@ -39,6 +39,7 @@ chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
 
 # ==================== 第三阶段：字体安装 ====================
 sudo dnf install -y @development-tools
+sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf help2man
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
 sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
 sudo dnf install -y p7zip p7zip-plugins 7zip-standalone-all

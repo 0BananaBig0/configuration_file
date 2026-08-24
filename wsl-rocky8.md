@@ -210,8 +210,8 @@ git clone https://github.com/verilator/verilator.git
 sudo dnf install -y ccache numactl autoconf flex flex-devel bison bison-devel help2man
 cd verilator
 #git reset --hard v5.026
+make clean
 unset VERILATOR_ROOT
-make distclean
 autoconf
 ./configure
 make -j24
