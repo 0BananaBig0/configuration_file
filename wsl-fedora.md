@@ -39,7 +39,6 @@ chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
 
 # ==================== 第三阶段：字体安装 ====================
 sudo dnf install -y @development-tools
-sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
 sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
 sudo dnf install -y p7zip p7zip-plugins 7zip-standalone-all
@@ -52,6 +51,7 @@ sudo dnf install -y zlib-devel libpng-devel libjpeg-devel libsecret-devel
 sudo dnf install -y wayland-devel libxkbcommon-devel openssl-devel mesa-libGL-devel
 sudo dnf install -y kernel-headers kernel-devel
 sudo dnf install -y kmodtool akmods mokutil openssl dkms
+sudo dnf --enablerepo='*debug*' install -y libatomic-debuginfo libstdc++-debuginfo glibc-debuginfo libgcc-debuginfo gdb gcc g++ make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf
 # sudo dnf provides */xxx.so
 sudo dnf install -y python3-devel libxml2-devel libxslt-devel
 mkdir -p ~/wsl_shared_folder/font
@@ -267,7 +267,7 @@ sudo dnf autoremove
 
 sudo dnf install -y sshfs
 
-# install qwen, not good enough, always blinks ⚠ 
+# install qwen, not good enough, always blinks ⚠
 curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
 # install Antigravity CLI, no a valid account to use it.
 curl -fsSL https://antigravity.google/cli/install.sh | bash
