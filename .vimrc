@@ -2533,12 +2533,6 @@ function! SetGeneralKeyMaps()
     let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
     let l:root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
     let l:cwd_path  = getcwd()          " Working directory of this tab
-    " Normalize paths (resolve symlinks, strip trailing slashes)
-    let l:root     = fnamemodify(l:root, ':p')
-    let l:cwd_path = fnamemodify(l:cwd_path, ':p')
-    if !empty(l:file_path)
-      let l:file_path = fnamemodify(l:file_path, ':p')
-    endif
     " Determine if the current working directory is valid:
     " Valid if it equals root, is a subpath of root,
     " or equals file_path, or is a subpath of file_path
