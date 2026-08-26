@@ -2466,11 +2466,8 @@ function! SetGeneralKeyMaps()
   endfunction
   function! QuitWin()
     let l:exec_quit='quit'
-    " Fix a bug that when QuitWin is called in single-terminal-tab, two tabs are closed.
-    " Because CUpdateTabTermBuf closes all terminals in a tab and then quit closes a win in another tab.
-    if &buftype=='terminal' && tabpagenr('$') > 1
-      let l:exec_quit=''
-    elseif &filetype=='' " Close terms without warnings.
+    let l:tab_num_before_close = tabpagenr('$')
+    if &filetype==''
       let l:exec_quit='quit!'
     endif
     if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
@@ -2489,7 +2486,9 @@ function! SetGeneralKeyMaps()
       call ReshapeVimspectorWins()
       return
     endif
-    exec l:exec_quit
+    if l:tab_num_before_close == tabpagenr('$')
+      exec l:exec_quit
+    endif
   endfunction
   function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
     let l:cur_tab=tabpagenr()
