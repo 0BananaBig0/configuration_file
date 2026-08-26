@@ -732,12 +732,44 @@ function! ConfigureDelayedPlugin()
       endif
     endif
   endfunction
+  function! CleanTabTermBuf()
+    " This function fixes a bug where g:tab_term_buf is not updated when you
+    " exit a terminal via the exit command.
+    " Find the last non -1 index (boundary)
+    let last = 0
+    for i in range(1, 32)  " indices 1 through 32
+      if g:tab_term_buf[i] != -1
+        let last = i
+      endif
+    endfor
+    " If no valid entries, exit early
+    if last == 0
+      return
+    endif
+    " Scan from index 1 upwards
+    let i = 1
+    while i <= last
+      let buf_nr = g:tab_term_buf[i]
+      if buf_nr != -1 && !bufexists(buf_nr)
+        " Buffer no longer exists: shift all elements to the right one position left
+        for j in range(i, last - 1)
+          let g:tab_term_buf[j] = g:tab_term_buf[j + 1]
+        endfor
+        let g:tab_term_buf[last] = -1
+        let last -= 1
+        " Do NOT increment i, because the current position now holds a new element
+      else
+        let i += 1
+      endif
+    endwhile
+  endfunction
   function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
     for l:term_index in range(a:id_first, a:id_last, a:plus_or_minus_one[1])
       let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
     endfor
   endfunction
   function! CUpdateTabTermBuf(auto_close_terminal=1)
+    call CleanTabTermBuf()
     let l:tab_term_buf = g:tab_term_buf[tabpagenr()]
     call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$') + 2, [-1, +1])
     if bufexists(l:tab_term_buf) && a:auto_close_terminal == 1
@@ -745,6 +777,7 @@ function! ConfigureDelayedPlugin()
     endif
   endfunction
   function! NUpdateTabTermBuf()
+    call CleanTabTermBuf()
     call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
     let g:tab_term_buf[tabpagenr() + 1] = - 1
   endfunction
