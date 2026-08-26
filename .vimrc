@@ -2467,6 +2467,7 @@ function! SetGeneralKeyMaps()
   function! QuitWin()
     let l:exec_quit='quit'
     let l:tab_num_before_close = tabpagenr('$')
+    let l:cur_tab_win_num = winnr('$')
     if &filetype==''
       let l:exec_quit='quit!'
     endif
@@ -2486,7 +2487,7 @@ function! SetGeneralKeyMaps()
       call ReshapeVimspectorWins()
       return
     endif
-    if l:tab_num_before_close == tabpagenr('$')
+    if l:tab_num_before_close == tabpagenr('$') && l:cur_tab_win_num == winnr('$')
       exec l:exec_quit
     endif
   endfunction
