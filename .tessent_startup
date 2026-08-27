@@ -1,2 +1,6 @@
-read_cell_library /home/banana/oasys_rtl_qs_ekit/libs/fastscan/*.fslib
-# read_liberty /home/banana/NangateOpenCellLibrary_45nm/Front_End/Liberty/NangateOpenCellLibrary_functional.lib
+set home $::env(HOME)
+set pattern "$home/oasys_rtl_qs_ekit/libs/fastscan/*.fslib"
+set matches [glob -nocomplain $pattern]
+if {[llength $matches] > 0} {
+    read_cell_library "$home/oasys_rtl_qs_ekit/libs/fastscan/*.fslib"
+}
