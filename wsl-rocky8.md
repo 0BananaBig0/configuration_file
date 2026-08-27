@@ -82,14 +82,12 @@ sudo npm install -g yarn
 # sudo dnf provides */xxx.so
 
 cd ~/wsl_shared_folder/font
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/DejaVuSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FantasqueSansMono.zip
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/UbuntuMono.zip
-x DejaVuSansMono.zip FantasqueSansMono.zip UbuntuMono.zip
-sudo cp DejaVuSansMono/ FantasqueSansMono UbuntuMono /usr/share/fonts -r
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.0/FantasqueSansMono.zip
+x FantasqueSansMono.zip
+sudo cp FantasqueSansMono /usr/share/fonts -r
 cd /usr/share/fonts
-sudo chown root:root DejaVuSansMono FantasqueSansMono UbuntuMono -R
-sudo chmod 755 DejaVuSansMono FantasqueSansMono UbuntuMono -R
+sudo chown root:root FantasqueSansMono -R
+sudo chmod 755 FantasqueSansMono -R
 sudo cp ~/configuration_file/local.conf /etc/fonts/ # or modify 40-nonlatin.conf, but difficult
 sudo mkdir /usr/share/fonts/win11 # to differentiate self-built font links from system font files
 sudo ln -s /mnt/c/Windows/Fonts/* /usr/share/fonts/win11

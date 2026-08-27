@@ -58,7 +58,7 @@ sudo dnf install -y python3-devel libxml2-devel libxslt-devel
 mkdir -p ~/wsl_shared_folder/font
 cd ~/wsl_shared_folder/font
 
-for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do
+for font in FantasqueSansMono; do
   if [ ! -f "${font}.zip" ]; then
     echo "下载 ${font}.zip..."
     curl -fL --retry 3 --connect-timeout 10 \
@@ -67,14 +67,14 @@ for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do
   fi
 done
 
-for font in DejaVuSansMono FantasqueSansMono UbuntuMono; do
+for font in FantasqueSansMono; do
   [ -f "${font}.zip" ] && unzip -o "${font}.zip" -d "${font}" 2>/dev/null || true
 done
 
-if [ -d "DejaVuSansMono" ] || [ -d "FantasqueSansMono" ] || [ -d "UbuntuMono" ]; then
-  sudo cp -r DejaVuSansMono FantasqueSansMono UbuntuMono /usr/share/fonts/ 2>/dev/null || true
-  sudo chown -R root:root /usr/share/fonts/DejaVuSansMono /usr/share/fonts/FantasqueSansMono /usr/share/fonts/UbuntuMono 2>/dev/null || true
-  sudo chmod -R 755 /usr/share/fonts/DejaVuSansMono /usr/share/fonts/FantasqueSansMono /usr/share/fonts/UbuntuMono 2>/dev/null || true
+if [ -d "FantasqueSansMono" ]; then
+  sudo cp -r FantasqueSansMono /usr/share/fonts/ 2>/dev/null || true
+  sudo chown -R root:root /usr/share/fonts/FantasqueSansMono 2>/dev/null || true
+  sudo chmod -R 755 /usr/share/fonts/FantasqueSansMono 2>/dev/null || true
 fi
 
 sudo mkdir -p /usr/share/fonts/win11
