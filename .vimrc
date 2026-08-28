@@ -109,9 +109,9 @@ Plug 'zivyangll/git-blame.vim', {'on': []}
 " c/cpp debug
 Plug 'puremourning/vimspector', {'on': []}
 " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
-Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile'], 'do': ':LeaderfInstallCExtension'}
+Plug 'Yggdroot/LeaderF', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile', 'LeaderfMarks'], 'do': ':LeaderfInstallCExtension'}
 " LeaderF extension for navigate the marks
-Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile']}
+Plug 'Yggdroot/LeaderF-marks', {'on': ['Leaderf', 'LeaderfFunction', 'LeaderfBuffer', 'LeaderfFile', 'LeaderfMarks']}
 " Verilog
 Plug 'HonkW93/automatic-verilog', {'for': ['verilog']}
 Plug '0BananaBig0/vim-verilog-instance', {'for': ['verilog']}
