@@ -408,3 +408,14 @@ ensure_dracula_konsole() {
     echo "Dracula theme installed at: $target"
 }
 ensure_dracula_konsole
+
+# 安装PonyTail插件
+codex plugin marketplace add DietrichGebert/ponytail
+codex
+
+# 然后在Codex的插件界面中：
+# 1. 打开 /plugins
+# 2. 选择 Ponytail marketplace
+# 3. 安装 Ponytail
+# 4. 打开 /hooks，审查并信任它的两个生命周期钩子
+# 5. 开始新的对话
