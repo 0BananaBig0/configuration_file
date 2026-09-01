@@ -1710,6 +1710,37 @@ function! ConfigureManualLoadPlugin()
     endif
     call vimspector#Continue()
   endfunction
+  function! EnablePythonProjectDebug()
+    " 1. Set the JSON file path (assume current directory, adjust as needed)
+    let l:json_file = WorkspaceRoot() . '/.vimspector.json'
+    " 2. Check if the file exists
+    if !filereadable(l:json_file)
+      echo "JSON file not found: " . l:json_file
+      return
+    endif
+    " 3. Read file content and parse JSON
+    let l:raw = join(readfile(l:json_file), "\n")
+    try
+      let l:data = json_decode(l:raw)
+    catch
+      echo "Failed to parse JSON: " . v:exception
+      return
+    endtry
+    " 4. Check if 'python: project' configuration exists
+    if !has_key(l:data, 'configurations') || !has_key(l:data['configurations'], 'python: project')
+      echo "python: project configuration not found."
+      return
+    endif
+    " 5. Get the configuration dictionary
+    let l:proj_config = l:data['configurations']['python: project']['configuration']
+    " 6. Check the conditions: module is non-empty and enable_project_debug is true (string "1")
+    let l:module = get(l:proj_config, 'module', '')
+    let l:enable_debug = get(l:proj_config, 'enable_project_debug', '')
+    if l:module != '' && l:enable_debug ==# '1'
+      return 1
+    endif
+    return 0
+  endfunction
   function! LaunchVimspector()
     if !exists("VimspectorShowOutput")
       set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 15
@@ -1717,7 +1748,11 @@ function! ConfigureManualLoadPlugin()
     endif
     call JumpToTheMainWin()
     if &filetype=='python'
-      call vimspector#LaunchWithSettings(#{configuration: 'python: launch', Test: 'python: launch'})
+      if EnablePythonProjectDebug()
+        call vimspector#LaunchWithSettings(#{configuration: 'python: project', Test: 'python: project'})
+      else
+        call vimspector#LaunchWithSettings(#{configuration: 'python: single-file', Test: 'python: single-file'})
+      endif
     elseif &filetype=='tcl'
       call vimspector#LaunchWithSettings(#{configuration: 'tcl: launch', Test: 'tcl: launch'})
     elseif &filetype=='c' || &filetype=='cpp'

@@ -6,7 +6,7 @@
                 "name": "cpp: launch",
                 "type": "cppdbg",
                 "request": "launch",
-                "program": "${workspaceRoot}/.exe",
+                "program": "${workspaceRoot}/",
                 "args": [
                     "",
                     "",
@@ -31,7 +31,39 @@
                 }
             }
         },
-        "python: launch": {
+        "python: project": {
+            "adapter": "debugpy",
+            "filetypes": [
+                "python"
+            ],
+            "configuration": {
+                "name": "python: launch",
+                "type": "python",
+                "request": "launch",
+                "module": "",
+                "enable_project_debug": true,
+                "args": [
+                    "",
+                    "",
+                    ""
+                ],
+                "console": "externalTerminal",
+                "cwd": "${workspaceRoot}",
+                "stopOnEntry": true,
+                "debugOptions": [],
+                "env": {
+                    "var_example": "value_example"
+                }
+            },
+            "breakpoints": {
+                "exception": {
+                    "raised": "Y",
+                    "uncaught": "Y",
+                    "userUnhandled": "Y"
+                }
+            }
+        },
+        "python: single-file": {
             "adapter": "debugpy",
             "filetypes": [
                 "python"
