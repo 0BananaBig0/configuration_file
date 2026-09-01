@@ -92,7 +92,7 @@ source ~/.zshrc
 
 python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 python3 -m pip install --user scons ipdb pylint yapf pygments cmakelang cmake-language-server \
-                       pyright cppman you-get sphinx sphinx-rtd-theme autopep8 \
+                       pyright cppman you-get sphinx sphinx-rtd-theme autopep8 pyverilog ply \
                        vim-vint tclint black pysnooper futures neovim #not do for root
 cargo install du-dust bottom cargo-cache asm-lsp eza --locked
 
