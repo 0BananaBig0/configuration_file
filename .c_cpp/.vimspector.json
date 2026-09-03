@@ -37,7 +37,7 @@
                 "python"
             ],
             "configuration": {
-                "name": "python: launch",
+                "name": "python: project",
                 "type": "python",
                 "request": "launch",
                 "module": "",
@@ -69,7 +69,7 @@
                 "python"
             ],
             "configuration": {
-                "name": "python: launch",
+                "name": "python: single-file",
                 "type": "python",
                 "request": "launch",
                 "program": "${file}",
