@@ -450,15 +450,20 @@ function! ConfigureDelayedPlugin()
     endfor
     call win_gotoid(l:target_win )
   endfunction
-  function! WorkspaceRoot()
+  function! WorkspaceRoot(file_path='')
     if &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
         \ || &filetype=='vista' || &buftype=='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin() " Avoid potential bugs
     endif
-    let l:workspace_root = FindRootPatternPath(expand('%:p:h')) " Where we store the opened file
+    if empty(a:file_path)
+      let l:file_path = expand('%:p:h')
+    else
+      let l:file_path = a:file_path
+    endif
+    let l:workspace_root = FindRootPatternPath(l:file_path) " Where we store the opened file
     if empty(l:workspace_root)
       echo 'You had better create a root-pattern file like .git in your project.'
-      return expand('%:p:h')
+      return l:file_path
     endif
     for l:str_id in range(strlen(l:workspace_root[0]) - 1, 0, -1)
       if l:workspace_root[0][l:str_id]=='/'
@@ -2585,33 +2590,18 @@ function! SetGeneralKeyMaps()
   " Define the main command (capital E) – safe and explicit
   command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
   function! s:EditWithWorkspaceCheck(filename) abort
-    " Step 1: Get workspace root (guaranteed to be a valid path)
-    let l:root = WorkspaceRoot()
-    " Step 2: Get current tab's local working directory
-    let l:tab_cwd = getcwd()
-    " Step 3: Change tab-local cwd only if we're outside the workspace tree
-    if stridx(l:tab_cwd, l:root . '/') != 0 && l:tab_cwd !=# l:root
-      execute 'lcd ' . l:root
-    endif
-    " Step 4: Open the file
     execute 'edit ' . a:filename
+    call EnterIntoWorkSpaceOrFilePath()
   endfunction
   function! EnterIntoWorkSpaceOrFilePath(into_work_space = 1) abort
     " Get info of the current window in this tab
     let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
-    let l:root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
-    let l:cwd_path  = getcwd()          " Working directory of this tab
-    " Determine if the current working directory is valid:
-    " Valid if it equals root, is a subpath of root,
-    " or equals file_path, or is a subpath of file_path
-    let l:valid = (l:cwd_path ==# l:root) ||
-          \ (stridx(l:cwd_path, l:root . '/') == 0) ||
-          \ (!empty(l:file_path) && (l:cwd_path ==# l:file_path)) ||
-          \ (!empty(l:file_path) && (stridx(l:cwd_path, l:file_path . '/') == 0))
+    let l:file_work_space_root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
+    let l:cwd_work_space_root  = WorkspaceRoot(getcwd())
     " If invalid, change tab-local working directory to workspace root
-    if !l:valid
+    if l:file_work_space_root != l:cwd_work_space_root
       if a:into_work_space == 1
-        execute 'lcd ' . l:root
+        execute 'lcd ' . l:file_work_space_root
       else
         execute 'lcd ' . l:file_path
       endif
