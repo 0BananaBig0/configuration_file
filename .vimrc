@@ -2599,7 +2599,7 @@ function! SetGeneralKeyMaps()
     let l:file_work_space_root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
     let l:cwd_work_space_root  = WorkspaceRoot(getcwd())
     " If invalid, change tab-local working directory to workspace root
-    if l:file_work_space_root != l:cwd_work_space_root
+    if l:file_work_space_root !=# l:cwd_work_space_root
       if a:into_work_space == 1
         execute 'lcd ' . l:file_work_space_root
       else
