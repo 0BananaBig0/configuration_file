@@ -284,8 +284,3 @@ sudo dnf install -y sshfs
 curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
 # install Antigravity CLI, no a valid account to use it.
 curl -fsSL https://antigravity.google/cli/install.sh | bash
-
-# install google browser
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-sudo dnf install ./google-chrome-stable_current_x86_64.rpm -y
-rm google-chrome-stable_current_x86_64.rpm
