@@ -76,7 +76,7 @@ echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.co
 sudo python3.12 -m pip install --upgrade pip --prefix=/data/bosios/python
 sudo python3.12 -m pip install scons pylint cmakelang cmake-language-server pyright \
                        cppman you-get sphinx sphinx-rtd-theme vim-vint black \
-                       pysnooper futures tclint distro --prefix=/data/bosios/python
+                       pysnooper tclint distro --prefix=/data/bosios/python
 
 sudo dnf config-manager --set-enabled powertools
 sudo dnf install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils

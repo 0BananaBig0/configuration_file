@@ -128,7 +128,7 @@ echo 'index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple' >> ~/.co
 python3 -m pip install --upgrade pip --user
 python3 -m pip install scons pylint cmakelang cmake-language-server pyright \
                        cppman you-get sphinx sphinx-rtd-theme vim-vint black \
-                       pysnooper futures tclint distro neovim --user
+                       pysnooper tclint distro neovim --user
 
 sudo dnf config-manager --set-enabled powertools
 sudo dnf install -y ocl-icd-devel ocl-icd opencl-headers clinfo

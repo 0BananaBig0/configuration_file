@@ -115,7 +115,7 @@ EOF
 python3.12 -m pip install --upgrade pip --user
 python3.12 -m pip install scons pylint cmakelang cmake-language-server pyright \
                           cppman you-get sphinx sphinx-rtd-theme vim-vint black \
-                          pysnooper futures tclint distro neovim httpie --user
+                          pysnooper tclint distro neovim httpie --user
 
 # ==================== 第六阶段：Node.js 24 + Yarn ====================
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash - || {
