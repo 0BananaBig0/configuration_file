@@ -2631,6 +2631,11 @@ function! SetGeneralKeyMaps()
     tabdo windo silent! call EnterIntoWorkSpaceOrFilePath()
     tabnext 1
   endfunction
+  function! SetZshIfExists()
+    if executable('zsh')
+      let &shell = exepath('zsh')
+    endif
+  endfunction
 endfunction
 
 
@@ -2654,5 +2659,6 @@ function! CocTimerStart(timer)
       autocmd VimEnter * silent! call InitializeCwdForEachTab()
     augroup END
   endif
+  call SetZshIfExists()
 endfunction
 call timer_start(333,'CocTimerStart',{'repeat':1})
