@@ -1741,10 +1741,10 @@ function! ConfigureManualLoadPlugin()
     " 6. Check the conditions: module is non-empty and enable_project_debug is true (string "1")
     let l:module = get(l:proj_config, 'module', '')
     let l:enable_debug = get(l:proj_config, 'enable_project_debug', '')
-    if l:module != '' && l:enable_debug ==# '1'
+    if l:module != '' && l:enable_debug
       return 1
     endif
-    return 0
+    return l:enable_debug
   endfunction
   function! LaunchVimspector()
     if !exists("VimspectorShowOutput")
@@ -2628,8 +2628,11 @@ function! SetGeneralKeyMaps()
     exec 'tnoremap <M-0> <C-w>:call TabPosActivateBuffer(10)<CR>'
   endfunction
   function! InitializeCwdForEachTab()
+    let l:current_tab = tabpagenr()
     tabdo windo silent! call EnterIntoWorkSpaceOrFilePath()
-    tabnext 1
+    if l:current_tab != tabpagenr()
+      execute "tabn " . l:current_tab
+    endif
   endfunction
   function! SetZshIfExists()
     if executable('zsh')
