@@ -742,7 +742,7 @@ function! ConfigureDelayedPlugin()
     " exit a terminal via the exit command.
     " Find the last non -1 index (boundary)
     let last = 0
-    for i in range(1, 32)  " indices 1 through 32
+    for i in range(1, 18)  " indices 1 through 18
       if g:tab_term_buf[i] != -1
         let last = i
       endif
@@ -2651,7 +2651,7 @@ function! CocTimerStart(timer)
   call ConfigureManualLoadPlugin()
   call InitializeTabPos()
   " Create an array to store the most recent terminal buffer for each tab
-  let g:tab_term_buf_size = 33
+  let g:tab_term_buf_size = 19
   if !exists('g:tab_term_buf')
     let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
   endif
