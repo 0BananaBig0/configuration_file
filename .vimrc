@@ -866,6 +866,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-M-l>', 'Go to next tab', 'i'],
           \ ['<C-M-k>', 'Go to next tab', 'n'],
           \ ['<C-M-k>', 'Go to next tab', 'i'],
+          \ ['<C-S-V>', 'Paste clipboard in file', 'i'],
           \ ['<M-1>', 'Go to tab 1', 'n', 'N/I/T'],
           \ ['<M-2>', 'Go to tab 2', 'n', 'N/I/T'],
           \ ['<M-3>', 'Go to tab 3', 'n', 'N/I/T'],
@@ -2492,6 +2493,7 @@ function! SetGeneralKeyMaps()
   inoremap <C-M-j> <C-o>gT
   inoremap <C-M-l> <C-o>gt
   inoremap <C-M-k> <C-o>gt
+  inoremap <C-S-V> <C-R>+
   function! GetLaunchDir() abort
     if &buftype ==# 'terminal'
       let l:terminal_job = term_getjob(bufnr('%'))
