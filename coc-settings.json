@@ -92,7 +92,7 @@
     "suggest.languageSourcePriority": 99,
     "suggest.removeDuplicateItems": true,
     "suggest.highPrioritySourceLimit": 50,
-    "suggest.lowPrioritySourceLimit": 20
+    "suggest.lowPrioritySourceLimit": 20,
     "coc.source.snippets.priority": 95,
     "coc.source.snippets.shortcut": "S",
     "coc.source.around.priority": 80,

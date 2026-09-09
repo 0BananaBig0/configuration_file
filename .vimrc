@@ -2016,7 +2016,7 @@ function! SetIndent()
   let l:indent_val=4
   if &filetype=='c' || &filetype=='cpp'
     setlocal cindent     " 设置使用C/C++语言的自动缩进方式
-  elseif &filetype=='vim'
+  elseif &filetype=='vim' || &filetype == 'markdown'
     let l:indent_val = 2
   endif
   let &l:tabstop = l:indent_val      " Tab键的显示宽度 and its practical width
