@@ -41,7 +41,7 @@ chmod 600 /home/banana/.ssh/authorized_keys 2>/dev/null || true
 sudo dnf install -y @development-tools
 sudo dnf install -y make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf help2man
 sudo dnf install -y npm nodejs bear git sqlite yarn neovim vim vim-X11
-sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools
+sudo dnf install -y python3 python3-pip perl flex duf pipx java python3-setuptools python3-pybind11
 sudo dnf install -y p7zip p7zip-plugins 7zip-standalone-all
 sudo dnf install -y ShellCheck cargo gem ruby-devel
 sudo dnf install -y boost-devel tcl-devel xauth
@@ -284,3 +284,14 @@ sudo dnf install -y sshfs
 curl -fsSL https://qwen-code-assets.oss-cn-hangzhou.aliyuncs.com/installation/install-qwen-standalone.sh | bash
 # install Antigravity CLI, no a valid account to use it.
 curl -fsSL https://antigravity.google/cli/install.sh | bash
+
+export CLAUDE_CONFIG_DIR="${HOME}/.local/.codex_home/claude"
+sudo tee /etc/yum.repos.d/claude-code.repo <<'EOF'
+[claude-code]
+name=Claude Code
+baseurl=https://downloads.claude.ai/claude-code/rpm/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://downloads.claude.ai/keys/claude-code.asc
+EOF
+sudo dnf install claude-code -y
