@@ -853,7 +853,9 @@ function! ConfigureManualLoadPlugin()
           \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<LocalLeader>r', 'Enter Into Workspace Root', 'n'],
+          \ ['<M-r>', 'Enter Into Workspace Root', 'n', 'N/I/T'],
           \ ['<LocalLeader>f', 'Enter Into File Path', 'n'],
+          \ ['<M-f>', 'Enter Into File Path', 'n', 'N/I/T'],
           \ ['<M-S-h>', 'Move tab left', 'n'],
           \ ['<M-S-h>', 'Move tab left', 'i'],
           \ ['<M-S-l>', 'Move tab right', 'n'],
@@ -2515,9 +2517,8 @@ function! SetGeneralKeyMaps()
     let l:target_dir = GetLaunchDir()
     call NUpdateTabTermBuf()
     tabnew
-    if a:mode ==# 'empty_tab'
-        exec 'lcd ' . l:target_dir
-    else
+    exec 'lcd ' . l:target_dir
+    if a:mode ==# 'terminal'
       let l:terminal_options = {
             \ 'curwin': 1,
             \ 'norestore': 1,
@@ -2610,7 +2611,13 @@ function! SetGeneralKeyMaps()
     endif
   endfunction
   noremap <LocalLeader>r :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
+  noremap <M-r> :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
+  inoremap <M-r> <C-o>:call EnterIntoWorkSpaceOrFilePath()<CR>
+  tnoremap <M-r> <C-w>:call EnterIntoWorkSpaceOrFilePath()<CR>
   noremap <LocalLeader>f :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
+  noremap <M-f> :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
+  inoremap <M-f> <C-o>:call EnterIntoWorkSpaceOrFilePath(0)<CR>
+  tnoremap <M-f> <C-w>:call EnterIntoWorkSpaceOrFilePath(0)<CR>
   " Alt+n跳到第n个tab，0<n<10
   function! TabPosActivateBuffer(index)
     if a:index <= tabpagenr('$')
