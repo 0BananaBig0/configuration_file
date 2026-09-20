@@ -107,4 +107,7 @@
     "coc.source.tag.shortcut": "T",
     "coc.source.word.priority": 30,
     "coc.source.word.shortcut": "W",
+    "json.schemaDownload.trustedDomains": {
+      "https://puremourning.github.io": true
+    },
 }

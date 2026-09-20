@@ -456,7 +456,7 @@ function! ConfigureDelayedPlugin()
       call JumpToTheMainWin() " Avoid potential bugs
     endif
     if empty(a:file_path)
-      let l:file_path = expand('%:p:h')
+      let l:file_path = GetLaunchDir()
     else
       let l:file_path = a:file_path
     endif
@@ -978,13 +978,13 @@ function! ConfigureManualLoadPlugin()
           \ [']<F7>', 'Move up stack frame', 'n'],
           \ [']<S-F7>', 'Move down stack frame', 'n'],
           \ [']<F8>', 'Show full variable values', 'n'],
-          \ ['<C-1>', 'Focus variables window', 'n', 'N/I'],
-          \ ['<C-3>', 'Focus watches window', 'n', 'N/I'],
-          \ ['<C-5>', 'Focus stack trace window', 'n', 'N/I'],
-          \ ['<C-7>', 'Focus code window', 'n', 'N/I'],
-          \ ['<C-8>', 'Show debugger console', 'n', 'N/I'],
-          \ ['<C-9>', 'Focus debugger terminal', 'n', 'N/I'],
-          \ ['<C-0>', 'List all breakpoints', 'n', 'N/I'],
+          \ ['<C-1>', 'Focus variables window', 'n', 'N/I/T'],
+          \ ['<C-3>', 'Focus watches window', 'n', 'N/I/T'],
+          \ ['<C-5>', 'Focus stack trace window', 'n', 'N/I/T'],
+          \ ['<C-7>', 'Focus code window', 'n', 'N/I/T'],
+          \ ['<C-8>', 'Show debugger console', 'n', 'N/I/T'],
+          \ ['<C-9>', 'Focus debugger terminal', 'n', 'N/I/T'],
+          \ ['<C-0>', 'List all breakpoints', 'n', 'N/I/T'],
           \ [']a', 'Show assembly', 'n'],
           \ [']s', 'Show disassembly', 'n'],
           \ [']c', 'Jump to program counter', 'n'],
@@ -1609,18 +1609,25 @@ function! ConfigureManualLoadPlugin()
   noremap ]<F8> :<C-u>let g:vimspector_variables_display_mode = 'full'<CR>
   noremap <C-1> :<C-u>call win_gotoid(g:vimspector_session_windows.variables)<CR>
   inoremap <C-1> <C-o>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
+  tnoremap <C-1> <C-w>:call win_gotoid(g:vimspector_session_windows.variables)<CR>
   noremap <C-3> :<C-u>call win_gotoid(g:vimspector_session_windows.watches)<CR>
   inoremap <C-3> <C-o>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
+  tnoremap <C-3> <C-w>:call win_gotoid(g:vimspector_session_windows.watches)<CR>
   noremap <C-5> :<C-u>call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
   inoremap <C-5> <C-o>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
+  tnoremap <C-5> <C-w>:call win_gotoid(g:vimspector_session_windows.stack_trace)<CR>
   noremap <C-7> :<C-u>call win_gotoid(g:vimspector_session_windows.code)<CR>
   inoremap <C-7> <C-o>:call win_gotoid(g:vimspector_session_windows.code)<CR>
+  tnoremap <C-7> <C-w>:call win_gotoid(g:vimspector_session_windows.code)<CR>
   noremap <C-8> :<C-u>VimspectorShowOutput Console<CR>
   inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
-  noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR>
-  inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR>
+  tnoremap <C-8> <C-w>:VimspectorShowOutput Console<CR>
+  noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-\><C-n>
+  inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-\><C-n>
+  tnoremap <C-9> <C-w>:call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-\><C-n>
   noremap <C-0> :<C-u>call ListAllBreakPoints()<CR>
   inoremap <C-0> <C-o>:call ListAllBreakPoints()<CR>
+  tnoremap <C-0> <C-w>:call ListAllBreakPoints()<CR>
   noremap ]a :<C-u>call ShowAssembleCode()<CR>
   noremap ]s <Plug>VimspectorDisassemble
   map ]c <Plug>VimspectorJumpToProgramCounter
@@ -1718,26 +1725,25 @@ function! ConfigureManualLoadPlugin()
     endif
     call vimspector#Continue()
   endfunction
-  function! EnablePythonProjectDebug()
+  function! EnablePythonProjectDebug() abort
     " 1. Set the JSON file path (assume current directory, adjust as needed)
     let l:json_file = WorkspaceRoot() . '/.vimspector.json'
     " 2. Check if the file exists
     if !filereadable(l:json_file)
-      echo "JSON file not found: " . l:json_file
-      return
+      echoerr "JSON file not found: " . l:json_file
     endif
     " 3. Read file content and parse JSON
     let l:raw = join(readfile(l:json_file), "\n")
     try
       let l:data = json_decode(l:raw)
     catch
-      echo "Failed to parse JSON: " . v:exception
-      return
+      echoerr "Failed to parse JSON: " . v:exception
     endtry
     " 4. Check if 'python: project' configuration exists
-    if !has_key(l:data, 'configurations') || !has_key(l:data['configurations'], 'python: project')
-      echo "python: project configuration not found."
-      return
+    if !has_key(l:data, 'configurations')
+       \ || !has_key(l:data['configurations'], 'python: project')
+       \ ||  !has_key(l:data['configurations'], 'python: single-file')
+      echoerr "Please update your .vimspector.json."
     endif
     " 5. Get the configuration dictionary
     let l:proj_config = l:data['configurations']['python: project']['configuration']
@@ -1746,8 +1752,9 @@ function! ConfigureManualLoadPlugin()
     let l:enable_debug = get(l:proj_config, 'enable_project_debug', '')
     if l:module != '' && l:enable_debug
       return 1
+    else
+      return 0
     endif
-    return l:enable_debug
   endfunction
   function! LaunchVimspector()
     if !exists("VimspectorShowOutput")
@@ -1756,7 +1763,7 @@ function! ConfigureManualLoadPlugin()
     endif
     call JumpToTheMainWin()
     if &filetype=='python'
-      if EnablePythonProjectDebug()
+      if EnablePythonProjectDebug() == 1
         call vimspector#LaunchWithSettings(#{configuration: 'python: project', Test: 'python: project'})
       else
         call vimspector#LaunchWithSettings(#{configuration: 'python: single-file', Test: 'python: single-file'})
@@ -2594,9 +2601,9 @@ function! SetGeneralKeyMaps()
   command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
   function! s:EditWithWorkspaceCheck(filename) abort
     execute 'edit ' . a:filename
-    call EnterIntoWorkSpaceOrFilePath()
+    call EnterIntoWorkspaceOrFilePath()
   endfunction
-  function! EnterIntoWorkSpaceOrFilePath(into_work_space = 1) abort
+  function! EnterIntoWorkspaceOrFilePath(into_work_space = 1) abort
     " Get info of the current window in this tab
     let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
     let l:file_work_space_root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
@@ -2610,14 +2617,14 @@ function! SetGeneralKeyMaps()
       endif
     endif
   endfunction
-  noremap <LocalLeader>r :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
-  noremap <M-r> :<C-u>call EnterIntoWorkSpaceOrFilePath()<CR>
-  inoremap <M-r> <C-o>:call EnterIntoWorkSpaceOrFilePath()<CR>
-  tnoremap <M-r> <C-w>:call EnterIntoWorkSpaceOrFilePath()<CR>
-  noremap <LocalLeader>f :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
-  noremap <M-f> :<C-u>call EnterIntoWorkSpaceOrFilePath(0)<CR>
-  inoremap <M-f> <C-o>:call EnterIntoWorkSpaceOrFilePath(0)<CR>
-  tnoremap <M-f> <C-w>:call EnterIntoWorkSpaceOrFilePath(0)<CR>
+  noremap <LocalLeader>r :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
+  noremap <M-r> :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
+  inoremap <M-r> <C-o>:call EnterIntoWorkspaceOrFilePath()<CR>
+  tnoremap <M-r> <C-w>:call EnterIntoWorkspaceOrFilePath()<CR>
+  noremap <LocalLeader>f :<C-u>call EnterIntoWorkspaceOrFilePath(0)<CR>
+  noremap <M-f> :<C-u>call EnterIntoWorkspaceOrFilePath(0)<CR>
+  inoremap <M-f> <C-o>:call EnterIntoWorkspaceOrFilePath(0)<CR>
+  tnoremap <M-f> <C-w>:call EnterIntoWorkspaceOrFilePath(0)<CR>
   " Alt+n跳到第n个tab，0<n<10
   function! TabPosActivateBuffer(index)
     if a:index <= tabpagenr('$')
@@ -2638,7 +2645,7 @@ function! SetGeneralKeyMaps()
   endfunction
   function! InitializeCwdForEachTab()
     let l:current_tab = tabpagenr()
-    tabdo windo silent! call EnterIntoWorkSpaceOrFilePath()
+    tabdo windo silent! call EnterIntoWorkspaceOrFilePath()
     if l:current_tab != tabpagenr()
       execute "tabn " . l:current_tab
     endif
