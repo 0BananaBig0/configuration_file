@@ -2467,6 +2467,8 @@ function! SetGeneralKeyMaps()
   inoremap <M-S-i> <C-o>I
   " Disable Q in normal mode
   noremap Q <Nop>
+  " Disable q in normal mode
+  noremap q <Nop>
   " When pressing <Shift-*>, the $, #, : and @ should not be included in the selection.
   set iskeyword-=$
   set iskeyword-=#
