@@ -2400,7 +2400,8 @@ function! SetGeneralKeyMaps()
     exec 'normal! ms'
     exec ':%retab!'
     exec ':%s/\s\+$//e'
-    exec ':%s/\r//e'
+    exec ':%s/\r//ge'
+    exec ':%s/\%u200b//ge'
     exec 'normal! `s'
   endfunction
   " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
