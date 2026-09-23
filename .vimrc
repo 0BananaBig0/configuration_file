@@ -2628,6 +2628,7 @@ function! SetGeneralKeyMaps()
   noremap <M-f> :<C-u>call EnterIntoWorkspaceOrFilePath(0)<CR>
   inoremap <M-f> <C-o>:call EnterIntoWorkspaceOrFilePath(0)<CR>
   tnoremap <M-f> <C-w>:call EnterIntoWorkspaceOrFilePath(0)<CR>
+  tnoremap <C-\><C-n> <C-\><C-n>:setlocal nonumber norelativenumber<CR>
   " Alt+n跳到第n个tab，0<n<10
   function! TabPosActivateBuffer(index)
     if a:index <= tabpagenr('$')
