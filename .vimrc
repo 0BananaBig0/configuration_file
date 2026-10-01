@@ -389,6 +389,35 @@ function! ConfigureDelayedPlugin()
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
+  " Debugger completion waits for adapter replies; run outside omnifunc's textlock.
+  function! s:CompleteVimspectorPrompt(timer) abort
+    if &filetype !=# 'VimspectorPrompt' || mode() !=# 'i'
+      return
+    endif
+    let l:position = [bufnr(), line('.'), col('.')]
+    let l:start = call(function(&omnifunc), [1, ''])
+    if l:start < 0
+      return
+    endif
+    let l:base = strpart(getline('.'), l:start, col('.') - 1 - l:start)
+    let l:matches = call(function(&omnifunc), [0, l:base])
+    if mode() ==# 'i' && l:position == [bufnr(), line('.'), col('.')]
+      call complete(l:start + 1, l:matches.words)
+    endif
+  endfunction
+  augroup Vimspector_Completion_Group
+    autocmd!
+    autocmd FileType VimspectorPrompt let b:coc_enabled = 0
+    autocmd FileType VimspectorPrompt setlocal completeopt=menuone,noinsert
+    autocmd FileType VimspectorPrompt inoremap <silent><buffer><expr> <Tab>
+          \ pumvisible() ? "\<C-n>" : "\<Cmd>call timer_start(0, function('<SID>CompleteVimspectorPrompt'))\<CR>"
+    autocmd FileType VimspectorPrompt inoremap <silent><buffer> <C-x><C-o>
+          \ <Cmd>call timer_start(0, function('<SID>CompleteVimspectorPrompt'))<CR>
+    autocmd FileType VimspectorPrompt inoremap <silent><buffer><expr> <S-Tab>
+          \ pumvisible() ? "\<C-p>" : "\<C-h>"
+    autocmd FileType VimspectorPrompt inoremap <silent><buffer><expr> <CR>
+          \ pumvisible() ? "\<C-y>" : "\<CR>"
+  augroup END
   nmap [c <Plug>(coc-declaration)
   noremap [tc :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
   nmap [d <Plug>(coc-definition)
