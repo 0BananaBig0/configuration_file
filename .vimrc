@@ -149,10 +149,11 @@ function! ConfigureMarkdownPlugin()
   noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
   let g:vmt_auto_update_on_save = 0
   let g:vmt_list_item_char = '-'
-  function! LoadMarkdownToc(function_name)
-      call plug#load('vim-markdown-toc')
-      while !exists(a:function_name)
-      endwhile
+  function! LoadMarkdownToc(function_name) abort
+    call plug#load('vim-markdown-toc')
+    if !exists(a:function_name)
+      throw 'vim-markdown-toc did not define ' . a:function_name
+    endif
   endfunction
   function! CreateMarkdownMenu()
     exec 'normal! ms'
@@ -398,13 +399,13 @@ function! ConfigureDelayedPlugin()
     return !col || getline('.')[col - 1]  =~# '\s'
   endfunction
   nmap [c <Plug>(coc-declaration)
-  noremap [tc :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDeclaration', 'tabe')<CR>
+  noremap [tc :<C-u>call CocActionAsync('jumpDeclaration', 'tabe')<CR>
   nmap [d <Plug>(coc-definition)
-  noremap [td :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpDefinition', 'tabe')<CR>
+  noremap [td :<C-u>call CocActionAsync('jumpDefinition', 'tabe')<CR>
   nmap [f <Plug>(coc-refactor)
   vmap [f <Plug>(coc-refactor-selected)
   nmap [i <Plug>(coc-implementation)
-  noremap [ti :<C-u>call NUpdateTabTermBuf()<CR>:call CocActionAsync('jumpImplementation', 'tabe')<CR>
+  noremap [ti :<C-u>call CocActionAsync('jumpImplementation', 'tabe')<CR>
   nmap [je <Plug>(coc-diagnostic-next-error)
   nmap [jd <Plug>(coc-diagnostic-next)
   nmap [ke <Plug>(coc-diagnostic-prev-error)
@@ -473,13 +474,7 @@ function! ConfigureDelayedPlugin()
       echo 'You had better create a root-pattern file like .git in your project.'
       return l:file_path
     endif
-    for l:str_id in range(strlen(l:workspace_root[0]) - 1, 0, -1)
-      if l:workspace_root[0][l:str_id]=='/'
-        let l:workspace_root[0] = strpart(l:workspace_root[0], 0, l:str_id)
-        break
-      endif
-    endfor
-    return l:workspace_root[0]
+    return fnamemodify(l:workspace_root[0], ':h')
   endfunction
   function! CopyFileRelToCPP(cpp_workspace_root, file_name) abort
     " Return 0 on failure, 1 if already present, or 2 if newly copied.
@@ -515,20 +510,7 @@ function! ConfigureDelayedPlugin()
   augroup Plugin_Configuration_Group | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg='White' guibg='Black'
   function! GetSelectedContent()
-    " Get the start and end positions of the visual selection
-    let l:start_pos = getpos("'<")
-    let l:end_pos = getpos("'>")
-    " Get the l:lines in the selected range
-    let l:lines = getline(l:start_pos[1], l:end_pos[1])
-    " Handle single-line selection
-    if len(l:lines) == 1
-        let l:lines = [strpart(l:lines[0], l:start_pos[2] - 1, l:end_pos[2] - l:start_pos[2] + 1)]
-    else
-        " Adjust the first and last l:lines based on the selection
-        let l:lines[0] = strpart(l:lines[0], l:start_pos[2] - 1)
-        let l:lines[-1] = strpart(l:lines[-1], 0, l:end_pos[2])
-    endif
-    return join(l:lines, " ")
+    return join(getregion(getpos("'<"), getpos("'>"), {'type': visualmode()}), ' ')
   endfunction
 
 
@@ -692,7 +674,7 @@ function! ConfigureDelayedPlugin()
     if l:target_buf != -1 && l:target_win != -1
       call win_gotoid(l:target_win)
       call feedkeys("\<C-\>\<C-n>", 'n')
-      let g:tab_term_buf[tabpagenr()] = l:target_buf
+      let t:term_buf = l:target_buf
       exec 'resize ' . a:height
     endif
     if a:go_to_top != 0
@@ -709,8 +691,8 @@ function! ConfigureDelayedPlugin()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
-        if l:win['bufnr'] > g:tab_term_buf[l:cur_tab]
-          let g:tab_term_buf[l:cur_tab] = l:win['bufnr']
+        if l:win['bufnr'] > get(t:, 'term_buf', -1)
+          let t:term_buf = l:win['bufnr']
         endif
         " Switch to the terminal window to hide it
         call win_gotoid(l:win['winid'])
@@ -719,7 +701,7 @@ function! ConfigureDelayedPlugin()
     endfor
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer
     if l:terminal_shown == 0
-      let l:latest_terminal = g:tab_term_buf[l:cur_tab]
+      let l:latest_terminal = get(t:, 'term_buf', -1)
       " Step 3: Open the latest terminal buffer if found, or open a new terminal
       if l:latest_terminal != -1 && bufexists(l:latest_terminal)
         " Open the terminal buffer in a new split at the bottom with the specified height
@@ -736,7 +718,7 @@ function! ConfigureDelayedPlugin()
               \ }
         let l:terminal_buf = term_start(&shell, l:terminal_options)
         exec 'resize ' . a:height
-        let g:tab_term_buf[l:cur_tab] = l:terminal_buf
+        let t:term_buf = l:terminal_buf
       endif
       if &buftype ==# 'terminal' && !exists('b:asyncrun_bid')
         let l:terminal_job = term_getjob(bufnr('%'))
@@ -745,55 +727,6 @@ function! ConfigureDelayedPlugin()
         endif
       endif
     endif
-  endfunction
-  function! CleanTabTermBuf()
-    " This function fixes a bug where g:tab_term_buf is not updated when you
-    " exit a terminal via the exit command.
-    " Find the last non -1 index (boundary)
-    let last = 0
-    for i in range(1, 18)  " indices 1 through 18
-      if g:tab_term_buf[i] != -1
-        let last = i
-      endif
-    endfor
-    " If no valid entries, exit early
-    if last == 0
-      return
-    endif
-    " Scan from index 1 upwards
-    let i = 1
-    while i <= last
-      let buf_nr = g:tab_term_buf[i]
-      if buf_nr != -1 && !bufexists(buf_nr)
-        " Buffer no longer exists: shift all elements to the right one position left
-        for j in range(i, last - 1)
-          let g:tab_term_buf[j] = g:tab_term_buf[j + 1]
-        endfor
-        let g:tab_term_buf[last] = -1
-        let last -= 1
-        " Do NOT increment i, because the current position now holds a new element
-      else
-        let i += 1
-      endif
-    endwhile
-  endfunction
-  function! UpdateTabTermBuf(id_first, id_last, plus_or_minus_one)
-    for l:term_index in range(a:id_first, a:id_last, a:plus_or_minus_one[1])
-      let g:tab_term_buf[l:term_index + a:plus_or_minus_one[0]] = g:tab_term_buf[l:term_index]
-    endfor
-  endfunction
-  function! CUpdateTabTermBuf(auto_close_terminal=1)
-    call CleanTabTermBuf()
-    let l:tab_term_buf = g:tab_term_buf[tabpagenr()]
-    call UpdateTabTermBuf(tabpagenr() + 1, tabpagenr('$') + 2, [-1, +1])
-    if bufexists(l:tab_term_buf) && a:auto_close_terminal == 1
-      exec 'silent bwipeout! ' . l:tab_term_buf
-    endif
-  endfunction
-  function! NUpdateTabTermBuf()
-    call CleanTabTermBuf()
-    call UpdateTabTermBuf(tabpagenr('$'), tabpagenr() + 1, [+1, -1])
-    let g:tab_term_buf[tabpagenr() + 1] = - 1
   endfunction
   noremap <F8> :<C-u>call ToggleTerminal()<CR>
   tnoremap <F8> <C-w>:call ToggleTerminal()<CR>
@@ -807,9 +740,9 @@ function! ConfigureManualLoadPlugin()
   " Vim-quickui setting
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
-  function! QuickuiInstallKeyMapGroup(name, key_maps, weight)
+  function! QuickuiInstallKeyMapGroup(name, key_maps)
     let l:name = substitute(a:name, '&', '', 'g')
-    call add(g:quickui_keymap_groups, [l:name, deepcopy(a:key_maps)])
+    call add(g:quickui_keymap_groups, [l:name, a:key_maps])
   endfunction
   function! QuickuiInstallKeyMapMenus()
     let g:quickui_keymap_groups = []
@@ -920,7 +853,7 @@ function! ConfigureManualLoadPlugin()
           \ ])
     call QuickuiInstallKeyMapGroup('&AsyncRun', [
           \ ['<LocalLeader><F8>', 'Run asynchronous command', 'n'],
-          \ ], 1900)
+          \ ])
     call QuickuiInstallKeyMapGroup('&AutoVerilog', [
           \ ['<Leader>ai', 'Generate instance', 'n'],
           \ ['<Leader>aa', 'Generate arguments', 'n'],
@@ -929,7 +862,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<Leader>ar', 'Generate registers', 'n'],
           \ ['<Leader>aw', 'Generate wires', 'n'],
           \ ['<Leader>ad', 'Generate definition', 'n'],
-          \ ], 2000)
+          \ ])
     call QuickuiInstallKeyMapGroup('&Bookmarks', [
           \ ['<Leader>bo', 'Load bookmark plugin', 'n'],
           \ ['<Leader>bt', 'Toggle bookmark', 'n'],
@@ -942,7 +875,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<Leader>bl', 'Move bookmark to line', 'n'],
           \ ['<Leader>bc', 'Clear bookmark', 'n'],
           \ ['<Leader>br', 'Clear all bookmarks', 'n'],
-          \ ], 1300)
+          \ ])
     call QuickuiInstallKeyMapGroup('&COC', [
           \ ['<TAB>', 'Select next completion item', 'i'],
           \ ['<S-TAB>', 'Select previous completion item', 'i'],
@@ -971,7 +904,7 @@ function! ConfigureManualLoadPlugin()
           \ ['[f', 'Refactor selection', 'x'],
           \ ['<F7>', 'Format document', 'n'],
           \ ['<F7>', 'Format selection', 'x'],
-          \ ], 700)
+          \ ])
     call QuickuiInstallKeyMapGroup('&Codex', [
           \ ['/', 'Open the slash-command menu', 'n', 'CLI'],
           \ ['<Ctrl-g>', 'Open editor for multiline prompt', 'n', 'CLI'],
@@ -986,15 +919,15 @@ function! ConfigureManualLoadPlugin()
           \ ['<Alt-r>', 'Toggle raw scrollback', 'n', 'CLI'],
           \ ['<Ctrl-l>', 'Clear view but keep current chat', 'n', 'CLI'],
           \ ['<Ctrl-c>', 'Close the Codex session', 'n', 'CLI'],
-          \ ], 600)
-    call QuickuiInstallKeyMapGroup('&General', l:general_key_maps, 300)
+          \ ])
+    call QuickuiInstallKeyMapGroup('&General', l:general_key_maps)
     call QuickuiInstallKeyMapGroup('&Git', [
           \ ['<Leader>git', 'Load Git plugins', 'n'],
           \ ['<Leader>gk', 'Previous hunk', 'n'],
           \ ['<Leader>gj', 'Next hunk', 'n'],
           \ ['<Leader>gf', 'Fold unchanged lines', 'n'],
           \ ['<Leader>gb', 'Show line blame', 'n'],
-          \ ], 1600)
+          \ ])
     call QuickuiInstallKeyMapGroup('&InterestingWords', [
           \ ['<Leader>wt', 'Load highlight plugin', 'n'],
           \ ['<Leader>wh', 'Highlight word', 'n'],
@@ -1002,7 +935,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<Leader>w<S-h>', 'Clear all word highlights', 'n'],
           \ ['<S-n>', 'Previous highlighted word', 'n'],
           \ ['n', 'Next highlighted word', 'n'],
-          \ ], 1400)
+          \ ])
     call QuickuiInstallKeyMapGroup('&Markdown', [
           \ ['<Leader>mh', 'Create Markmap', 'n'],
           \ ['<Leader>mh', 'Create Markmap from selection', 'x'],
@@ -1011,7 +944,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<Leader>mg', 'Generate table of contents', 'n'],
           \ ['<Leader>mu', 'Update table of contents', 'n'],
           \ ['<Leader>mf', 'Fix Markdown lint errors', 'n'],
-          \ ], 1700)
+          \ ])
     call QuickuiInstallKeyMapGroup('&Matchup', [
           \ ['%', 'Jump to matching delimiter', 'n', 'N/V/O'],
           \ ['g%', 'Jump to matching delimiter from before cursor', 'n', 'N/V/O'],
@@ -1022,22 +955,22 @@ function! ConfigureManualLoadPlugin()
           \ ['ds%', 'Delete surrounding delimiters', 'n'],
           \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
           \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
-          \ ], 800)
+          \ ])
     call QuickuiInstallKeyMapGroup('&NERDCommenter', [
           \ ['<F3>', 'Comment', 'n', 'N/V/O'],
           \ ['<S-F3>', 'Uncomment', 'n', 'N/V/O'],
-          \ ], 1800)
+          \ ])
     call QuickuiInstallKeyMapGroup('&NERDTree', [
           \ ['<Leader>nt', 'Toggle file tree', 'n'],
           \ ['<Leader>nc', 'Open tree at working directory', 'n'],
-          \ ], 1100)
+          \ ])
     call QuickuiInstallKeyMapGroup('&QuickUI', [
           \ ['<Leader>qc', 'Open keymap cheatsheet', 'n'],
           \ ['<Leader>qm', 'Open menu', 'n'],
           \ ['<Leader>qb', 'List buffers', 'n'],
           \ ['<Leader>qt', 'Preview tag', 'n'],
-          \ ], 1000)
-    call QuickuiInstallKeyMapGroup('&Search', l:search_key_maps, 200)
+          \ ])
+    call QuickuiInstallKeyMapGroup('&Search', l:search_key_maps)
     call QuickuiInstallKeyMapGroup('&Vimspector', [
           \ ['<Leader><F5>', 'Create C/C++ debug files without .vscode', 'n'],
           \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n', 'N/I/T'],
@@ -1093,20 +1026,20 @@ function! ConfigureManualLoadPlugin()
           \ [']a', 'Show assembly', 'n'],
           \ [']s', 'Show disassembly', 'n'],
           \ [']d', 'Delete character', 'n'],
-          \ ], 900)
+          \ ])
     call QuickuiInstallKeyMapGroup('&Vista', [
           \ ['<Leader>vt', 'Toggle symbol window', 'n'],
           \ ['<Leader>vf', 'Focus symbol window', 'n'],
-          \ ], 1200)
+          \ ])
     call QuickuiInstallKeyMapGroup('&VisualMulti', [
           \ ['<C-n>', 'Start multiple cursors', 'n'],
-          \ ], 1500)
+          \ ])
     call QuickuiInstallKeyMapGroup('&WhichKey', [
           \ ['<Leader>', 'Show Leader mappings', 'n'],
           \ ['<LocalLeader>', 'Show LocalLeader mappings', 'n'],
           \ ['[', 'Show left-bracket mappings', 'n'],
           \ [']', 'Show right-bracket mappings', 'n'],
-          \ ], 2100)
+          \ ])
   endfunction
   function! QuickuiCheatsheetTruncate(text, width)
     if a:width <= 0
@@ -1401,19 +1334,19 @@ function! ConfigureManualLoadPlugin()
     call QuickuiInstallKeyMapMenus()
   endfunction
   function! QuickuiOpenMenu()
-    if !exists('quickui#menu#open')
+    if !exists('g:quickui_keymap_groups') || !exists('*quickui#menu#open')
       call QuickuiConfiguration()
     endif
     call quickui#menu#open()
   endfunction
   function! QuickuiListBuffer()
-    if !exists('quickui#tools#list_buffer')
+    if !exists('g:quickui_keymap_groups') || !exists('*quickui#menu#open')
       call QuickuiConfiguration()
     endif
     call quickui#tools#list_buffer('e')
   endfunction
   function! QuickuiPreviewTag()
-    if !exists('quickui#tools#preview_tag')
+    if !exists('g:quickui_keymap_groups') || !exists('*quickui#menu#open')
       call QuickuiConfiguration()
     endif
     call quickui#tools#preview_tag('')
@@ -1476,13 +1409,13 @@ function! ConfigureManualLoadPlugin()
         call system('chown -R $SUDO_USER:$SUDO_USER '.shellescape(l:bookmark_root_location))
       endif
     endif
-    if !filereadable(l:bookmark_file)
-      call system('touch '.shellescape(l:bookmark_file))
+    if getftype(l:bookmark_file) ==# ''
+      call writefile([], l:bookmark_file)
       if !empty($SUDO_USER)
         call system('chown $SUDO_USER:$SUDO_USER '.shellescape(l:bookmark_file))
       endif
     endif
-    return l:bookmark_path
+    return l:bookmark_file
   endfunction
   noremap <Leader>bo :<C-u>call plug#load('vim-bookmarks')<CR>
   noremap <Leader>bt :<C-u>BookmarkToggle<CR>
@@ -1502,12 +1435,13 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>wt :<C-u>call LoadAndSetVimInterestingwords()<CR>
   nnoremap <Leader>wh :call MultipleWordsHighlight('n')<CR>
   vnoremap <Leader>wh :<C-u>call MultipleWordsHighlight('v')<CR>
-  function! LoadAndSetVimInterestingwords()
+  function! LoadAndSetVimInterestingwords() abort
     let g:interestingWordsRandomiseColors = 1
     let g:interestingWordsDefaultMappings = 0
     call plug#load('vim-interestingwords')
-    while !exists('*UncolorAllWords')
-    endwhile
+    if !exists('*UncolorAllWords')
+      throw 'vim-interestingwords did not define UncolorAllWords()'
+    endif
     noremap <Leader>w<S-h> :<C-u>call UncolorAllWords()<CR>
     noremap n :<C-u>call WordNavigation(1)<CR>
     noremap <S-n> :<C-u>call WordNavigation(0)<CR>
@@ -1522,30 +1456,32 @@ function! ConfigureManualLoadPlugin()
 
 
   " vim-visual-multi setting
-  noremap <C-n> :<C-u>call MultipleCursors()<CR>
-  function! MultipleCursors(key_map="\<C-n>")
-    if !empty(maparg(a:key_map, 'v', 0, 1))
-      call LoadVimVisualMulti()
+  if !exists('g:loaded_visual_multi')
+    noremap <C-n> :<C-u>call MultipleCursors()<CR>
+    xnoremap <C-n> :<C-u>call MultipleCursors(nr2char(14), 1)<CR>
+  endif
+  function! MultipleCursors(key_map="\<C-n>", visual=0) abort
+    if !exists('g:loaded_visual_multi')
+      call LoadVimVisualMulti(a:visual)
     endif
-    call feedkeys(a:key_map, "!")
+    call feedkeys(a:key_map, 'm')
   endfunction
-  function! LoadVimVisualMulti()
-    " 1. Save the current visual selection and load vim-viusal-multi
-    let l:original_visual_mode = visualmode()
-    let [l:start_line, l:start_col] = getpos("'<")[1:2]
-    let [l:end_line, l:end_col] = getpos("'>")[1:2]
+  function! LoadVimVisualMulti(visual=0) abort
+    let l:visual = a:visual || index(['v', 'V', "\<C-v>"], mode()) >= 0
     call plug#load('vim-visual-multi')
-    " 2. Restore the visual selection
-    call cursor(l:start_line, l:start_col)
-    execute "normal! " . l:original_visual_mode
-    call cursor(l:end_line, l:end_col)
+    if !exists('g:loaded_visual_multi')
+      throw 'vim-visual-multi could not be loaded'
+    endif
+    if l:visual
+      normal! gv
+    endif
   endfunction
 
 
 
   " Vim-fugitive, vim-gitgutter and git-blame setting
   noremap <Leader>git :<C-u>call LoadAndSetGitPlugin()<CR>
-  function! LoadAndSetGitPlugin()
+  function! LoadAndSetGitPlugin() abort
     let g:fugitive_no_maps = 1
     let g:gitgutter_map_keys = 0
     map <Leader>gk <Plug>(GitGutterPrevHunk)
@@ -1553,11 +1489,10 @@ function! ConfigureManualLoadPlugin()
     map <Leader>gf <Plug>(GitGutterFold)
     noremap <Leader>gb :<C-u>call gitblame#echo()<CR>
     exec 'normal! ms'
-    call plug#load('vim-fugitive')
-    call plug#load('vim-gitgutter')
-    call plug#load('git-blame.vim')
-    while !exists('*FugitiveStatusline')
-    endwhile
+    call plug#load('vim-fugitive', 'vim-gitgutter', 'git-blame.vim')
+    if !exists('*FugitiveStatusline')
+      throw 'vim-fugitive did not define FugitiveStatusline()'
+    endif
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
@@ -1660,7 +1595,6 @@ function! ConfigureManualLoadPlugin()
     if l:copy_result == 2 && !WorkspaceHasBuildFiles()
       call DisableProjectDebug()
     endif
-    call NUpdateTabTermBuf()
     exec 'tabe ' . fnameescape(l:json_file_path)
   endfunction
   nnoremap ]mp :<C-u>call EnableProjectDebug()<CR>
@@ -1676,7 +1610,7 @@ function! ConfigureManualLoadPlugin()
   noremap ]<S-F4> :<C-u>call vimspector#SetAdvancedLineBreakpoint()<CR>
   noremap ]<C-F4> :<C-u>call vimspector#AddAdvancedFunctionBreakpoint()<CR>
   noremap <F5> :<C-u>call plug#load('vimspector')<CR>
-  noremap <S-F5> :<C-u>call CUpdateTabTermBuf(0)<CR>:VimspectorReset<CR>
+  noremap <S-F5> :<C-u>VimspectorReset<CR>
   noremap ]<F5> :<C-u>call LaunchVimspector()<CR>
   noremap <Leader><F5> :<C-u>call ConfigureCppDebug()<CR>
   noremap <M-F5> :<C-u>call ConfigureCppDebug()<CR>
@@ -1783,7 +1717,7 @@ function! ConfigureManualLoadPlugin()
     call s:ConfigureVimspectorPrompt()
     9wincmd _
     call win_gotoid(g:vimspector_session_windows.terminal)
-    let g:tab_term_buf[tabpagenr()] = bufnr('%')
+    let t:term_buf = bufnr('%')
     36wincmd |
     call win_gotoid(g:vimspector_session_windows.variables)
     setlocal wrap
@@ -1802,12 +1736,8 @@ function! ConfigureManualLoadPlugin()
     call win_gotoid(l:cur_winid)
   endfunction
   function! s:SetUpTerminal()
-    call win_gotoid(g:vimspector_session_windows.terminal)
-    let l:term_buf_id = winbufnr(g:vimspector_session_windows.terminal)
-    hide
-    call win_gotoid(g:vimspector_session_windows.output)
-    exec 'rightbelow vsplit | b ' . l:term_buf_id
-    let g:vimspector_session_windows.terminal = win_getid()
+    call win_splitmove(g:vimspector_session_windows.terminal,
+          \ g:vimspector_session_windows.output, {'vertical': 1, 'rightbelow': 1})
     call ReshapeVimspectorWins()
   endfunction
   function! QuitVimspectorWins()
@@ -1831,7 +1761,7 @@ function! ConfigureManualLoadPlugin()
     call vimspector#Restart()
   endfunction
   function! ToggleBreakpoint()
-    if !exists("VimspectorShowOutput")
+    if !exists(':VimspectorShowOutput')
       call plug#load('vimspector')
     endif
     call vimspector#ToggleBreakpoint()
@@ -1868,14 +1798,10 @@ function! ConfigureManualLoadPlugin()
     " 6. Check the conditions: module is non-empty and enable_project_debug is true (string "1")
     let l:module = get(l:proj_config, 'module', '')
     let l:enable_debug = get(l:proj_config, 'enable_project_debug', '')
-    if l:module != '' && l:enable_debug
-      return 1
-    else
-      return 0
-    endif
+    return l:module != '' && l:enable_debug
   endfunction
   function! LaunchVimspector()
-    if !exists("VimspectorShowOutput")
+    if !exists(':VimspectorShowOutput')
       set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 15
       call plug#load('vimspector')
     endif
@@ -1893,16 +1819,18 @@ function! ConfigureManualLoadPlugin()
     endif
   endfunction
   function! AddVarToWatch(selection)
+    call vimspector#AddWatch(a:selection)
+  endfunction
+  function! s:VimspectorCommand(command) abort
     let l:cur_winid = win_getid()
-    call win_gotoid(g:vimspector_session_windows.watches)
-    exec "normal! i".a:selection."\<CR>"
-    call win_gotoid(l:cur_winid)
+    try
+      call vimspector#Evaluate('-exec ' . a:command)
+    finally
+      call win_gotoid(l:cur_winid)
+    endtry
   endfunction
   function! ListAllBreakPoints()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec info breakpoints\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('info breakpoints')
   endfunction
   function! ShowAssembleCode()
     if exists("g:vimspector_session_windows.disassembly")
@@ -1910,99 +1838,55 @@ function! ConfigureManualLoadPlugin()
       call win_gotoid(g:vimspector_session_windows.disassembly)
       return
     endif
-    let l:cur_winid = win_getid()
     call vimspector#ShowDisassembly()
-    while !exists("g:vimspector_session_windows.disassembly")
-      \ || win_id2win(g:vimspector_session_windows.disassembly) == 0
-      \ || l:cur_winid == win_getid()
-      sleep 33m
-    endwhile
-    let l:dis_buf_id = winbufnr(g:vimspector_session_windows.disassembly)
-    hide
-    call win_gotoid(g:vimspector_session_windows.code)
-    exec 'rightbelow vsplit | b ' . l:dis_buf_id
-    let g:vimspector_session_windows.disassembly = win_getid()
+    let l:dis_winid = get(get(g:, 'vimspector_session_windows', {}), 'disassembly', 0)
+    if win_id2win(l:dis_winid) == 0
+      return
+    endif
+    call win_splitmove(l:dis_winid, g:vimspector_session_windows.code,
+          \ {'vertical': 1, 'rightbelow': 1})
     call ReshapeVimspectorWins(30)
     call win_gotoid(g:vimspector_session_windows.disassembly)
     65wincmd |
   endfunction
   function! ControlAllChildrenProcessess()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec set detach-on-fork off\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('set detach-on-fork off')
   endfunction
   function! DetachAllChildrenProcessess()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec set detach-on-fork on\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('set detach-on-fork on')
   endfunction
   function! FollowChildrenProcessess()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec set follow-fork-mode child\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('set follow-fork-mode child')
   endfunction
   function! FollowParentProcessess()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec set follow-fork-mode parent\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('set follow-fork-mode parent')
   endfunction
   function! ListAllProcessess()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec info inferiors\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('info inferiors')
   endfunction
   function! SwitchToSpecificProcess(num=1)
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec inferior a:num\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('inferior ' . a:num)
   endfunction
   function! ListAllThreads()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec info threads\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('info threads')
   endfunction
   function! CheckAllBacktraces()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec thread apply all backtrace\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('thread apply all backtrace')
   endfunction
   function! CheckCurrentBacktrace()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec backtrace\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('backtrace')
   endfunction
   function! SetBacktraceLimit(limit=6)
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec set backtrace limit a:limit\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('set backtrace limit ' . a:limit)
   endfunction
   function! SwitchToSpecificThread(num=1)
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec thread a:num\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('thread ' . a:num)
   endfunction
   function! ContinueAllThreads()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec thread apply all continue\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('thread apply all continue')
   endfunction
   function! StopAllThreads()
-    let l:cur_winid = win_getid()
-    exec ":VimspectorShowOutput Console"
-    exec "normal! i"."-exec thread apply all stop\<CR>"
-    call win_gotoid(l:cur_winid)
+    call s:VimspectorCommand('thread apply all stop')
   endfunction
   augroup Plugin_Configuration_Group | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
 
@@ -2239,12 +2123,12 @@ function! SetGeneralKeyMaps()
   noremap <LocalLeader>a :<C-u>call AutoWrap()<CR>
   function! AutoWrap()
     let original_win = winnr()
+    set diffopt+=context:3
     " 遍历两个 diff 窗口
     for win in range(1, winnr('$'))
       " 切换到目标窗口
       execute win . 'wincmd w'
       setlocal wrap
-      setlocal diffopt+=context:3
     endfor
     " 返回原始窗口
     execute original_win . 'wincmd w'
@@ -2252,16 +2136,8 @@ function! SetGeneralKeyMaps()
   noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
   noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
   function! ShowNearestClassOrStruct()
-    let l:class_line = search('^class\s\+.\+', 'bcnWz')
-    let l:struct_line = search('^struct\s\+.\+', 'bcnWz')
-      let l:nearest_name = 'No class/struct can be found.'
-    if(l:class_line > l:struct_line)
-      let l:nearest_name = getline(l:class_line)
-    elseif(l:class_line < l:struct_line)
-      let l:nearest_name = getline(l:struct_line)
-    else
-      let l:nearest_name = 'No class/struct can be found.'
-    endif
+    let l:nearest_line = search('^\%(class\|struct\)\s\+.\+', 'bcnWz')
+    let l:nearest_name = l:nearest_line ? getline(l:nearest_line) : 'No class/struct can be found.'
     let l:nearest_end_poisition = strridx(l:nearest_name, '{')
     if(l:nearest_end_poisition > 0)
       let l:nearest_name = strpart(l:nearest_name, 0, l:nearest_end_poisition)
@@ -2280,9 +2156,7 @@ function! SetGeneralKeyMaps()
       let l:block_name = strpart(l:block_name, 0, l:block_end_position)
     endif
     let l:block_name = strpart(l:block_name, stridx(l:block_name, a:show_name) + len(a:show_name) + 1)
-    while(strpart(l:block_name, 0 , 1)==' ')
-      let l:block_name = strpart(l:block_name, 1)
-    endwhile
+    let l:block_name = substitute(l:block_name, '^ *', '', '')
     echo a:show_name '-->' l:block_name
   endfunction
   function! ShowCurrentFuncCodeBlockName()
@@ -2366,20 +2240,14 @@ function! SetGeneralKeyMaps()
         call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
       endif
     endfor
-    call add(l:all_possible_paths, l:cur_file_path)
-    let l:cmakelist_path = []
-    let l:qmakepro_path = []
-    let l:makefile_path = []
-    let l:sconstruct_path = []
+    if l:cur_file_path !=# l:cpp_workspace_root
+      call add(l:all_possible_paths, l:cur_file_path)
+    endif
     for l:possible_path in l:all_possible_paths
-      let l:pattern = l:possible_path."/CMakeLists.txt"
-      " Get the list of matching files (non-recursive)
-      let l:cmakelist_path = glob(l:pattern, 0, 1)
-      if !empty(l:cmakelist_path)
-        let l:cmakelist_path = ' cd '.l:possible_path
+      if filereadable(l:possible_path.'/CMakeLists.txt')
+        let l:cmakelist_path = ' cd '.shellescape(l:possible_path, 1)
             \ .' && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON'
-        call system('ccache --version')
-        if v:shell_error " Not use ccache
+        if !executable('ccache')
           echo "ccache is not installed."
         else
           let l:cmakelist_path = l:cmakelist_path
@@ -2392,50 +2260,48 @@ function! SetGeneralKeyMaps()
       let l:pattern = l:possible_path."/*.pro"
       let l:qmakepro_path = glob(l:pattern, 0, 1)
       if !empty(l:qmakepro_path)
-        return ' cd '.l:possible_path.' && qmake -o build/Makefile'
+        return ' cd '.shellescape(l:possible_path, 1).' && qmake -o build/Makefile'
             \ .' && bear --append -- make -C build -j12'
       endif
-      let l:pattern = l:possible_path."/[m,M]akefile"
-      let l:makefile_path = glob(l:pattern, 0, 1)
-      if !empty(l:makefile_path)
-        return ' cd '.l:possible_path.' && bear --append -- make -j12'
+      if filereadable(l:possible_path.'/Makefile') || filereadable(l:possible_path.'/makefile')
+        return ' cd '.shellescape(l:possible_path, 1).' && bear --append -- make -j12'
       endif
-      let l:pattern = l:possible_path."/SConstruct"
-      let l:sconstruct_path = glob(l:pattern, 0, 1)
-      if !empty(l:sconstruct_path)
-        return ' cd '.l:possible_path.' && bear --append -- scons -j12'
+      if filereadable(l:possible_path.'/SConstruct')
+        return ' cd '.shellescape(l:possible_path, 1).' && bear --append -- scons -j12'
       endif
     endfor
     let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
           \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
-          \ .expand('%:t').' -o '.fnamemodify(expand('%'), ':t:r').'.exe'
+          \ .shellescape(expand('%:t'), 1).' -o '.shellescape(expand('%:t:r').'.exe', 1)
     if &filetype=='cpp'
-      return ' cd '.l:cur_file_path.' && g++ -Weffc++'.l:compile_single_file
+      return ' cd '.shellescape(l:cur_file_path, 1).' && g++ -Weffc++'.l:compile_single_file
     elseif &filetype=='cuda'
-      return ' cd '.l:cur_file_path.' && nvcc -g '.expand('%:t').' -o '
-          \ .fnamemodify(expand('%'), ':t:r').'.exe'
+      return ' cd '.shellescape(l:cur_file_path, 1).' && nvcc -g '.shellescape(expand('%:t'), 1).' -o '
+          \ .shellescape(expand('%:t:r').'.exe', 1)
     elseif &filetype=='verilog' || &filetype=='systemverilog'
-      return ' cd '.l:cur_file_path.' iverilog *.v -o %<.out && vvp %<.out'
+      let l:output_file = shellescape(expand('%:t:r').'.out', 1)
+      return ' cd '.shellescape(l:cur_file_path, 1).' && iverilog *.v -o '.l:output_file.' && vvp '.l:output_file
     else
-      return ' cd '.l:cur_file_path.' && gcc'.l:compile_single_file
+      return ' cd '.shellescape(l:cur_file_path, 1).' && gcc'.l:compile_single_file
     endif
   endfunction
   if !(exists('*CompileAndExcute') && &filetype=='vim')
     function! CompileAndExcute()
       let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+      let l:source_file = shellescape(expand('%:p'), 1)
       if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
-        exec l:compile_exec.' /usr/bin/env python3 %'
+        exec l:compile_exec.' /usr/bin/env python3 '.l:source_file
       elseif &filetype=='sh'
-        exec l:compile_exec.' /usr/bin/env sh %'
+        exec l:compile_exec.' /usr/bin/env sh '.l:source_file
       elseif &filetype=='csh'
-        exec l:compile_exec.' /usr/bin/env csh %'
+        exec l:compile_exec.' /usr/bin/env csh '.l:source_file
       elseif &filetype=='verilog'
         let l:verilog_compilation = CPPCompilation()
-        exec l:compile_exec.l:verilog_compilation.' && gtkwave %<.vcd'
+        exec l:compile_exec.l:verilog_compilation.' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
       elseif &filetype=='perl'
-        exec l:compile_exec.' /usr/bin/env perl %'
+        exec l:compile_exec.' /usr/bin/env perl '.l:source_file
       elseif &filetype=='tcl'
-        exec l:compile_exec.' /usr/bin/env tclsh %'
+        exec l:compile_exec.' /usr/bin/env tclsh '.l:source_file
       elseif &filetype=='markdown'
         exec ':CocCommand markdown-preview-enhanced.openPreview'
       elseif &filetype=='vim'
@@ -2446,23 +2312,27 @@ function! SetGeneralKeyMaps()
         call CompileAndExcute()
       else
         let l:cpp_compilation = CPPCompilation()
+        let l:program_name = expand('%:t:r').'.exe'
         if stridx(l:cpp_compilation, 'bear') != -1
+          let l:build_program = shellescape('build/'.l:program_name, 1)
+          let l:local_program = shellescape('./'.l:program_name, 1)
+          let l:source_program = shellescape(expand('%:p:r').'.exe', 1)
           exec l:compile_exec.l:cpp_compilation
-                \.' && if [ -e build/'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
-                \.' build/'.fnamemodify(expand('%'), ':t:r').'.exe;'
-                \.'  elif [ -e ./'.fnamemodify(expand('%'), ':t:r').'.exe ]; then'
-                \.' ./'.fnamemodify(expand('%'), ':t:r').'.exe;'
-                \.'  elif [ -e '.fnamemodify(expand('%:r'), ':p').'.exe ]; then'
-                \.' '.fnamemodify(expand('%:r'), ':p').'.exe;'
+                \.' && if [ -e '.l:build_program.' ]; then'
+                \.' '.l:build_program.';'
+                \.'  elif [ -e '.l:local_program.' ]; then'
+                \.' '.l:local_program.';'
+                \.'  elif [ -e '.l:source_program.' ]; then'
+                \.' '.l:source_program.';'
                 \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
                 \.' build/*.exe;'
                 \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
                 \.' ./*.exe;'
                 \.' else'
-                \.' '.expand('%:p:h').'/*.exe;'
+                \.' '.shellescape(expand('%:p:h'), 1).'/*.exe;'
                 \.' fi'
         elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
-          exec l:compile_exec.l:cpp_compilation.' && ./'.fnamemodify(expand('%'), ':t:r').'.exe'
+          exec l:compile_exec.l:cpp_compilation.' && '.shellescape('./'.l:program_name, 1)
         endif
       endif
     endfunction
@@ -2471,7 +2341,7 @@ function! SetGeneralKeyMaps()
     let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
     if &filetype=='verilog'
         let l:verilog_compilation = CPPCompilation()
-        exec l:compile_exec.l:verilog_compilation
+        exec l:compile_only.l:verilog_compilation
     elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
         \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
       call JumpToTheMainWin()
@@ -2643,9 +2513,8 @@ function! SetGeneralKeyMaps()
   endfunction
   function! NewTab(mode = 'terminal') abort
     let l:target_dir = GetLaunchDir()
-    call NUpdateTabTermBuf()
     tabnew
-    exec 'lcd ' . l:target_dir
+    exec 'lcd ' . fnameescape(l:target_dir)
     if a:mode ==# 'terminal'
       let l:terminal_options = {
             \ 'curwin': 1,
@@ -2654,35 +2523,34 @@ function! SetGeneralKeyMaps()
             \ 'term_kill': 'term',
             \ 'cwd': l:target_dir,
             \ }
-      let g:tab_term_buf[tabpagenr()] = term_start(&shell, l:terminal_options)
+      let t:term_buf = term_start(&shell, l:terminal_options)
     endif
   endfunction
-  function! CloseAndBackTab()
+  function! CloseAndBackTab() abort
     let l:exec_tabp='tabp'
     if tabpagenr() == tabpagenr('$')
       let l:exec_tabp=''
     endif
     while winnr('$') > 1 " Prevent the function from closing multiple tabs
+      let l:winid = win_getid()
       call QuitWin()
+      if win_id2win(l:winid) > 0
+        return
+      endif
     endwhile
+    let l:tab_count = tabpagenr('$')
     call QuitWin()
-    exec l:exec_tabp
+    if tabpagenr('$') < l:tab_count
+      exec l:exec_tabp
+    endif
   endfunction
-  function! QuitWin()
+  function! QuitWin() abort
     let l:exec_quit='quit'
     let l:tab_num_before_close = tabpagenr('$')
     let l:cur_tab_win_num = winnr('$')
-    if &filetype==''
+    let l:terminal_buf = get(t:, 'term_buf', -1)
+    if &buftype ==# 'terminal' || (&filetype=='' && !&modified)
       let l:exec_quit='quit!'
-    endif
-    if winnr('$') == 1 && tabpagenr('$') > 1 " Multiple tabs, single win
-      call CUpdateTabTermBuf()
-    elseif winnr('$') == 1 " Single win, single tab
-      for l:buf in range(1, bufnr('$') + 1) " Clear term buffers without warnings.
-        if l:buf != bufnr('%') && bufexists(l:buf)
-          exec 'silent bwipeout! ' . l:buf
-        endif
-      endfor
     endif
     if exists("g:vimspector_session_windows.disassembly")
       \ && g:vimspector_session_windows.disassembly == win_getid()
@@ -2691,31 +2559,31 @@ function! SetGeneralKeyMaps()
       call ReshapeVimspectorWins()
       return
     endif
-    if l:tab_num_before_close == tabpagenr('$') && l:cur_tab_win_num == winnr('$')
+    try
       exec l:exec_quit
-    endif
-  endfunction
-  function! MoveTab(boundary, plus_or_minus, plus_or_minus_one, first, last)
-    let l:cur_tab=tabpagenr()
-    if l:cur_tab == a:boundary && tabpagenr('$') > 1
-      exec ':tabmove '.a:plus_or_minus[0].(tabpagenr('$') - 1)
-      let l:tmp = g:tab_term_buf[l:cur_tab]
-      for l:index in range(a:first, a:last, a:plus_or_minus_one[0])
-        let g:tab_term_buf[l:index] = g:tab_term_buf[l:index + a:plus_or_minus_one[0]]
+    catch /^Vim\%((\a\+)\)\=:E947/
+      if l:tab_num_before_close != 1 || l:cur_tab_win_num != 1
+            \ || !empty(filter(getbufinfo({'bufmodified': 1}),
+            \ {_, buf -> getbufvar(buf.bufnr, '&buftype') !=# 'terminal'}))
+        throw 'QuitWin: ' . v:exception
+      endif
+      for l:buf in getbufinfo()
+        if getbufvar(l:buf.bufnr, '&buftype') ==# 'terminal'
+          execute 'silent bwipeout! ' . l:buf.bufnr
+        endif
       endfor
-      let g:tab_term_buf[a:last] = l:tmp
-    elseif tabpagenr('$') > 1
-      exec ':tabmove '.a:plus_or_minus[1]
-      let l:tmp = g:tab_term_buf[l:cur_tab]
-      let g:tab_term_buf[l:cur_tab] = g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]]
-      let g:tab_term_buf[l:cur_tab + a:plus_or_minus_one[1]] = l:tmp
+      exec l:exec_quit
+    endtry
+    if l:cur_tab_win_num == 1 && tabpagenr('$') < l:tab_num_before_close
+          \ && getbufvar(l:terminal_buf, '&buftype') ==# 'terminal'
+      execute 'silent bwipeout! ' . l:terminal_buf
     endif
   endfunction
   function! MoveTabH()
-    call MoveTab(1, ['+', '-'], [+1, -1], 1, tabpagenr('$'))
+    execute 'tabmove ' . (tabpagenr() == 1 ? '$' : '-1')
   endfunction
   function! MoveTabL()
-    call MoveTab(tabpagenr('$'), ['-', '+'], [-1, +1], tabpagenr('$'), 1)
+    execute 'tabmove ' . (tabpagenr() == tabpagenr('$') ? '0' : '+1')
   endfunction
   tnoremap <C-S-v> <C-w>"+
   " Define the main command (capital E) – safe and explicit
@@ -2725,17 +2593,9 @@ function! SetGeneralKeyMaps()
     call EnterIntoWorkspaceOrFilePath()
   endfunction
   function! EnterIntoWorkspaceOrFilePath(into_work_space = 1) abort
-    " Get info of the current window in this tab
-    let l:file_path = expand('%:p:h')   " Directory of the current file (absolute)
-    let l:file_work_space_root      = WorkspaceRoot()   " Workspace root (guaranteed valid)
-    let l:cwd_work_space_root  = WorkspaceRoot(getcwd())
-    " If invalid, change tab-local working directory to workspace root
-    if l:file_work_space_root !=# l:cwd_work_space_root
-      if a:into_work_space == 1
-        execute 'lcd ' . l:file_work_space_root
-      else
-        execute 'lcd ' . l:file_path
-      endif
+    let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetLaunchDir()
+    if l:target_dir !=# getcwd()
+      execute 'lcd ' . fnameescape(l:target_dir)
     endif
   endfunction
   noremap <LocalLeader>r :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
@@ -2788,11 +2648,6 @@ function! CocTimerStart(timer)
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
   call InitializeTabPos()
-  " Create an array to store the most recent terminal buffer for each tab
-  let g:tab_term_buf_size = 19
-  if !exists('g:tab_term_buf')
-    let g:tab_term_buf = repeat([-1], g:tab_term_buf_size)
-  endif
   if exists('v:vim_did_enter') && v:vim_did_enter
     silent! call InitializeCwdForEachTab()
   else
