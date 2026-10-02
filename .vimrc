@@ -1016,7 +1016,8 @@ function! ConfigureManualLoadPlugin()
     if strdisplaywidth(a:text) <= a:width
       return a:text
     endif
-    return strcharpart(a:text, 0, a:width - 1).'…'
+    let l:ellipsis = printf('%.*S', a:width, '…')
+    return printf('%.*S', a:width - strdisplaywidth(l:ellipsis), a:text).l:ellipsis
   endfunction
   function! QuickuiCheatsheetKeyMapLine(key_map, width)
     let l:mode_name = get(a:key_map, 3, a:key_map[2] ==# 'x' ? 'V' : toupper(a:key_map[2]))
@@ -1025,7 +1026,7 @@ function! ConfigureManualLoadPlugin()
     let l:description_width = a:width - l:key_width - 3
     let l:key = QuickuiCheatsheetTruncate(l:key, l:key_width)
     let l:description = QuickuiCheatsheetTruncate(a:key_map[1], l:description_width)
-    return '  '.printf('%-'.l:key_width.'s', l:key).' '.l:description
+    return '  '.printf('%-*S', l:key_width, l:key).' '.l:description
   endfunction
   function! QuickuiCheatsheetGroup(group, width, toggle_key)
     let l:title = '['.a:toggle_key.'] '.a:group[0].': [-]'
@@ -1034,8 +1035,7 @@ function! ConfigureManualLoadPlugin()
     for l:key_map_id in range(0, len(a:group[1]) - 1, 2)
       let l:left = QuickuiCheatsheetKeyMapLine(
             \ a:group[1][l:key_map_id], l:mapping_column_width)
-      let l:left .= repeat(' ', max([0,
-            \ l:mapping_column_width - strdisplaywidth(l:left)]))
+      let l:left = printf('%-*S', l:mapping_column_width, l:left)
       let l:right = ''
       if l:key_map_id + 1 < len(a:group[1])
         let l:right = QuickuiCheatsheetKeyMapLine(
@@ -1066,7 +1066,7 @@ function! ConfigureManualLoadPlugin()
         let l:fold_mark = get(g:quickui_cheatsheet_folded, l:group[0], 0) ? '+' : '-'
         let l:cell = '['.l:toggle_key.']'.l:fold_mark.' '.l:group[0]
         let l:cell = QuickuiCheatsheetTruncate(l:cell, l:cell_width)
-        let l:cell .= repeat(' ', max([0, l:cell_width - strdisplaywidth(l:cell)]))
+        let l:cell = printf('%-*S', l:cell_width, l:cell)
         call add(l:cells, l:cell)
       endfor
       call add(l:rows, trim(join(l:cells, ' '), " \t", 2))
