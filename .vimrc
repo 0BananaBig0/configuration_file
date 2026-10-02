@@ -1211,13 +1211,11 @@ function! ConfigureManualLoadPlugin()
       call QuickuiStartKeyMapCheatsheetSearch(a:winid, a:key)
       return 1
     elseif a:key ==# 'n' || a:key ==# 'N'
-      if exists('g:quickui_cheatsheet_search_pattern')
-        let l:backwards = get(g:, 'quickui_cheatsheet_search_direction', '/') ==# '?'
-        if a:key ==# 'N'
-          let l:backwards = !l:backwards
-        endif
-        call QuickuiRunKeyMapCheatsheetSearch(a:winid, l:backwards)
+      let l:backwards = get(g:, 'quickui_cheatsheet_search_direction', '/') ==# '?'
+      if a:key ==# 'N'
+        let l:backwards = !l:backwards
       endif
+      call QuickuiRunKeyMapCheatsheetSearch(a:winid, l:backwards)
       return 1
     elseif a:key ==# ' '
       call quickui#utils#scroll(a:winid, 'PAGEDOWN')
@@ -2446,10 +2444,7 @@ function! SetGeneralKeyMaps()
     endif
   endfunction
   function! CloseAndBackTab() abort
-    let l:exec_tabp='tabp'
-    if tabpagenr() == tabpagenr('$')
-      let l:exec_tabp=''
-    endif
+    let l:go_back = tabpagenr() < tabpagenr('$')
     while winnr('$') > 1 " Prevent the function from closing multiple tabs
       let l:winid = win_getid()
       call QuitWin()
@@ -2459,8 +2454,8 @@ function! SetGeneralKeyMaps()
     endwhile
     let l:tab_count = tabpagenr('$')
     call QuitWin()
-    if tabpagenr('$') < l:tab_count
-      exec l:exec_tabp
+    if l:go_back && tabpagenr('$') < l:tab_count
+      tabprevious
     endif
   endfunction
   function! QuitWin() abort
