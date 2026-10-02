@@ -157,9 +157,7 @@ function! ConfigureMarkdownPlugin()
   endfunction
   function! CreateMarkdownMenu()
     normal! ms
-    if !exists(':GenTocGFM')
-      call LoadMarkdownToc(':GenTocGFM')
-    endif
+    call LoadMarkdownToc(':GenTocGFM')
     exec "normal! ggO\<ESC>"
     GenTocGFM
     normal! ggdd`s
@@ -168,9 +166,7 @@ function! ConfigureMarkdownPlugin()
     let l:previous_column = col('.')
     let l:previous_line = line('.')
     let l:previous_total_line_count = line('$')
-    if !exists(':UpdateToc')
-      call LoadMarkdownToc(':UpdateToc')
-    endif
+    call LoadMarkdownToc(':UpdateToc')
     UpdateToc
     let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
     call setpos('.', [0, l:new_line, l:previous_column, 0])
@@ -612,9 +608,7 @@ function! ConfigureDelayedPlugin()
   endfunction
 
   function! s:EnsureMatchupForCurrentBuffer() abort
-      if !exists('g:loaded_matchup')
-          call plug#load('vim-matchup')
-      endif
+      call plug#load('vim-matchup')
 
       " if buffer does not exist
       if empty(&l:filetype)
@@ -1725,9 +1719,7 @@ function! ConfigureManualLoadPlugin()
     call vimspector#Restart()
   endfunction
   function! ToggleBreakpoint()
-    if !exists(':VimspectorShowOutput')
-      call plug#load('vimspector')
-    endif
+    call plug#load('vimspector')
     call vimspector#ToggleBreakpoint()
   endfunction
   function! ContinueInVimspector()
