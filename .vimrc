@@ -452,11 +452,7 @@ function! ConfigureDelayedPlugin()
     if s:IsAuxiliaryBuffer()
       call JumpToTheMainWin() " Avoid potential bugs
     endif
-    if empty(a:file_path)
-      let l:file_path = GetLaunchDir()
-    else
-      let l:file_path = a:file_path
-    endif
+    let l:file_path = empty(a:file_path) ? GetLaunchDir() : a:file_path
     let l:workspace_root = FindRootPatternPath(l:file_path) " Where we store the opened file
     if empty(l:workspace_root)
       echo 'You had better create a root-pattern file like .git in your project.'
@@ -702,9 +698,8 @@ function! ConfigureDelayedPlugin()
               \ 'term_kill': 'term',
               \ 'cwd': l:terminal_directory,
               \ }
-        let l:terminal_buf = term_start(&shell, l:terminal_options)
+        let t:term_buf = term_start(&shell, l:terminal_options)
         exec 'resize ' . a:height
-        let t:term_buf = l:terminal_buf
       endif
       if &buftype ==# 'terminal' && !exists('b:asyncrun_bid')
         let l:terminal_job = term_getjob(bufnr('%'))
@@ -1036,8 +1031,7 @@ function! ConfigureManualLoadPlugin()
     return strcharpart(a:text, 0, a:width - 1).'…'
   endfunction
   function! QuickuiCheatsheetKeyMapLine(key_map, width)
-    let l:mode_name = get({'n': 'N', 'x': 'V', 'i': 'I', 'o': 'O'},
-          \ a:key_map[2], toupper(a:key_map[2]))
+    let l:mode_name = get({'x': 'V'}, a:key_map[2], toupper(a:key_map[2]))
     let l:mode_name = get(a:key_map, 3, l:mode_name)
     let l:key = a:key_map[0].' ['.l:mode_name.']'
     let l:key_width = min([22, max([12, a:width / 2])])
@@ -1088,7 +1082,7 @@ function! ConfigureManualLoadPlugin()
         let l:cell .= repeat(' ', max([0, l:cell_width - strdisplaywidth(l:cell)]))
         call add(l:cells, l:cell)
       endfor
-      call add(l:rows, substitute(join(l:cells, ' '), '\s\+$', '', ''))
+      call add(l:rows, trim(join(l:cells, ' '), " \t", 2))
     endfor
     return l:rows
   endfunction
@@ -1332,15 +1326,9 @@ function! ConfigureManualLoadPlugin()
   " NERDTree Setting
   noremap <Leader>nt :<C-u>NERDTreeToggle<CR>
   noremap <Leader>nc :<C-u>NERDTreeCWD<CR>
-  let g:NERDTreeFileExtensionHighlightFullName = 1
-  let g:NERDTreeExactMatchHighlightFullName = 1
-  let g:NERDTreePatternMatchHighlightFullName = 1
-  let g:NERDTreeHighlightFolders = 1
-  let g:NERDTreeHighlightFoldersFullName = 1
   let g:NERDTreeQuitOnOpen = 1
   let g:NERDTreeDirArrowExpandable = '+'
   let g:NERDTreeDirArrowCollapsible = '-'
-  let g:NERDTreeHidden = 0
 
 
 
@@ -1645,12 +1633,12 @@ function! ConfigureManualLoadPlugin()
       return
     endif
     let l:position = [bufnr(), line('.'), col('.')]
-    let l:start = call(function(&omnifunc), [1, ''])
+    let l:start = call(&omnifunc, [1, ''])
     if l:start < 0
       return
     endif
     let l:base = strpart(getline('.'), l:start, col('.') - 1 - l:start)
-    let l:matches = call(function(&omnifunc), [0, l:base])
+    let l:matches = call(&omnifunc, [0, l:base])
     if mode() ==# 'i' && l:position == [bufnr(), line('.'), col('.')]
       call complete(l:start + 1, l:matches.words)
     endif
@@ -1990,13 +1978,11 @@ function! SetIndent()
 endfunction
 function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3
-  let l:lpadding_strs = &commentstring[0].&commentstring[1]
+  let l:padding_str = &commentstring[0].&commentstring[1]
       \ .repeat(&commentstring[0], l:padding_str_len - 2)
-  let l:rpadding_strs = repeat(&commentstring[0], l:padding_str_len - 2)
-      \ .&commentstring[1].&commentstring[0]
   let l:start_space_len = (a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2) / 2
   let l:end_space_len = a:column_limit - l:start_space_len - strdisplaywidth(a:info) - l:padding_str_len * 2
-  call append(line('$'), l:lpadding_strs.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:rpadding_strs)
+  call append(line('$'), l:padding_str.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_str)
 endfunction
 function! SetTitle()
   if &filetype=='c' || &filetype=='cpp' || expand('%:e')=='cl'
@@ -2103,7 +2089,7 @@ function! SetGeneralKeyMaps()
       let l:block_name = strpart(l:block_name, 0, l:block_end_position)
     endif
     let l:block_name = strpart(l:block_name, stridx(l:block_name, a:show_name) + len(a:show_name) + 1)
-    let l:block_name = substitute(l:block_name, '^ *', '', '')
+    let l:block_name = trim(l:block_name, ' ', 1)
     echo a:show_name '-->' l:block_name
   endfunction
   function! ShowCurrentFuncCodeBlockName()
