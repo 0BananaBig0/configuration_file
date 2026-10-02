@@ -289,7 +289,68 @@ function! s:LazyPlugins() abort
   endif
 endfunction
 
+function! s:CheatsheetCategories() abort
+  call popup_clear()
+  call QuickuiOpenKeyMapCheatsheet()
+  let l:winid = popup_list()[0]
+  try
+    let l:names = map(copy(g:quickui_keymap_groups), {_, group -> group[0]})
+    call assert_true(index(l:names, 'TigerVNC') >= 0, 'TigerVNC is included in the cheatsheet')
+    call assert_equal(sort(copy(l:names)), l:names, 'categories remain alphabetical')
+    " A new category must not leave the last category without a usable fold key.
+    for [l:index, l:name] in items(l:names)
+      let l:key = get(g:quickui_cheatsheet_toggle_keys, l:index, '?')
+      call QuickuiKeyMapCheatsheetFilter(l:winid, l:key)
+      call assert_false(g:quickui_cheatsheet_folded[l:name], l:name . ' unfolds with its key')
+      call assert_true(index(getbufline(winbufnr(l:winid), 1, '$'),
+            \ '[' . l:key . '] ' . l:name . ': [-]') >= 0, l:name . ' renders when unfolded')
+      call QuickuiKeyMapCheatsheetFilter(l:winid, l:key)
+      call assert_true(g:quickui_cheatsheet_folded[l:name], l:name . ' folds with the same key')
+    endfor
+  finally
+    call popup_clear()
+  endtry
+endfunction
+
+function! s:CheatsheetWidths() abort
+  let l:saved = [&ambiwidth, &listchars, &fillchars]
+  try
+    set listchars= fillchars= ambiwidth=single
+    for [l:text, l:width, l:expected] in [
+          \ ['abcdef', 4, 'abc…'], ['中文名', 5, '中文…'],
+          \ ["e\u0301xyz", 3, "e\u0301x…"], ['中', 2, '中'],
+          \ ['abcdef', 1, '…'], ['abc', 0, ''], ['abc', -1, '']]
+      call assert_equal(l:expected, QuickuiCheatsheetTruncate(l:text, l:width),
+            \ 'truncate by display columns, preserving combining characters')
+    endfor
+    let l:line = QuickuiCheatsheetKeyMapLine(['中', 'desc', 'n'], 26)
+    call assert_equal(16, strdisplaywidth(strpart(l:line, 0, stridx(l:line, 'desc'))),
+          \ 'description starts after the full key column')
+    let l:group = QuickuiCheatsheetGroup(['Test',
+          \ [['中', '左', 'n'], ['right', '右', 'n']]], 62, '1')
+    call assert_equal(34, strdisplaywidth(strpart(l:group[2], 0, stridx(l:group[2], 'right'))),
+          \ 'second mapping stays aligned after wide text')
+    set ambiwidth=double
+    for [l:width, l:expected] in [[1, ''], [2, '…'], [4, '中…']]
+      call assert_equal(l:expected, QuickuiCheatsheetTruncate('中文名', l:width),
+            \ 'reserve the actual display width of the ellipsis')
+    endfor
+  finally
+    let [&ambiwidth, &listchars, &fillchars] = l:saved
+  endtry
+endfunction
+
 function! s:NativeHelpers() abort
+  " With gdefault, explicit /g would leave repeated unwanted characters behind.
+  enew
+  set gdefault
+  setlocal expandtab tabstop=4
+  call setline(1, ["a\r\rb\u200b\u200bc   ", "\talpha\tbeta  ", 'plain'])
+  call cursor(1, 1)
+  call RetabAndDeleteTraillingUselessChars()
+  call assert_equal(['abc', '    alpha   beta', 'plain'], getline(1, '$'),
+        \ 'cleanup removes every CR and zero-width space, expands tabs and trims whitespace')
+
   " Catch byte slicing and ignored line/block/exclusive selection modes.
   enew
   call setline(1, ['αβγ', 'abcde'])
@@ -328,6 +389,15 @@ function! s:NativeHelpers() abort
   call assert_equal(l:root . '/src', getcwd(), 'enter file directory inside same workspace')
   call EnterIntoWorkspaceOrFilePath()
   call assert_equal(l:root, getcwd(), 'enter workspace root from a subdirectory')
+  " Workspace navigation must not overwrite Insert-mode redo.
+  for l:mode in ['n', 'i', 't']
+    call assert_match('EnterIntoWorkspaceOrFilePath()', maparg('<M-s>', l:mode),
+          \ 'Alt-S enters the workspace in mode ' . l:mode)
+  endfor
+  call assert_equal('<C-O><C-R>', maparg('<M-r>', 'i'), 'Alt-R keeps Insert-mode redo')
+  call EnterIntoWorkspaceOrFilePath(0)
+  call feedkeys("\<M-s>", 'xt')
+  call assert_equal(l:root, getcwd(), 'Alt-S actually enters the workspace')
   call NewTab('empty_tab')
   call assert_equal(l:root . '/src', getcwd(), 'new tab inherits launch directory with special characters')
   call CloseAndBackTab()
@@ -418,7 +488,7 @@ function! s:BuildCommands() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLayout', 'LazyPlugins', 'NativeHelpers', 'AsyncRunPaths', 'BuildCommands']
+  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLayout', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetWidths', 'NativeHelpers', 'AsyncRunPaths', 'BuildCommands']
     try
       call call(function('s:' . s:check), [])
     catch
