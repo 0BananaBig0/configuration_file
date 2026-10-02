@@ -431,13 +431,16 @@ function! ConfigureDelayedPlugin()
   let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
   function! FindRootPatternPath(target_path)
     for l:pattern in g:root_patterns
-      let l:possible_path = substitute(a:target_path, '/\+$', '', '')
-      while index(['', '.', '/', $HOME, '/home/'.$SUDO_USER], l:possible_path) < 0
+      let l:possible_path = a:target_path
+      while index([$HOME, '/home/'.$SUDO_USER, '/'], l:possible_path) < 0
         let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
         if !empty(l:root_pattern_path)
           return l:root_pattern_path
         endif
-        let l:possible_path = fnamemodify(l:possible_path, ':h')
+        if stridx(l:possible_path, '/') < 0
+          break
+        endif
+        let l:possible_path = substitute(l:possible_path, '/[^/]*$', '', '')
       endwhile
     endfor
     return []
@@ -512,6 +515,7 @@ function! ConfigureDelayedPlugin()
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
   let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
   let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
+  let g:NERDCommentEmptyLines      = 0      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDCustomDelimiters = {
           \ 'c': {'left': '//'},
@@ -535,6 +539,9 @@ function! ConfigureDelayedPlugin()
   " --------------------------------------------------------------------------
   " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
   " --------------------------------------------------------------------------
+  let g:matchup_enabled = 1                " 总开关
+  let g:matchup_motion_enabled = 1        " [% ]% g% 等，便宜，开着
+  let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
   let g:matchup_surround_enabled = 1       " ds% cs%，可选
 
   silent! nunmap [%
@@ -558,12 +565,15 @@ function! ConfigureDelayedPlugin()
   let g:matchup_matchparen_timeout = 160   " ★ 从默认 300 压到 160ms，超时放弃不重算
   let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
   let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
+  let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
 
   " --- 分隔符引擎（影响 motion/text-obj 速度）---
+  let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
   let g:matchup_delim_noskips = 1          " ★ 不在 comment/string 里做 keyword 匹配，C++ 大文件省不少
 
   " --- 不需要的功能关掉 ---
   let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
+  let g:matchup_transmute_enabled = 0      " 实验性的，关
 
   let g:matchup_matchparen_offscreen = {
         \ 'method':    'popup',
@@ -1034,7 +1044,7 @@ function! ConfigureManualLoadPlugin()
   function! QuickuiCheatsheetKeyMapLine(key_map, width)
     let l:mode_name = get({'n': 'N', 'x': 'V', 'i': 'I', 'o': 'O'},
           \ a:key_map[2], toupper(a:key_map[2]))
-    let l:mode_name = len(a:key_map) > 3 ? a:key_map[3] : l:mode_name
+    let l:mode_name = get(a:key_map, 3, l:mode_name)
     let l:key = a:key_map[0].' ['.l:mode_name.']'
     let l:key_width = min([22, max([12, a:width / 2])])
     let l:description_width = a:width - l:key_width - 3
@@ -1328,15 +1338,22 @@ function! ConfigureManualLoadPlugin()
   " NERDTree Setting
   noremap <Leader>nt :<C-u>NERDTreeToggle<CR>
   noremap <Leader>nc :<C-u>NERDTreeCWD<CR>
+  let g:NERDTreeFileExtensionHighlightFullName = 1
+  let g:NERDTreeExactMatchHighlightFullName = 1
+  let g:NERDTreePatternMatchHighlightFullName = 1
+  let g:NERDTreeHighlightFolders = 1
+  let g:NERDTreeHighlightFoldersFullName = 1
   let g:NERDTreeQuitOnOpen = 1
   let g:NERDTreeDirArrowExpandable = '+'
   let g:NERDTreeDirArrowCollapsible = '-'
+  let g:NERDTreeHidden = 0
 
 
 
   " Vista setting
   noremap <Leader>vt :<C-u>Vista!!<CR>
   noremap <Leader>vf :<C-u>Vista focus<CR>
+  let g:vista_no_mappings = 0
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
@@ -1350,6 +1367,7 @@ function! ConfigureManualLoadPlugin()
   " Vim-bookmarks setting
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
+  let g:bookmark_auto_save = 1
   " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
@@ -1464,15 +1482,8 @@ function! ConfigureManualLoadPlugin()
 
   " Vimspector setting
   function! JumpToTabIfExists(filepath)
-    " 1. Get the buffer number for the absolute file path
-    let l:bufnr = bufnr(a:filepath)
-    " If buffer doesn't exist at all, do nothing
-    if l:bufnr == -1
-      return 0
-    endif
-    " 2. Find all window IDs displaying this buffer across all tabs
-    let l:winids = win_findbuf(l:bufnr)
-    " 3. Jump to the first matching window/tab if found
+    " Find all windows displaying this buffer; a missing buffer has none.
+    let l:winids = win_findbuf(bufnr(a:filepath))
     if !empty(l:winids)
       call win_gotoid(l:winids[0])
       return 1
@@ -1851,6 +1862,7 @@ function! ConfigureManualLoadPlugin()
   else
     let g:Lf_CacheDirectory = expand('/home/'.$SUDO_USER.'/.vim/cache')
   endif
+  let g:Lf_GtagsAutoGenerate = 0
   let g:Lf_Gtagslabel = 'native-pygments'
   let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
   let g:Lf_RootMarkers = g:root_patterns
