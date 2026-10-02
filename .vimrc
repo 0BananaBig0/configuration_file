@@ -1961,9 +1961,10 @@ function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3
   let l:padding_str = &commentstring[0].&commentstring[1]
       \ .repeat(&commentstring[0], l:padding_str_len - 2)
-  let l:start_space_len = (a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2) / 2
-  let l:end_space_len = a:column_limit - l:start_space_len - strdisplaywidth(a:info) - l:padding_str_len * 2
-  call append(line('$'), l:padding_str.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_str)
+  let l:available = a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2
+  let l:start_space_len = l:available / 2
+  let l:end_space_len = l:available - l:start_space_len
+  call append('$', l:padding_str.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_str)
 endfunction
 function! SetTitle()
   if &filetype=='c' || &filetype=='cpp' || expand('%:e')=='cl'
@@ -1988,7 +1989,7 @@ function! SetTitle()
       \ .repeat(&commentstring[0], l:column_limit - 4)
       \ .&commentstring[1].&commentstring[0]
   if &filetype=='sh' || &filetype=='csh' || &filetype=='perl' || &filetype=='tcl'
-    call append(line('$'), l:top_and_bottom)
+    call append('$', l:top_and_bottom)
   else
     call setline(1, l:top_and_bottom)
   endif
@@ -2010,20 +2011,20 @@ function! SetTitle()
   call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
   call append('$', [l:top_and_bottom, ''])
   if &filetype=='c'
-    call append(line('$'), '#include <stdio.h>')
+    call append('$', '#include <stdio.h>')
   elseif &filetype=='cpp'
     if expand('%:e')=~?'^h.*'
-      call append(line('$'), '#pragma once')
+      call append('$', '#pragma once')
     endif
-    call append(line('$'), '#include <iostream>')
+    call append('$', '#include <iostream>')
   elseif &filetype=='cuda'
     call append('$', ['#include <iostream>', '#include <cuda_runtime.h>'])
   elseif &filetype=='make'
-    call append(line('$'), '.PHONY:')
+    call append('$', '.PHONY:')
   elseif &filetype=='perl'
     call append('$', ['use strict;', 'use warnings;'])
   endif
-  call append(line('$'), '')
+  call append('$', '')
   call setpos('.', [0, line('$'), 0, 0])
 endfunction
 augroup Local_Autocmd_Group
@@ -2161,8 +2162,7 @@ function! SetGeneralKeyMaps()
         if !executable('ccache')
           echo "ccache is not installed."
         else
-          let l:cmakelist_path = l:cmakelist_path
-                \ .' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
+          let l:cmakelist_path .= ' -DCMAKE_C_COMPILER_LAUNCHER=ccache'
                 \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
         endif
         return l:cmakelist_path.' -S . -B build'
@@ -2290,8 +2290,9 @@ function! SetGeneralKeyMaps()
     normal! ms
     %retab!
     %s/\s\+$//e
-    %s/\r//ge
-    %s/\%u200b//ge
+    " gdefault already replaces every occurrence; /g would reverse it.
+    %s/\r//e
+    %s/\%u200b//e
     normal! `s
   endfunction
   " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
