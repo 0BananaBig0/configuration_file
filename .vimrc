@@ -334,6 +334,11 @@ function! ConfigureWhichKey()
         \ 'e': 'Evaluate expression',
         \ 'j': 'Next breakpoint',
         \ 'k': 'Previous breakpoint',
+        \ 'm': {
+          \ 'name': '+Python Debug Mode',
+          \ 'p': 'Enable Python project debugging',
+          \ 's': 'Use Python single-file debugging',
+          \ },
         \ 'p': {'name': 'which_key_ignore'},
         \ 'pc': 'Control child processes',
         \ 'pd': 'Detach child processes',
@@ -1037,6 +1042,8 @@ function! ConfigureManualLoadPlugin()
           \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n', 'N/I/T'],
           \ ['<Leader><F6>', 'Create C/C++ debug files with .vscode', 'n'],
           \ ['<M-F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
+          \ [']mp', 'Enable Python project debugging', 'n'],
+          \ [']ms', 'Use Python single-file debugging', 'n'],
           \ ['<F5>', 'Load Vimspector', 'n'],
           \ ['<S-F5>', 'Reset Vimspector', 'n'],
           \ [']<F5>', 'Launch debugger', 'n'],
@@ -1579,12 +1586,67 @@ function! ConfigureManualLoadPlugin()
     endif
     return 0
   endfunction
+  function! WorkspaceHasBuildFiles() abort
+    let l:root = WorkspaceRoot()
+    for l:name in readdir(l:root)
+      if (index(['CMakeLists.txt', 'CMakePresets.json', 'CMakeUserPresets.json',
+            \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache'], l:name) >= 0
+            \ || l:name =~# '\.\%(pro\|pri\|cmake\|mk\)$')
+            \ && filereadable(l:root . '/' . l:name)
+        return 1
+      endif
+    endfor
+    return 0
+  endfunction
+  function! s:SetProjectDebug(enabled) abort
+    let l:json_file = WorkspaceRoot() . '/.vimspector.json'
+    try
+      if !filereadable(l:json_file)
+        throw 'JSON file not found: ' . l:json_file
+      endif
+      if getbufvar(bufnr(l:json_file), '&modified')
+        throw 'Save .vimspector.json before changing the debug mode.'
+      endif
+      let l:raw = join(readfile(l:json_file), "\n")
+      let l:data = json_decode(l:raw)
+      let l:data.configurations['python: project'].configuration.enable_project_debug = a:enabled
+      " Replace only this flag, keeping the existing JSON layout.
+      let l:pattern = '"python: project"\_s*:\_s*{\_.\{-}"configuration"\_s*:\_s*{'
+            \ . '\_.\{-}"enable_project_debug"\_s*:\_s*\zs\%(true\|false\)'
+      let l:updated = substitute(l:raw, l:pattern, a:enabled ? 'true' : 'false', '')
+      if json_decode(l:updated) !=# l:data
+        throw 'Cannot locate the Python project enable_project_debug flag.'
+      endif
+      if l:updated !=# l:raw
+        if writefile(split(l:updated, "\n", 1), l:json_file, 's') != 0
+          throw 'Cannot write ' . l:json_file
+        endif
+        if bufloaded(l:json_file)
+          execute 'checktime ' . bufnr(l:json_file)
+        endif
+      endif
+      echom 'Python debug mode: ' . (a:enabled ? 'project' : 'single-file')
+      return 1
+    catch
+      echohl WarningMsg
+      echom 'Cannot change project debug mode: ' . v:exception
+      echohl None
+      return 0
+    endtry
+  endfunction
+  function! EnableProjectDebug() abort
+    return s:SetProjectDebug(v:true)
+  endfunction
+  function! DisableProjectDebug() abort
+    return s:SetProjectDebug(v:false)
+  endfunction
   function! ConfigureCppDebug(config_vscode=0)
     let l:cpp_workspace_root = WorkspaceRoot()
     let l:json_file_path = l:cpp_workspace_root.'/.vimspector.json'
     if JumpToTabIfExists(l:json_file_path) == 1
       return
     endif
+    let l:new_config = !filereadable(l:json_file_path)
     if a:config_vscode == 1
       if !isdirectory(l:cpp_workspace_root.'/.vscode')
         call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
@@ -1592,10 +1654,15 @@ function! ConfigureManualLoadPlugin()
       call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     endif
     if CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
+      if l:new_config && !WorkspaceHasBuildFiles()
+        call DisableProjectDebug()
+      endif
       call NUpdateTabTermBuf()
-      exec 'tabe ' . l:json_file_path
+      exec 'tabe ' . fnameescape(l:json_file_path)
     endif
   endfunction
+  nnoremap ]mp :<C-u>call EnableProjectDebug()<CR>
+  nnoremap ]ms :<C-u>call DisableProjectDebug()<CR>
   noremap <F2> :<C-u>call ContinueInVimspector()<CR>
   noremap <S-F2> :<C-u>call RestartVimspector()<CR>
   map ]<F2> <Plug>VimspectorRunToCursor
