@@ -805,12 +805,12 @@ function! ConfigureManualLoadPlugin()
   function! QuickuiInstallKeyMapMenus()
     let g:quickui_keymap_groups = []
     let l:search_key_maps = [
-          \ ['<LocalLeader>ks', 'Previous function start', 'n'],
-          \ ['<LocalLeader>ke', 'Previous function end', 'n'],
-          \ ['<LocalLeader>kc', 'Previous comment block', 'n'],
-          \ ['<LocalLeader>js', 'Next function start', 'n'],
-          \ ['<LocalLeader>je', 'Next function end', 'n'],
-          \ ['<LocalLeader>jc', 'Next comment block', 'n'],
+          \ ['<LocalLeader>ks', 'Previous function start', 'n', 'N/V'],
+          \ ['<LocalLeader>ke', 'Previous function end', 'n', 'N/V'],
+          \ ['<LocalLeader>kc', 'Previous comment block', 'n', 'N/V'],
+          \ ['<LocalLeader>js', 'Next function start', 'n', 'N/V'],
+          \ ['<LocalLeader>je', 'Next function end', 'n', 'N/V'],
+          \ ['<LocalLeader>jc', 'Next comment block', 'n', 'N/V'],
           \ ['<Leader>`', 'Show nearest function or class', 'n'],
           \ ['`<Leader>', 'Show nearest non-function block', 'n'],
           \ ['<LocalLeader>u', 'Clear search highlight', 'n'],
@@ -839,7 +839,6 @@ function! ConfigureManualLoadPlugin()
           \ ['<M-S-y>', 'Yank line', 'i'],
           \ ['<M-S-a>', 'Append at end of line', 'i'],
           \ ['<M-S-i>', 'Insert at first non-blank', 'i'],
-          \ ['Q', 'Disabled Ex mode', 'n'],
           \ ]
     call extend(l:general_key_maps, [
           \ ['<LocalLeader>w', 'Write file', 'n'],
@@ -969,8 +968,8 @@ function! ConfigureManualLoadPlugin()
           \ ['<S-F5>', 'Reset Vimspector', 'n'],
           \ [']<F5>', 'Launch debugger', 'n'],
           \ ['<Leader><F5>', 'Create C/C++ debug files without .vscode', 'n'],
-          \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n'],
-          \ ['<Leader><F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
+          \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n', 'N/I/T'],
+          \ ['<Leader><F6>', 'Create C/C++ debug files with .vscode', 'n'],
           \ ['<M-F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
           \ ['<F6>', 'Step over', 'n'],
           \ ['<C-F6>', 'Step into', 'n'],
@@ -985,6 +984,7 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-8>', 'Show debugger console', 'n', 'N/I/T'],
           \ ['<C-9>', 'Focus debugger terminal', 'n', 'N/I/T'],
           \ ['<C-0>', 'List all breakpoints', 'n', 'N/I/T'],
+          \ ['<C-x><C-o>', 'Complete watch or console expression', 'i'],
           \ [']a', 'Show assembly', 'n'],
           \ [']s', 'Show disassembly', 'n'],
           \ [']c', 'Jump to program counter', 'n'],
@@ -1354,7 +1354,7 @@ function! ConfigureManualLoadPlugin()
           \ [ 'LeaderF &Mru', 'Leaderf mru --regexMode', 'Open recently accessed files'],
           \ [ 'LeaderF &Buffer', 'Leaderf buffer', 'List current buffers in leaderf'],
           \ [ '--', '' ],
-          \ [ "E&xit\tAlt+x", 'q' ],
+          \ [ 'E&xit', 'call QuitWin()' ],
           \ ])
     " Script inside %{...} will be evaluated and expanded in the string
     call quickui#menu#install('&Option', [
