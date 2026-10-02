@@ -653,7 +653,7 @@ function! ConfigureDelayedPlugin()
         let l:target_win = l:win['winid']
       endif
     endfor
-    if l:target_buf != -1 && l:target_win != -1
+    if l:target_win != -1
       call win_gotoid(l:target_win)
       call feedkeys("\<C-\>\<C-n>", 'n')
       let t:term_buf = l:target_buf
@@ -667,7 +667,6 @@ function! ConfigureDelayedPlugin()
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
-    let l:terminal_directory = GetLaunchDir()
     " Loop through all windows in the current tab to check for a terminal
     for l:win in getwininfo()
       if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
@@ -690,6 +689,7 @@ function! ConfigureDelayedPlugin()
         exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
+        let l:terminal_directory = GetLaunchDir()
         exec 'belowright ' . a:height . ' new'
         let l:terminal_options = {
               \ 'curwin': 1,
@@ -1537,9 +1537,7 @@ function! ConfigureManualLoadPlugin()
       return
     endif
     if a:config_vscode == 1
-      if !isdirectory(l:cpp_workspace_root.'/.vscode')
-        call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
-      endif
+      call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
       call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     endif
     if l:copy_result == 2 && !WorkspaceHasBuildFiles()
@@ -2027,8 +2025,7 @@ function! SetTitle()
   call AppendInfo('Author: '.l:author, l:column_limit)
   call AppendInfo('Mail: '.l:email, l:column_limit)
   call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
-  call append(line('$'), l:top_and_bottom)
-  call append(line('$'), '')
+  call append('$', [l:top_and_bottom, ''])
   if &filetype=='c'
     call append(line('$'), '#include <stdio.h>')
   elseif &filetype=='cpp'
@@ -2037,13 +2034,11 @@ function! SetTitle()
     endif
     call append(line('$'), '#include <iostream>')
   elseif &filetype=='cuda'
-    call append(line('$'), '#include <iostream>')
-    call append(line('$'), '#include <cuda_runtime.h>')
+    call append('$', ['#include <iostream>', '#include <cuda_runtime.h>'])
   elseif &filetype=='make'
     call append(line('$'), '.PHONY:')
   elseif &filetype=='perl'
-    call append(line('$'), 'use strict;')
-    call append(line('$'), 'use warnings;')
+    call append('$', ['use strict;', 'use warnings;'])
   endif
   call append(line('$'), '')
   call setpos('.', [0, line('$'), 0, 0])
@@ -2289,8 +2284,8 @@ function! SetGeneralKeyMaps()
     " Find the nearest line which contains at least one non-space character.
     if getline('.') =~? '^\s*$' " The current line is empty.
       let l:line_num = line('.')
-      let l:down_line_num = search('^\s*\S', 'nW')
-      let l:up_line_num = search('^\s*\S', 'bnW')
+      let l:down_line_num = nextnonblank(l:line_num + 1)
+      let l:up_line_num = prevnonblank(l:line_num - 1)
       if l:up_line_num == 0 && l:down_line_num == 0 " All lines are empty.
         let l:line_num = 1
       elseif l:down_line_num == 0 || (l:up_line_num != 0
@@ -2299,10 +2294,7 @@ function! SetGeneralKeyMaps()
       elseif l:line_num != l:down_line_num
         let l:line_num = l:down_line_num
       endif
-      let l:col_num = col('.')
-      if strlen(getline(l:line_num)) < l:col_num
-        let l:col_num = strlen(getline(l:line_num))
-      endif
+      let l:col_num = min([col('.'), strlen(getline(l:line_num))])
       call setpos('.', [0, l:line_num, l:col_num, 0])
       normal! m"
     endif
