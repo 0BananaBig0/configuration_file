@@ -1397,7 +1397,7 @@ function! ConfigureManualLoadPlugin()
 
   " vim-visual-multi setting
   if !exists('g:loaded_visual_multi')
-    noremap <C-n> :<C-u>call MultipleCursors()<CR>
+    nnoremap <C-n> :<C-u>call MultipleCursors()<CR>
     xnoremap <C-n> :<C-u>call MultipleCursors(nr2char(14), 1)<CR>
   endif
   function! MultipleCursors(key_map="\<C-n>", visual=0) abort
