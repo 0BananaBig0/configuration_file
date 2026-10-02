@@ -743,16 +743,14 @@ function! ConfigureManualLoadPlugin()
           \ ['<LocalLeader>q', 'Quit window', 'n'],
           \ ['<M-q>', 'Quit window', 'n', 'N/I/T'],
           \ ['<LocalLeader>r', 'Enter Into Workspace Root', 'n'],
-          \ ['<M-r>', 'Enter Into Workspace Root', 'n', 'N/I/T'],
+          \ ['<M-s>', 'Enter Into Workspace Root', 'n', 'N/I/T'],
           \ ['<LocalLeader>f', 'Enter Into File Path', 'n'],
           \ ['<M-f>', 'Enter Into File Path', 'n', 'N/I/T'],
           \ ['gf', 'Open file under cursor', 'n'],
           \ ['<C-w>f', 'Open file in a split', 'n'],
           \ ['<C-w>gf', 'Open file in a tab', 'n'],
           \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
-          \ ]
-    " Tabs
-    call extend(l:general_key_maps, [
+          "\ Tabs
           \ ['<LocalLeader>t', 'Open new tab', 'n'],
           \ ['<M-t>', 'Open new tab', 'n', 'N/I/T'],
           \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
@@ -779,17 +777,13 @@ function! ConfigureManualLoadPlugin()
           \ ['<M-8>', 'Go to tab 8', 'n', 'N/I/T'],
           \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
           \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
-          \ ])
-    " Terminal
-    call extend(l:general_key_maps, [
+          "\ Terminal
           \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
           \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
           \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
           \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
-          \ ])
-    " Editing
-    call extend(l:general_key_maps, [
+          "\ Editing
           \ ['<M-h>', 'Move left', 'i'],
           \ ['<M-l>', 'Move right', 'i'],
           \ ['<M-j>', 'Move down', 'i'],
@@ -811,26 +805,20 @@ function! ConfigureManualLoadPlugin()
           \ ['<C-M-CR>', 'Insert a blank line', 'i'],
           \ ['<C-S-CR>', 'Insert a blank line', 'n'],
           \ ['<C-S-CR>', 'Insert a blank line', 'i'],
-          \ ])
-    " Diff and cleanup
-    call extend(l:general_key_maps, [
+          "\ Diff and cleanup
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<LocalLeader>a', 'Wrap all diff windows', 'n'],
           \ ['<LocalLeader><F5>', 'Delete blank lines', 'n'],
           \ ['<LocalLeader><F7>', 'Retab and clean trailing characters', 'n'],
-          \ ])
-    " Build
-    call extend(l:general_key_maps, [
+          "\ Build
           \ ['<Leader><F2>', 'Compile only', 'n'],
           \ ['<LocalLeader><F2>', 'Compile and execute', 'n'],
           \ ['<Leader><F7>', 'Create Clang configuration files', 'n'],
-          \ ])
-    " Appearance
-    call extend(l:general_key_maps, [
+          "\ Appearance
           \ ['<Leader>ppt', 'Use presentation appearance', 'n'],
           \ ['<Leader>per', 'Restore editor appearance', 'n'],
           \ ['<LocalLeader>m', 'Toggle GUI menu and toolbar', 'n'],
-          \ ])
+          \ ]
     call QuickuiInstallKeyMapGroup('&AsyncRun', [
           \ ['<LocalLeader><F8>', 'Run asynchronous command', 'n'],
           \ ])
@@ -1031,8 +1019,7 @@ function! ConfigureManualLoadPlugin()
     return strcharpart(a:text, 0, a:width - 1).'…'
   endfunction
   function! QuickuiCheatsheetKeyMapLine(key_map, width)
-    let l:mode_name = get({'x': 'V'}, a:key_map[2], toupper(a:key_map[2]))
-    let l:mode_name = get(a:key_map, 3, l:mode_name)
+    let l:mode_name = get(a:key_map, 3, a:key_map[2] ==# 'x' ? 'V' : toupper(a:key_map[2]))
     let l:key = a:key_map[0].' ['.l:mode_name.']'
     let l:key_width = min([22, max([12, a:width / 2])])
     let l:description_width = a:width - l:key_width - 3
@@ -1090,14 +1077,12 @@ function! ConfigureManualLoadPlugin()
     let l:window_width = min([180, max([40, &columns - 8])])
     let l:lines = QuickuiCheatsheetCategoryRows(l:window_width)
     call add(l:lines, '')
-    let l:group_id = 0
-    for l:group in g:quickui_keymap_groups
+    for [l:group_id, l:group] in items(g:quickui_keymap_groups)
       let l:toggle_key = get(g:quickui_cheatsheet_toggle_keys, l:group_id, '?')
       if !get(g:quickui_cheatsheet_folded, l:group[0], 0)
         call extend(l:lines, QuickuiCheatsheetGroup(
               \ l:group, l:window_width, l:toggle_key))
       endif
-      let l:group_id += 1
     endfor
     if get(g:, 'quickui_cheatsheet_search_active', 0)
       let l:instructions = 'Search '.g:quickui_cheatsheet_search_direction
@@ -1272,7 +1257,7 @@ function! ConfigureManualLoadPlugin()
     " Install a 'File' menu, use [text, command] to represent an item.
     call quickui#menu#install('&File', [
           \ [ "&Save\tCtrl+s", 'w'],
-          \ [ 'Save &As', 'call feedkey(":saveas ")' ],
+          \ [ 'Save &As', 'call feedkeys(":saveas ")' ],
           \ [ 'Save All', 'wa' ],
           \ [ '--', '' ],
           \ [ 'LeaderF &File', 'Leaderf file', 'Open file with leaderf'],
@@ -2289,7 +2274,7 @@ function! SetGeneralKeyMaps()
       elseif l:down_line_num == 0 || (l:up_line_num != 0
             \ && l:line_num - l:up_line_num < l:down_line_num - l:line_num) " Closest to the up line.
         let l:line_num = l:up_line_num
-      elseif l:line_num != l:down_line_num
+      else
         let l:line_num = l:down_line_num
       endif
       let l:col_num = min([col('.'), strlen(getline(l:line_num))])
@@ -2513,9 +2498,9 @@ function! SetGeneralKeyMaps()
     endif
   endfunction
   noremap <LocalLeader>r :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
-  noremap <M-r> :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
-  inoremap <M-r> <C-o>:call EnterIntoWorkspaceOrFilePath()<CR>
-  tnoremap <M-r> <C-w>:call EnterIntoWorkspaceOrFilePath()<CR>
+  noremap <M-s> :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
+  inoremap <M-s> <C-o>:call EnterIntoWorkspaceOrFilePath()<CR>
+  tnoremap <M-s> <C-w>:call EnterIntoWorkspaceOrFilePath()<CR>
   noremap <LocalLeader>f :<C-u>call EnterIntoWorkspaceOrFilePath(0)<CR>
   noremap <M-f> :<C-u>call EnterIntoWorkspaceOrFilePath(0)<CR>
   inoremap <M-f> <C-o>:call EnterIntoWorkspaceOrFilePath(0)<CR>
@@ -2545,8 +2530,9 @@ function! SetGeneralKeyMaps()
     endif
   endfunction
   function! SetZshIfExists()
-    if executable('zsh')
-      let &shell = exepath('zsh')
+    let l:zsh = exepath('zsh')
+    if !empty(l:zsh)
+      let &shell = l:zsh
     endif
   endfunction
 endfunction
