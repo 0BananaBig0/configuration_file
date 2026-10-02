@@ -459,9 +459,12 @@ function! ConfigureDelayedPlugin()
     endfor
     call win_gotoid(l:target_win )
   endfunction
-  function! WorkspaceRoot(file_path='')
-    if &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
+  function! s:IsAuxiliaryBuffer() abort
+    return &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
         \ || &filetype=='vista' || &buftype=='nofile' || &filetype=='nerdtree'
+  endfunction
+  function! WorkspaceRoot(file_path='')
+    if s:IsAuxiliaryBuffer()
       call JumpToTheMainWin() " Avoid potential bugs
     endif
     if empty(a:file_path)
@@ -487,8 +490,7 @@ function! ConfigureDelayedPlugin()
     if filereadable(l:target_file)
       echo 'File '.l:target_file.' has existed.'
     elseif filereadable(l:source_file)
-      let l:source_file_content = readfile(l:source_file)
-      return writefile(l:source_file_content, l:target_file, 's') == 0 ? 2 : 0
+      return writefile(readfile(l:source_file), l:target_file, 's') == 0 ? 2 : 0
     else
       echo 'File '.l:source_file.' and file '.l:target_file.' do not exist.'
       return 0
@@ -526,7 +528,6 @@ function! ConfigureDelayedPlugin()
   let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
   let g:NERDCommentEmptyLines      = 0      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
-  let g:NERDToggleCheckAllLines    = 1      " 检查选中的行操作是否成功
   let g:NERDCustomDelimiters = {
           \ 'c': {'left': '//'},
           \ 'cpp': {'left': '//'},
@@ -745,8 +746,7 @@ function! ConfigureManualLoadPlugin()
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
   function! QuickuiInstallKeyMapGroup(name, key_maps)
-    let l:name = substitute(a:name, '&', '', 'g')
-    call add(g:quickui_keymap_groups, [l:name, a:key_maps])
+    call add(g:quickui_keymap_groups, [substitute(a:name, '&', '', 'g'), a:key_maps])
   endfunction
   function! QuickuiInstallKeyMapMenus()
     let g:quickui_keymap_groups = []
@@ -1124,8 +1124,7 @@ function! ConfigureManualLoadPlugin()
         let g:quickui_cheatsheet_folded[l:group[0]] = 1
       endfor
     endif
-    let l:window_width = max([40, &columns - 8])
-    let l:window_width = min([180, l:window_width])
+    let l:window_width = min([180, max([40, &columns - 8])])
     let l:lines = QuickuiCheatsheetCategoryRows(l:window_width)
     call add(l:lines, '')
     let l:group_id = 0
@@ -1275,7 +1274,7 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! QuickuiOpenKeyMapCheatsheet()
     if !exists('g:quickui_keymap_groups')
-      call QuickuiConfiguration()
+      call ConfigureQuickui()
     endif
     let g:quickui_cheatsheet_folded = {}
     for l:group in g:quickui_keymap_groups
@@ -1301,7 +1300,10 @@ function! ConfigureManualLoadPlugin()
       call popup_setoptions(l:winid, {'filter': function('QuickuiKeyMapCheatsheetFilter')})
     endif
   endfunction
-  function! QuickuiConfiguration()
+  function! ConfigureQuickui()
+    if exists('g:quickui_keymap_groups') && exists('*quickui#menu#open')
+      return
+    endif
     call plug#load('vim-quickui')
     " Clear all the menus
     call quickui#menu#reset()
@@ -1338,21 +1340,15 @@ function! ConfigureManualLoadPlugin()
     call QuickuiInstallKeyMapMenus()
   endfunction
   function! QuickuiOpenMenu()
-    if !exists('g:quickui_keymap_groups') || !exists('*quickui#menu#open')
-      call QuickuiConfiguration()
-    endif
+    call ConfigureQuickui()
     call quickui#menu#open()
   endfunction
   function! QuickuiListBuffer()
-    if !exists('g:quickui_keymap_groups') || !exists('*quickui#menu#open')
-      call QuickuiConfiguration()
-    endif
+    call ConfigureQuickui()
     call quickui#tools#list_buffer('e')
   endfunction
   function! QuickuiPreviewTag()
-    if !exists('g:quickui_keymap_groups') || !exists('*quickui#menu#open')
-      call QuickuiConfiguration()
-    endif
+    call ConfigureQuickui()
     call quickui#tools#preview_tag('')
   endfunction
   " Enable to display tips in the cmdline
@@ -1399,14 +1395,13 @@ function! ConfigureManualLoadPlugin()
   " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
-    let l:bookmark_extension = 'bookmarks'
     if empty($SUDO_USER)
       let l:bookmark_root_location = $HOME.'/.vim/.vim-bookmarks'
     else
       let l:bookmark_root_location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'
     endif
     let l:bookmark_path = l:bookmark_root_location.expand('%:p:h')
-    let l:bookmark_file = simplify(l:bookmark_path.'/'.expand('%:t').'.'.l:bookmark_extension)
+    let l:bookmark_file = simplify(l:bookmark_path.'/'.expand('%:t').'.bookmarks')
     if !isdirectory(l:bookmark_path)
       call mkdir(l:bookmark_path, 'p')
       if !empty($SUDO_USER)
@@ -1800,9 +1795,7 @@ function! ConfigureManualLoadPlugin()
     " 5. Get the configuration dictionary
     let l:proj_config = l:data['configurations']['python: project']['configuration']
     " 6. Check the conditions: module is non-empty and enable_project_debug is true (string "1")
-    let l:module = get(l:proj_config, 'module', '')
-    let l:enable_debug = get(l:proj_config, 'enable_project_debug', '')
-    return l:module != '' && l:enable_debug
+    return get(l:proj_config, 'module', '') != '' && get(l:proj_config, 'enable_project_debug', '')
   endfunction
   function! LaunchVimspector()
     if !exists(':VimspectorShowOutput')
@@ -2152,8 +2145,7 @@ function! SetGeneralKeyMaps()
     if getline('.') =~ a:name_keyword
       let l:block_name = getline('.')
     else
-      let l:block_name_line = search(a:name_keyword, 'bcnWz')
-      let l:block_name = getline(l:block_name_line)
+      let l:block_name = getline(search(a:name_keyword, 'bcnWz'))
     endif
     let l:block_end_position = strridx(l:block_name, a:end_keyword)
     if(l:block_end_position > 0)
@@ -2261,9 +2253,7 @@ function! SetGeneralKeyMaps()
         return l:cmakelist_path.' -S . -B build'
             \ .' && bear --append -- make -C build -j12'
       endif
-      let l:pattern = l:possible_path."/*.pro"
-      let l:qmakepro_path = glob(l:pattern, 0, 1)
-      if !empty(l:qmakepro_path)
+      if !empty(glob(l:possible_path.'/*.pro', 0, 1))
         return ' cd '.shellescape(l:possible_path, 1).' && qmake -o build/Makefile'
             \ .' && bear --append -- make -C build -j12'
       endif
@@ -2300,8 +2290,7 @@ function! SetGeneralKeyMaps()
       elseif &filetype=='csh'
         exec l:compile_exec.' /usr/bin/env csh '.l:source_file
       elseif &filetype=='verilog'
-        let l:verilog_compilation = CPPCompilation()
-        exec l:compile_exec.l:verilog_compilation.' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
+        exec l:compile_exec.CPPCompilation().' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
       elseif &filetype=='perl'
         exec l:compile_exec.' /usr/bin/env perl '.l:source_file
       elseif &filetype=='tcl'
@@ -2310,8 +2299,7 @@ function! SetGeneralKeyMaps()
         exec ':CocCommand markdown-preview-enhanced.openPreview'
       elseif &filetype=='vim'
         exec ':source ~/.vimrc'
-      elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
-          \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
+      elseif s:IsAuxiliaryBuffer()
         call JumpToTheMainWin()
         call CompileAndExcute()
       else
@@ -2344,10 +2332,8 @@ function! SetGeneralKeyMaps()
   function! CompileCommand()
     let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
     if &filetype=='verilog'
-        let l:verilog_compilation = CPPCompilation()
-        exec l:compile_only.l:verilog_compilation
-    elseif &filetype=='help' || &buftype =='terminal' || &filetype=='VimspectorPrompt'
-        \ || &filetype=='vista' || &buftype =='nofile' || &filetype=='nerdtree'
+        exec l:compile_only.CPPCompilation()
+    elseif s:IsAuxiliaryBuffer()
       call JumpToTheMainWin()
       call CompileCommand()
     else
@@ -2620,14 +2606,12 @@ function! SetGeneralKeyMaps()
     endif
   endfunction
   function! InitializeTabPos()
-    for l:i in range(1, 9)
-        exec 'noremap <M-' . l:i . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
-        exec 'inoremap <M-' . l:i . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
-        exec 'tnoremap <M-' . l:i . '> <C-w>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+    for l:i in range(1, 10)
+        let l:key = l:i % 10
+        exec 'noremap <M-' . l:key . '> :<C-u>call TabPosActivateBuffer(' . l:i . ')<CR>'
+        exec 'inoremap <M-' . l:key . '> <C-o>:call TabPosActivateBuffer(' . l:i . ')<CR>'
+        exec 'tnoremap <M-' . l:key . '> <C-w>:call TabPosActivateBuffer(' . l:i . ')<CR>'
     endfor
-    exec 'noremap <M-0> :<C-u>call TabPosActivateBuffer(10)<CR>'
-    exec 'inoremap <M-0> <C-o>:call TabPosActivateBuffer(10)<CR>'
-    exec 'tnoremap <M-0> <C-w>:call TabPosActivateBuffer(10)<CR>'
   endfunction
   function! InitializeCwdForEachTab()
     let l:current_tab = tabpagenr()
