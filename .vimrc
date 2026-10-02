@@ -156,13 +156,13 @@ function! ConfigureMarkdownPlugin()
     endif
   endfunction
   function! CreateMarkdownMenu()
-    exec 'normal! ms'
+    normal! ms
     if !exists(':GenTocGFM')
       call LoadMarkdownToc(':GenTocGFM')
     endif
     exec "normal! ggO\<ESC>"
-    exec ':GenTocGFM'
-    exec 'normal! ggdd`s'
+    GenTocGFM
+    normal! ggdd`s
   endfunction
   function! UpdateMarkdownMenu()
     let l:previous_column = col('.')
@@ -171,7 +171,7 @@ function! ConfigureMarkdownPlugin()
     if !exists(':UpdateToc')
       call LoadMarkdownToc(':UpdateToc')
     endif
-    exec ':UpdateToc'
+    UpdateToc
     let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
     call setpos('.', [0, l:new_line, l:previous_column, 0])
   endfunction
@@ -430,34 +430,20 @@ function! ConfigureDelayedPlugin()
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
   let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
   function! FindRootPatternPath(target_path)
-    let l:root_pattern_path = []
-    " Access target_path
-    let l:target_path = a:target_path.'/'
     for l:pattern in g:root_patterns
-      for l:str_id in range(strlen(l:target_path) - 1, 0, -1)
-        if l:target_path[l:str_id]=='/'
-          let l:possible_path = strpart(a:target_path, 0, l:str_id)
-          if l:possible_path==$HOME || l:possible_path=='/home/'.$SUDO_USER || l:possible_path=='/'
-            break
-          endif
-          let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
-          if !empty(l:root_pattern_path)
-            return l:root_pattern_path
-          endif
+      let l:possible_path = substitute(a:target_path, '/\+$', '', '')
+      while index(['', '.', '/', $HOME, '/home/'.$SUDO_USER], l:possible_path) < 0
+        let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
+        if !empty(l:root_pattern_path)
+          return l:root_pattern_path
         endif
-      endfor
+        let l:possible_path = fnamemodify(l:possible_path, ':h')
+      endwhile
     endfor
-    return l:root_pattern_path
+    return []
   endfunction
   function! JumpToTheMainWin()
-    let l:target_win = win_getid()
-    let l:cur_tab = tabpagenr()
-    for l:win in getwininfo()
-      if l:win['tabnr'] == l:cur_tab && l:win['winid'] < l:target_win
-        let l:target_win = l:win['winid']
-      endif
-    endfor
-    call win_gotoid(l:target_win )
+    call win_gotoid(min(gettabinfo(tabpagenr())[0].windows))
   endfunction
   function! s:IsAuxiliaryBuffer() abort
     return &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
@@ -526,7 +512,6 @@ function! ConfigureDelayedPlugin()
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
   let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
   let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
-  let g:NERDCommentEmptyLines      = 0      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDCustomDelimiters = {
           \ 'c': {'left': '//'},
@@ -550,9 +535,6 @@ function! ConfigureDelayedPlugin()
   " --------------------------------------------------------------------------
   " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
   " --------------------------------------------------------------------------
-  let g:matchup_enabled = 1                " 总开关
-  let g:matchup_motion_enabled = 1        " [% ]% g% 等，便宜，开着
-  let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
   let g:matchup_surround_enabled = 1       " ds% cs%，可选
 
   silent! nunmap [%
@@ -576,15 +558,12 @@ function! ConfigureDelayedPlugin()
   let g:matchup_matchparen_timeout = 160   " ★ 从默认 300 压到 160ms，超时放弃不重算
   let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
   let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
-  let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
 
   " --- 分隔符引擎（影响 motion/text-obj 速度）---
-  let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
   let g:matchup_delim_noskips = 1          " ★ 不在 comment/string 里做 keyword 匹配，C++ 大文件省不少
 
   " --- 不需要的功能关掉 ---
   let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
-  let g:matchup_transmute_enabled = 0      " 实验性的，关
 
   let g:matchup_matchparen_offscreen = {
         \ 'method':    'popup',
@@ -594,7 +573,6 @@ function! ConfigureDelayedPlugin()
         \ 'syntax_hl': 1,
         \ 'scrolloff': 1,
         \ }
-  let s:matchup_loaded = 0
 
   function! ConfigureVimNavigationKeyMaps()
     silent! nunmap <buffer> [[
@@ -624,9 +602,8 @@ function! ConfigureDelayedPlugin()
   endfunction
 
   function! s:EnsureMatchupForCurrentBuffer() abort
-      if !s:matchup_loaded
+      if !exists('g:loaded_matchup')
           call plug#load('vim-matchup')
-          let s:matchup_loaded = 1
       endif
 
       " if buffer does not exist
@@ -1066,13 +1043,8 @@ function! ConfigureManualLoadPlugin()
     return '  '.printf('%-'.l:key_width.'s', l:key).' '.l:description
   endfunction
   function! QuickuiCheatsheetGroup(group, width, toggle_key)
-    let l:folded = get(g:quickui_cheatsheet_folded, a:group[0], 0)
-    let l:fold_mark = l:folded ? '[+]' : '[-]'
-    let l:title = '['.a:toggle_key.'] '.a:group[0].': '.l:fold_mark
+    let l:title = '['.a:toggle_key.'] '.a:group[0].': [-]'
     let l:lines = [l:title, repeat('-', min([a:width, strlen(l:title)]))]
-    if l:folded
-      return l:lines
-    endif
     let l:mapping_column_width = (a:width - 2) / 2
     for l:key_map_id in range(0, len(a:group[1]) - 1, 2)
       let l:left = QuickuiCheatsheetKeyMapLine(
@@ -1117,13 +1089,6 @@ function! ConfigureManualLoadPlugin()
     return l:rows
   endfunction
   function! QuickuiBuildKeyMapCheatsheet()
-    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimo', '\zs')
-    if !exists('g:quickui_cheatsheet_folded')
-      let g:quickui_cheatsheet_folded = {}
-      for l:group in g:quickui_keymap_groups
-        let g:quickui_cheatsheet_folded[l:group[0]] = 1
-      endfor
-    endif
     let l:window_width = min([180, max([40, &columns - 8])])
     let l:lines = QuickuiCheatsheetCategoryRows(l:window_width)
     call add(l:lines, '')
@@ -1276,6 +1241,7 @@ function! ConfigureManualLoadPlugin()
     if !exists('g:quickui_keymap_groups')
       call ConfigureQuickui()
     endif
+    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimo', '\zs')
     let g:quickui_cheatsheet_folded = {}
     for l:group in g:quickui_keymap_groups
       let g:quickui_cheatsheet_folded[l:group[0]] = 1
@@ -1362,22 +1328,15 @@ function! ConfigureManualLoadPlugin()
   " NERDTree Setting
   noremap <Leader>nt :<C-u>NERDTreeToggle<CR>
   noremap <Leader>nc :<C-u>NERDTreeCWD<CR>
-  let g:NERDTreeFileExtensionHighlightFullName = 1
-  let g:NERDTreeExactMatchHighlightFullName = 1
-  let g:NERDTreePatternMatchHighlightFullName = 1
-  let g:NERDTreeHighlightFolders = 1
-  let g:NERDTreeHighlightFoldersFullName = 1
   let g:NERDTreeQuitOnOpen = 1
   let g:NERDTreeDirArrowExpandable = '+'
   let g:NERDTreeDirArrowCollapsible = '-'
-  let g:NERDTreeHidden = 0
 
 
 
   " Vista setting
   noremap <Leader>vt :<C-u>Vista!!<CR>
   noremap <Leader>vf :<C-u>Vista focus<CR>
-  let g:vista_no_mappings = 0
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
@@ -1391,7 +1350,6 @@ function! ConfigureManualLoadPlugin()
   " Vim-bookmarks setting
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
-  let g:bookmark_auto_save = 1
   " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
@@ -1487,7 +1445,7 @@ function! ConfigureManualLoadPlugin()
     map <Leader>gj <Plug>(GitGutterNextHunk)
     map <Leader>gf <Plug>(GitGutterFold)
     noremap <Leader>gb :<C-u>call gitblame#echo()<CR>
-    exec 'normal! ms'
+    normal! ms
     call plug#load('vim-fugitive', 'vim-gitgutter', 'git-blame.vim')
     if !exists('*FugitiveStatusline')
       throw 'vim-fugitive did not define FugitiveStatusline()'
@@ -1495,7 +1453,7 @@ function! ConfigureManualLoadPlugin()
     set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
     set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
     set statusline+=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
-    exec 'normal! `s'
+    normal! `s
   endfunction
   function! GitStatus()
     let [a,m,r] = GitGutterGetHunkSummary()
@@ -1740,20 +1698,16 @@ function! ConfigureManualLoadPlugin()
     call ReshapeVimspectorWins()
   endfunction
   function! QuitVimspectorWins()
-    let l:quit_success = 0
     if exists("g:vimspector_session_windows.disassembly")
       \ && win_id2win(g:vimspector_session_windows.disassembly) > 0
       call win_gotoid(g:vimspector_session_windows.disassembly)
       quit!
-      let l:quit_success = 1
     endif
     if exists("g:vimspector_session_windows.terminal")
       \ && win_id2win(g:vimspector_session_windows.terminal) > 0
       call win_gotoid(g:vimspector_session_windows.terminal)
       quit!
-      let l:quit_success = 1
     endif
-    return l:quit_success
   endfunction
   function! RestartVimspector()
     call QuitVimspectorWins()
@@ -1897,7 +1851,6 @@ function! ConfigureManualLoadPlugin()
   else
     let g:Lf_CacheDirectory = expand('/home/'.$SUDO_USER.'/.vim/cache')
   endif
-  let g:Lf_GtagsAutoGenerate = 0
   let g:Lf_Gtagslabel = 'native-pygments'
   let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
   let g:Lf_RootMarkers = g:root_patterns
@@ -2119,16 +2072,10 @@ augroup END
 function! SetGeneralKeyMaps()
   noremap <LocalLeader>a :<C-u>call AutoWrap()<CR>
   function! AutoWrap()
-    let original_win = winnr()
     set diffopt+=context:3
-    " 遍历两个 diff 窗口
-    for win in range(1, winnr('$'))
-      " 切换到目标窗口
-      execute win . 'wincmd w'
-      setlocal wrap
+    for l:winid in gettabinfo(tabpagenr())[0].windows
+      call win_execute(l:winid, 'setlocal wrap')
     endfor
-    " 返回原始窗口
-    execute original_win . 'wincmd w'
   endfunction
   noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
   noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
@@ -2296,9 +2243,9 @@ function! SetGeneralKeyMaps()
       elseif &filetype=='tcl'
         exec l:compile_exec.' /usr/bin/env tclsh '.l:source_file
       elseif &filetype=='markdown'
-        exec ':CocCommand markdown-preview-enhanced.openPreview'
+        CocCommand markdown-preview-enhanced.openPreview
       elseif &filetype=='vim'
-        exec ':source ~/.vimrc'
+        source ~/.vimrc
       elseif s:IsAuxiliaryBuffer()
         call JumpToTheMainWin()
         call CompileAndExcute()
@@ -2348,7 +2295,7 @@ function! SetGeneralKeyMaps()
   noremap <LocalLeader><F4> :<C-u>vert diffsplit<Space>
   noremap <LocalLeader><F5> :<C-u>call DeleteBlankLine()<CR>
   function! DeleteBlankLine()
-    exec 'normal! m"'
+    normal! m"
     " Find the nearest line which contains at least one non-space character.
     if getline('.') =~? '^\s*$' " The current line is empty.
       let l:line_num = line('.')
@@ -2367,20 +2314,20 @@ function! SetGeneralKeyMaps()
         let l:col_num = strlen(getline(l:line_num))
       endif
       call setpos('.', [0, l:line_num, l:col_num, 0])
-      exec 'normal! m"'
+      normal! m"
     endif
-    exec ':g/^\s*$/d'
-    exec 'normal! `"'
+    g/^\s*$/d
+    normal! `"
   endfunction
   noremap <LocalLeader><F7> :<C-u>call RetabAndDeleteTraillingUselessChars()<CR>
   noremap <LocalLeader>u :<C-u>nohlsearch<CR>
   function! RetabAndDeleteTraillingUselessChars()
-    exec 'normal! ms'
-    exec ':%retab!'
-    exec ':%s/\s\+$//e'
-    exec ':%s/\r//ge'
-    exec ':%s/\%u200b//ge'
-    exec 'normal! `s'
+    normal! ms
+    %retab!
+    %s/\s\+$//e
+    %s/\r//ge
+    %s/\%u200b//ge
+    normal! `s
   endfunction
   " Ctrl-Enter/Space在普通模式下像插入模式一样使用回车/Space
   nnoremap <C-CR> :call InsertEnterInNormalMode()<CR>
@@ -2631,7 +2578,7 @@ endfunction
 
 " After 333ms, call the coc.nvim, markdown-preview and so on
 function! CocTimerStart(timer)
-  exec 'CocStart'
+  CocStart
   call SetGeneralKeyMaps()
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
