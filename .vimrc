@@ -481,14 +481,15 @@ function! ConfigureDelayedPlugin()
     endfor
     return l:workspace_root[0]
   endfunction
-  function! CopyFileRelToCPP(cpp_workspace_root, file_name)
+  function! CopyFileRelToCPP(cpp_workspace_root, file_name) abort
+    " Return 0 on failure, 1 if already present, or 2 if newly copied.
     let l:source_file = $HOME.'/.vim/.c_cpp/'.a:file_name
     let l:target_file = a:cpp_workspace_root.'/'.a:file_name
     if filereadable(l:target_file)
       echo 'File '.l:target_file.' has existed.'
     elseif filereadable(l:source_file)
       let l:source_file_content = readfile(l:source_file)
-      call writefile(l:source_file_content, l:target_file, 's')
+      return writefile(l:source_file_content, l:target_file, 's') == 0 ? 2 : 0
     else
       echo 'File '.l:source_file.' and file '.l:target_file.' do not exist.'
       return 0
@@ -1646,20 +1647,21 @@ function! ConfigureManualLoadPlugin()
     if JumpToTabIfExists(l:json_file_path) == 1
       return
     endif
-    let l:new_config = !filereadable(l:json_file_path)
     if a:config_vscode == 1
       if !isdirectory(l:cpp_workspace_root.'/.vscode')
         call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
       endif
       call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     endif
-    if CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
-      if l:new_config && !WorkspaceHasBuildFiles()
-        call DisableProjectDebug()
-      endif
-      call NUpdateTabTermBuf()
-      exec 'tabe ' . fnameescape(l:json_file_path)
+    let l:copy_result = CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
+    if l:copy_result == 0
+      return
     endif
+    if l:copy_result == 2 && !WorkspaceHasBuildFiles()
+      call DisableProjectDebug()
+    endif
+    call NUpdateTabTermBuf()
+    exec 'tabe ' . fnameescape(l:json_file_path)
   endfunction
   nnoremap ]mp :<C-u>call EnableProjectDebug()<CR>
   nnoremap ]ms :<C-u>call DisableProjectDebug()<CR>
