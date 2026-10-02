@@ -477,7 +477,11 @@ function! ConfigureDelayedPlugin()
     return fnamemodify(l:workspace_root[0], ':h')
   endfunction
   function! CopyFileRelToCPP(cpp_workspace_root, file_name) abort
-    " Return 0 on failure, 1 if already present, or 2 if newly copied.
+    " Return 0 on failure or skipped copy, 1 if already present, or 2 if newly copied.
+    if fnamemodify(resolve(a:cpp_workspace_root), ':p') ==# fnamemodify(resolve($HOME), ':p')
+      echo 'Skipping configuration copy: workspace root is the home directory.'
+      return 0
+    endif
     let l:source_file = $HOME.'/.vim/.c_cpp/'.a:file_name
     let l:target_file = a:cpp_workspace_root.'/'.a:file_name
     if filereadable(l:target_file)
@@ -1582,15 +1586,15 @@ function! ConfigureManualLoadPlugin()
     if JumpToTabIfExists(l:json_file_path) == 1
       return
     endif
+    let l:copy_result = CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
+    if l:copy_result == 0
+      return
+    endif
     if a:config_vscode == 1
       if !isdirectory(l:cpp_workspace_root.'/.vscode')
         call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
       endif
       call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
-    endif
-    let l:copy_result = CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
-    if l:copy_result == 0
-      return
     endif
     if l:copy_result == 2 && !WorkspaceHasBuildFiles()
       call DisableProjectDebug()
