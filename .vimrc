@@ -939,6 +939,14 @@ function! ConfigureManualLoadPlugin()
           \ ['<Leader>qt', 'Preview tag', 'n'],
           \ ])
     call QuickuiInstallKeyMapGroup('&Search', l:search_key_maps)
+    " TigerVNC Viewer 1.16+ defaults on Windows (ShortcutModifiers=Ctrl,Alt).
+    call QuickuiInstallKeyMapGroup('&TigerVNC', [
+          \ ['<Ctrl-Alt>', 'Release keyboard grab', 'n', 'Win'],
+          \ ['<Ctrl-Alt-g>', 'Grab keyboard for remote session', 'n', 'Win'],
+          \ ['<Ctrl-Alt-Enter>', 'Toggle fullscreen', 'n', 'Win'],
+          \ ['<Ctrl-Alt-m>', 'Open viewer menu', 'n', 'Win'],
+          \ ['<Ctrl-Alt-Space>', 'Bypass viewer shortcuts temporarily', 'n', 'Win'],
+          \ ])
     call QuickuiInstallKeyMapGroup('&Vimspector', [
           \ ['<Leader><F5>', 'Create C/C++ debug files without .vscode', 'n'],
           \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n', 'N/I/T'],
@@ -1089,7 +1097,7 @@ function! ConfigureManualLoadPlugin()
             \ .g:quickui_cheatsheet_search_input.'_   Enter: search   Esc: cancel'
       let l:instructions_second_line = ''
     else
-      let l:instructions = '1-9/a-f/i/m/o: fold   z/r: fold/unfold all   gg/G: top/bottom   /?: search   n/N: next/prev'
+      let l:instructions = '1-9/a-f/i/m/o/p: fold   z/r: fold/unfold all   gg/G: top/bottom   /?: search   n/N: next/prev'
       let l:instructions_second_line = 'j/k/PgUp/PgDn: scroll   Space: page down   Esc/q: close'
     endif
     return [[QuickuiCheatsheetTruncate(l:instructions, l:window_width),
@@ -1222,7 +1230,7 @@ function! ConfigureManualLoadPlugin()
     if !exists('g:quickui_keymap_groups')
       call ConfigureQuickui()
     endif
-    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimo', '\zs')
+    let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimop', '\zs')
     let g:quickui_cheatsheet_folded = {}
     for l:group in g:quickui_keymap_groups
       let g:quickui_cheatsheet_folded[l:group[0]] = 1
