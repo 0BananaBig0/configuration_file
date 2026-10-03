@@ -621,8 +621,9 @@ function! ConfigureDelayedPlugin()
   endfunction
   function! FindRootPatternPath(target_path)
     let l:paths = s:AncestorPaths(a:target_path, [$HOME, '/home/'.$SUDO_USER])
-    for l:pattern in g:root_patterns
-      for l:possible_path in l:paths
+    " Prefer the nearest directory, then marker order within that directory.
+    for l:possible_path in l:paths
+      for l:pattern in g:root_patterns
         let l:root_pattern_path = l:possible_path.'/'.l:pattern
         if !empty(getftype(l:root_pattern_path))
           return l:root_pattern_path
