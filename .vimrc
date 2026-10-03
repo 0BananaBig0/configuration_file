@@ -1340,20 +1340,19 @@ function! ConfigureManualLoadPlugin()
     endif
     return 0
   endfunction
-  function! WorkspaceHasBuildFiles() abort
-    let l:root = WorkspaceRoot()
-    for l:name in readdir(l:root)
+  function! WorkspaceHasBuildFiles(root=WorkspaceRoot()) abort
+    for l:name in readdir(a:root)
       if (index(['CMakeLists.txt', 'CMakePresets.json', 'CMakeUserPresets.json',
             \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache'], l:name) >= 0
             \ || l:name =~# '\.\%(pro\|pri\|cmake\|mk\)$')
-            \ && filereadable(l:root . '/' . l:name)
+            \ && filereadable(a:root . '/' . l:name)
         return 1
       endif
     endfor
     return 0
   endfunction
-  function! s:SetProjectDebug(enabled) abort
-    let l:json_file = WorkspaceRoot() . '/.vimspector.json'
+  function! s:SetProjectDebug(enabled, root=WorkspaceRoot()) abort
+    let l:json_file = a:root . '/.vimspector.json'
     try
       if !filereadable(l:json_file)
         throw 'JSON file not found: ' . l:json_file
@@ -1388,11 +1387,11 @@ function! ConfigureManualLoadPlugin()
       return 0
     endtry
   endfunction
-  function! EnableProjectDebug() abort
-    return s:SetProjectDebug(v:true)
+  function! EnableProjectDebug(root=WorkspaceRoot()) abort
+    return s:SetProjectDebug(v:true, a:root)
   endfunction
-  function! DisableProjectDebug() abort
-    return s:SetProjectDebug(v:false)
+  function! DisableProjectDebug(root=WorkspaceRoot()) abort
+    return s:SetProjectDebug(v:false, a:root)
   endfunction
   function! ConfigureCppDebug(config_vscode=0)
     let l:cpp_workspace_root = WorkspaceRoot()
@@ -1408,8 +1407,8 @@ function! ConfigureManualLoadPlugin()
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
       call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
     endif
-    if l:copy_result == 2 && !WorkspaceHasBuildFiles()
-      call DisableProjectDebug()
+    if l:copy_result == 2 && !WorkspaceHasBuildFiles(l:cpp_workspace_root)
+      call DisableProjectDebug(l:cpp_workspace_root)
     endif
     exec 'tabe ' . fnameescape(l:json_file_path)
   endfunction
@@ -2078,18 +2077,13 @@ function! SetGeneralKeyMaps()
     function! CompileAndExcute()
       let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
       let l:source_file = shellescape(expand('%:p'), 1)
-      if &filetype=='python' && expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'
-        exec l:compile_exec.' /usr/bin/env python3 '.l:source_file
-      elseif &filetype=='sh'
-        exec l:compile_exec.' /usr/bin/env sh '.l:source_file
-      elseif &filetype=='csh'
-        exec l:compile_exec.' /usr/bin/env csh '.l:source_file
+      let l:interpreter = get({'python': 'python3', 'sh': 'sh', 'csh': 'csh',
+            \ 'perl': 'perl', 'tcl': 'tclsh'}, &ignorecase ? tolower(&filetype) : &filetype, '')
+      if !empty(l:interpreter) && (&filetype != 'python'
+            \ || (expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'))
+        exec l:compile_exec.' /usr/bin/env '.l:interpreter.' '.l:source_file
       elseif &filetype=='verilog'
         exec l:compile_exec.CPPCompilation().' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
-      elseif &filetype=='perl'
-        exec l:compile_exec.' /usr/bin/env perl '.l:source_file
-      elseif &filetype=='tcl'
-        exec l:compile_exec.' /usr/bin/env tclsh '.l:source_file
       elseif &filetype=='markdown'
         CocCommand markdown-preview-enhanced.openPreview
       elseif &filetype=='vim'

@@ -114,6 +114,14 @@ try
     call writefile([''], s:root . '/src/CMakeLists.txt')
     call assert_false(WorkspaceHasBuildFiles(), 'only files directly in the root')
 
+    " An already resolved root must be checked independently of the active workspace.
+    let s:explicit_root = s:root
+    call writefile([''], s:explicit_root . '/CMakeLists.txt')
+    let s:root = s:OpenWorkspace('other-workspace')
+    call assert_false(WorkspaceHasBuildFiles(), 'active workspace has no build files')
+    call assert_true(WorkspaceHasBuildFiles(s:explicit_root), 'check the supplied workspace root')
+    call assert_equal(s:root . '/src/main.py', expand('%:p'), 'explicit root check keeps source focus')
+
     " Catch incorrect defaults in either setup variant, including spaced paths.
     for [s:name, s:marker, s:vscode, s:want] in [
           \ ['cmake project', 'CMakeLists.txt', 0, v:true],

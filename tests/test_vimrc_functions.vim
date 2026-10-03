@@ -445,6 +445,59 @@ function! s:AsyncRunPaths() abort
   unlet g:asyncrun_mode g:asyncrun_hook
 endfunction
 
+function! s:InterpreterCommands() abort
+  " Keep AsyncRun's parser; capture its process boundary without launching interpreters.
+  let g:asyncrun_mode = 10
+  let g:asyncrun_hook = 'CaptureAsyncRun'
+  let l:ignorecase = &ignorecase
+  try
+    for [l:filetype, l:interpreter] in [
+          \ ['python', 'python3'], ['sh', 'sh'], ['csh', 'csh'],
+          \ ['perl', 'perl'], ['tcl', 'tclsh']]
+      let l:file = s:fixtures . "/script ' % # $ ( ) |." . l:filetype
+      call writefile(['# interpreter fixture'], l:file)
+      execute 'edit ' . fnameescape(l:file)
+      let &l:filetype = l:filetype
+      let g:build_command = ''
+      call CompileAndExcute()
+      call assert_equal('/usr/bin/env ' . l:interpreter . ' ' . shellescape(l:file),
+            \ trim(g:build_command), l:filetype . ' keeps interpreter and quoted filename')
+    endfor
+
+    " SCons exceptions apply to Python, while the original comparisons honor ignorecase.
+    let l:root = s:fixtures . '/scons project'
+    call mkdir(l:root . '/.git', 'p')
+    call writefile(['# scons fixture'], l:root . '/SConstruct')
+    for l:name in ['SConstruct', 'SConscript', 'sconstruct']
+      let l:file = l:root . '/' . l:name
+      call writefile(['# scons fixture'], l:file)
+      execute 'edit ' . fnameescape(l:file)
+      setlocal filetype=python
+      set ignorecase
+      let g:build_command = ''
+      call CompileAndExcute()
+      call assert_match('bear --append -- scons -j12', g:build_command, l:name . ' uses SCons')
+      setlocal filetype=sh
+      call CompileAndExcute()
+      call assert_equal('/usr/bin/env sh ' . shellescape(l:file), trim(g:build_command),
+            \ 'SCons filename does not override another interpreter')
+    endfor
+
+    execute 'edit ' . fnameescape(s:fixtures . '/main.py')
+    let &l:filetype = 'Python'
+    for l:ignore in [0, 1]
+      let &ignorecase = l:ignore
+      let g:build_command = ''
+      call CompileAndExcute()
+      call assert_equal(l:ignore ? '/usr/bin/env python3 ' . shellescape(s:fixtures . '/main.py') : '',
+            \ trim(g:build_command), 'filetype comparisons honor ignorecase')
+    endfor
+  finally
+    let &ignorecase = l:ignorecase
+    unlet g:asyncrun_mode g:asyncrun_hook
+  endtry
+endfunction
+
 function! s:BuildCommands() abort
   " Capture the external AsyncRun boundary instead of launching compilers.
   command! -bang -nargs=* AsyncRun let g:build_command = <q-args>
@@ -502,7 +555,7 @@ function! s:BuildCommands() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLayout', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetWidths', 'NativeHelpers', 'AsyncRunPaths', 'BuildCommands']
+  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLayout', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetWidths', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands']
     try
       call call(function('s:' . s:check), [])
     catch
