@@ -1710,7 +1710,7 @@ function! ConfigureManualLoadPlugin()
     call s:VimspectorCommand('thread apply all continue')
   endfunction
   function! StopAllThreads()
-    call s:VimspectorCommand('thread apply all stop')
+    call s:VimspectorCommand('interrupt -a')
   endfunction
   augroup Plugin_Configuration_Group
     autocmd! User VimspectorTerminalOpened
@@ -2126,6 +2126,9 @@ function! SetGeneralKeyMaps()
           let l:build_program = shellescape('build/'.l:program_name, 1)
           let l:local_program = shellescape('./'.l:program_name, 1)
           let l:source_program = shellescape(expand('%:p:r').'.exe', 1)
+          let l:build_native = shellescape('build/'.expand('%:t:r'), 1)
+          let l:local_native = shellescape('./'.expand('%:t:r'), 1)
+          let l:source_native = shellescape(expand('%:p:r'), 1)
           exec l:compile_exec.l:cpp_compilation
                 \.' && if [ -e '.l:build_program.' ]; then'
                 \.' '.l:build_program.';'
@@ -2133,6 +2136,12 @@ function! SetGeneralKeyMaps()
                 \.' '.l:local_program.';'
                 \.'  elif [ -e '.l:source_program.' ]; then'
                 \.' '.l:source_program.';'
+                \.'  elif [ -f '.l:build_native.' ] && [ -x '.l:build_native.' ]; then'
+                \.' '.l:build_native.';'
+                \.'  elif [ -f '.l:local_native.' ] && [ -x '.l:local_native.' ]; then'
+                \.' '.l:local_native.';'
+                \.'  elif [ -f '.l:source_native.' ] && [ -x '.l:source_native.' ]; then'
+                \.' '.l:source_native.';'
                 \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
                 \.' build/*.exe;'
                 \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'

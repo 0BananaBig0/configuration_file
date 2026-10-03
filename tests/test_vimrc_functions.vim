@@ -173,7 +173,7 @@ function! s:DebuggerCommands() abort
         \ ['SetBacktraceLimit', [4], '-exec set backtrace limit 4'],
         \ ['SwitchToSpecificThread', [9], '-exec thread 9'],
         \ ['ContinueAllThreads', [], '-exec thread apply all continue'],
-        \ ['StopAllThreads', [], '-exec thread apply all stop']]
+        \ ['StopAllThreads', [], '-exec interrupt -a']]
     call win_gotoid(l:original_win)
     let g:debugger_command = ''
     call call(function(l:name), l:args)
@@ -817,6 +817,41 @@ function! s:BuildRoutingIgnoresFilenames() abort
   endtry
 endfunction
 
+function! s:ProjectExecutableLocations() abort
+  " Run the generated shell branch: catch missing locations, quoting and .exe precedence.
+  command! -bang -nargs=* AsyncRun let g:build_command = <q-args>
+  let l:root = s:fixtures . '/run [one] project'
+  call mkdir(l:root . '/.git', 'p')
+  call mkdir(l:root . '/build', 'p')
+  call mkdir(l:root . '/src', 'p')
+  call writefile([''], l:root . '/Makefile')
+  call writefile(['int main(void) { return 0; }'], l:root . '/src/main file.c')
+  execute 'edit ' . fnameescape(l:root . '/src/main file.c')
+  call CompileAndExcute()
+  let l:run = strpart(g:build_command, stridx(g:build_command, ' && if ') + 4)
+  let l:shells = ['/bin/sh'] + (executable('zsh') ? [exepath('zsh')] : [])
+  for l:location in ['build/', '', 'src/']
+    let l:native = l:root . '/' . l:location . 'main file'
+    call writefile(['#!/bin/sh', 'echo NATIVE_PROGRAM'], l:native)
+    call setfperm(l:native, 'rwx------')
+    for l:exe in [0, 1]
+      if l:exe
+        call writefile(['#!/bin/sh', 'echo EXE_PROGRAM'], l:root . '/main file.exe')
+        call setfperm(l:root . '/main file.exe', 'rwx------')
+      endif
+      for l:shell in l:shells
+        let l:output = system(shellescape(l:shell) . ' -c '
+              \ . shellescape('cd ' . shellescape(l:root) . ' && ' . l:run))
+        call assert_equal(0, v:shell_error, l:location . ' execution with ' . l:shell)
+        call assert_equal(l:exe ? "EXE_PROGRAM\n" : "NATIVE_PROGRAM\n", l:output,
+              \ 'named .exe priority and extensionless fallback: ' . l:location)
+      endfor
+    endfor
+    call delete(l:native)
+    call delete(l:root . '/main file.exe')
+  endfor
+endfunction
+
 function! s:ProjectBuilds() abort
   " Catch generator mismatches and skipped GNUmakefiles with real builds and LSP databases.
   for l:tool in ['cmake', 'ninja', 'make', 'gcc', 'bear']
@@ -845,6 +880,12 @@ function! s:ProjectBuilds() abort
     endif
     let l:output = system(l:command)
     call assert_equal(0, v:shell_error, l:generator . ' builds with project flags: ' . l:output)
+    " Execute the real run branch after the build, including extensionless CMake outputs.
+    command! -bang -nargs=* AsyncRun let g:build_command = <q-args>
+    call CompileAndExcute()
+    let l:run = strpart(g:build_command, stridx(g:build_command, ' && if ') + 4)
+    let l:output = system('cd ' . shellescape(l:root) . ' && ' . l:run)
+    call assert_equal(0, v:shell_error, l:generator . ' executes the built program: ' . l:output)
     let l:database = l:root . '/compile_commands.json'
     call assert_true(filereadable(l:database), l:generator . ' creates the LSP database at the root')
     if filereadable(l:database)
@@ -906,7 +947,7 @@ function! s:SystemVerilogBuild() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch
