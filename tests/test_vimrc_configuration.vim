@@ -147,6 +147,37 @@ function! s:EnterIndentation() abort
   endfor
 endfunction
 
+function! s:AltEnterIndentation() abort
+  " Splitting within indentation must not duplicate the retained whitespace.
+  for l:insert in [0, 1]
+    for [l:prefix, l:expandtab, l:expected] in [
+          \ ['    ', 1, '    '], ["\t", 0, "\t"],
+          \ ["\t  ", 0, "\t  "], ["\t  ", 1, '      ']]
+      for l:column in range(1, strlen(l:prefix) + 1)
+        enew!
+        setlocal filetype=python
+        let &l:expandtab = l:expandtab
+        call setline(1, ['if True:', l:prefix . 'print("test")'])
+        call cursor(2, l:column)
+        call feedkeys((l:insert ? 'i' : '') . "\<M-CR>"
+              \ . (l:insert ? '' : 'i') . "X\<Esc>", 'xt')
+        call assert_equal(['if True:', strpart(l:prefix, 0, l:column - 1),
+              \ l:expected . 'Xprint("test")'], getline(1, '$'),
+              \ 'Alt+Enter preserves indentation and insertion position: '
+              \ . string([l:insert, l:prefix, l:expandtab, l:column]))
+      endfor
+    endfor
+    enew!
+    setlocal filetype=python expandtab
+    call setline(1, '    first  second')
+    call cursor(1, 10)
+    call feedkeys((l:insert ? 'i' : '') . "\<M-CR>"
+          \ . (l:insert ? '' : 'i') . "X\<Esc>", 'xt')
+    call assert_equal(['    first', '    X  second'], getline(1, '$'),
+          \ 'Alt+Enter retains spaces after code at the split')
+  endfor
+endfunction
+
 function! s:HeaderWidth() abort
   " Catch presentation mode and hidden column guides breaking file headers.
   let l:saved = &colorcolumn
@@ -346,7 +377,7 @@ endfunction
 
 try
   for s:check in ['ManualConfigurationReload', 'FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
-        \ 'EnterIndentation', 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
+        \ 'EnterIndentation', 'AltEnterIndentation', 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
         \ 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
     try
       call call(function('s:' . s:check), [])

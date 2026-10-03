@@ -2103,7 +2103,7 @@ function! SetGeneralKeyMaps()
     function! CompileAndExcute()
       let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
       let l:source_file = shellescape(expand('%:p'), 1)
-      let l:interpreter = get({'python': 'python3', 'sh': 'sh', 'csh': 'csh',
+      let l:interpreter = get({'python': 'python3', 'sh': 'bash', 'csh': 'csh',
             \ 'perl': 'perl', 'tcl': 'tclsh'}, &ignorecase ? tolower(&filetype) : &filetype, '')
       if !empty(l:interpreter) && (&filetype != 'python'
             \ || (expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'))
@@ -2252,7 +2252,12 @@ function! SetGeneralKeyMaps()
     finally
       let &paste = l:paste
     endtry
-    call setline(l:new_line, l:cur_indent.getline(l:new_line))
+    let l:remainder = getline(l:new_line)
+    if getline(l:cur_line) =~# '^\s*$'
+      " Replace indentation carried over by a split within leading whitespace.
+      let l:remainder = substitute(l:remainder, '^\s*', '', '')
+    endif
+    call setline(l:new_line, l:cur_indent.l:remainder)
     call setpos('.', [0, l:new_line, strlen(l:cur_indent) + 1, 0])
   endfunction
   " Ctrl-Alt/Shift-Enter新建空行

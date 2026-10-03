@@ -643,7 +643,7 @@ function! s:InterpreterCommands() abort
   let l:ignorecase = &ignorecase
   try
     for [l:filetype, l:interpreter] in [
-          \ ['python', 'python3'], ['sh', 'sh'], ['csh', 'csh'],
+          \ ['python', 'python3'], ['sh', 'bash'], ['csh', 'csh'],
           \ ['perl', 'perl'], ['tcl', 'tclsh']]
       let l:file = s:fixtures . "/script ' % # $ ( ) |." . l:filetype
       call writefile(['# interpreter fixture'], l:file)
@@ -654,6 +654,17 @@ function! s:InterpreterCommands() abort
       call assert_equal('/usr/bin/env ' . l:interpreter . ' ' . shellescape(l:file),
             \ trim(g:build_command), l:filetype . ' keeps interpreter and quoted filename')
     endfor
+
+    " Invoking Bash as sh enables POSIX mode and changes errexit in substitutions.
+    let l:file = s:fixtures . '/bash-mode.sh'
+    call writefile(['#!/usr/bin/env bash', 'set -e',
+          \ 'result=$(false; printf "ok")', 'printf "%s\n" "$result"'], l:file)
+    execute 'edit ' . fnameescape(l:file)
+    setlocal filetype=sh
+    call CompileAndExcute()
+    let l:output = system(g:build_command)
+    call assert_equal(0, v:shell_error, 'shell execution retains Bash semantics')
+    call assert_equal("ok\n", l:output, 'Bash command substitution completes')
 
     " SCons exceptions apply to Python, while the original comparisons honor ignorecase.
     let l:root = s:fixtures . '/scons project'
@@ -670,7 +681,7 @@ function! s:InterpreterCommands() abort
       call assert_match('bear --append -- scons -j12', g:build_command, l:name . ' uses SCons')
       setlocal filetype=sh
       call CompileAndExcute()
-      call assert_equal('/usr/bin/env sh ' . shellescape(l:file), trim(g:build_command),
+      call assert_equal('/usr/bin/env bash ' . shellescape(l:file), trim(g:build_command),
             \ 'SCons filename does not override another interpreter')
     endfor
 
