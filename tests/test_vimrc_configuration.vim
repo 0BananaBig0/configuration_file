@@ -126,6 +126,36 @@ function! s:HeaderWidth() abort
   endtry
 endfunction
 
+function! s:HeaderFileKinds() abort
+  " Catch changed extension checks dropping shebangs, comments, or includes.
+  for [l:name, l:filetype, l:comment, l:shebang, l:tail] in [
+        \ ['header.h', 'cpp', '// %s', '', ['#pragma once', '#include <iostream>']],
+        \ ['header.H', 'cpp', '// %s', '', ['#pragma once', '#include <iostream>']],
+        \ ['main.cpp', 'cpp', '// %s', '', ['#include <iostream>']],
+        \ ['kernel.cl', 'opencl', '// %s', '', []],
+        \ ['kernel.cu', 'cuda', '// %s', '', ['#include <iostream>', '#include <cuda_runtime.h>']],
+        \ ['view.qml', 'qml', '// %s', '', []],
+        \ ['main.tcl', 'tcl', '# %s', '#!/usr/bin/env tclsh', []],
+        \ ['commands.pdl', 'tcl', '# %s', '', []]]
+    enew!
+    execute 'file ' . fnameescape(s:fixtures . '/' . l:name)
+    let &l:filetype = l:filetype
+    let &l:commentstring = '# %s'
+    call SetTitle()
+    call assert_equal(l:comment, &l:commentstring, l:name . ' keeps comment style')
+    if !empty(l:shebang)
+      call assert_equal(l:shebang, getline(1), l:name . ' keeps shebang')
+    else
+      call assert_notmatch('^#!', getline(1), l:name . ' has no added shebang')
+    endif
+    if !empty(l:tail)
+      call assert_equal(l:tail, getline(line('$') - len(l:tail), line('$') - 1),
+            \ l:name . ' keeps generated includes and header guard')
+    endif
+    call assert_equal('', getline('$'), l:name . ' keeps final blank line')
+  endfor
+endfunction
+
 function! s:SourceWindow() abort
   " Catch selecting an old auxiliary window instead of the actual source.
   enew!
@@ -183,6 +213,68 @@ function! s:VisualWhichKey() abort
   call ConfigureDelayedPlugin()
 endfunction
 
+function! s:VimVisualNavigation() abort
+  " Catch changed search flags, regex escaping, and lost Visual selections.
+  let l:selection = &selection
+  try
+    for l:setting in ['inclusive', 'exclusive']
+      let &selection = l:setting
+      for l:visual in ['vll', 'Vj', "\<C-V>jl"]
+        for [l:line, l:key, l:want] in [[2, 'ks', 1], [2, 'js', 8],
+              \ [2, 'jc', 5], [9, 'kc', 6]]
+          enew!
+          call setline(1, ['function! First()', '  let x = 1', 'endfunction', '',
+                \ '" first comment', '" continued comment', 'let x = 0',
+                \ 'function! Second()', '  let y = 2', 'endfunction', '',
+                \ '" last comment', 'let z = 3'])
+          setlocal filetype=vim
+          " Mapping dispatch distinguishes modes even when -es makes mode() return ce.
+          nnoremap <buffer> <F12> <Cmd>let g:vim_navigation_selection = ['normal', getpos('v')]<CR>
+          xnoremap <buffer> <F12> <Cmd>let g:vim_navigation_selection = ['visual', getpos('v')]<CR>
+          call cursor(l:line, 2)
+          let g:vim_navigation_selection = []
+          call feedkeys(l:visual . ',' . l:key . "\<F12>", 'xt')
+          call assert_equal(l:want, line('.'), l:key . ' keeps its search direction')
+          call assert_equal('visual', g:vim_navigation_selection[0],
+                \ l:key . ' keeps Visual mode active')
+          call assert_equal(l:line, g:vim_navigation_selection[1][1],
+                \ l:key . ' preserves the selection anchor')
+          execute "normal! \<Esc>"
+        endfor
+      endfor
+    endfor
+    for [l:line, l:key] in [[2, 'je'], [9, 'ke']]
+      call cursor(l:line, 2)
+      call feedkeys('vll,' . l:key, 'xt')
+      call assert_equal(3, line('.'), l:key . ' finds the nearest function end')
+      execute "normal! \<Esc>"
+    endfor
+  finally
+    let &selection = l:selection
+    unlet! g:vim_navigation_selection
+  endtry
+endfunction
+
+function! s:MarkdownMenu() abort
+  " Catch first-use TOC loading after an unnamed buffer's FileType event.
+  enew!
+  setlocal filetype=markdown
+  call setline(1, ['# Title', '', '## Section', 'body'])
+  call cursor(3, 2)
+  call CreateMarkdownMenu()
+  call assert_equal('markdown', &l:filetype, 'TOC loading restores the Markdown filetype')
+  call assert_true(index(getline(1, '$'), '- [Title](#title)') >= 0,
+        \ 'Markdown menu contains the heading link')
+  call assert_equal(['# Title', '', '## Section', 'body'], getline(line('$') - 3, '$'),
+        \ 'Markdown menu preserves the document')
+  call assert_equal('## Section', getline('.'), 'Markdown menu restores the source line')
+  call assert_equal(2, col('.'), 'Markdown menu restores the source column')
+  enew!
+  setlocal filetype=text
+  call LoadMarkdownToc(':UpdateToc')
+  call assert_equal('text', &l:filetype, 'TOC loading preserves other filetypes')
+endfunction
+
 function! s:ShortcutHelp() abort
   " Keep each plugin's own shortcut descriptions and hierarchy.
   call assert_equal('Generate parameters', g:leader_key_map.a.p.p)
@@ -209,7 +301,8 @@ endfunction
 
 try
   for s:check in ['FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
-        \ 'HeaderWidth', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey', 'ShortcutHelp']
+        \ 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
+        \ 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
     try
       call call(function('s:' . s:check), [])
     catch

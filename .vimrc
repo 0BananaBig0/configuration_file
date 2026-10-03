@@ -152,7 +152,11 @@ function! ConfigureDelayedPlugin()
     let g:vmt_auto_update_on_save = 0
     let g:vmt_list_item_char = '-'
     function! LoadMarkdownToc(function_name) abort
+      let l:filetype = &l:filetype
       call plug#load('vim-markdown-toc')
+      if l:filetype ==# 'markdown'
+        setlocal filetype=markdown
+      endif
       if !exists(a:function_name)
         throw 'vim-markdown-toc did not define ' . a:function_name
       endif
@@ -160,7 +164,7 @@ function! ConfigureDelayedPlugin()
     function! CreateMarkdownMenu()
       normal! ms
       call LoadMarkdownToc(':GenTocGFM')
-      exec "normal! ggO\<ESC>"
+      normal! ggO
       GenTocGFM
       normal! ggdd`s
     endfunction
@@ -473,15 +477,15 @@ function! ConfigureDelayedPlugin()
     return l:groups
   endfunction
   function! s:WhichKeyMap(prefix, layout, groups) abort
-    let l:result = a:layout
+    let l:prefix_length = strlen(a:prefix)
     for l:group in a:groups
       for l:mapping in l:group[1]
         if l:mapping[2] !=# 'n' || stridx(l:mapping[0], a:prefix) != 0
           continue
         endif
-        let l:key = strpart(l:mapping[0], strlen(a:prefix))
+        let l:key = strpart(l:mapping[0], l:prefix_length)
         let l:key = substitute(l:key, '<S-\([a-z]\)>', '\U\1', 'g')
-        let l:node = l:result
+        let l:node = a:layout
         while strlen(l:key) > 1 && has_key(l:node, l:key[0])
               \ && type(l:node[l:key[0]]) == v:t_dict
               \ && l:node[l:key[0]].name !=# 'which_key_ignore'
@@ -493,11 +497,11 @@ function! ConfigureDelayedPlugin()
         endif
       endfor
     endfor
-    return l:result
+    return a:layout
   endfunction
   function! s:ShowVisualWhichKey(prefix) abort
     let l:view = winsaveview()
-    execute 'WhichKeyVisual ' . string(a:prefix)
+    call which_key#start(1, 0, a:prefix)
     " WhichKey's ranged feedkeys() call moves the cursor before replaying the action.
     call winrestview(l:view)
   endfunction
@@ -759,23 +763,27 @@ function! ConfigureDelayedPlugin()
         \ 'syntax_hl': 1,
         \ 'scrolloff': 1,
         \ }
+  function! s:SearchVisualVimNavigation(pattern, flags) abort
+    normal! gv
+    call search(a:pattern, a:flags)
+  endfunction
   function! ConfigureVimNavigationKeyMaps()
     for l:key in ['[[', ']]', '[]', '][', '["', ']"']
       execute 'silent! nunmap <buffer> ' . l:key
       execute 'silent! xunmap <buffer> ' . l:key
     endfor
     nnoremap <silent><buffer> <LocalLeader>ks m':call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
-    xnoremap <silent><buffer> <LocalLeader>ks m':<C-U>exe "normal! gv"<Bar>call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>ks m':<C-U>call <SID>SearchVisualVimNavigation('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
     nnoremap <silent><buffer> <LocalLeader>js m':call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
-    xnoremap <silent><buffer> <LocalLeader>js m':<C-U>exe "normal! gv"<Bar>call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>js m':<C-U>call <SID>SearchVisualVimNavigation('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
     nnoremap <silent><buffer> <LocalLeader>ke m':call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
-    xnoremap <silent><buffer> <LocalLeader>ke m':<C-U>exe "normal! gv"<Bar>call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>ke m':<C-U>call <SID>SearchVisualVimNavigation('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
     nnoremap <silent><buffer> <LocalLeader>je m':call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
-    xnoremap <silent><buffer> <LocalLeader>je m':<C-U>exe "normal! gv"<Bar>call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>je m':<C-U>call <SID>SearchVisualVimNavigation('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
     nnoremap <silent><buffer> <LocalLeader>jc :call search('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
-    xnoremap <silent><buffer> <LocalLeader>jc :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>jc :<C-U>call <SID>SearchVisualVimNavigation('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
     nnoremap <silent><buffer> <LocalLeader>kc :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
-    xnoremap <silent><buffer> <LocalLeader>kc :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>kc :<C-U>call <SID>SearchVisualVimNavigation('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
   endfunction
   function! s:EnsureMatchupForCurrentBuffer() abort
       call plug#load('vim-matchup')
@@ -1848,8 +1856,9 @@ function! AppendInfo(info, column_limit)
   call append('$', l:padding_str.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_str)
 endfunction
 function! SetTitle()
-  if &filetype=='c' || &filetype=='cpp' || expand('%:e')=='cl'
-      \ || expand('%:e')=='cu' || expand('%:e')=='qml'
+  let l:extension = expand('%:e')
+  if &filetype=='c' || &filetype=='cpp' || l:extension=='cl'
+      \ || l:extension=='cu' || l:extension=='qml'
     setlocal commentstring=//\ %s
   endif
   if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
@@ -1862,7 +1871,7 @@ function! SetTitle()
     call setline(1, '#!/usr/bin/env csh')
   elseif &filetype=='perl'
     call setline(1, '#!/usr/bin/env perl')
-  elseif expand('%:e')=='tcl'
+  elseif l:extension=='tcl'
     call setline(1, '#!/usr/bin/env tclsh')
   endif
   " Header width is independent of visible column guides and presentation mode.
@@ -1895,7 +1904,7 @@ function! SetTitle()
   if &filetype=='c'
     call append('$', '#include <stdio.h>')
   elseif &filetype=='cpp'
-    if expand('%:e')=~?'^h.*'
+    if l:extension=~?'^h.*'
       call append('$', '#pragma once')
     endif
     call append('$', '#include <iostream>')
@@ -2356,10 +2365,18 @@ function! SetGeneralKeyMaps()
     endif
   endfunction
   function! MoveTabH()
-    execute 'tabmove ' . (tabpagenr() == 1 ? '$' : '-1')
+    if tabpagenr() == 1
+      tabmove $
+    else
+      tabmove -1
+    endif
   endfunction
   function! MoveTabL()
-    execute 'tabmove ' . (tabpagenr() == tabpagenr('$') ? '0' : '+1')
+    if tabpagenr() == tabpagenr('$')
+      tabmove 0
+    else
+      tabmove +1
+    endif
   endfunction
   tnoremap <C-S-v> <C-w>"+
   " Define the main command (capital E) – safe and explicit

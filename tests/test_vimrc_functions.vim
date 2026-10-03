@@ -136,6 +136,9 @@ function! s:DebuggerCommands() abort
         \ 'function! vimspector#AddWatch(expr) abort',
         \ '  let g:watch_expression = a:expr',
         \ 'endfunction',
+        \ 'function! vimspector#LaunchWithSettings(settings) abort',
+        \ '  call add(g:launch_settings, a:settings)',
+        \ 'endfunction',
         \ 'function! vimspector#ShowDisassembly() abort',
         \ '  if get(g:, "test_create_disassembly", 0)',
         \ '    let l:origin = win_getid()',
@@ -202,6 +205,33 @@ function! s:DebuggerCommands() abort
   unlet g:vimspector_session_windows
 endfunction
 
+function! s:DebuggerLaunch() abort
+  " Capture the adapter launch while exercising real JSON mode selection.
+  let l:root = s:fixtures . '/debug launch'
+  call mkdir(l:root . '/.git', 'p')
+  call writefile(['# launch fixture'], l:root . '/main.py')
+  execute 'edit ' . fnameescape(l:root . '/main.py')
+  for [l:filetype, l:module, l:enabled, l:want] in [
+        \ ['python', '', v:true, 'python: single-file'],
+        \ ['python', 'package.main', v:false, 'python: single-file'],
+        \ ['python', 'package.main', v:true, 'python: project'],
+        \ ['tcl', '', v:false, 'tcl: launch'],
+        \ ['c', '', v:false, 'cpp: launch'],
+        \ ['cpp', '', v:false, 'cpp: launch'],
+        \ ['cuda', '', v:false, '']]
+    call writefile([json_encode({'configurations': {
+          \ 'python: project': {'configuration': {
+          \ 'module': l:module, 'enable_project_debug': l:enabled}},
+          \ 'python: single-file': {}}})], l:root . '/.vimspector.json')
+    let &l:filetype = l:filetype
+    let g:launch_settings = []
+    call LaunchVimspector()
+    call assert_equal(empty(l:want) ? [] : [{'configuration': l:want, 'Test': l:want}],
+          \ g:launch_settings, l:filetype . ' launches the selected debug configuration once')
+  endfor
+  unlet g:launch_settings
+endfunction
+
 function! s:DebuggerLayout() abort
   enew
   let g:vimspector_session_windows = {'code': win_getid()}
@@ -227,6 +257,59 @@ function! s:DebuggerLayout() abort
   call assert_match('Disassembly', execute('nmenu WinBar'), 'disassembly keeps window menu')
   let g:test_create_disassembly = 0
   unlet g:vimspector_session_windows
+endfunction
+
+function! s:DebuggerWindowClosing() abort
+  " Catch reversed closing order, absent/stale IDs, and crossing tab boundaries.
+  enew
+  let l:source = win_getid()
+  unlet! g:vimspector_session_windows
+  call QuitVimspectorWins()
+  let g:vimspector_session_windows = {'disassembly': -1, 'terminal': -1}
+  call QuitVimspectorWins()
+  call assert_equal(l:source, win_getid(), 'missing and stale debugger windows leave focus unchanged')
+  new
+  let l:disassembly = win_getid()
+  new
+  let l:terminal = win_getid()
+  let g:vimspector_session_windows = {'disassembly': l:disassembly, 'terminal': l:terminal}
+  let g:test_closed_debugger_windows = []
+  augroup Test_Debugger_Window_Closing
+    autocmd!
+    autocmd WinClosed * call add(g:test_closed_debugger_windows, str2nr(expand('<afile>')))
+  augroup END
+  try
+    call QuitVimspectorWins()
+    call assert_equal([l:disassembly, l:terminal], g:test_closed_debugger_windows,
+          \ 'disassembly closes before terminal')
+    call assert_equal(l:source, win_getid(), 'source window remains open')
+
+    " Closing disassembly can update the adapter's terminal window reference.
+    new
+    let l:disassembly = win_getid()
+    new
+    let l:terminal = win_getid()
+    let g:vimspector_session_windows = {'disassembly': l:disassembly}
+    execute 'autocmd Test_Debugger_Window_Closing WinClosed ' . l:disassembly
+          \ . ' let g:vimspector_session_windows.terminal = ' . l:terminal
+    let g:test_closed_debugger_windows = []
+    call QuitVimspectorWins()
+    call assert_equal([l:disassembly, l:terminal], g:test_closed_debugger_windows,
+          \ 'terminal reference is read after disassembly closes')
+
+    " Characterize the existing limitation: windows in another tab are skipped.
+    tabnew
+    let l:other_tab_window = win_getid()
+    let g:vimspector_session_windows = {'terminal': l:other_tab_window}
+    call win_gotoid(l:source)
+    call QuitVimspectorWins()
+    call assert_equal([l:other_tab_window], win_findbuf(winbufnr(l:other_tab_window)),
+          \ 'debugger window in another tab stays open')
+    call assert_equal(l:source, win_getid(), 'closing stays within the current tab')
+  finally
+    autocmd! Test_Debugger_Window_Closing
+    unlet! g:vimspector_session_windows g:test_closed_debugger_windows
+  endtry
 endfunction
 
 function! s:LazyPlugins() abort
@@ -309,6 +392,33 @@ function! s:CheatsheetCategories() abort
     endfor
   finally
     call popup_clear()
+  endtry
+endfunction
+
+function! s:CheatsheetSearch() abort
+  call QuickuiOpenKeyMapCheatsheet()
+  let l:winid = popup_list()[0]
+  try
+    for l:direction in ['/', '?']
+      call QuickuiStartKeyMapCheatsheetSearch(l:winid, l:direction)
+      let g:quickui_cheatsheet_search_input = 'TigerVNC'
+      call QuickuiKeyMapCheatsheetFilter(l:winid, "\<CR>")
+      let l:lines = getbufline(winbufnr(l:winid), 1, '$')
+      let l:matches = filter(range(1, len(l:lines)), {_, n -> l:lines[n - 1] =~# 'TigerVNC'})
+      call assert_false(g:quickui_cheatsheet_search_active, 'Enter closes search input')
+      call assert_notmatch('^Search ', l:lines[0], 'Enter redraws normal instructions')
+      call assert_equal('TigerVNC', g:quickui_cheatsheet_search_pattern)
+      call quickui#core#win_execute(l:winid, 'let g:test_cheatsheet_line = line(".")')
+      call assert_equal(l:direction ==# '/' ? l:matches[0] : l:matches[-1],
+            \ g:test_cheatsheet_line, 'search begins at the correct end of refreshed text')
+    endfor
+    call QuickuiStartKeyMapCheatsheetSearch(l:winid, '/')
+    call QuickuiKeyMapCheatsheetFilter(l:winid, "\<CR>")
+    call assert_false(g:quickui_cheatsheet_search_active, 'empty Enter closes search input')
+    call assert_equal('TigerVNC', g:quickui_cheatsheet_search_pattern, 'empty input keeps the previous pattern')
+  finally
+    call popup_clear()
+    unlet! g:test_cheatsheet_line
   endtry
 endfunction
 
@@ -552,10 +662,23 @@ function! s:BuildCommands() abort
   call assert_match("'main file.cpp' -o 'main file.exe'", CPPCompilation(), 'quoted single-file compiler arguments')
   call CompileAndExcute()
   call assert_match("&& '\./main file.exe'", g:build_command, 'quoted compiled-program invocation')
+  for [l:filetype, l:extension, l:want] in [
+        \ ['c', 'c', 'gcc -fsanitize=address,undefined,leak -g -pedantic-errors'
+        \ . " -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow 'main file.c' -o 'main file.exe'"],
+        \ ['cuda', 'cu', "nvcc -g 'main file.cu' -o 'main file.exe'"],
+        \ ['verilog', 'v', "iverilog *.v -o 'main file.out' && vvp 'main file.out'"],
+        \ ['systemverilog', 'sv', "iverilog *.v -o 'main file.out' && vvp 'main file.out'"]]
+    let l:file = l:root . '/src/main file.' . l:extension
+    call writefile([''], l:file)
+    execute 'edit ' . fnameescape(l:file)
+    let &l:filetype = l:filetype
+    call assert_equal(' cd ' . shellescape(l:root . '/src') . ' && ' . l:want,
+          \ CPPCompilation(), l:filetype . ' keeps its compiler and quoted output')
+  endfor
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLayout', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetWidths', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands']
+  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands']
     try
       call call(function('s:' . s:check), [])
     catch
