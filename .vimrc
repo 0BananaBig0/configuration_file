@@ -603,21 +603,29 @@ function! ConfigureDelayedPlugin()
            \ 'coc-sh', 'coc-pyright', 'coc-webview', 'coc-markmap', 'coc-markdown-preview-enhanced',
            \ 'coc-markdownlint', 'coc-json', 'coc-css', 'coc-tsserver', 'coc-xml']
   let g:root_patterns = ['.git', '.hg', '.projections.json', '.project', '.svn', '.root', '.vscode', 'SConstruct']
+  function! s:AncestorPaths(target_path, stop_paths) abort
+    let l:paths = []
+    let l:path = a:target_path
+    while l:path !=# '/' && index(a:stop_paths, l:path) < 0
+      call add(l:paths, l:path)
+      if stridx(l:path, '/') < 0
+        break
+      endif
+      let l:path = fnamemodify(l:path, ':h')
+    endwhile
+    return l:paths
+  endfunction
   function! FindRootPatternPath(target_path)
+    let l:paths = s:AncestorPaths(a:target_path, [$HOME, '/home/'.$SUDO_USER])
     for l:pattern in g:root_patterns
-      let l:possible_path = a:target_path
-      while index([$HOME, '/home/'.$SUDO_USER, '/'], l:possible_path) < 0
+      for l:possible_path in l:paths
         let l:root_pattern_path = l:possible_path.'/'.l:pattern
         if !empty(getftype(l:root_pattern_path))
-          return [l:root_pattern_path]
+          return l:root_pattern_path
         endif
-        if stridx(l:possible_path, '/') < 0
-          break
-        endif
-        let l:possible_path = fnamemodify(l:possible_path, ':h')
-      endwhile
+      endfor
     endfor
-    return []
+    return ''
   endfunction
   function! JumpToTheMainWin()
     let l:windows = filter(gettabinfo(tabpagenr())[0].windows,
@@ -634,12 +642,12 @@ function! ConfigureDelayedPlugin()
       call JumpToTheMainWin() " Avoid potential bugs
     endif
     let l:file_path = empty(a:file_path) ? GetLaunchDir() : a:file_path
-    let l:workspace_root = FindRootPatternPath(l:file_path) " Where we store the opened file
-    if empty(l:workspace_root)
+    let l:root_pattern_path = FindRootPatternPath(l:file_path) " Where we store the opened file
+    if empty(l:root_pattern_path)
       echo 'You had better create a root-pattern file like .git in your project.'
       return l:file_path
     endif
-    return fnamemodify(l:workspace_root[0], ':h')
+    return fnamemodify(l:root_pattern_path, ':h')
   endfunction
   function! CopyFileRelToCPP(cpp_workspace_root, file_name) abort
     " Return 0 on failure or skipped copy, 1 if already present, or 2 if newly copied.
@@ -661,9 +669,9 @@ function! ConfigureDelayedPlugin()
   endfunction
   function! ConfigureClangTools()
     let l:cpp_workspace_root = WorkspaceRoot()
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.clangd')
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-format')
-    call CopyFileRelToCPP(l:cpp_workspace_root, '.clang-tidy')
+    for l:file_name in ['.clangd', '.clang-format', '.clang-tidy']
+      call CopyFileRelToCPP(l:cpp_workspace_root, l:file_name)
+    endfor
   endfunction
   noremap <Leader><F7> :<C-u>call ConfigureClangTools()<CR>
   noremap K :<C-u>call ShowDocumentation()<CR>
@@ -2026,14 +2034,7 @@ function! SetGeneralKeyMaps()
     let l:cpp_workspace_root = WorkspaceRoot()
     let l:cur_file_path = expand('%:p:h')
     let l:all_possible_paths = [l:cpp_workspace_root]
-    for l:str_id in range(strlen(l:cpp_workspace_root) + 1, strlen(l:cur_file_path))
-      if l:cur_file_path[l:str_id]=='/'
-        call add(l:all_possible_paths, strpart(l:cur_file_path, 0, l:str_id))
-      endif
-    endfor
-    if l:cur_file_path !=# l:cpp_workspace_root
-      call add(l:all_possible_paths, l:cur_file_path)
-    endif
+          \ + reverse(s:AncestorPaths(l:cur_file_path, [l:cpp_workspace_root]))
     for l:possible_path in l:all_possible_paths
       if filereadable(l:possible_path.'/CMakeLists.txt')
         let l:cmakelist_path = ' cd '.shellescape(l:possible_path, 1)

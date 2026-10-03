@@ -480,6 +480,20 @@ function! s:BuildCommands() abort
   call assert_match('bear --append -- make -j12', CPPCompilation(), 'root build wins over nested build')
   call delete(l:root . '/Makefile')
   call delete(l:root . '/src/CMakeLists.txt')
+  " Parent build files still win over deeper files when the root has none.
+  let l:deep = l:root . '/src/nested/deep'
+  call mkdir(l:deep, 'p')
+  call writefile(['int main() { return 0; }'], l:deep . '/main.cpp')
+  execute 'edit ' . fnameescape(l:deep . '/main.cpp')
+  call assert_equal(l:root, WorkspaceRoot(), 'deep source keeps its workspace root')
+  call writefile([''], l:root . '/src/Makefile')
+  call writefile([''], l:deep . '/CMakeLists.txt')
+  call assert_match('cd ' . escape(shellescape(l:root . '/src'), '\.^$~[]*') . ' && bear',
+        \ CPPCompilation(), 'parent build wins over deeper CMake build')
+  call delete(l:root . '/src/Makefile')
+  call assert_match('cd ' . escape(shellescape(l:deep), '\.^$~[]*') . ' && cmake',
+        \ CPPCompilation(), 'source directory is included in build discovery')
+  call delete(l:deep . '/CMakeLists.txt')
   call writefile(['int main() { return 0; }'], l:root . '/src/main file.cpp')
   execute 'edit ' . fnameescape(l:root . '/src/main file.cpp')
   call assert_match("'main file.cpp' -o 'main file.exe'", CPPCompilation(), 'quoted single-file compiler arguments')
