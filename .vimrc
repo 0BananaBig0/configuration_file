@@ -1023,7 +1023,9 @@ function! ConfigureManualLoadPlugin()
         let g:quickui_cheatsheet_search_active = 0
         if !empty(g:quickui_cheatsheet_search_input)
           let g:quickui_cheatsheet_search_pattern = g:quickui_cheatsheet_search_input
-          call QuickuiRefreshKeyMapCheatsheet(a:winid)
+        endif
+        call QuickuiRefreshKeyMapCheatsheet(a:winid)
+        if !empty(g:quickui_cheatsheet_search_input)
           if g:quickui_cheatsheet_search_direction ==# '?'
             call quickui#core#win_execute(a:winid, 'normal! G$')
           else
@@ -1031,8 +1033,6 @@ function! ConfigureManualLoadPlugin()
           endif
           call QuickuiRunKeyMapCheatsheetSearch(a:winid,
                 \ g:quickui_cheatsheet_search_direction ==# '?')
-        else
-          call QuickuiRefreshKeyMapCheatsheet(a:winid)
         endif
       elseif a:key ==# "\<BS>" || a:key ==# "\<C-H>"
         let l:length = strchars(g:quickui_cheatsheet_search_input)
@@ -1614,16 +1614,15 @@ function! ConfigureManualLoadPlugin()
     endif
     call JumpToTheMainWin()
     if &filetype=='python'
-      if EnablePythonProjectDebug() == 1
-        call vimspector#LaunchWithSettings(#{configuration: 'python: project', Test: 'python: project'})
-      else
-        call vimspector#LaunchWithSettings(#{configuration: 'python: single-file', Test: 'python: single-file'})
-      endif
+      let l:configuration = EnablePythonProjectDebug() == 1 ? 'python: project' : 'python: single-file'
     elseif &filetype=='tcl'
-      call vimspector#LaunchWithSettings(#{configuration: 'tcl: launch', Test: 'tcl: launch'})
+      let l:configuration = 'tcl: launch'
     elseif &filetype=='c' || &filetype=='cpp'
-      call vimspector#LaunchWithSettings(#{configuration: 'cpp: launch', Test: 'cpp: launch'})
+      let l:configuration = 'cpp: launch'
+    else
+      return
     endif
+    call vimspector#LaunchWithSettings(#{configuration: l:configuration, Test: l:configuration})
   endfunction
   function! AddVarToWatch(selection)
     call vimspector#AddWatch(a:selection)
@@ -2058,20 +2057,18 @@ function! SetGeneralKeyMaps()
         return ' cd '.shellescape(l:possible_path, 1).' && bear --append -- scons -j12'
       endif
     endfor
-    let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
-          \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
-          \ .shellescape(expand('%:t'), 1).' -o '.shellescape(expand('%:t:r').'.exe', 1)
-    if &filetype=='cpp'
-      return ' cd '.shellescape(l:cur_file_path, 1).' && g++ -Weffc++'.l:compile_single_file
-    elseif &filetype=='cuda'
+    if &filetype=='cuda'
       return ' cd '.shellescape(l:cur_file_path, 1).' && nvcc -g '.shellescape(expand('%:t'), 1).' -o '
           \ .shellescape(expand('%:t:r').'.exe', 1)
     elseif &filetype=='verilog' || &filetype=='systemverilog'
       let l:output_file = shellescape(expand('%:t:r').'.out', 1)
       return ' cd '.shellescape(l:cur_file_path, 1).' && iverilog *.v -o '.l:output_file.' && vvp '.l:output_file
-    else
-      return ' cd '.shellescape(l:cur_file_path, 1).' && gcc'.l:compile_single_file
     endif
+    let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
+          \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
+          \ .shellescape(expand('%:t'), 1).' -o '.shellescape(expand('%:t:r').'.exe', 1)
+    let l:compiler = &filetype=='cpp' ? 'g++ -Weffc++' : 'gcc'
+    return ' cd '.shellescape(l:cur_file_path, 1).' && '.l:compiler.l:compile_single_file
   endfunction
   if !(exists('*CompileAndExcute') && &filetype=='vim')
     function! CompileAndExcute()
