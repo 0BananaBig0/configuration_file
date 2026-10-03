@@ -633,9 +633,12 @@ function! ConfigureDelayedPlugin()
     return ''
   endfunction
   function! JumpToTheMainWin()
-    let l:windows = filter(gettabinfo(tabpagenr())[0].windows,
-          \ {_, winid -> !s:IsAuxiliaryBuffer(winbufnr(winid))})
-    return empty(l:windows) ? 0 : win_gotoid(min(l:windows))
+    for l:winid in sort(gettabinfo(tabpagenr())[0].windows, 'N')
+      if !s:IsAuxiliaryBuffer(winbufnr(l:winid))
+        return win_gotoid(l:winid)
+      endif
+    endfor
+    return 0
   endfunction
   function! s:IsAuxiliaryBuffer(buffer=bufnr('%')) abort
     return index(['help', 'VimspectorPrompt', 'vista', 'nerdtree'],
@@ -1353,13 +1356,17 @@ function! ConfigureManualLoadPlugin()
   function! WorkspaceHasBuildFiles(root=WorkspaceRoot()) abort
     let l:build_files = ['CMakeLists.txt', 'CMakePresets.json', 'CMakeUserPresets.json',
           \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache']
-    for l:name in readdir(a:root)
-      if (index(l:build_files, l:name) >= 0
-            \ || l:name =~# '\.\%(pro\|pri\|cmake\|mk\)$')
-            \ && filereadable(a:root . '/' . l:name)
+    let l:names = readdir(a:root)
+    " Scan names in native code; keep exact names literal and case-sensitive.
+    let l:pattern = '\C\.\%(pro\|pri\|cmake\|mk\)$'
+          \ . '\|\V\^\%(' . join(l:build_files, '\|') . '\)\$'
+    let l:index = match(l:names, l:pattern)
+    while l:index >= 0
+      if filereadable(a:root . '/' . l:names[l:index])
         return 1
       endif
-    endfor
+      let l:index = match(l:names, l:pattern, l:index + 1)
+    endwhile
     return 0
   endfunction
   function! s:SetProjectDebug(enabled, root=WorkspaceRoot()) abort
