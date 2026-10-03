@@ -710,7 +710,7 @@ function! ConfigureDelayedPlugin()
 
   " vim-matchup configuration
   " --------------------------------------------------------------------------
-  " 2. 全局开关（在 plug#begin / 插件加载前设，match-up 读取这些变量初始化）
+  " 2. 全局开关（在 Matchup 加载前设，插件读取这些变量初始化）
   " --------------------------------------------------------------------------
   let g:matchup_enabled = 1                " 总开关
   let g:matchup_motion_enabled = 1        " [% ]% g% 等，便宜，开着
@@ -735,7 +735,7 @@ function! ConfigureDelayedPlugin()
   let g:matchup_matchparen_deferred_hide_delay = 600  " 移走 600ms 后消高亮
   let g:matchup_matchparen_timeout = 160   " ★ 从默认 300 压到 160ms，超时放弃不重算
   let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
-  let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
+  let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索上下各最多 600 行
   let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
   " --- 分隔符引擎（影响 motion/text-obj 速度）---
   let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
@@ -752,18 +752,10 @@ function! ConfigureDelayedPlugin()
         \ 'scrolloff': 1,
         \ }
   function! ConfigureVimNavigationKeyMaps()
-    silent! nunmap <buffer> [[
-    silent! xunmap <buffer> [[
-    silent! nunmap <buffer> ]]
-    silent! xunmap <buffer> ]]
-    silent! nunmap <buffer> []
-    silent! xunmap <buffer> []
-    silent! nunmap <buffer> ][
-    silent! xunmap <buffer> ][
-    silent! nunmap <buffer> ["
-    silent! xunmap <buffer> ["
-    silent! nunmap <buffer> ]"
-    silent! xunmap <buffer> ]"
+    for l:key in ['[[', ']]', '[]', '][', '["', ']"']
+      execute 'silent! nunmap <buffer> ' . l:key
+      execute 'silent! xunmap <buffer> ' . l:key
+    endfor
     nnoremap <silent><buffer> <LocalLeader>ks m':call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
     xnoremap <silent><buffer> <LocalLeader>ks m':<C-U>exe "normal! gv"<Bar>call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
     nnoremap <silent><buffer> <LocalLeader>js m':call search('^\s*\(fu\%[nction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
@@ -779,15 +771,16 @@ function! ConfigureDelayedPlugin()
   endfunction
   function! s:EnsureMatchupForCurrentBuffer() abort
       call plug#load('vim-matchup')
-      " if buffer does not exist
+      " Buffers without a filetype have no FileType setup to replay.
       if empty(&l:filetype)
           return
       endif
-      " Each buffer and filetype only execute duautocmd onece.
+      " Skip replay until this buffer's filetype changes again.
       if get(b:, 'matchup_lazy_replayed_ft', '') ==# &l:filetype
           return
       endif
       let b:matchup_lazy_replayed_ft = &l:filetype
+      " Keep the full replay for ftplugins, Matchup initialization and loading hooks.
       execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
   endfunction
   augroup Vim-Matchup_Group
@@ -805,6 +798,7 @@ function! ConfigureDelayedPlugin()
     " 切换 buffer、打开分屏或 tab 时都会覆盖到
     autocmd BufEnter * ++nested call <SID>EnsureMatchupForCurrentBuffer()
   augroup END
+  " The current Vim buffer's FileType event may predate this delayed setup.
   if &filetype ==# 'vim'
     call ConfigureVimNavigationKeyMaps()
   endif
