@@ -11,7 +11,7 @@ set timeoutlen=666
 " 匹配括号高亮的时间（单位是十分之一秒）
 set matchtime=1
 " 打开文件时进行解码的猜测列表
-set fileencodings=utf-8,utf-16,utf-32,ucs-bom,shift-jis,gb18030,big5,latin1
+set fileencodings=ucs-bom,utf-8,utf-16,utf-32,shift-jis,gb18030,big5,latin1
 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
 set encoding=utf-8
 scriptencoding utf-8
@@ -26,11 +26,12 @@ let maplocalleader = ","
 augroup Auto_Set_FileType_Group
   autocmd!
   autocmd BufNewFile */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | setlocal filetype=cpp | endif
-  autocmd BufNewFile *.launch,*.qrc,*.conf setlocal filetype=xml
+  autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf setlocal filetype=xml
   autocmd BufNewFile *.v setlocal filetype=verilog
-  autocmd BufNewFile *.tessent_startup,*.dofile,*.pdl,*.pdl.* setlocal filetype=tcl
-  autocmd BufNewFile *.stil setlocal filetype=stil
+  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* setlocal filetype=tcl
+  autocmd BufNewFile,BufRead *.stil setlocal filetype=stil
 augroup END
+
 
 
 " Rainbow setting
@@ -131,249 +132,426 @@ noremap <Leader>per :<C-u>colorscheme dracula<CR>
 
 
 
-function! ConfigureMarkdownPlugin()
-  " Coc-markmap, coc-markdownlint setting
-  " Watch workflow from the whole file
-  noremap <Leader>mm :<C-u>CocCommand markmap.watch<CR>
-  " Create markmap html file
-  noremap <Leader>mc :<C-u>CocCommand markmap.create --offline<CR>
-  nnoremap <Leader>mh <Plug>(coc-markmap-create)
-  vnoremap <Leader>mh <Plug>(coc-markmap-create-v)
-  noremap <Leader>mf :<C-u>CocCommand markdownlint.fixAll<CR>
-
-
-
-  " Vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
-  " If you want to go to the last line of the menu, you can press `` in normal mode
-  noremap <Leader>mg :<C-u>call CreateMarkdownMenu()<CR>
-  noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
-  let g:vmt_auto_update_on_save = 0
-  let g:vmt_list_item_char = '-'
-  function! LoadMarkdownToc(function_name) abort
-    call plug#load('vim-markdown-toc')
-    if !exists(a:function_name)
-      throw 'vim-markdown-toc did not define ' . a:function_name
-    endif
-  endfunction
-  function! CreateMarkdownMenu()
-    normal! ms
-    call LoadMarkdownToc(':GenTocGFM')
-    exec "normal! ggO\<ESC>"
-    GenTocGFM
-    normal! ggdd`s
-  endfunction
-  function! UpdateMarkdownMenu()
-    let l:previous_column = col('.')
-    let l:previous_line = line('.')
-    let l:previous_total_line_count = line('$')
-    call LoadMarkdownToc(':UpdateToc')
-    UpdateToc
-    let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
-    call setpos('.', [0, l:new_line, l:previous_column, 0])
-  endfunction
-endfunction
-
-
-
-function! ConfigureWhichKey()
-  let g:which_key_use_floating_win = 0
-  let g:which_key_fallback_to_native_key = 0
-  " Show groups first; read alphabetical shortcuts from left to right.
-  let g:which_key_group_dicts = 'start'
-  let g:which_key_sort_horizontal = 1
-  call plug#load('vim-which-key')
-  noremap <Leader> :<C-u>WhichKey '\'<CR>
-  noremap <LocalLeader> :<C-u>WhichKey ','<CR>
-  noremap [ :<C-u>WhichKey '['<CR>
-  noremap ] :<C-u>WhichKey ']'<CR>
-  let g:leader_key_map = {
-        \ 'a': {
-          \ 'name': '+Automatic Verilog',
-          \ 'a': 'Generate arguments',
-          \ 'd': 'Generate definition',
-          \ 'i': 'Generate instance',
-          \ 'p': {
-            \ 'name': '+Parameters',
-            \ 'p': 'Generate parameters',
-            \ 'v': 'Generate parameter values',
-            \ },
-          \ 'r': 'Generate registers',
-          \ 'w': 'Generate wires',
-          \ },
-        \ 'b': {
-          \ 'name': '+Bookmarks',
-          \ 'a': 'Annotate bookmark',
-          \ 'c': 'Clear bookmark',
-          \ 'd': 'Move bookmark down',
-          \ 'l': 'Move bookmark to line',
-          \ 'n': 'Next bookmark',
-          \ 'o': 'Load bookmark plugin',
-          \ 'p': 'Previous bookmark',
-          \ 'r': 'Clear all bookmarks',
-          \ 's': 'Show all bookmarks',
-          \ 't': 'Toggle bookmark',
-          \ 'u': 'Move bookmark up',
-          \ },
-        \ 'g': {
-          \ 'name': '+Git',
-          \ 'b': 'Show line blame',
-          \ 'f': 'Fold unchanged lines',
-          \ 'i': {
-            \ 'name': '+Plugin',
-            \ 't': 'Load Git plugins',
-            \ },
-          \ 'j': 'Next hunk',
-          \ 'k': 'Previous hunk',
-          \ },
-        \ 'm': {
-          \ 'name': '+Markdown',
-          \ 'c': 'Create Markmap HTML',
-          \ 'f': 'Fix Markdown lint errors',
-          \ 'g': 'Generate table of contents',
-          \ 'h': 'Create Markmap',
-          \ 'm': 'Watch Markmap',
-          \ 'u': 'Update table of contents',
-          \ },
-        \ 'n': {
-          \ 'name': '+NERDTree',
-          \ 'c': 'Open tree at working directory',
-          \ 't': 'Toggle file tree',
-          \ },
-        \ 'p': {
-          \ 'name': '+Appearance',
-          \ 'e': {
-            \ 'name': '+Editor',
-            \ 'r': 'Restore editor appearance',
-            \ },
-          \ 'p': {
-            \ 'name': '+Presentation',
-            \ 't': 'Use presentation appearance',
-            \ },
-          \ },
-        \ 'q': {
-          \ 'name': '+QuickUI',
-          \ 'b': 'List buffers',
-          \ 'c': 'Open keymap cheatsheet',
-          \ 'm': 'Open menu',
-          \ 't': 'Preview tag',
-          \ },
-        \ 'v': {
-          \ 'name': '+Vista',
-          \ 'f': 'Focus symbol window',
-          \ 't': 'Toggle symbol window',
-          \ },
-        \ 'w': {
-          \ 'name': '+Multiple Highlights',
-          \ 'h': 'Highlight word',
-          \ 'H': 'Clear all word highlights',
-          \ 't': 'Load highlight plugin',
-          \ },
-        \ '<F2>': 'Compile only',
-        \ '<F5>': 'Create C/C++ debug files without .vscode',
-        \ '<F6>': 'Create C/C++ debug files with .vscode',
-        \ '<F7>': 'Create Clang configuration files',
-        \ '`': 'Show nearest function or class',
-        \ }
-  let g:local_key_map = {
-        \ 'a': 'Wrap all diff windows',
-        \ 'b': 'Close tab and go back',
-        \ 'f': 'Enter Into File Path',
-        \ 'j': {'name': 'which_key_ignore'},
-        \ 'jc': 'Next comment block',
-        \ 'jd': 'Next unmatched delimiter',
-        \ 'je': 'Next function end',
-        \ 'js': 'Next function start',
-        \ 'k': {'name': 'which_key_ignore'},
-        \ 'kc': 'Previous comment block',
-        \ 'kd': 'Previous unmatched delimiter',
-        \ 'ke': 'Previous function end',
-        \ 'ks': 'Previous function start',
-        \ 'm': 'Toggle GUI menu and toolbar',
-        \ 'q': 'Quit window',
-        \ 'r': 'Enter Into Workspace Root',
-        \ 't': 'Open new tab',
-        \ 'u': 'Clear search highlight',
-        \ 'w': 'Write file',
-        \ '<F2>': 'Compile and execute',
-        \ '<F4>': 'Open vertical diff',
-        \ '<F5>': 'Delete blank lines',
-        \ '<F7>': 'Retab and clean trailing characters',
-        \ '<F8>': 'Run asynchronous command',
-        \ }
-  let g:left_bracket_key_map = {
-        \ 'a': 'Code action',
-        \ 'b': 'Toggle buffer diagnostics',
-        \ 'c': 'Go to declaration',
-        \ 'd': 'Go to definition',
-        \ 'f': 'Refactor selection or symbol',
-        \ 'g': 'Toggle diagnostics globally',
-        \ 'h': 'Toggle inlay hints',
-        \ 'i': 'Go to implementation',
-        \ 'j': {'name': 'which_key_ignore'},
-        \ 'jd': 'Next diagnostic',
-        \ 'je': 'Next error diagnostic',
-        \ 'k': {'name': 'which_key_ignore'},
-        \ 'kd': 'Previous diagnostic',
-        \ 'ke': 'Previous error diagnostic',
-        \ 'l': 'Line code action',
-        \ 'n': 'Rename symbol',
-        \ 'o': 'Show diagnostic information',
-        \ 'r': 'Show references',
-        \ 't': {'name': 'which_key_ignore'},
-        \ 'tc': 'Open declaration in new tab',
-        \ 'td': 'Open definition in new tab',
-        \ 'ti': 'Open implementation in new tab',
-        \ }
-  let g:right_bracket_key_map = {
-        \ 'a': 'Show assembly',
-        \ 'c': 'Jump to program counter',
-        \ 'd': 'Delete character',
-        \ 'e': 'Evaluate expression',
-        \ 'j': 'Next breakpoint',
-        \ 'k': 'Previous breakpoint',
-        \ 'm': {
-          \ 'name': '+Python Debug Mode',
-          \ 'p': 'Enable Python project debugging',
-          \ 's': 'Use Python single-file debugging',
-          \ },
-        \ 'p': {'name': 'which_key_ignore'},
-        \ 'pc': 'Control child processes',
-        \ 'pd': 'Detach child processes',
-        \ 'pf': 'Follow child processes',
-        \ 'pi': 'List processes',
-        \ 'pp': 'Follow parent process',
-        \ 'ps': 'Switch process',
-        \ 'r': 'Reshape debugger windows',
-        \ 's': 'Show disassembly',
-        \ 't': {'name': 'which_key_ignore'},
-        \ 'ta': 'Show all backtraces',
-        \ 'tb': 'Show current backtrace',
-        \ 'tc': 'Continue all threads',
-        \ 'tl': 'Set backtrace limit',
-        \ 'ts': 'Switch thread',
-        \ 'tt': 'Stop all threads',
-        \ 'v': 'Add variable to watches',
-        \ '<F2>': 'Run to cursor',
-        \ '<S-F2>': 'Stop debugger',
-        \ '<C-F2>': 'Pause debugger',
-        \ '<F4>': 'Toggle conditional breakpoint',
-        \ '<S-F4>': 'Set advanced line breakpoint',
-        \ '<C-F4>': 'Add function breakpoint',
-        \ '<F5>': 'Launch debugger',
-        \ '<F7>': 'Move up stack frame',
-        \ '<S-F7>': 'Move down stack frame',
-        \ '<F8>': 'Show full variable values',
-        \ }
-  call which_key#register(get(g:, 'mapleader', "\\"), "g:leader_key_map")
-  call which_key#register(get(g:, 'maplocalleader', ','), "g:local_key_map")
-  call which_key#register('[', "g:left_bracket_key_map")
-  call which_key#register(']', "g:right_bracket_key_map")
-endfunction
-
-
-
 function! ConfigureDelayedPlugin()
+  function! ConfigureMarkdownPlugin()
+    " Coc-markmap, coc-markdownlint setting
+    " Watch workflow from the whole file
+    noremap <Leader>mm :<C-u>CocCommand markmap.watch<CR>
+    " Create markmap html file
+    noremap <Leader>mc :<C-u>CocCommand markmap.create --offline<CR>
+    nnoremap <Leader>mh <Plug>(coc-markmap-create)
+    vnoremap <Leader>mh <Plug>(coc-markmap-create-v)
+    noremap <Leader>mf :<C-u>CocCommand markdownlint.fixAll<CR>
+
+
+
+    " Vim-markdown-toc setting :GenTocGFM :UpdateToc :RemoveToc generate the menu
+    " If you want to go to the last line of the menu, you can press `` in normal mode
+    noremap <Leader>mg :<C-u>call CreateMarkdownMenu()<CR>
+    noremap <Leader>mu :<C-u>call UpdateMarkdownMenu()<CR>
+    let g:vmt_auto_update_on_save = 0
+    let g:vmt_list_item_char = '-'
+    function! LoadMarkdownToc(function_name) abort
+      call plug#load('vim-markdown-toc')
+      if !exists(a:function_name)
+        throw 'vim-markdown-toc did not define ' . a:function_name
+      endif
+    endfunction
+    function! CreateMarkdownMenu()
+      normal! ms
+      call LoadMarkdownToc(':GenTocGFM')
+      exec "normal! ggO\<ESC>"
+      GenTocGFM
+      normal! ggdd`s
+    endfunction
+    function! UpdateMarkdownMenu()
+      let l:previous_column = col('.')
+      let l:previous_line = line('.')
+      let l:previous_total_line_count = line('$')
+      call LoadMarkdownToc(':UpdateToc')
+      UpdateToc
+      let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
+      call setpos('.', [0, l:new_line, l:previous_column, 0])
+    endfunction
+  endfunction
+
+
+
   " Vim-which-key setting
+  function! s:ShortcutGroups() abort
+    let l:groups = []
+    let l:search_key_maps = [
+          \ ['<LocalLeader>ks', 'Previous function start', 'n', 'N/V'],
+          \ ['<LocalLeader>js', 'Next function start', 'n', 'N/V'],
+          \ ['<LocalLeader>ke', 'Previous function end', 'n', 'N/V'],
+          \ ['<LocalLeader>je', 'Next function end', 'n', 'N/V'],
+          \ ['<LocalLeader>kc', 'Previous comment block', 'n', 'N/V'],
+          \ ['<LocalLeader>jc', 'Next comment block', 'n', 'N/V'],
+          \ ['<Leader>`', 'Show nearest function or class', 'n'],
+          \ ['`<Leader>', 'Show nearest non-function block', 'n'],
+          \ ['<LocalLeader>u', 'Clear search highlight', 'n'],
+          \ ]
+    " Files and working directory
+    let l:general_key_maps = [
+          \ ['<LocalLeader>w', 'Write file', 'n'],
+          \ ['<LocalLeader>q', 'Quit window', 'n'],
+          \ ['<M-q>', 'Quit window', 'n', 'N/I/T'],
+          \ ['<LocalLeader>r', 'Enter Into Workspace Root', 'n'],
+          \ ['<M-s>', 'Enter Into Workspace Root', 'n', 'N/I/T'],
+          \ ['<LocalLeader>f', 'Enter Into File Path', 'n'],
+          \ ['<M-f>', 'Enter Into File Path', 'n', 'N/I/T'],
+          \ ['gf', 'Open file under cursor', 'n'],
+          \ ['<C-w>f', 'Open file in a split', 'n'],
+          \ ['<C-w>gf', 'Open file in a tab', 'n'],
+          \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
+          "\ Tabs
+          \ ['<LocalLeader>t', 'Open new tab', 'n'],
+          \ ['<M-t>', 'Open new tab', 'n', 'N/I/T'],
+          \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
+          \ ['<M-b>', 'Close tab and go back', 'n', 'N/I/T'],
+          \ ['<C-M-h>', 'Go to previous tab', 'n'],
+          \ ['<C-M-l>', 'Go to next tab', 'n'],
+          \ ['<C-M-h>', 'Go to previous tab', 'i'],
+          \ ['<C-M-l>', 'Go to next tab', 'i'],
+          \ ['<C-M-j>', 'Go to previous tab', 'n'],
+          \ ['<C-M-k>', 'Go to next tab', 'n'],
+          \ ['<C-M-j>', 'Go to previous tab', 'i'],
+          \ ['<C-M-k>', 'Go to next tab', 'i'],
+          \ ['<M-S-h>', 'Move tab left', 'n'],
+          \ ['<M-S-l>', 'Move tab right', 'n'],
+          \ ['<M-S-h>', 'Move tab left', 'i'],
+          \ ['<M-S-l>', 'Move tab right', 'i'],
+          \ ['<M-1>', 'Go to tab 1', 'n', 'N/I/T'],
+          \ ['<M-2>', 'Go to tab 2', 'n', 'N/I/T'],
+          \ ['<M-3>', 'Go to tab 3', 'n', 'N/I/T'],
+          \ ['<M-4>', 'Go to tab 4', 'n', 'N/I/T'],
+          \ ['<M-5>', 'Go to tab 5', 'n', 'N/I/T'],
+          \ ['<M-6>', 'Go to tab 6', 'n', 'N/I/T'],
+          \ ['<M-7>', 'Go to tab 7', 'n', 'N/I/T'],
+          \ ['<M-8>', 'Go to tab 8', 'n', 'N/I/T'],
+          \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
+          \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
+          "\ Terminal
+          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
+          \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
+          \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
+          \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
+          \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
+          "\ Editing
+          \ ['<M-h>', 'Move left', 'i'],
+          \ ['<M-l>', 'Move right', 'i'],
+          \ ['<M-j>', 'Move down', 'i'],
+          \ ['<M-k>', 'Move up', 'i'],
+          \ ['<M-u>', 'Undo', 'i'],
+          \ ['<M-r>', 'Redo', 'i'],
+          \ ['<M-p>', 'Put before cursor', 'i'],
+          \ ['<M-S-p>', 'Put after cursor', 'i'],
+          \ ['<C-S-V>', 'Paste clipboard in file', 'i'],
+          \ ['<M-S-y>', 'Yank line', 'i'],
+          \ ['<M-S-d>', 'Delete to end of line', 'i'],
+          \ ['<M-S-i>', 'Insert at first non-blank', 'i'],
+          \ ['<M-S-a>', 'Append at end of line', 'i'],
+          \ ['<C-Space>', 'Insert one space', 'n'],
+          \ ['<C-CR>', 'Insert an indented line', 'n'],
+          \ ['<M-CR>', 'Enter without trailing comment', 'n'],
+          \ ['<M-CR>', 'Enter without trailing comment', 'i'],
+          \ ['<C-M-CR>', 'Insert a blank line', 'n'],
+          \ ['<C-M-CR>', 'Insert a blank line', 'i'],
+          \ ['<C-S-CR>', 'Insert a blank line', 'n'],
+          \ ['<C-S-CR>', 'Insert a blank line', 'i'],
+          "\ Diff and cleanup
+          \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
+          \ ['<LocalLeader>a', 'Wrap all diff windows', 'n'],
+          \ ['<LocalLeader><F5>', 'Delete blank lines', 'n'],
+          \ ['<LocalLeader><F7>', 'Retab and clean trailing characters', 'n'],
+          "\ Build
+          \ ['<Leader><F2>', 'Compile only', 'n'],
+          \ ['<LocalLeader><F2>', 'Compile and execute', 'n'],
+          \ ['<Leader><F7>', 'Create Clang configuration files', 'n'],
+          "\ Appearance
+          \ ['<Leader>ppt', 'Use presentation appearance', 'n'],
+          \ ['<Leader>per', 'Restore editor appearance', 'n'],
+          \ ['<LocalLeader>m', 'Toggle GUI menu and toolbar', 'n'],
+          \ ]
+    call add(l:groups, ['AsyncRun', [
+          \ ['<LocalLeader><F8>', 'Run asynchronous command', 'n'],
+          \ ]])
+    call add(l:groups, ['AutoVerilog', [
+          \ ['<Leader>ai', 'Generate instance', 'n'],
+          \ ['<Leader>aa', 'Generate arguments', 'n'],
+          \ ['<Leader>app', 'Generate parameters', 'n'],
+          \ ['<Leader>apv', 'Generate parameter values', 'n'],
+          \ ['<Leader>ar', 'Generate registers', 'n'],
+          \ ['<Leader>aw', 'Generate wires', 'n'],
+          \ ['<Leader>ad', 'Generate definition', 'n'],
+          \ ]])
+    call add(l:groups, ['Bookmarks', [
+          \ ['<Leader>bo', 'Load bookmark plugin', 'n'],
+          \ ['<Leader>bt', 'Toggle bookmark', 'n'],
+          \ ['<Leader>ba', 'Annotate bookmark', 'n'],
+          \ ['<Leader>bs', 'Show all bookmarks', 'n'],
+          \ ['<Leader>bp', 'Previous bookmark', 'n'],
+          \ ['<Leader>bn', 'Next bookmark', 'n'],
+          \ ['<Leader>bu', 'Move bookmark up', 'n'],
+          \ ['<Leader>bd', 'Move bookmark down', 'n'],
+          \ ['<Leader>bl', 'Move bookmark to line', 'n'],
+          \ ['<Leader>bc', 'Clear bookmark', 'n'],
+          \ ['<Leader>br', 'Clear all bookmarks', 'n'],
+          \ ]])
+    call add(l:groups, ['COC', [
+          \ ['<TAB>', 'Select next completion item', 'i'],
+          \ ['<S-TAB>', 'Select previous completion item', 'i'],
+          \ ['<CR>', 'Confirm completion', 'i'],
+          \ ['K', 'Show documentation', 'n'],
+          \ ['[d', 'Go to definition', 'n'],
+          \ ['[td', 'Open definition in a new tab', 'n'],
+          \ ['[c', 'Go to declaration', 'n'],
+          \ ['[tc', 'Open declaration in a new tab', 'n'],
+          \ ['[i', 'Go to implementation', 'n'],
+          \ ['[ti', 'Open implementation in a new tab', 'n'],
+          \ ['[r', 'Show references', 'n'],
+          \ ['[kd', 'Previous diagnostic', 'n'],
+          \ ['[jd', 'Next diagnostic', 'n'],
+          \ ['[ke', 'Previous error diagnostic', 'n'],
+          \ ['[je', 'Next error diagnostic', 'n'],
+          \ ['[o', 'Show diagnostic information', 'n'],
+          \ ['[b', 'Toggle buffer diagnostics', 'n'],
+          \ ['[g', 'Toggle diagnostics globally', 'n'],
+          \ ['[h', 'Toggle inlay hints', 'n'],
+          \ ['[a', 'Code action', 'n'],
+          \ ['[a', 'Code action for selection', 'x'],
+          \ ['[l', 'Line code action', 'n'],
+          \ ['[n', 'Rename symbol', 'n'],
+          \ ['[f', 'Refactor symbol', 'n'],
+          \ ['[f', 'Refactor selection', 'x'],
+          \ ['<F7>', 'Format document', 'n'],
+          \ ['<F7>', 'Format selection', 'x'],
+          \ ]])
+    call add(l:groups, ['Codex', [
+          \ ['/', 'Open the slash-command menu', 'n', 'CLI'],
+          \ ['<Ctrl-g>', 'Open editor for multiline prompt', 'n', 'CLI'],
+          \ ['@', 'Find a workspace file for the prompt', 'n', 'CLI'],
+          \ ['<Up>/<Down>', 'Restore draft history', 'n', 'CLI'],
+          \ ['<Ctrl-r>', 'Search prompt history', 'n', 'CLI'],
+          \ ['!', 'Run a local shell command', 'n', 'CLI'],
+          \ ['<Tab>', 'Queue a follow-up while working', 'n', 'CLI'],
+          \ ['<Enter>', 'Steer the current turn while working', 'n', 'CLI'],
+          \ ['<Esc><Esc>', 'Edit previous message and fork', 'n', 'CLI'],
+          \ ['<Ctrl-o>', 'Copy latest completed output', 'n', 'CLI'],
+          \ ['<Alt-r>', 'Toggle raw scrollback', 'n', 'CLI'],
+          \ ['<Ctrl-l>', 'Clear view but keep current chat', 'n', 'CLI'],
+          \ ['<Ctrl-c>', 'Close the Codex session', 'n', 'CLI'],
+          \ ]])
+    call add(l:groups, ['General', l:general_key_maps])
+    call add(l:groups, ['Git', [
+          \ ['<Leader>git', 'Load Git plugins', 'n'],
+          \ ['<Leader>gk', 'Previous hunk', 'n'],
+          \ ['<Leader>gj', 'Next hunk', 'n'],
+          \ ['<Leader>gf', 'Fold unchanged lines', 'n'],
+          \ ['<Leader>gb', 'Show line blame', 'n'],
+          \ ]])
+    call add(l:groups, ['InterestingWords', [
+          \ ['<Leader>wt', 'Load highlight plugin', 'n'],
+          \ ['<Leader>wh', 'Highlight word', 'n'],
+          \ ['<Leader>wh', 'Highlight selection', 'x'],
+          \ ['<Leader>w<S-h>', 'Clear all word highlights', 'n'],
+          \ ['<S-n>', 'Previous highlighted word', 'n'],
+          \ ['n', 'Next highlighted word', 'n'],
+          \ ]])
+    call add(l:groups, ['Markdown', [
+          \ ['<Leader>mh', 'Create Markmap', 'n'],
+          \ ['<Leader>mh', 'Create Markmap from selection', 'x'],
+          \ ['<Leader>mc', 'Create Markmap HTML', 'n'],
+          \ ['<Leader>mm', 'Watch Markmap', 'n'],
+          \ ['<Leader>mg', 'Generate table of contents', 'n'],
+          \ ['<Leader>mu', 'Update table of contents', 'n'],
+          \ ['<Leader>mf', 'Fix Markdown lint errors', 'n'],
+          \ ]])
+    call add(l:groups, ['Matchup', [
+          \ ['%', 'Jump to matching delimiter', 'n', 'N/V/O'],
+          \ ['g%', 'Jump to matching delimiter from before cursor', 'n', 'N/V/O'],
+          \ ['z%', 'Jump inside next match', 'n', 'N/V/O'],
+          \ ['a%', 'Select around matching delimiters', 'x', 'V/O'],
+          \ ['i%', 'Select inside matching delimiters', 'x', 'V/O'],
+          \ ['cs%', 'Change surrounding delimiters', 'n'],
+          \ ['ds%', 'Delete surrounding delimiters', 'n'],
+          \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
+          \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
+          \ ]])
+    call add(l:groups, ['NERDCommenter', [
+          \ ['<F3>', 'Comment', 'n', 'N/V/O'],
+          \ ['<S-F3>', 'Uncomment', 'n', 'N/V/O'],
+          \ ]])
+    call add(l:groups, ['NERDTree', [
+          \ ['<Leader>nt', 'Toggle file tree', 'n'],
+          \ ['<Leader>nc', 'Open tree at working directory', 'n'],
+          \ ]])
+    call add(l:groups, ['QuickUI', [
+          \ ['<Leader>qc', 'Open keymap cheatsheet', 'n'],
+          \ ['<Leader>qm', 'Open menu', 'n'],
+          \ ['<Leader>qb', 'List buffers', 'n'],
+          \ ['<Leader>qt', 'Preview tag', 'n'],
+          \ ]])
+    call add(l:groups, ['Search', l:search_key_maps])
+    " TigerVNC Viewer 1.16+ defaults on Windows (ShortcutModifiers=Ctrl,Alt).
+    call add(l:groups, ['TigerVNC', [
+          \ ['<Ctrl-Alt>', 'Release keyboard grab', 'n', 'Win'],
+          \ ['<Ctrl-Alt-g>', 'Grab keyboard for remote session', 'n', 'Win'],
+          \ ['<Ctrl-Alt-Enter>', 'Toggle fullscreen', 'n', 'Win'],
+          \ ['<Ctrl-Alt-m>', 'Open viewer menu', 'n', 'Win'],
+          \ ['<Ctrl-Alt-Space>', 'Bypass viewer shortcuts temporarily', 'n', 'Win'],
+          \ ]])
+    call add(l:groups, ['Vimspector', [
+          \ ['<Leader><F5>', 'Create C/C++ debug files without .vscode', 'n'],
+          \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n', 'N/I/T'],
+          \ ['<Leader><F6>', 'Create C/C++ debug files with .vscode', 'n'],
+          \ ['<M-F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
+          \ [']mp', 'Enable Python project debugging', 'n'],
+          \ [']ms', 'Use Python single-file debugging', 'n'],
+          \ ['<F5>', 'Load Vimspector', 'n'],
+          \ ['<S-F5>', 'Reset Vimspector', 'n'],
+          \ [']<F5>', 'Launch debugger', 'n'],
+          \ ['<F2>', 'Continue debugging', 'n'],
+          \ ['<S-F2>', 'Restart debugging', 'n'],
+          \ [']<F2>', 'Run to cursor', 'n'],
+          \ [']<C-F2>', 'Pause debugger', 'n'],
+          \ [']<S-F2>', 'Stop debugger', 'n'],
+          \ ['<F6>', 'Step over', 'n'],
+          \ ['<C-F6>', 'Step into', 'n'],
+          \ ['<S-F6>', 'Step out', 'n'],
+          \ ['<F4>', 'Toggle breakpoint', 'n'],
+          \ [']<F4>', 'Toggle conditional breakpoint', 'n'],
+          \ [']<S-F4>', 'Set advanced line breakpoint', 'n'],
+          \ [']<C-F4>', 'Add function breakpoint', 'n'],
+          \ ['<S-F4>', 'Clear all breakpoints', 'n'],
+          \ [']k', 'Previous breakpoint', 'n'],
+          \ [']j', 'Next breakpoint', 'n'],
+          \ ['<C-0>', 'List all breakpoints', 'n', 'N/I/T'],
+          \ [']v', 'Add variable to watches', 'n', 'N/V'],
+          \ [']e', 'Evaluate expression', 'n'],
+          \ ['<C-x><C-o>', 'Complete watch or console expression', 'i'],
+          \ [']<F8>', 'Show full variable values', 'n'],
+          \ [']<F7>', 'Move up stack frame', 'n'],
+          \ [']<S-F7>', 'Move down stack frame', 'n'],
+          \ [']tb', 'Show current backtrace', 'n'],
+          \ [']ta', 'Show all backtraces', 'n'],
+          \ [']tl', 'Set backtrace limit', 'n'],
+          \ [']pi', 'List processes', 'n'],
+          \ [']ps', 'Switch process', 'n'],
+          \ [']pc', 'Control child processes', 'n'],
+          \ [']pd', 'Detach child processes', 'n'],
+          \ [']pf', 'Follow child processes', 'n'],
+          \ [']pp', 'Follow parent process', 'n'],
+          \ [']ts', 'Switch thread', 'n'],
+          \ [']tc', 'Continue all threads', 'n'],
+          \ [']tt', 'Stop all threads', 'n'],
+          \ ['<C-1>', 'Focus variables window', 'n', 'N/I/T'],
+          \ ['<C-3>', 'Focus watches window', 'n', 'N/I/T'],
+          \ ['<C-5>', 'Focus stack trace window', 'n', 'N/I/T'],
+          \ ['<C-7>', 'Focus code window', 'n', 'N/I/T'],
+          \ ['<C-8>', 'Show debugger console', 'n', 'N/I/T'],
+          \ ['<C-9>', 'Focus debugger terminal', 'n', 'N/I/T'],
+          \ [']r', 'Reshape debugger windows', 'n'],
+          \ [']c', 'Jump to program counter', 'n'],
+          \ [']a', 'Show assembly', 'n'],
+          \ [']s', 'Show disassembly', 'n'],
+          \ [']d', 'Delete character', 'n'],
+          \ ]])
+    call add(l:groups, ['Vista', [
+          \ ['<Leader>vt', 'Toggle symbol window', 'n'],
+          \ ['<Leader>vf', 'Focus symbol window', 'n'],
+          \ ]])
+    call add(l:groups, ['VisualMulti', [
+          \ ['<C-n>', 'Start multiple cursors', 'n'],
+          \ ]])
+    call add(l:groups, ['WhichKey', [
+          \ ['<Leader>', 'Show Leader mappings', 'n'],
+          \ ['<LocalLeader>', 'Show LocalLeader mappings', 'n'],
+          \ ['[', 'Show left-bracket mappings', 'n'],
+          \ [']', 'Show right-bracket mappings', 'n'],
+          \ ]])
+    return l:groups
+  endfunction
+  function! s:WhichKeyMap(prefix, layout, groups) abort
+    let l:result = a:layout
+    for l:group in a:groups
+      for l:mapping in l:group[1]
+        if l:mapping[2] !=# 'n' || stridx(l:mapping[0], a:prefix) != 0
+          continue
+        endif
+        let l:key = strpart(l:mapping[0], strlen(a:prefix))
+        let l:key = substitute(l:key, '<S-\([a-z]\)>', '\U\1', 'g')
+        let l:node = l:result
+        while strlen(l:key) > 1 && has_key(l:node, l:key[0])
+              \ && type(l:node[l:key[0]]) == v:t_dict
+              \ && l:node[l:key[0]].name !=# 'which_key_ignore'
+          let l:node = l:node[l:key[0]]
+          let l:key = strpart(l:key, 1)
+        endwhile
+        if !empty(l:key)
+          let l:node[l:key] = get(l:node, l:key, l:mapping[1])
+        endif
+      endfor
+    endfor
+    return l:result
+  endfunction
+  function! s:ShowVisualWhichKey(prefix) abort
+    let l:view = winsaveview()
+    execute 'WhichKeyVisual ' . string(a:prefix)
+    " WhichKey's ranged feedkeys() call moves the cursor before replaying the action.
+    call winrestview(l:view)
+  endfunction
+  function! ConfigureWhichKey()
+    let g:which_key_use_floating_win = 0
+    let g:which_key_fallback_to_native_key = 0
+    " Show groups first; read alphabetical shortcuts from left to right.
+    let g:which_key_group_dicts = 'start'
+    let g:which_key_sort_horizontal = 1
+    call plug#load('vim-which-key')
+    noremap <Leader> :<C-u>WhichKey '\'<CR>
+    noremap <LocalLeader> :<C-u>WhichKey ','<CR>
+    noremap [ :<C-u>WhichKey '['<CR>
+    noremap ] :<C-u>WhichKey ']'<CR>
+    vnoremap <Leader> :<C-u>call <SID>ShowVisualWhichKey('\')<CR>
+    vnoremap <LocalLeader> :<C-u>call <SID>ShowVisualWhichKey(',')<CR>
+    vnoremap [ :<C-u>call <SID>ShowVisualWhichKey('[')<CR>
+    vnoremap ] :<C-u>call <SID>ShowVisualWhichKey(']')<CR>
+    let l:groups = s:ShortcutGroups()
+    let g:leader_key_map = s:WhichKeyMap('<Leader>', {
+          \ 'a': {'name': '+Automatic Verilog', 'p': {'name': '+Parameters'}},
+          \ 'b': {'name': '+Bookmarks'},
+          \ 'g': {'name': '+Git', 'i': {'name': '+Plugin'}},
+          \ 'm': {'name': '+Markdown'},
+          \ 'n': {'name': '+NERDTree'},
+          \ 'p': {'name': '+Appearance',
+            \ 'e': {'name': '+Editor'}, 'p': {'name': '+Presentation'}},
+          \ 'q': {'name': '+QuickUI'},
+          \ 'v': {'name': '+Vista'},
+          \ 'w': {'name': '+Multiple Highlights'},
+          \ }, l:groups)
+    let g:local_key_map = s:WhichKeyMap('<LocalLeader>', {
+          \ 'j': {'name': 'which_key_ignore'},
+          \ 'k': {'name': 'which_key_ignore'},
+          \ }, l:groups)
+    let g:left_bracket_key_map = s:WhichKeyMap('[', {
+          \ 'f': 'Refactor selection or symbol',
+          \ 'tc': 'Open declaration in new tab',
+          \ 'td': 'Open definition in new tab',
+          \ 'ti': 'Open implementation in new tab',
+          \ 'j': {'name': 'which_key_ignore'},
+          \ 'k': {'name': 'which_key_ignore'},
+          \ 't': {'name': 'which_key_ignore'},
+          \ }, l:groups)
+    let g:right_bracket_key_map = s:WhichKeyMap(']', {
+          \ 'm': {'name': '+Python Debug Mode'},
+          \ 'p': {'name': 'which_key_ignore'},
+          \ 't': {'name': 'which_key_ignore'},
+          \ }, l:groups)
+    call which_key#register(get(g:, 'mapleader', "\\"), "g:leader_key_map")
+    call which_key#register(get(g:, 'maplocalleader', ','), "g:local_key_map")
+    call which_key#register('[', "g:left_bracket_key_map")
+    call which_key#register(']', "g:right_bracket_key_map")
+  endfunction
   call ConfigureWhichKey()
   call ConfigureMarkdownPlugin()
 
@@ -429,24 +607,27 @@ function! ConfigureDelayedPlugin()
     for l:pattern in g:root_patterns
       let l:possible_path = a:target_path
       while index([$HOME, '/home/'.$SUDO_USER, '/'], l:possible_path) < 0
-        let l:root_pattern_path = glob(l:possible_path.'/'.l:pattern, 0, 1)
-        if !empty(l:root_pattern_path)
-          return l:root_pattern_path
+        let l:root_pattern_path = l:possible_path.'/'.l:pattern
+        if !empty(getftype(l:root_pattern_path))
+          return [l:root_pattern_path]
         endif
         if stridx(l:possible_path, '/') < 0
           break
         endif
-        let l:possible_path = substitute(l:possible_path, '/[^/]*$', '', '')
+        let l:possible_path = fnamemodify(l:possible_path, ':h')
       endwhile
     endfor
     return []
   endfunction
   function! JumpToTheMainWin()
-    call win_gotoid(min(gettabinfo(tabpagenr())[0].windows))
+    let l:windows = filter(gettabinfo(tabpagenr())[0].windows,
+          \ {_, winid -> !s:IsAuxiliaryBuffer(winbufnr(winid))})
+    return empty(l:windows) ? 0 : win_gotoid(min(l:windows))
   endfunction
-  function! s:IsAuxiliaryBuffer() abort
-    return &filetype=='help' || &buftype=='terminal' || &filetype=='VimspectorPrompt'
-        \ || &filetype=='vista' || &buftype=='nofile' || &filetype=='nerdtree'
+  function! s:IsAuxiliaryBuffer(buffer=bufnr('%')) abort
+    return index(['help', 'VimspectorPrompt', 'vista', 'nerdtree'],
+          \ getbufvar(a:buffer, '&filetype')) >= 0
+          \ || index(['terminal', 'nofile'], getbufvar(a:buffer, '&buftype')) >= 0
   endfunction
   function! WorkspaceRoot(file_path='')
     if s:IsAuxiliaryBuffer()
@@ -535,7 +716,6 @@ function! ConfigureDelayedPlugin()
   let g:matchup_motion_enabled = 1        " [% ]% g% 等，便宜，开着
   let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
   let g:matchup_surround_enabled = 1       " ds% cs%，可选
-
   silent! nunmap [%
   silent! xunmap [%
   silent! ounmap [%
@@ -548,7 +728,6 @@ function! ConfigureDelayedPlugin()
   nmap <silent> <LocalLeader>jd <Plug>(matchup-]%)
   xmap <silent> <LocalLeader>jd <Plug>(matchup-]%)
   omap <silent> <LocalLeader>jd <Plug>(matchup-]%)
-
   " --- matchparen 模块（这是性能大头）---
   let g:matchup_matchparen_enabled = 1     " 开高亮，但用下面选项把它压稳
   let g:matchup_matchparen_deferred = 1    " ★★★ 关键：延迟高亮，CursorMoved 不再同步算
@@ -558,15 +737,12 @@ function! ConfigureDelayedPlugin()
   let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
   let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索只扫上下 400 行（默认无独立上限，跟 delim_stopline 走）
   let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
-
   " --- 分隔符引擎（影响 motion/text-obj 速度）---
   let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
   let g:matchup_delim_noskips = 1          " ★ 不在 comment/string 里做 keyword 匹配，C++ 大文件省不少
-
   " --- 不需要的功能关掉 ---
   let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
   let g:matchup_transmute_enabled = 0      " 实验性的，关
-
   let g:matchup_matchparen_offscreen = {
         \ 'method':    'popup',
         \ 'fullwidth': 1,
@@ -575,7 +751,6 @@ function! ConfigureDelayedPlugin()
         \ 'syntax_hl': 1,
         \ 'scrolloff': 1,
         \ }
-
   function! ConfigureVimNavigationKeyMaps()
     silent! nunmap <buffer> [[
     silent! xunmap <buffer> [[
@@ -602,15 +777,12 @@ function! ConfigureDelayedPlugin()
     nnoremap <silent><buffer> <LocalLeader>kc :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
     xnoremap <silent><buffer> <LocalLeader>kc :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
   endfunction
-
   function! s:EnsureMatchupForCurrentBuffer() abort
       call plug#load('vim-matchup')
-
       " if buffer does not exist
       if empty(&l:filetype)
           return
       endif
-
       " Each buffer and filetype only execute duautocmd onece.
       if get(b:, 'matchup_lazy_replayed_ft', '') ==# &l:filetype
           return
@@ -618,7 +790,6 @@ function! ConfigureDelayedPlugin()
       let b:matchup_lazy_replayed_ft = &l:filetype
       execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
   endfunction
-
   augroup Vim-Matchup_Group
     autocmd!
     " --------------------------------------------------------------------------
@@ -721,301 +892,8 @@ function! ConfigureManualLoadPlugin()
   " Vim-quickui setting
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
-  function! QuickuiInstallKeyMapGroup(name, key_maps)
-    call add(g:quickui_keymap_groups, [substitute(a:name, '&', '', 'g'), a:key_maps])
-  endfunction
   function! QuickuiInstallKeyMapMenus()
-    let g:quickui_keymap_groups = []
-    let l:search_key_maps = [
-          \ ['<LocalLeader>ks', 'Previous function start', 'n', 'N/V'],
-          \ ['<LocalLeader>js', 'Next function start', 'n', 'N/V'],
-          \ ['<LocalLeader>ke', 'Previous function end', 'n', 'N/V'],
-          \ ['<LocalLeader>je', 'Next function end', 'n', 'N/V'],
-          \ ['<LocalLeader>kc', 'Previous comment block', 'n', 'N/V'],
-          \ ['<LocalLeader>jc', 'Next comment block', 'n', 'N/V'],
-          \ ['<Leader>`', 'Show nearest function or class', 'n'],
-          \ ['`<Leader>', 'Show nearest non-function block', 'n'],
-          \ ['<LocalLeader>u', 'Clear search highlight', 'n'],
-          \ ]
-    " Files and working directory
-    let l:general_key_maps = [
-          \ ['<LocalLeader>w', 'Write file', 'n'],
-          \ ['<LocalLeader>q', 'Quit window', 'n'],
-          \ ['<M-q>', 'Quit window', 'n', 'N/I/T'],
-          \ ['<LocalLeader>r', 'Enter Into Workspace Root', 'n'],
-          \ ['<M-s>', 'Enter Into Workspace Root', 'n', 'N/I/T'],
-          \ ['<LocalLeader>f', 'Enter Into File Path', 'n'],
-          \ ['<M-f>', 'Enter Into File Path', 'n', 'N/I/T'],
-          \ ['gf', 'Open file under cursor', 'n'],
-          \ ['<C-w>f', 'Open file in a split', 'n'],
-          \ ['<C-w>gf', 'Open file in a tab', 'n'],
-          \ ['gx', 'Open word or URL under cursor', 'n', 'N/V'],
-          "\ Tabs
-          \ ['<LocalLeader>t', 'Open new tab', 'n'],
-          \ ['<M-t>', 'Open new tab', 'n', 'N/I/T'],
-          \ ['<LocalLeader>b', 'Close tab and go back', 'n'],
-          \ ['<M-b>', 'Close tab and go back', 'n', 'N/I/T'],
-          \ ['<C-M-h>', 'Go to previous tab', 'n'],
-          \ ['<C-M-l>', 'Go to next tab', 'n'],
-          \ ['<C-M-h>', 'Go to previous tab', 'i'],
-          \ ['<C-M-l>', 'Go to next tab', 'i'],
-          \ ['<C-M-j>', 'Go to previous tab', 'n'],
-          \ ['<C-M-k>', 'Go to next tab', 'n'],
-          \ ['<C-M-j>', 'Go to previous tab', 'i'],
-          \ ['<C-M-k>', 'Go to next tab', 'i'],
-          \ ['<M-S-h>', 'Move tab left', 'n'],
-          \ ['<M-S-l>', 'Move tab right', 'n'],
-          \ ['<M-S-h>', 'Move tab left', 'i'],
-          \ ['<M-S-l>', 'Move tab right', 'i'],
-          \ ['<M-1>', 'Go to tab 1', 'n', 'N/I/T'],
-          \ ['<M-2>', 'Go to tab 2', 'n', 'N/I/T'],
-          \ ['<M-3>', 'Go to tab 3', 'n', 'N/I/T'],
-          \ ['<M-4>', 'Go to tab 4', 'n', 'N/I/T'],
-          \ ['<M-5>', 'Go to tab 5', 'n', 'N/I/T'],
-          \ ['<M-6>', 'Go to tab 6', 'n', 'N/I/T'],
-          \ ['<M-7>', 'Go to tab 7', 'n', 'N/I/T'],
-          \ ['<M-8>', 'Go to tab 8', 'n', 'N/I/T'],
-          \ ['<M-9>', 'Go to tab 9', 'n', 'N/I/T'],
-          \ ['<M-0>', 'Go to tab 10', 'n', 'N/I/T'],
-          "\ Terminal
-          \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
-          \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
-          \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
-          \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
-          \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
-          "\ Editing
-          \ ['<M-h>', 'Move left', 'i'],
-          \ ['<M-l>', 'Move right', 'i'],
-          \ ['<M-j>', 'Move down', 'i'],
-          \ ['<M-k>', 'Move up', 'i'],
-          \ ['<M-u>', 'Undo', 'i'],
-          \ ['<M-r>', 'Redo', 'i'],
-          \ ['<M-p>', 'Put before cursor', 'i'],
-          \ ['<M-S-p>', 'Put after cursor', 'i'],
-          \ ['<C-S-V>', 'Paste clipboard in file', 'i'],
-          \ ['<M-S-y>', 'Yank line', 'i'],
-          \ ['<M-S-d>', 'Delete to end of line', 'i'],
-          \ ['<M-S-i>', 'Insert at first non-blank', 'i'],
-          \ ['<M-S-a>', 'Append at end of line', 'i'],
-          \ ['<C-Space>', 'Insert one space', 'n'],
-          \ ['<C-CR>', 'Insert an indented line', 'n'],
-          \ ['<M-CR>', 'Enter without trailing comment', 'n'],
-          \ ['<M-CR>', 'Enter without trailing comment', 'i'],
-          \ ['<C-M-CR>', 'Insert a blank line', 'n'],
-          \ ['<C-M-CR>', 'Insert a blank line', 'i'],
-          \ ['<C-S-CR>', 'Insert a blank line', 'n'],
-          \ ['<C-S-CR>', 'Insert a blank line', 'i'],
-          "\ Diff and cleanup
-          \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
-          \ ['<LocalLeader>a', 'Wrap all diff windows', 'n'],
-          \ ['<LocalLeader><F5>', 'Delete blank lines', 'n'],
-          \ ['<LocalLeader><F7>', 'Retab and clean trailing characters', 'n'],
-          "\ Build
-          \ ['<Leader><F2>', 'Compile only', 'n'],
-          \ ['<LocalLeader><F2>', 'Compile and execute', 'n'],
-          \ ['<Leader><F7>', 'Create Clang configuration files', 'n'],
-          "\ Appearance
-          \ ['<Leader>ppt', 'Use presentation appearance', 'n'],
-          \ ['<Leader>per', 'Restore editor appearance', 'n'],
-          \ ['<LocalLeader>m', 'Toggle GUI menu and toolbar', 'n'],
-          \ ]
-    call QuickuiInstallKeyMapGroup('&AsyncRun', [
-          \ ['<LocalLeader><F8>', 'Run asynchronous command', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&AutoVerilog', [
-          \ ['<Leader>ai', 'Generate instance', 'n'],
-          \ ['<Leader>aa', 'Generate arguments', 'n'],
-          \ ['<Leader>app', 'Generate parameters', 'n'],
-          \ ['<Leader>apv', 'Generate parameter values', 'n'],
-          \ ['<Leader>ar', 'Generate registers', 'n'],
-          \ ['<Leader>aw', 'Generate wires', 'n'],
-          \ ['<Leader>ad', 'Generate definition', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Bookmarks', [
-          \ ['<Leader>bo', 'Load bookmark plugin', 'n'],
-          \ ['<Leader>bt', 'Toggle bookmark', 'n'],
-          \ ['<Leader>ba', 'Annotate bookmark', 'n'],
-          \ ['<Leader>bs', 'Show all bookmarks', 'n'],
-          \ ['<Leader>bp', 'Previous bookmark', 'n'],
-          \ ['<Leader>bn', 'Next bookmark', 'n'],
-          \ ['<Leader>bu', 'Move bookmark up', 'n'],
-          \ ['<Leader>bd', 'Move bookmark down', 'n'],
-          \ ['<Leader>bl', 'Move bookmark to line', 'n'],
-          \ ['<Leader>bc', 'Clear bookmark', 'n'],
-          \ ['<Leader>br', 'Clear all bookmarks', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&COC', [
-          \ ['<TAB>', 'Select next completion item', 'i'],
-          \ ['<S-TAB>', 'Select previous completion item', 'i'],
-          \ ['<CR>', 'Confirm completion', 'i'],
-          \ ['K', 'Show documentation', 'n'],
-          \ ['[d', 'Go to definition', 'n'],
-          \ ['[td', 'Open definition in a new tab', 'n'],
-          \ ['[c', 'Go to declaration', 'n'],
-          \ ['[tc', 'Open declaration in a new tab', 'n'],
-          \ ['[i', 'Go to implementation', 'n'],
-          \ ['[ti', 'Open implementation in a new tab', 'n'],
-          \ ['[r', 'Show references', 'n'],
-          \ ['[kd', 'Previous diagnostic', 'n'],
-          \ ['[jd', 'Next diagnostic', 'n'],
-          \ ['[ke', 'Previous error diagnostic', 'n'],
-          \ ['[je', 'Next error diagnostic', 'n'],
-          \ ['[o', 'Show diagnostic information', 'n'],
-          \ ['[b', 'Toggle buffer diagnostics', 'n'],
-          \ ['[g', 'Toggle diagnostics globally', 'n'],
-          \ ['[h', 'Toggle inlay hints', 'n'],
-          \ ['[a', 'Code action', 'n'],
-          \ ['[a', 'Code action for selection', 'x'],
-          \ ['[l', 'Line code action', 'n'],
-          \ ['[n', 'Rename symbol', 'n'],
-          \ ['[f', 'Refactor symbol', 'n'],
-          \ ['[f', 'Refactor selection', 'x'],
-          \ ['<F7>', 'Format document', 'n'],
-          \ ['<F7>', 'Format selection', 'x'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Codex', [
-          \ ['/', 'Open the slash-command menu', 'n', 'CLI'],
-          \ ['<Ctrl-g>', 'Open editor for multiline prompt', 'n', 'CLI'],
-          \ ['@', 'Find a workspace file for the prompt', 'n', 'CLI'],
-          \ ['<Up>/<Down>', 'Restore draft history', 'n', 'CLI'],
-          \ ['<Ctrl-r>', 'Search prompt history', 'n', 'CLI'],
-          \ ['!', 'Run a local shell command', 'n', 'CLI'],
-          \ ['<Tab>', 'Queue a follow-up while working', 'n', 'CLI'],
-          \ ['<Enter>', 'Steer the current turn while working', 'n', 'CLI'],
-          \ ['<Esc><Esc>', 'Edit previous message and fork', 'n', 'CLI'],
-          \ ['<Ctrl-o>', 'Copy latest completed output', 'n', 'CLI'],
-          \ ['<Alt-r>', 'Toggle raw scrollback', 'n', 'CLI'],
-          \ ['<Ctrl-l>', 'Clear view but keep current chat', 'n', 'CLI'],
-          \ ['<Ctrl-c>', 'Close the Codex session', 'n', 'CLI'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&General', l:general_key_maps)
-    call QuickuiInstallKeyMapGroup('&Git', [
-          \ ['<Leader>git', 'Load Git plugins', 'n'],
-          \ ['<Leader>gk', 'Previous hunk', 'n'],
-          \ ['<Leader>gj', 'Next hunk', 'n'],
-          \ ['<Leader>gf', 'Fold unchanged lines', 'n'],
-          \ ['<Leader>gb', 'Show line blame', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&InterestingWords', [
-          \ ['<Leader>wt', 'Load highlight plugin', 'n'],
-          \ ['<Leader>wh', 'Highlight word', 'n'],
-          \ ['<Leader>wh', 'Highlight selection', 'x'],
-          \ ['<Leader>w<S-h>', 'Clear all word highlights', 'n'],
-          \ ['<S-n>', 'Previous highlighted word', 'n'],
-          \ ['n', 'Next highlighted word', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Markdown', [
-          \ ['<Leader>mh', 'Create Markmap', 'n'],
-          \ ['<Leader>mh', 'Create Markmap from selection', 'x'],
-          \ ['<Leader>mc', 'Create Markmap HTML', 'n'],
-          \ ['<Leader>mm', 'Watch Markmap', 'n'],
-          \ ['<Leader>mg', 'Generate table of contents', 'n'],
-          \ ['<Leader>mu', 'Update table of contents', 'n'],
-          \ ['<Leader>mf', 'Fix Markdown lint errors', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Matchup', [
-          \ ['%', 'Jump to matching delimiter', 'n', 'N/V/O'],
-          \ ['g%', 'Jump to matching delimiter from before cursor', 'n', 'N/V/O'],
-          \ ['z%', 'Jump inside next match', 'n', 'N/V/O'],
-          \ ['a%', 'Select around matching delimiters', 'x', 'V/O'],
-          \ ['i%', 'Select inside matching delimiters', 'x', 'V/O'],
-          \ ['cs%', 'Change surrounding delimiters', 'n'],
-          \ ['ds%', 'Delete surrounding delimiters', 'n'],
-          \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
-          \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&NERDCommenter', [
-          \ ['<F3>', 'Comment', 'n', 'N/V/O'],
-          \ ['<S-F3>', 'Uncomment', 'n', 'N/V/O'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&NERDTree', [
-          \ ['<Leader>nt', 'Toggle file tree', 'n'],
-          \ ['<Leader>nc', 'Open tree at working directory', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&QuickUI', [
-          \ ['<Leader>qc', 'Open keymap cheatsheet', 'n'],
-          \ ['<Leader>qm', 'Open menu', 'n'],
-          \ ['<Leader>qb', 'List buffers', 'n'],
-          \ ['<Leader>qt', 'Preview tag', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Search', l:search_key_maps)
-    " TigerVNC Viewer 1.16+ defaults on Windows (ShortcutModifiers=Ctrl,Alt).
-    call QuickuiInstallKeyMapGroup('&TigerVNC', [
-          \ ['<Ctrl-Alt>', 'Release keyboard grab', 'n', 'Win'],
-          \ ['<Ctrl-Alt-g>', 'Grab keyboard for remote session', 'n', 'Win'],
-          \ ['<Ctrl-Alt-Enter>', 'Toggle fullscreen', 'n', 'Win'],
-          \ ['<Ctrl-Alt-m>', 'Open viewer menu', 'n', 'Win'],
-          \ ['<Ctrl-Alt-Space>', 'Bypass viewer shortcuts temporarily', 'n', 'Win'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Vimspector', [
-          \ ['<Leader><F5>', 'Create C/C++ debug files without .vscode', 'n'],
-          \ ['<M-F5>', 'Create C/C++ debug files without .vscode', 'n', 'N/I/T'],
-          \ ['<Leader><F6>', 'Create C/C++ debug files with .vscode', 'n'],
-          \ ['<M-F6>', 'Create C/C++ debug files with .vscode', 'n', 'N/I/T'],
-          \ [']mp', 'Enable Python project debugging', 'n'],
-          \ [']ms', 'Use Python single-file debugging', 'n'],
-          \ ['<F5>', 'Load Vimspector', 'n'],
-          \ ['<S-F5>', 'Reset Vimspector', 'n'],
-          \ [']<F5>', 'Launch debugger', 'n'],
-          \ ['<F2>', 'Continue debugging', 'n'],
-          \ ['<S-F2>', 'Restart debugging', 'n'],
-          \ [']<F2>', 'Run to cursor', 'n'],
-          \ [']<C-F2>', 'Pause debugger', 'n'],
-          \ [']<S-F2>', 'Stop debugger', 'n'],
-          \ ['<F6>', 'Step over', 'n'],
-          \ ['<C-F6>', 'Step into', 'n'],
-          \ ['<S-F6>', 'Step out', 'n'],
-          \ ['<F4>', 'Toggle breakpoint', 'n'],
-          \ [']<F4>', 'Toggle conditional breakpoint', 'n'],
-          \ [']<S-F4>', 'Set advanced line breakpoint', 'n'],
-          \ [']<C-F4>', 'Add function breakpoint', 'n'],
-          \ ['<S-F4>', 'Clear all breakpoints', 'n'],
-          \ [']k', 'Previous breakpoint', 'n'],
-          \ [']j', 'Next breakpoint', 'n'],
-          \ ['<C-0>', 'List all breakpoints', 'n', 'N/I/T'],
-          \ [']v', 'Add variable to watches', 'n', 'N/V'],
-          \ [']e', 'Evaluate expression', 'n'],
-          \ ['<C-x><C-o>', 'Complete watch or console expression', 'i'],
-          \ [']<F8>', 'Show full variable values', 'n'],
-          \ [']<F7>', 'Move up stack frame', 'n'],
-          \ [']<S-F7>', 'Move down stack frame', 'n'],
-          \ [']tb', 'Show current backtrace', 'n'],
-          \ [']ta', 'Show all backtraces', 'n'],
-          \ [']tl', 'Set backtrace limit', 'n'],
-          \ [']pi', 'List processes', 'n'],
-          \ [']ps', 'Switch process', 'n'],
-          \ [']pc', 'Control child processes', 'n'],
-          \ [']pd', 'Detach child processes', 'n'],
-          \ [']pf', 'Follow child processes', 'n'],
-          \ [']pp', 'Follow parent process', 'n'],
-          \ [']ts', 'Switch thread', 'n'],
-          \ [']tc', 'Continue all threads', 'n'],
-          \ [']tt', 'Stop all threads', 'n'],
-          \ ['<C-1>', 'Focus variables window', 'n', 'N/I/T'],
-          \ ['<C-3>', 'Focus watches window', 'n', 'N/I/T'],
-          \ ['<C-5>', 'Focus stack trace window', 'n', 'N/I/T'],
-          \ ['<C-7>', 'Focus code window', 'n', 'N/I/T'],
-          \ ['<C-8>', 'Show debugger console', 'n', 'N/I/T'],
-          \ ['<C-9>', 'Focus debugger terminal', 'n', 'N/I/T'],
-          \ [']r', 'Reshape debugger windows', 'n'],
-          \ [']c', 'Jump to program counter', 'n'],
-          \ [']a', 'Show assembly', 'n'],
-          \ [']s', 'Show disassembly', 'n'],
-          \ [']d', 'Delete character', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&Vista', [
-          \ ['<Leader>vt', 'Toggle symbol window', 'n'],
-          \ ['<Leader>vf', 'Focus symbol window', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&VisualMulti', [
-          \ ['<C-n>', 'Start multiple cursors', 'n'],
-          \ ])
-    call QuickuiInstallKeyMapGroup('&WhichKey', [
-          \ ['<Leader>', 'Show Leader mappings', 'n'],
-          \ ['<LocalLeader>', 'Show LocalLeader mappings', 'n'],
-          \ ['[', 'Show left-bracket mappings', 'n'],
-          \ [']', 'Show right-bracket mappings', 'n'],
-          \ ])
+    let g:quickui_keymap_groups = s:ShortcutGroups()
   endfunction
   function! QuickuiCheatsheetTruncate(text, width)
     if a:width <= 0
@@ -1338,17 +1216,16 @@ function! ConfigureManualLoadPlugin()
 
 
   " Vim-bookmarks setting
+  function! s:UserHome() abort
+    return empty($SUDO_USER) ? $HOME : '/home/'.$SUDO_USER
+  endfunction
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
   let g:bookmark_auto_save = 1
   " Save bookmarks to $HOME/.vim/.vim-bookmarks or /home/$SUDO_USER/.vim/.vim-bookmarks
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
-    if empty($SUDO_USER)
-      let l:bookmark_root_location = $HOME.'/.vim/.vim-bookmarks'
-    else
-      let l:bookmark_root_location = '/home/'.$SUDO_USER.'/.vim/.vim-bookmarks'
-    endif
+    let l:bookmark_root_location = s:UserHome().'/.vim/.vim-bookmarks'
     let l:bookmark_path = l:bookmark_root_location.expand('%:p:h')
     let l:bookmark_file = simplify(l:bookmark_path.'/'.expand('%:t').'.bookmarks')
     if !isdirectory(l:bookmark_path)
@@ -1441,9 +1318,7 @@ function! ConfigureManualLoadPlugin()
     if !exists('*FugitiveStatusline')
       throw 'vim-fugitive did not define FugitiveStatusline()'
     endif
-    set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
-    set statusline+=%=\ %{GitStatus()}%{FugitiveStatusline()}
-    set statusline+=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
+    call s:SetStatusline('%{GitStatus()}%{FugitiveStatusline()}')
     normal! `s
   endfunction
   function! GitStatus()
@@ -1826,11 +1701,7 @@ function! ConfigureManualLoadPlugin()
   " Leaderf setting,列出当前文件函数(:LeaderfFunction),使用rg模糊查找(:Leaderf rg)
   " ctrl+j/k上下选择显示查找结果，ctrl+上/下键上下移动被显示的查找结果的内容
   let g:Lf_WindowPosition = 'popup'
-  if empty($SUDO_USER)
-    let g:Lf_CacheDirectory = expand($HOME.'/.vim/cache')
-  else
-    let g:Lf_CacheDirectory = expand('/home/'.$SUDO_USER.'/.vim/cache')
-  endif
+  let g:Lf_CacheDirectory = expand(s:UserHome().'/.vim/cache')
   let g:Lf_GtagsAutoGenerate = 0
   let g:Lf_Gtagslabel = 'native-pygments'
   let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
@@ -1846,6 +1717,8 @@ function! ConfigureManualLoadPlugin()
   let g:Lf_PreviewInPopup = 1
   " Open the preview window automatically
   let g:Lf_PreviewResult = {'Rg': 1}
+
+
 
   " automatic-verilog
   noremap <Leader>ai :call g:AutoInst(0)<ESC>
@@ -1889,8 +1762,12 @@ endif
 set shortmess+=c
 set showcmd
 set foldmethod=manual
-set statusline=[TYPE=%Y]\ [POS=%l,%v,%L]\ [%{toupper(&fileencoding)}=0x%B]%m%r
-set statusline+=%=\ [%{strftime(\"%m/%d/%y-%a-%H:%M\")}]%<
+function! s:SetStatusline(extra='') abort
+  let &statusline = '[TYPE=%Y] [POS=%l,%v,%L] [%{toupper(&fileencoding)}=0x%B]%m%r'
+        \ .'%= '.(empty(a:extra) ? '' : a:extra.' ')
+        \ .'[%{strftime("%m/%d/%y-%a-%H:%M")}]%<'
+endfunction
+call s:SetStatusline()
 " 当窗口多于一个时显示状态行(1),总是显示状态行(2)
 set laststatus=2
 " 允许光标出现在最后一个字符的后面
@@ -1924,8 +1801,6 @@ set history=3333
 set gdefault
 " 保存全局变量
 set viminfo+=!
-" 带有如下符号的单词不要被换行分割
-set iskeyword+=_,$,@,%,#,-
 " 增强模式中的命令行自动完成/补全操作
 set wildmode=list:longest
 " Prevent exe files from appearing in auto-completion
@@ -1992,7 +1867,8 @@ function! SetTitle()
   elseif expand('%:e')=='tcl'
     call setline(1, '#!/usr/bin/env tclsh')
   endif
-  let l:column_limit = split(&colorcolumn, ",")[0]
+  " Header width is independent of visible column guides and presentation mode.
+  let l:column_limit = 80
   let l:top_and_bottom = &commentstring[0].&commentstring[1]
       \ .repeat(&commentstring[0], l:column_limit - 4)
       \ .&commentstring[1].&commentstring[0]
@@ -2040,10 +1916,11 @@ augroup Local_Autocmd_Group
   autocmd FileType * call SetIndent()
   autocmd BufNewFile * call SetTitle()
   " Disable automatic word wrap which is enabled by filetype plugin indent on
-  autocmd FileType vim,cmake set textwidth=0
+  autocmd FileType vim,cmake setlocal textwidth=0
   " Uncomment the following to have Vim jump to the last position when reopening a file
   autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
+
 
 
 function! SetGeneralKeyMaps()
@@ -2223,8 +2100,9 @@ function! SetGeneralKeyMaps()
       elseif &filetype=='vim'
         source ~/.vimrc
       elseif s:IsAuxiliaryBuffer()
-        call JumpToTheMainWin()
-        call CompileAndExcute()
+        if JumpToTheMainWin()
+          call CompileAndExcute()
+        endif
       else
         let l:cpp_compilation = CPPCompilation()
         let l:program_name = expand('%:t:r').'.exe'
@@ -2257,8 +2135,9 @@ function! SetGeneralKeyMaps()
     if &filetype=='verilog'
         exec l:compile_only.CPPCompilation()
     elseif s:IsAuxiliaryBuffer()
-      call JumpToTheMainWin()
-      call CompileCommand()
+      if JumpToTheMainWin()
+        call CompileCommand()
+      endif
     else
       let l:cpp_compilation = CPPCompilation()
       if stridx(l:cpp_compilation, 'bear') != -1
@@ -2340,9 +2219,13 @@ function! SetGeneralKeyMaps()
     let l:new_line = l:cur_line + 1
     let l:cur_indent_count = indent(l:cur_line)
     let l:cur_indent = repeat(" ", l:cur_indent_count)
-    set paste
-    exec "normal! i\<CR>\<ESC>"
-    set nopaste
+    let l:paste = &paste
+    try
+      set paste
+      exec "normal! i\<CR>\<ESC>"
+    finally
+      let &paste = l:paste
+    endtry
     call setline(l:new_line, l:cur_indent.getline(l:new_line))
     call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
   endfunction
@@ -2372,7 +2255,8 @@ function! SetGeneralKeyMaps()
   set iskeyword-=$
   set iskeyword-=#
   set iskeyword-=:
-  set iskeyword-=@
+  set iskeyword+=%
+  set iskeyword+=-
   " When pressing <Shift-*>, the / and . should be included in the selection.
   set iskeyword+=/
   set iskeyword+=.

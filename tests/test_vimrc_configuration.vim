@@ -1,0 +1,231 @@
+" Run: vim -Nu NONE -n -i NONE -es -S tests/test_vimrc_configuration.vim
+set nocompatible noswapfile
+let s:repo = expand('<sfile>:p:h:h')
+execute 'source ' . fnameescape(get(g:, 'vimrc_under_test', s:repo . '/.vimrc'))
+call timer_stopall()
+" Plugin helpers become available in their owning configuration phase.
+let s:vimrc_sid = filter(getscriptinfo(),
+      \ {_, script -> script.name ==# fnamemodify(get(g:, 'vimrc_under_test', s:repo . '/.vimrc'), ':p')})[0].sid
+for s:helper in ['ConfigureMarkdownPlugin', 'ConfigureWhichKey',
+      \ '<SNR>' . s:vimrc_sid . '_ShortcutGroups',
+      \ '<SNR>' . s:vimrc_sid . '_WhichKeyMap',
+      \ '<SNR>' . s:vimrc_sid . '_ShowVisualWhichKey',
+      \ '<SNR>' . s:vimrc_sid . '_UserHome']
+  call assert_false(exists('*' . s:helper), s:helper . ' waits for plugin configuration')
+endfor
+call SetGeneralKeyMaps()
+call ConfigureDelayedPlugin()
+call assert_true(exists('*ConfigureMarkdownPlugin'), 'delayed Markdown helper is available')
+call assert_true(exists('*ConfigureWhichKey'), 'delayed WhichKey helper is available')
+call assert_true(exists('*<SNR>' . s:vimrc_sid . '_ShortcutGroups'), 'shared metadata is available after delayed configuration')
+call assert_true(exists('*<SNR>' . s:vimrc_sid . '_WhichKeyMap'), 'WhichKey builder is available after delayed configuration')
+call assert_false(exists('*<SNR>' . s:vimrc_sid . '_UserHome'), 'manual home helper waits for manual configuration')
+call ConfigureManualLoadPlugin()
+call assert_true(exists('*<SNR>' . s:vimrc_sid . '_UserHome'), 'manual home helper is available')
+set hidden noconfirm
+let s:fixtures = tempname()
+call mkdir(s:fixtures . '/.git', 'p')
+
+function! s:FiletypeLoading() abort
+  " Keep native detection and the plugin runtime-path state of existing files.
+  call mkdir(s:fixtures . '/include', 'p')
+  for [l:path, l:lines, l:type, l:plugin] in [
+        \ ['/coq.v', ['Definition answer := 42.'], 'coq', 'automatic-verilog'],
+        \ ['/include/existing', ['ordinary content'], '', 'vim-c-cpp-modern']]
+    let l:loaded = stridx(&runtimepath, '/' . l:plugin) >= 0
+    call writefile(l:lines, s:fixtures . l:path)
+    execute 'edit! ' . fnameescape(s:fixtures . l:path)
+    call assert_equal(l:type, &filetype, 'existing file keeps native detection')
+    call assert_equal(l:loaded, stridx(&runtimepath, '/' . l:plugin) >= 0,
+          \ 'existing file preserves plugin runtime-path state')
+  endfor
+endfunction
+
+function! s:UnicodeFiles() abort
+  " Catch a BOM being decoded with the wrong byte order before ucs-bom runs.
+  for [l:name, l:bytes, l:encoding] in [
+        \ ['utf16le', 0zFFFE680065006C006C006F000A00, 'utf-16le'],
+        \ ['utf32le', 0zFFFE000068000000650000006C0000006C0000006F0000000A000000, 'ucs-4le'],
+        \ ['utf8', 0zEFBBBF68656C6C6F0A, 'utf-8']]
+    let l:path = s:fixtures . '/' . l:name . '.txt'
+    call writefile(l:bytes, l:path)
+    execute 'edit! ' . fnameescape(l:path)
+    call assert_equal('hello', getline(1), l:name . ' decodes correctly')
+    call assert_true(&bomb, l:name . ' retains its BOM')
+    call assert_equal(l:encoding, &fileencoding, l:name . ' detects byte order')
+  endfor
+endfunction
+
+function! s:ExistingFileTypes() abort
+  " Catch files losing their configured syntax after saving and reopening.
+  for [l:ext, l:want] in [['dofile', 'tcl'], ['pdl', 'tcl'],
+        \ ['pdl.test', 'tcl'], ['tessent_startup', 'tcl'], ['stil', 'stil'],
+        \ ['launch', 'xml'], ['qrc', 'xml'], ['conf', 'xml']]
+    let l:path = s:fixtures . '/existing.' . l:ext
+    call writefile(['ordinary content'], l:path)
+    execute 'edit! ' . fnameescape(l:path)
+    call assert_equal(l:want, &filetype, 'existing ' . l:ext . ' detection')
+    execute 'edit! ' . fnameescape(s:fixtures . '/new.' . l:ext)
+    call assert_equal(l:want, &filetype, 'new ' . l:ext . ' detection')
+  endfor
+endfunction
+
+function! s:LocalOptions() abort
+  " Catch filetype-specific formatting leaking into unrelated new buffers.
+  let l:saved = &g:textwidth
+  try
+    for l:ft in ['vim', 'cmake']
+      enew!
+      setglobal textwidth=72
+      let &l:filetype = l:ft
+      call assert_equal(0, &l:textwidth, l:ft . ' disables wrapping locally')
+      call assert_equal(72, &g:textwidth, l:ft . ' preserves the default')
+      enew!
+      call assert_equal(72, &l:textwidth, 'unrelated buffer keeps wrapping')
+    endfor
+  finally
+    let &g:textwidth = l:saved
+  endtry
+
+  " Catch the Enter helper changing paste mode, including on editing errors.
+  for l:paste in [0, 1]
+    enew!
+    call setline(1, '  abc')
+    call cursor(1, 4)
+    let &paste = l:paste
+    call EnterWithoutTraillingComment()
+    call assert_equal(['  a', '  bc'], getline(1, '$'), 'split without comment continuation')
+    call assert_equal(l:paste, &paste, 'Enter restores paste mode')
+  endfor
+  enew!
+  setlocal nomodifiable
+  set nopaste
+  try
+    call EnterWithoutTraillingComment()
+  catch
+  endtry
+  call assert_false(&paste, 'failed Enter restores paste mode')
+  setlocal modifiable
+  set nopaste
+endfunction
+
+function! s:HeaderWidth() abort
+  " Catch presentation mode and hidden column guides breaking file headers.
+  let l:saved = &colorcolumn
+  try
+    for [l:label, l:columns] in [['presentation', '0'], ['no-guide', '']]
+      enew!
+      let &colorcolumn = l:columns
+      execute 'edit! ' . fnameescape(s:fixtures . '/' . l:label . '.sh')
+      call assert_equal('#!/usr/bin/env bash', getline(1), 'header keeps shebang')
+      call assert_equal(80, strdisplaywidth(getline(2)), l:label . ' header width')
+      call assert_match('File Name:', getline(3), l:label . ' contains filename')
+    endfor
+  finally
+    let &colorcolumn = l:saved
+  endtry
+endfunction
+
+function! s:SourceWindow() abort
+  " Catch selecting an old auxiliary window instead of the actual source.
+  enew!
+  setlocal buftype=nofile filetype=help
+  let l:aux = win_getid()
+  belowright new
+  let l:source = win_getid()
+  call writefile(['print("test")'], s:fixtures . '/source.py')
+  execute 'edit! ' . fnameescape(s:fixtures . '/source.py')
+  call win_gotoid(l:aux)
+  call JumpToTheMainWin()
+  call assert_equal(l:source, win_getid(), 'old auxiliary window is skipped')
+  call win_gotoid(l:aux)
+  call assert_equal(s:fixtures, WorkspaceRoot(), 'workspace comes from source')
+  call assert_equal(l:source, win_getid(), 'workspace navigation selects source')
+  call win_gotoid(l:source)
+  close!
+  call assert_equal(0, JumpToTheMainWin(), 'no source window has an explicit result')
+  " Both compile helpers must terminate when no eligible window exists.
+  call CompileCommand()
+  call CompileAndExcute()
+endfunction
+
+function! s:LiteralRootMarkers() abort
+  " Catch treating bracket characters in directory names as glob patterns.
+  let l:root = s:fixtures . '/project [one]'
+  call mkdir(l:root . '/.git', 'p')
+  call mkdir(l:root . '/src', 'p')
+  call writefile([''], l:root . '/src/.root')
+  enew!
+  call assert_equal(l:root, WorkspaceRoot(l:root . '/src'),
+        \ 'literal paths retain Git-marker priority over a nearer .root')
+endfunction
+
+function! s:VisualWhichKey() abort
+  " Exercise the prefix's emitted command through the installed WhichKey parser.
+  enew!
+  call setline(1, ['alpha beta', 'ABCDE'])
+  nnoremap [f :let g:whichkey_selection = 'normal'<CR>
+  xnoremap [f :<C-u>let g:whichkey_selection = GetSelectedContent()<CR>
+  let l:command = substitute(maparg('[', 'x'), '^:<C-U>\|<CR>$', '', 'g')
+  for [l:column, l:keys, l:want] in [[1, 'vll', 'alp'], [3, 'vhh', 'alp'],
+        \ [1, 'Vj', 'alpha beta ABCDE'], [1, "\<C-v>jl", 'al AB']]
+    call cursor(1, l:column)
+    execute 'normal! ' . l:keys
+    execute "normal! \<Esc>"
+    call assert_equal(l:want, GetSelectedContent(), 'fixture establishes the selection')
+    let g:whichkey_selection = ''
+    call feedkeys('f', 't')
+    execute l:command
+    call feedkeys('', 'xt')
+    call assert_equal(l:want, g:whichkey_selection, 'WhichKey keeps selection type and extent')
+  endfor
+  call popup_clear()
+  call ConfigureDelayedPlugin()
+endfunction
+
+function! s:ShortcutHelp() abort
+  " Keep each plugin's own shortcut descriptions and hierarchy.
+  call assert_equal('Generate parameters', g:leader_key_map.a.p.p)
+  call assert_equal('Load Git plugins', g:leader_key_map.g.i.t)
+  call assert_equal('Restore editor appearance', g:leader_key_map.p.e.r)
+  call assert_equal('Clear all word highlights', g:leader_key_map.w.H)
+  call assert_equal('Next unmatched delimiter', g:local_key_map.jd)
+  call assert_equal('which_key_ignore', g:local_key_map.j.name)
+  call assert_equal('Set advanced line breakpoint', g:right_bracket_key_map['<S-F4>'])
+  call assert_equal('Enable Python project debugging', g:right_bracket_key_map.m.p)
+  call assert_equal('Refactor selection or symbol', g:left_bracket_key_map.f)
+  call assert_equal('Open declaration in new tab', g:left_bracket_key_map.tc)
+  call assert_equal('Open definition in new tab', g:left_bracket_key_map.td)
+  call assert_equal('Open implementation in new tab', g:left_bracket_key_map.ti)
+  call QuickuiInstallKeyMapMenus()
+  call assert_equal(['Refactor symbol', 'Refactor selection'], map(filter(deepcopy(g:quickui_keymap_groups),
+        \ {_, group -> group[0] ==# 'COC'})[0][1]->filter({_, row -> row[0] ==# '[f'}),
+        \ {_, row -> row[1]}))
+  enew!
+  call setline(1, 'hello_world')
+  call cursor(1, 2)
+  call assert_equal('hello_world', expand('<cword>'), 'keyword cleanup retains letters')
+endfunction
+
+try
+  for s:check in ['FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
+        \ 'HeaderWidth', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey', 'ShortcutHelp']
+    try
+      call call(function('s:' . s:check), [])
+    catch
+      call assert_report(s:check . ': ' . v:exception . ' at ' . v:throwpoint)
+    finally
+      silent! tabonly!
+      silent! only!
+      silent! %bwipeout!
+    endtry
+  endfor
+finally
+  call delete(s:fixtures, 'rf')
+endtry
+if !empty(v:errors)
+  call writefile(v:errors, '/dev/stdout')
+  cquit
+endif
+call writefile(['PASS: Vimrc encodings, filetypes, option isolation, headers, source windows and Visual WhichKey'], '/dev/stdout')
+qa!
