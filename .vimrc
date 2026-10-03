@@ -1414,7 +1414,8 @@ function! ConfigureManualLoadPlugin()
   function! ConfigureCppDebug(config_vscode=0)
     let l:cpp_workspace_root = WorkspaceRoot()
     let l:json_file_path = l:cpp_workspace_root.'/.vimspector.json'
-    if JumpToTabIfExists(l:json_file_path) == 1
+    let l:config_open = JumpToTabIfExists(l:json_file_path)
+    if l:config_open && a:config_vscode != 1
       return
     endif
     let l:copy_result = CopyFileRelToCPP(l:cpp_workspace_root, '.vimspector.json')
@@ -1424,6 +1425,9 @@ function! ConfigureManualLoadPlugin()
     if a:config_vscode == 1
       call mkdir(l:cpp_workspace_root.'/.vscode', 'p', 0755)
       call CopyFileRelToCPP(l:cpp_workspace_root, '.vscode/launch.json')
+    endif
+    if l:config_open
+      return
     endif
     if l:copy_result == 2 && !WorkspaceHasBuildFiles(l:cpp_workspace_root)
       call DisableProjectDebug(l:cpp_workspace_root)
@@ -2038,11 +2042,13 @@ function! SetGeneralKeyMaps()
   endfunction
   noremap <LocalLeader><F2> :<C-u>call CompileAndExcute()<CR>
   noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
-  function! CPPCompilation()
+  function! CPPCompilation(build_info={})
     let l:cpp_workspace_root = WorkspaceRoot()
     let l:cur_file_path = expand('%:p:h')
     let l:all_possible_paths = [l:cpp_workspace_root]
           \ + reverse(s:AncestorPaths(l:cur_file_path, [l:cpp_workspace_root]))
+    " Optional output metadata avoids classifying builds by command text.
+    let a:build_info.project = 1
     for l:possible_path in l:all_possible_paths
       if filereadable(l:possible_path.'/CMakeLists.txt')
         let l:cmakelist_path = ' cd '.shellescape(l:possible_path, 1)
@@ -2067,6 +2073,7 @@ function! SetGeneralKeyMaps()
         return ' cd '.shellescape(l:possible_path, 1).' && bear --append -- scons -j12'
       endif
     endfor
+    let a:build_info.project = 0
     if &filetype=='cuda'
       return ' cd '.shellescape(l:cur_file_path, 1).' && nvcc -g '.shellescape(expand('%:t'), 1).' -o '
           \ .shellescape(expand('%:t:r').'.exe', 1)
@@ -2111,9 +2118,10 @@ function! SetGeneralKeyMaps()
           call CompileAndExcute()
         endif
       else
-        let l:cpp_compilation = CPPCompilation()
+        let l:build_info = {}
+        let l:cpp_compilation = CPPCompilation(l:build_info)
         let l:program_name = expand('%:t:r').'.exe'
-        if stridx(l:cpp_compilation, 'bear') != -1
+        if l:build_info.project
           let l:build_program = shellescape('build/'.l:program_name, 1)
           let l:local_program = shellescape('./'.l:program_name, 1)
           let l:source_program = shellescape(expand('%:p:r').'.exe', 1)
@@ -2146,8 +2154,9 @@ function! SetGeneralKeyMaps()
         call CompileCommand()
       endif
     else
-      let l:cpp_compilation = CPPCompilation()
-      if stridx(l:cpp_compilation, 'bear') != -1
+      let l:build_info = {}
+      let l:cpp_compilation = CPPCompilation(l:build_info)
+      if l:build_info.project || &filetype=='cuda'
             \ || ((&filetype=='c' || &filetype=='cpp')
             \   && expand('%:e')!~'^h.*')
         exec l:compile_only.l:cpp_compilation
