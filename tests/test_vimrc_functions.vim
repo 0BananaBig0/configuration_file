@@ -450,9 +450,25 @@ function! s:CheatsheetCategories() abort
 endfunction
 
 function! s:CheatsheetSearch() abort
+  let l:screen_size = [&columns, &lines]
   call QuickuiOpenKeyMapCheatsheet()
   let l:winid = popup_list()[0]
   try
+    call QuickuiStartKeyMapCheatsheetSearch(l:winid, '/')
+    for [l:columns, l:rows] in [[120, 40], [80, 24], [80, 35]]
+      let [&columns, &lines] = [l:columns, l:rows]
+      let g:quickui_cheatsheet_search_input = repeat('中', 50)
+      for l:key in ['a', '中', "\<BS>", "\<C-H>"]
+        call QuickuiKeyMapCheatsheetFilter(l:winid, l:key)
+        let [l:expected, l:width] = QuickuiBuildKeyMapCheatsheet()
+        call assert_equal(l:expected, getbufline(winbufnr(l:winid), 1, '$'),
+              \ 'typing and deleting keep the complete popup text equivalent')
+        let l:options = popup_getoptions(l:winid)
+        call assert_equal(l:width, l:options.minwidth, 'search responds to width changes')
+        call assert_equal(min([max([6, &lines - 6]), len(l:expected)]), l:options.minheight,
+              \ 'search responds to height changes')
+      endfor
+    endfor
     for l:direction in ['/', '?']
       call QuickuiStartKeyMapCheatsheetSearch(l:winid, l:direction)
       let g:quickui_cheatsheet_search_input = 'TigerVNC'
@@ -483,6 +499,7 @@ function! s:CheatsheetSearch() abort
     call assert_equal('TigerVNC', g:quickui_cheatsheet_search_pattern, 'empty input keeps the previous pattern')
   finally
     call popup_clear()
+    let [&columns, &lines] = l:screen_size
     unlet! g:test_cheatsheet_line
   endtry
 endfunction
@@ -539,11 +556,15 @@ function! s:CodeBlockFiletypes() abort
     for [l:kind, l:type, l:extension, l:text, l:want] in [
           \ ['Func', 'tcl', 'tcl', 'proc Work {', 'proc --> Work'],
           \ ['Func', 'tcl', 'pdl', 'iProc Work {', 'iProc --> Work'],
+          \ ['Func', 'tcl', 'dofile', 'proc Work {', 'proc --> Work'],
+          \ ['Func', 'tcl', 'pdl', '  proc Work {', 'proc --> Work'],
+          \ ['Func', 'tcl', 'tcl', '  iProc Work {', 'iProc --> Work'],
           \ ['Func', 'perl', 'pl', 'sub Work {', 'sub --> Work'],
           \ ['Func', 'python', 'py', 'def Work():', 'def --> Work()'],
           \ ['Func', 'make', 'mk', 'define Work', 'define --> Work'],
           \ ['Func', 'vim', 'vim', 'function! Work()', 'function --> Work()'],
           \ ['Func', 'verilog', 'v', 'module Work(input x);', 'module --> Work'],
+          \ ['Func', 'systemverilog', 'sv', 'module Work(input x);', 'module --> Work'],
           \ ['Func', 'icl', 'icl', 'module Work(input x) {', 'module --> Work(input x)'],
           \ ['NoneFunc', 'tcl', 'tcl', 'namespace eval Space {', 'namespace eval --> Space'],
           \ ['NoneFunc', 'perl', 'pl', 'package Space {', 'package --> Space'],
@@ -557,12 +578,79 @@ function! s:CodeBlockFiletypes() abort
         call cursor(1, 1)
         call assert_equal(l:want, trim(execute('call ShowCurrent' . l:kind . 'CodeBlockName()')),
               \ l:filetype . ' keeps its pattern, label and delimiter')
+        if l:kind ==# 'Func' && l:type !=# 'icl'
+          call assert_equal(l:want, trim(execute('call CallShowNearestFunction()')),
+                \ l:filetype . ' dispatches the code-block shortcut')
+        endif
         bwipeout!
       endfor
+    endfor
+    for l:extension in ['tcl', 'dofile', 'pdl']
+      enew!
+      execute 'file ' . fnameescape(s:fixtures . '/mixed.' . l:extension)
+      setlocal filetype=tcl
+      call setline(1, ['proc First {} {', '  puts "proc Fake {} {"', '}',
+            \ '  iProc Second {} {', '    body', '}'])
+      for [l:line, l:want] in [[2, 'proc --> First {}'], [5, 'iProc --> Second {}']]
+        call cursor(l:line, 3)
+        let l:position = getpos('.')
+        call assert_equal(l:want, trim(execute('call CallShowNearestFunction()')),
+              \ 'find the nearest declaration in mixed Tcl/PDL code')
+        call assert_equal(l:position, getpos('.'), 'lookup preserves the cursor')
+      endfor
+      silent %delete _
+      call assert_equal(l:extension ==# 'tcl' ? 'proc -->' : 'iProc -->',
+            \ trim(execute('call CallShowNearestFunction()')), 'missing declaration keeps the existing label')
     endfor
   finally
     let &ignorecase = l:ignorecase
   endtry
+endfunction
+
+function! s:CodeBlockDeclarations() abort
+  " Match real declarations, including indentation and portless modules.
+  for [l:ft, l:extension, l:lines, l:want] in [
+        \ ['python', 'py', ['def real():', '    # def fake():', '    pass'], 'def --> real()'],
+        \ ['python', 'py', ['def real():', '    text = "def fake():"', '    pass'], 'def --> real()'],
+        \ ['python', 'py', ['class Worker:', '    async def work():', '        pass'], 'def --> work()'],
+        \ ['cpp', 'cpp', ['namespace N {', '  class Widget {', '    int x;'], 'class Widget'],
+        \ ['c', 'c', ['void f() {', '  struct Local {', '    int x;'], 'struct Local'],
+        \ ['verilog', 'v', ['  module Top(input x);', '    wire y;'], 'module --> Top'],
+        \ ['systemverilog', 'sv', ['module tb;', '  initial $finish;'], 'module --> tb'],
+        \ ['systemverilog', 'sv', ['  module tb;', '    initial $finish;'], 'module --> tb'],
+        \ ['icl', 'icl', ['  Module Top {', '    ScanInPort SI;'], 'module --> Top']]
+    enew!
+    execute 'file ' . fnameescape(s:fixtures . '/declaration.' . l:extension)
+    let &l:filetype = l:ft
+    call setline(1, l:lines)
+    call cursor(len(l:lines), 3)
+    let l:position = getpos('.')
+    call assert_equal(l:want, trim(execute('call CallShowNearestFunction()')), string(l:lines))
+    call assert_equal(l:position, getpos('.'), 'declaration lookup preserves cursor')
+    call assert_equal(l:lines, getline(1, '$'), 'declaration lookup preserves text')
+    bwipeout!
+  endfor
+endfunction
+
+function! s:MultipleTerminals() abort
+  enew!
+  let l:source = win_getid()
+  let l:first = term_start('/bin/sh', {'term_kill': 'term'})
+  let l:second = term_start('/bin/sh', {'term_kill': 'term'})
+  tabnew
+  let l:other = term_start('/bin/sh', {'curwin': 1, 'term_kill': 'term'})
+  let t:term_buf = l:other
+  let l:other_win = win_getid()
+  tabprevious
+  call ToggleTerminal()
+  call assert_equal(l:source, win_getid(), 'hiding multiple terminals returns to source')
+  call assert_equal([], win_findbuf(l:first))
+  call assert_equal([], win_findbuf(l:second))
+  call assert_equal(l:second, t:term_buf, 'track newest terminal in this tab')
+  call assert_equal([l:other_win], win_findbuf(l:other), 'other tab stays visible')
+  call assert_equal(l:other, gettabvar(2, 'term_buf'), 'other tab retains ownership')
+  call ToggleTerminal()
+  call assert_equal(l:second, bufnr(), 'reopen the newest terminal')
 endfunction
 
 function! s:NativeHelpers() abort
@@ -1001,7 +1089,7 @@ function! s:SystemVerilogBuild() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch

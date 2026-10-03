@@ -855,10 +855,9 @@ function! ConfigureDelayedPlugin()
     endif
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
-    let l:cur_tab = tabpagenr()
-    " Loop through all windows in the current tab to check for a terminal
-    for l:win in getwininfo()
-      if l:win['terminal'] == 1 && l:win['tabnr'] == l:cur_tab
+    " Snapshot this tab's windows before hiding any terminals.
+    for l:win in map(gettabinfo(tabpagenr())[0].windows, {_, id -> getwininfo(id)[0]})
+      if l:win['terminal'] == 1
         " A terminal window is found, set the flag and get the buffer number
         let l:terminal_shown = 1
         if l:win['bufnr'] > get(t:, 'term_buf', -1)
@@ -1978,7 +1977,7 @@ function! SetGeneralKeyMaps()
   noremap <silent><Leader>` :<C-u>call CallShowNearestFunction()<CR>
   noremap <silent>`<Leader> :<C-u>call CallShowNearestFunctionNone()<CR>
   function! ShowNearestClassOrStruct()
-    let l:nearest_line = search('^\%(class\|struct\)\s\+.\+', 'bcnWz')
+    let l:nearest_line = search('^\s*\%(class\|struct\)\s\+.\+', 'bcnWz')
     let l:nearest_name = l:nearest_line ? getline(l:nearest_line) : 'No class/struct can be found.'
     let l:nearest_end_poisition = strridx(l:nearest_name, '{')
     if(l:nearest_end_poisition > 0)
@@ -1994,10 +1993,13 @@ function! SetGeneralKeyMaps()
     let l:show_name = a:label_from_declaration
           \ ? get(matchlist(l:block_name, '^\s*\(\S\+\)'), 1, a:show_name) : a:show_name
     let l:block_end_position = strridx(l:block_name, a:end_keyword)
+    if l:block_end_position < 0 && a:show_name ==# 'module' && a:end_keyword ==# '('
+      let l:block_end_position = stridx(l:block_name, ';')
+    endif
     if(l:block_end_position > 0)
       let l:block_name = strpart(l:block_name, 0, l:block_end_position)
     endif
-    let l:block_name = strpart(l:block_name, stridx(l:block_name, l:show_name) + len(l:show_name) + 1)
+    let l:block_name = strpart(l:block_name, matchend(l:block_name, '\c\V'.escape(l:show_name, '\')) + 1)
     let l:block_name = trim(l:block_name, ' ', 1)
     echo l:show_name '-->' l:block_name
   endfunction
@@ -2011,7 +2013,7 @@ function! SetGeneralKeyMaps()
         let l:name_keyword = 'sub\s\+.\+\s*{'
         let l:show_name = 'sub'
     elseif &filetype=='python'
-        let l:name_keyword = 'def\s\+.\+(.*'
+        let l:name_keyword = '^\s*\%(async\s\+\)\?def\s\+.\+(.*'
         let l:show_name = 'def'
         let l:end_keyword = ':'
     elseif &filetype=='make'
@@ -2023,7 +2025,7 @@ function! SetGeneralKeyMaps()
         let l:show_name = 'function'
         let l:end_keyword = '\n'
     else
-      let l:name_keyword = '^module\s\+.\+\s*(\|^Module\s\+.\+\s*{'
+      let l:name_keyword = '^\s*module\s\+.\+\s*[(;]\|^\s*Module\s\+.\+\s*{'
       let l:show_name = 'module'
       let l:end_keyword = (&filetype=='verilog' || &filetype=='systemverilog') ? '(' : '{'
     endif

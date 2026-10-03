@@ -78,6 +78,24 @@ try
     call assert_equal(0, JumpToTheMainWin())
   endfor
 
+  " Measure complete F8 show/hide pairs with unrelated tabs present.
+  silent! %bwipeout!
+  new
+  let t:term_buf = term_start('/bin/sh', {'hidden': 1, 'term_kill': 'term'})
+  for s:tabs in [1, 10, 50]
+    while tabpagenr('$') < s:tabs
+      tabnew
+      new
+    endwhile
+    tabfirst
+    call s:Measure('terminal-pair-' . s:tabs . '-tabs',
+          \ 'execute("call ToggleTerminal() | call ToggleTerminal()")', 100)
+    call assert_equal(2, winnr('$'), 'each pair restores the source windows')
+    call assert_equal([], win_findbuf(t:term_buf), 'terminal ends hidden')
+  endfor
+  silent! tabonly!
+  silent! %bwipeout!
+
   call QuickuiInstallKeyMapMenus()
   let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimop', '\zs')
   let g:quickui_cheatsheet_folded = {}
@@ -86,9 +104,16 @@ try
         \ eval(join(map(copy(g:quickui_keymap_groups), {_, group -> len(group[1])}), '+')),
         \ &columns)], '/dev/stdout', 'a')
   call s:Measure('quickui-expanded', 'QuickuiBuildKeyMapCheatsheet()', 100)
+  call ConfigureQuickui()
+  call QuickuiOpenKeyMapCheatsheet()
+  let g:vimrc_bench_popup = popup_list()[0]
+  call QuickuiStartKeyMapCheatsheetSearch(g:vimrc_bench_popup, '/')
+  call s:Measure('quickui-search-key',
+        \ 'QuickuiKeyMapCheatsheetFilter(g:vimrc_bench_popup, empty(g:quickui_cheatsheet_search_input) ? "a" : "\<BS>")', 100)
 catch
   call assert_report(v:exception . ' at ' . v:throwpoint)
 finally
+  call popup_clear()
   silent! tabonly!
   silent! %bwipeout!
   call delete(s:fixtures, 'rf')
