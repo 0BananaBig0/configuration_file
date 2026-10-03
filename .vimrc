@@ -1043,9 +1043,9 @@ function! ConfigureManualLoadPlugin()
                 \ g:quickui_cheatsheet_search_direction ==# '?')
         endif
       elseif a:key ==# "\<BS>" || a:key ==# "\<C-H>"
-        let l:length = strchars(g:quickui_cheatsheet_search_input)
         let g:quickui_cheatsheet_search_input = strcharpart(
-              \ g:quickui_cheatsheet_search_input, 0, max([0, l:length - 1]))
+              \ g:quickui_cheatsheet_search_input, 0,
+              \ strchars(g:quickui_cheatsheet_search_input) - 1)
         call QuickuiRefreshKeyMapCheatsheet(a:winid)
       elseif a:key =~# '^[[:print:]]$'
         let g:quickui_cheatsheet_search_input .= a:key
@@ -1566,9 +1566,9 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! QuitVimspectorWins()
     for l:window in ['disassembly', 'terminal']
-      if exists('g:vimspector_session_windows.' . l:window)
-            \ && win_id2win(g:vimspector_session_windows[l:window]) > 0
-        call win_gotoid(g:vimspector_session_windows[l:window])
+      let l:winid = get(get(g:, 'vimspector_session_windows', {}), l:window, 0)
+      if win_id2win(l:winid) > 0
+        call win_gotoid(l:winid)
         quit!
       endif
     endfor
@@ -1950,9 +1950,8 @@ function! SetGeneralKeyMaps()
     echo l:nearest_name
   endfunction
   function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword)
-    if getline('.') =~ a:name_keyword
-      let l:block_name = getline('.')
-    else
+    let l:block_name = getline('.')
+    if l:block_name !~ a:name_keyword
       let l:block_name = getline(search(a:name_keyword, 'bcnWz'))
     endif
     let l:block_end_position = strridx(l:block_name, a:end_keyword)
