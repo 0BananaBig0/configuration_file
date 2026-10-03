@@ -26,6 +26,18 @@ set hidden noconfirm
 let s:fixtures = tempname()
 call mkdir(s:fixtures . '/.git', 'p')
 
+function! s:ManualConfigurationReload() abort
+  " Reconfiguration must replace its handler without clearing CoC's handler.
+  let l:coc = autocmd_get({'group': 'Plugin_Configuration_Group', 'event': 'CursorHold'})
+  call assert_false(empty(l:coc), 'CoC highlight handler exists before reconfiguration')
+  call ConfigureManualLoadPlugin()
+  call assert_equal(1, len(autocmd_get({'group': 'Plugin_Configuration_Group',
+        \ 'event': 'User', 'pattern': 'VimspectorTerminalOpened'})),
+        \ 'manual reconfiguration registers the terminal handler once')
+  call assert_equal(l:coc, autocmd_get({'group': 'Plugin_Configuration_Group',
+        \ 'event': 'CursorHold'}), 'manual reconfiguration preserves CoC highlighting')
+endfunction
+
 function! s:FiletypeLoading() abort
   " Keep native detection and the plugin runtime-path state of existing files.
   call mkdir(s:fixtures . '/include', 'p')
@@ -171,6 +183,13 @@ function! s:SourceWindow() abort
   call win_gotoid(l:aux)
   call assert_equal(s:fixtures, WorkspaceRoot(), 'workspace comes from source')
   call assert_equal(l:source, win_getid(), 'workspace navigation selects source')
+  " Screen order must not replace the existing lowest-window-ID preference.
+  leftabove new
+  setlocal buftype= filetype=python
+  let l:newer_source = win_getid()
+  call assert_equal(1, JumpToTheMainWin(), 'an eligible source is found')
+  call assert_equal(l:source, win_getid(), 'oldest eligible window wins over screen order')
+  call win_execute(l:newer_source, 'close!')
   call win_gotoid(l:source)
   close!
   call assert_equal(0, JumpToTheMainWin(), 'no source window has an explicit result')
@@ -186,8 +205,8 @@ function! s:LiteralRootMarkers() abort
   call mkdir(l:root . '/src', 'p')
   call writefile([''], l:root . '/src/.root')
   enew!
-  call assert_equal(l:root, WorkspaceRoot(l:root . '/src'),
-        \ 'literal paths retain Git-marker priority over a nearer .root')
+  call assert_equal(l:root . '/src', WorkspaceRoot(l:root . '/src'),
+        \ 'literal paths select the nearer .root marker')
 endfunction
 
 function! s:VisualWhichKey() abort
@@ -300,7 +319,7 @@ function! s:ShortcutHelp() abort
 endfunction
 
 try
-  for s:check in ['FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
+  for s:check in ['ManualConfigurationReload', 'FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
         \ 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
         \ 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
     try

@@ -2060,13 +2060,14 @@ function! SetGeneralKeyMaps()
                 \  .' -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
         endif
         return l:cmakelist_path.' -S . -B build'
-            \ .' && bear --append -- make -C build -j12'
+            \ .' && bear --append -- cmake --build build --parallel 12'
       endif
       if !empty(glob(fnameescape(l:possible_path).'/*.pro', 0, 1))
         return ' cd '.shellescape(l:possible_path, 1).' && qmake -o build/Makefile'
             \ .' && bear --append -- make -C build -j12'
       endif
       if filereadable(l:possible_path.'/Makefile') || filereadable(l:possible_path.'/makefile')
+            \ || filereadable(l:possible_path.'/GNUmakefile')
         return ' cd '.shellescape(l:possible_path, 1).' && bear --append -- make -j12'
       endif
       if filereadable(l:possible_path.'/SConstruct')

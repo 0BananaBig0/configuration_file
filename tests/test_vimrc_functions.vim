@@ -297,15 +297,15 @@ function! s:DebuggerWindowClosing() abort
     call assert_equal([l:disassembly, l:terminal], g:test_closed_debugger_windows,
           \ 'terminal reference is read after disassembly closes')
 
-    " Characterize the existing limitation: windows in another tab are skipped.
+    " Debugger windows must also close when invoked from another tab.
     tabnew
     let l:other_tab_window = win_getid()
     let g:vimspector_session_windows = {'terminal': l:other_tab_window}
     call win_gotoid(l:source)
     call QuitVimspectorWins()
-    call assert_equal([l:other_tab_window], win_findbuf(winbufnr(l:other_tab_window)),
-          \ 'debugger window in another tab stays open')
-    call assert_equal(l:source, win_getid(), 'closing stays within the current tab')
+    call assert_equal([0, 0], win_id2tabwin(l:other_tab_window),
+          \ 'debugger window in another tab closes')
+    call assert_equal(l:source, win_getid(), 'closing the debugger tab returns to source')
   finally
     autocmd! Test_Debugger_Window_Closing
     unlet! g:vimspector_session_windows g:test_closed_debugger_windows
@@ -374,7 +374,9 @@ endfunction
 
 function! s:CheatsheetCategories() abort
   call popup_clear()
+  let g:quickui_cheatsheet_folded = {'obsolete': 1}
   call QuickuiOpenKeyMapCheatsheet()
+  call assert_false(has_key(g:quickui_cheatsheet_folded, 'obsolete'), 'opening resets old fold state')
   let l:winid = popup_list()[0]
   try
     let l:names = map(copy(g:quickui_keymap_groups), {_, group -> group[0]})
@@ -389,6 +391,15 @@ function! s:CheatsheetCategories() abort
             \ '[' . l:key . '] ' . l:name . ': [-]') >= 0, l:name . ' renders when unfolded')
       call QuickuiKeyMapCheatsheetFilter(l:winid, l:key)
       call assert_true(g:quickui_cheatsheet_folded[l:name], l:name . ' folds with the same key')
+    endfor
+    call QuickuiKeyMapCheatsheetFilter(l:winid, 'r')
+    let g:quickui_cheatsheet_folded.obsolete = 0
+    let l:folded = g:quickui_cheatsheet_folded
+    call QuickuiKeyMapCheatsheetFilter(l:winid, 'z')
+    call assert_true(l:folded is g:quickui_cheatsheet_folded, 'fold all updates the existing dictionary')
+    call assert_equal(0, get(l:folded, 'obsolete', -1), 'fold all preserves unrelated entries')
+    for l:name in l:names
+      call assert_equal(1, get(l:folded, l:name, 0), l:name . ' folds with z')
     endfor
   finally
     call popup_clear()
@@ -411,6 +422,17 @@ function! s:CheatsheetSearch() abort
       call quickui#core#win_execute(l:winid, 'let g:test_cheatsheet_line = line(".")')
       call assert_equal(l:direction ==# '/' ? l:matches[0] : l:matches[-1],
             \ g:test_cheatsheet_line, 'search begins at the correct end of refreshed text')
+    endfor
+    for l:key in ["\<BS>", "\<C-H>"]
+      for [l:input, l:want] in [['', ''], ['a', ''], ['abc', 'ab'],
+            \ ['中文', '中'], ["e\u0301", 'e']]
+        call QuickuiStartKeyMapCheatsheetSearch(l:winid, '/')
+        let g:quickui_cheatsheet_search_input = l:input
+        call QuickuiKeyMapCheatsheetFilter(l:winid, l:key)
+        call assert_equal(l:want, g:quickui_cheatsheet_search_input,
+              \ 'Backspace removes one Unicode character, including on empty input')
+        call assert_true(g:quickui_cheatsheet_search_active, 'Backspace keeps search input open')
+      endfor
     endfor
     call QuickuiStartKeyMapCheatsheetSearch(l:winid, '/')
     call QuickuiKeyMapCheatsheetFilter(l:winid, "\<CR>")
@@ -447,6 +469,56 @@ function! s:CheatsheetWidths() abort
     endfor
   finally
     let [&ambiwidth, &listchars, &fillchars] = l:saved
+  endtry
+endfunction
+
+function! s:CodeBlockNames() abort
+  " Catch inverted matching or changed backward searches when reusing the line.
+  enew
+  let l:lines = ['# heading', 'def First():', '  pass', 'def Second():', '  pass']
+  call setline(1, l:lines)
+  for [l:line, l:want] in [[1, 'def -->'], [2, 'def --> First'],
+        \ [3, 'def --> First'], [4, 'def --> Second'], [5, 'def --> Second']]
+    call cursor(l:line, 3)
+    let l:position = getpos('.')
+    call assert_equal(l:want,
+          \ trim(execute("call ShowCurrentCodeBlockName('^def\\s\\+', 'def', '(')")),
+          \ 'code-block name comes from the current or nearest preceding definition')
+    call assert_equal(l:position, getpos('.'), 'code-block lookup leaves the cursor in place')
+  endfor
+  call assert_equal(l:lines, getline(1, '$'), 'code-block lookup preserves the buffer')
+endfunction
+
+function! s:CodeBlockFiletypes() abort
+  " Catch delimiter changes when combining filetype selection branches.
+  let l:ignorecase = &ignorecase
+  try
+    for [l:kind, l:type, l:extension, l:text, l:want] in [
+          \ ['Func', 'tcl', 'tcl', 'proc Work {', 'proc --> Work'],
+          \ ['Func', 'tcl', 'pdl', 'iProc Work {', 'iProc --> Work'],
+          \ ['Func', 'perl', 'pl', 'sub Work {', 'sub --> Work'],
+          \ ['Func', 'python', 'py', 'def Work():', 'def --> Work()'],
+          \ ['Func', 'make', 'mk', 'define Work', 'define --> Work'],
+          \ ['Func', 'vim', 'vim', 'function! Work()', 'function --> Work()'],
+          \ ['Func', 'verilog', 'v', 'module Work(input x);', 'module --> Work'],
+          \ ['Func', 'icl', 'icl', 'module Work(input x) {', 'module --> Work(input x)'],
+          \ ['NoneFunc', 'tcl', 'tcl', 'namespace eval Space {', 'namespace eval --> Space'],
+          \ ['NoneFunc', 'perl', 'pl', 'package Space {', 'package --> Space'],
+          \ ['NoneFunc', 'python', 'py', 'class Space:', 'class --> Space']]
+      for [l:case, l:filetype] in [[0, l:type], [1, l:type], [1, toupper(l:type)]]
+        enew!
+        execute 'file ' . fnameescape(s:fixtures . '/block.' . l:extension)
+        let &ignorecase = l:case
+        let &l:filetype = l:filetype
+        call setline(1, l:text)
+        call cursor(1, 1)
+        call assert_equal(l:want, trim(execute('call ShowCurrent' . l:kind . 'CodeBlockName()')),
+              \ l:filetype . ' keeps its pattern, label and delimiter')
+        bwipeout!
+      endfor
+    endfor
+  finally
+    let &ignorecase = l:ignorecase
   endtry
 endfunction
 
@@ -512,9 +584,18 @@ function! s:NativeHelpers() abort
   call assert_equal(l:root . '/src', getcwd(), 'new tab inherits launch directory with special characters')
   call CloseAndBackTab()
 
-  " A closer low-priority marker must not change existing Git-root priority.
+  " A nearer marker wins even when a distant marker has higher priority.
   call writefile([''], l:root . '/src/.root')
-  call assert_equal(l:root, WorkspaceRoot(l:root . '/src'))
+  call assert_equal(l:root . '/src', WorkspaceRoot(l:root . '/src'),
+        \ 'marker in the starting directory wins over parent Git root')
+  call mkdir(l:root . '/src/nested', 'p')
+  call assert_equal(l:root . '/src', WorkspaceRoot(l:root . '/src/nested'),
+        \ 'nearest ancestor marker wins over parent Git root')
+  call writefile(['gitdir: elsewhere'], l:root . '/src/.git')
+  call assert_equal(l:root . '/src/.git', FindRootPatternPath(l:root . '/src/nested'),
+        \ 'pattern order breaks ties in the nearest marked directory')
+  call delete(l:root . '/src/.git')
+  call delete(l:root . '/src/.root')
   " Auxiliary buffers use the source window; ordinary splits keep their focus.
   let l:source_win = win_getid()
   for l:filetype in ['help', 'VimspectorPrompt', 'vista', 'nerdtree', 'python']
@@ -611,7 +692,7 @@ endfunction
 function! s:BuildCommands() abort
   " Capture the external AsyncRun boundary instead of launching compilers.
   command! -bang -nargs=* AsyncRun let g:build_command = <q-args>
-  let l:root = s:fixtures . '/build project'
+  let l:root = s:fixtures . '/build [one] project'
   call mkdir(l:root . '/.git', 'p')
   call mkdir(l:root . '/src', 'p')
   call writefile(['module main; endmodule'], l:root . '/src/main.v')
@@ -632,10 +713,17 @@ function! s:BuildCommands() abort
   call writefile(['int main() { return 0; }'], l:root . '/src/main.cpp')
   execute 'edit ' . fnameescape(l:root . '/src/main.cpp')
   setlocal filetype=cpp
-  for [l:marker, l:want] in [['CMakeLists.txt', 'cmake'], ['app.pro', 'qmake'], ['Makefile', 'make'], ['SConstruct', 'scons']]
+  for [l:marker, l:want] in [['CMakeLists.txt', 'cmake'], ['app.pro', 'qmake'], ['Makefile', 'make'], ['makefile', 'make'], ['GNUmakefile', 'make'], ['SConstruct', 'scons']]
     call writefile([''], l:root . '/' . l:marker)
-    call assert_match('cd ' . escape(shellescape(l:root), '\.^$~[]*') . ' &&', CPPCompilation(), 'quoted build root')
-    call assert_match(l:want, CPPCompilation(), l:marker . ' selects its build tool')
+    let l:info = {}
+    let l:command = CPPCompilation(l:info)
+    call assert_match('cd ' . escape(shellescape(l:root), '\.^$~[]*') . ' &&', l:command, 'quoted build root')
+    call assert_match(l:want, l:command, l:marker . ' selects its build tool')
+    call assert_equal(1, l:info.project, l:marker . ' selects project execution')
+    if l:marker ==# 'CMakeLists.txt'
+      call assert_match('bear --append -- cmake --build build --parallel 12', l:command,
+            \ 'CMake delegates to its generator while retaining Bear capture')
+    endif
     call delete(l:root . '/' . l:marker)
   endfor
   call writefile([''], l:root . '/Makefile')
@@ -666,19 +754,159 @@ function! s:BuildCommands() abort
         \ ['c', 'c', 'gcc -fsanitize=address,undefined,leak -g -pedantic-errors'
         \ . " -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow 'main file.c' -o 'main file.exe'"],
         \ ['cuda', 'cu', "nvcc -g 'main file.cu' -o 'main file.exe'"],
-        \ ['verilog', 'v', "iverilog *.v -o 'main file.out' && vvp 'main file.out'"],
-        \ ['systemverilog', 'sv', "iverilog *.v -o 'main file.out' && vvp 'main file.out'"]]
+        \ ['verilog', 'v', "iverilog *.v -o 'main file.out' && vvp 'main file.out'"]]
     let l:file = l:root . '/src/main file.' . l:extension
     call writefile([''], l:file)
     execute 'edit ' . fnameescape(l:file)
     let &l:filetype = l:filetype
     call assert_equal(' cd ' . shellescape(l:root . '/src') . ' && ' . l:want,
           \ CPPCompilation(), l:filetype . ' keeps its compiler and quoted output')
+    if l:filetype ==# 'cuda'
+      let g:build_command = ''
+      call CompileCommand()
+      call assert_match("nvcc -g 'main file.cu' -o 'main file.exe'", g:build_command,
+            \ 'compile-only submits the standalone CUDA command')
+      call assert_match('JumpToTerm(1)', g:build_command, 'CUDA compile-only terminal behavior')
+      call assert_notmatch("&& '\./main file.exe'", g:build_command, 'compile-only does not run CUDA output')
+    endif
   endfor
 endfunction
 
+function! s:BuildRoutingIgnoresFilenames() abort
+  " Keep real AsyncRun parsing, replacing only the external compiler process.
+  command! -bang -nargs=+ -range=0 -complete=file AsyncRun
+        \ call asyncrun#run('<bang>', '', <q-args>, <count>, <line1>, <line2>)
+  let g:asyncrun_mode = 10
+  let g:asyncrun_hook = 'CaptureAsyncRun'
+  let l:saved_path = $PATH
+  let l:bin = s:fixtures . '/routing-bin'
+  call mkdir(l:bin)
+  call writefile(['#!/bin/sh', 'printf "#!/bin/sh\necho NEW_PROGRAM\n" > main.exe',
+        \ 'chmod +x main.exe'], l:bin . '/gcc')
+  call setfperm(l:bin . '/gcc', 'rwx------')
+  let $PATH = l:bin . ':' . $PATH
+  try
+    " The second path also defeats searching for a longer command substring.
+    for l:name in ['bear-project', 'project && bear --append -- make']
+      let l:root = s:fixtures . '/' . l:name
+      call mkdir(l:root . '/.git', 'p')
+      call mkdir(l:root . '/build')
+      call writefile(['int main(void) { return 0; }'], l:root . '/main.c')
+      call writefile(['#!/bin/sh', 'echo STALE_PROGRAM'], l:root . '/build/main.exe')
+      call setfperm(l:root . '/build/main.exe', 'rwx------')
+      execute 'edit ' . fnameescape(l:root . '/main.c')
+      setlocal filetype=c
+      call CompileAndExcute()
+      let l:output = system(g:build_command)
+      call assert_equal(0, v:shell_error, 'successful compiler fixture')
+      call assert_equal("NEW_PROGRAM\n", l:output, 'run the new single-file executable: ' . l:name)
+      call writefile([''], l:root . '/main.h')
+      execute 'edit ' . fnameescape(l:root . '/main.h')
+      setlocal filetype=c
+      let g:build_command = ''
+      call CompileCommand()
+      call assert_equal('', g:build_command, 'a path containing bear must not enable standalone header compilation')
+      call writefile([''], l:root . '/Makefile')
+      call CompileCommand()
+      call assert_match('bear --append -- make -j12', g:build_command,
+            \ 'a real project build still compiles from a header')
+    endfor
+  finally
+    let $PATH = l:saved_path
+    unlet g:asyncrun_mode g:asyncrun_hook
+  endtry
+endfunction
+
+function! s:ProjectBuilds() abort
+  " Catch generator mismatches and skipped GNUmakefiles with real builds and LSP databases.
+  for l:tool in ['cmake', 'ninja', 'make', 'gcc', 'bear']
+    if !executable(l:tool)
+      call writefile(['SKIP: project integration builds require ' . l:tool], '/dev/stdout')
+      return
+    endif
+  endfor
+  for l:generator in ['Ninja', 'Unix Makefiles', 'GNUmakefile']
+    let l:root = s:fixtures . '/project ' . l:generator
+    call mkdir(l:root . '/.git', 'p')
+    call writefile(['#ifndef PROJECT_BUILD', '#error Missing project flags', '#endif',
+          \ 'int main(void) { return 0; }'], l:root . '/main.c')
+    if l:generator ==# 'GNUmakefile'
+      call writefile(['all:', "\tgcc -DPROJECT_BUILD main.c -o main.exe"], l:root . '/GNUmakefile')
+    else
+      call writefile(['cmake_minimum_required(VERSION 3.16)', 'project(Audit C)',
+            \ 'add_executable(main main.c)', 'target_compile_definitions(main PRIVATE PROJECT_BUILD)'],
+            \ l:root . '/CMakeLists.txt')
+    endif
+    execute 'edit ' . fnameescape(l:root . '/main.c')
+    let l:command = CPPCompilation()
+    if l:generator !=# 'GNUmakefile'
+      " Set the generator only for this subprocess; leave the test environment intact.
+      let l:command = 'export CMAKE_GENERATOR=' . shellescape(l:generator) . '; ' . l:command
+    endif
+    let l:output = system(l:command)
+    call assert_equal(0, v:shell_error, l:generator . ' builds with project flags: ' . l:output)
+    let l:database = l:root . '/compile_commands.json'
+    call assert_true(filereadable(l:database), l:generator . ' creates the LSP database at the root')
+    if filereadable(l:database)
+      let l:entries = json_decode(join(readfile(l:database), "\n"))
+      call assert_false(empty(filter(l:entries,
+            \ {_, entry -> fnamemodify(entry.file, ':t') ==# 'main.c'})),
+            \ l:generator . ' records the source compilation')
+    endif
+  endfor
+endfunction
+
+function! s:SystemVerilogBuild() abort
+  command! -bang -nargs=* AsyncRun let g:build_command = <q-args>
+  let l:root = s:fixtures . '/systemverilog [one] project'
+  call mkdir(l:root . '/.git', 'p')
+  let l:source = l:root . '/top file.sv'
+  call writefile(['module top;', 'initial begin',
+        \ 'string message;', 'message = "SV PASS";', '$display("%s", message);',
+        \ 'end', 'endmodule'], l:source)
+  execute 'edit ' . fnameescape(l:source)
+  setlocal filetype=systemverilog
+  for l:mixed in [0, 1]
+    if l:mixed
+      call writefile(['module helper;', 'initial $display("V PASS");', 'endmodule'],
+            \ l:root . '/helper file.v')
+    endif
+    let l:command = CPPCompilation()
+    call assert_match('iverilog -g2012 ', l:command, 'enable SystemVerilog syntax')
+    call assert_true(stridx(l:command, shellescape(l:source, 1)) >= 0,
+          \ 'compile the SystemVerilog source with its spaced filename')
+    let g:build_command = ''
+    call CompileCommand()
+    call assert_match('iverilog -g2012 ', g:build_command, 'compile shortcut runs SystemVerilog')
+    call assert_match('JumpToTerm(1)', g:build_command, 'compile shortcut keeps terminal behavior')
+    let g:build_command = ''
+    call CompileAndExcute()
+    call assert_match('iverilog -g2012 ', g:build_command, 'run shortcut runs SystemVerilog')
+    call assert_match("&& gtkwave 'top file.vcd'", g:build_command, 'run shortcut opens its waveform')
+    if executable('iverilog') && executable('vvp')
+      let l:output = system(l:command)
+      call assert_equal(0, v:shell_error, 'compile and run SystemVerilog: ' . l:output)
+      call assert_equal(l:mixed ? ['SV PASS', 'V PASS'] : ['SV PASS'],
+            \ sort(split(l:output, "\n")), 'SV-only and mixed-language sources run')
+    endif
+  endfor
+  " AsyncRun saves the buffer after CPPCompilation() constructs its command.
+  let l:unsaved = l:root . '/new file.sv'
+  execute 'edit ' . fnameescape(l:unsaved)
+  call setline(1, ['module unsaved;', 'initial $display("NEW PASS");', 'endmodule'])
+  let l:command = CPPCompilation()
+  call assert_true(stridx(l:command, shellescape(l:unsaved, 1)) >= 0,
+        \ 'include the new source before AsyncRun saves it')
+  write
+  if executable('iverilog') && executable('vvp')
+    let l:output = system(l:command)
+    call assert_equal(0, v:shell_error, 'compile the newly saved source: ' . l:output)
+    call assert_equal(['NEW PASS', 'SV PASS', 'V PASS'], sort(split(l:output, "\n")))
+  endif
+endfunction
+
 try
-  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands']
+  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch

@@ -91,6 +91,25 @@ try
     call DisableProjectDebug()
     call assert_equal(s:original, readfile(s:root . '/.vimspector.json'))
 
+    " A visible debugger config must not prevent adding VS Code integration.
+    let s:config_window = win_getid()
+    let s:tab_count = tabpagenr('$')
+    call append('$', 'unsaved fixture change')
+    let s:config_text = getline(1, '$')
+    call ConfigureCppDebug(1)
+    call assert_true(filereadable(s:root . '/.vscode/launch.json'), 'add VS Code config with debugger config open')
+    call assert_equal(s:config_window, win_getid(), 'reuse the open config window')
+    call assert_equal(s:tab_count, tabpagenr('$'), 'do not open a duplicate config tab')
+    call assert_equal(s:original, readfile(s:root . '/.vimspector.json'), 'preserve config on disk')
+    call assert_equal(s:config_text, getline(1, '$'), 'preserve unsaved config changes')
+    call assert_true(&modified)
+    if filereadable(s:root . '/.vscode/launch.json')
+      call writefile(['keep VS Code settings'], s:root . '/.vscode/launch.json')
+      call ConfigureCppDebug(1)
+      call assert_equal(['keep VS Code settings'], readfile(s:root . '/.vscode/launch.json'))
+    endif
+    edit!
+
     " Catch accidental overwrite of manual choices when setup is repeated.
     call EnableProjectDebug()
     execute 'edit ' . fnameescape(s:root . '/src/main.py')
@@ -104,7 +123,7 @@ try
     let s:root = s:OpenWorkspace('markers')
     for s:marker in ['app.pro', 'common.pri', '.qmake.conf', '.qmake.cache',
           \ 'CMakeLists.txt', 'helpers.cmake', 'CMakePresets.json',
-          \ 'CMakeUserPresets.json', 'Makefile', 'makefile', 'GNUmakefile', 'rules.mk']
+          \ 'CMakeUserPresets.json', 'Makefile', 'makefile', 'GNUmakefile', 'rules.mk', 'SConstruct']
       call assert_false(WorkspaceHasBuildFiles(), 'empty root before ' . s:marker)
       call writefile([''], s:root . '/' . s:marker)
       call assert_true(WorkspaceHasBuildFiles(), s:marker)
@@ -113,6 +132,25 @@ try
     call mkdir(s:root . '/Makefile')
     call writefile([''], s:root . '/src/CMakeLists.txt')
     call assert_false(WorkspaceHasBuildFiles(), 'only files directly in the root')
+
+    " Keep exact names and suffix matching, including with 'nomagic'.
+    let s:saved_magic = &magic
+    try
+      for [s:magic, s:marker, s:want] in [
+            \ [1, 'notMakefile', 0], [1, 'MAKEFILE', 0],
+            \ [1, 'CMakeListsXtxt', 0], [1, 'rules.mk.backup', 0],
+            \ [1, '.hidden.mk', 1], [1, 'app.pro', 1],
+            \ [0, 'rulesXmk', 0], [0, 'rules.mk', 1],
+            \ [0, 'CMakeListsXtxt', 0], [0, 'CMakeLists.txt', 1]]
+        let &magic = s:magic
+        call writefile([''], s:root . '/' . s:marker)
+        call assert_equal(s:want, WorkspaceHasBuildFiles(s:root),
+              \ 'build marker ' . s:marker . ' with magic=' . s:magic)
+        call delete(s:root . '/' . s:marker)
+      endfor
+    finally
+      let &magic = s:saved_magic
+    endtry
 
     " An already resolved root must be checked independently of the active workspace.
     let s:explicit_root = s:root
@@ -127,6 +165,7 @@ try
           \ ['cmake project', 'CMakeLists.txt', 0, v:true],
           \ ['qmake', 'app.pro', 0, v:true],
           \ ['make', 'Makefile', 0, v:true],
+          \ ['scons', 'SConstruct', 0, v:true],
           \ ['vscode', '', 1, v:false]]
       let s:root = s:OpenWorkspace(s:name)
       if !empty(s:marker)
