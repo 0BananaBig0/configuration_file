@@ -1355,7 +1355,7 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! WorkspaceHasBuildFiles(root=WorkspaceRoot()) abort
     let l:build_files = ['CMakeLists.txt', 'CMakePresets.json', 'CMakeUserPresets.json',
-          \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache']
+          \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache', 'SConstruct']
     let l:names = readdir(a:root)
     " Scan names in native code; keep exact names literal and case-sensitive.
     let l:pattern = '\C\.\%(pro\|pri\|cmake\|mk\)$'
@@ -1576,8 +1576,7 @@ function! ConfigureManualLoadPlugin()
   function! QuitVimspectorWins()
     for l:window in ['disassembly', 'terminal']
       let l:winid = get(get(g:, 'vimspector_session_windows', {}), l:window, 0)
-      if win_id2win(l:winid) > 0
-        call win_gotoid(l:winid)
+      if l:winid > 0 && win_gotoid(l:winid)
         quit!
       endif
     endfor
@@ -2057,7 +2056,7 @@ function! SetGeneralKeyMaps()
         return l:cmakelist_path.' -S . -B build'
             \ .' && bear --append -- make -C build -j12'
       endif
-      if !empty(glob(l:possible_path.'/*.pro', 0, 1))
+      if !empty(glob(fnameescape(l:possible_path).'/*.pro', 0, 1))
         return ' cd '.shellescape(l:possible_path, 1).' && qmake -o build/Makefile'
             \ .' && bear --append -- make -C build -j12'
       endif
@@ -2073,7 +2072,18 @@ function! SetGeneralKeyMaps()
           \ .shellescape(expand('%:t:r').'.exe', 1)
     elseif &filetype=='verilog' || &filetype=='systemverilog'
       let l:output_file = shellescape(expand('%:t:r').'.out', 1)
-      return ' cd '.shellescape(l:cur_file_path, 1).' && iverilog *.v -o '.l:output_file.' && vvp '.l:output_file
+      let l:compiler = 'iverilog *.v'
+      if &filetype=='systemverilog'
+        let l:source_files = readdir(l:cur_file_path,
+              \ {name -> name !~# '^\.' && name =~# '\.\%(v\|sv\)$'})
+        " AsyncRun saves a new buffer after this command is constructed.
+        if index(l:source_files, expand('%:t')) < 0
+          call add(l:source_files, expand('%:t'))
+        endif
+        let l:compiler = 'iverilog -g2012 '.join(map(l:source_files,
+              \ {_, name -> shellescape(l:cur_file_path.'/'.name, 1)}), ' ')
+      endif
+      return ' cd '.shellescape(l:cur_file_path, 1).' && '.l:compiler.' -o '.l:output_file.' && vvp '.l:output_file
     endif
     let l:compile_single_file = ' -fsanitize=address,undefined,leak -g -pedantic-errors'
           \ .' -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow '
@@ -2090,7 +2100,7 @@ function! SetGeneralKeyMaps()
       if !empty(l:interpreter) && (&filetype != 'python'
             \ || (expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'))
         exec l:compile_exec.' /usr/bin/env '.l:interpreter.' '.l:source_file
-      elseif &filetype=='verilog'
+      elseif &filetype=='verilog' || &filetype=='systemverilog'
         exec l:compile_exec.CPPCompilation().' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
       elseif &filetype=='markdown'
         CocCommand markdown-preview-enhanced.openPreview
@@ -2129,7 +2139,7 @@ function! SetGeneralKeyMaps()
   endif
   function! CompileCommand()
     let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
-    if &filetype=='verilog'
+    if &filetype=='verilog' || &filetype=='systemverilog'
         exec l:compile_only.CPPCompilation()
     elseif s:IsAuxiliaryBuffer()
       if JumpToTheMainWin()
