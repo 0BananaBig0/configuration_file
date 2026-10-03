@@ -2217,9 +2217,9 @@ function! SetGeneralKeyMaps()
     " 1. 获取当前光标所在位置的行数
     let l:cur_line = line('.')
     let l:new_line = l:cur_line + 1
-    " 2. 获取 `l:cur_line` 中的缩进空格数，并生成 n 个空格
-    let l:cur_indent_count = indent(l:cur_line)
-    let l:cur_indent = repeat(' ', l:cur_indent_count)
+    " 2. 保留 noexpandtab 下的原始缩进，expandtab 下使用空格
+    let l:cur_indent = &expandtab ? repeat(' ', indent(l:cur_line))
+          \ : matchstr(getline(l:cur_line), '^\s*')
     " 3. 进入插入模式，输入回车，然后返回正常模式
     " feedkeys() is an asynchronous function that causes some issues.
     " call feedkeys("i\<CR>\<ESC>", 'n')
@@ -2231,7 +2231,7 @@ function! SetGeneralKeyMaps()
     " 4. 如果 `l:new_line` 行为空或只有空格, 给 `l:new_line` 行插入 `l:cur_indent`
     if getline(l:new_line) =~? '^\s*$'
       call setline(l:new_line, l:cur_indent)
-      let l:new_column = l:cur_indent_count + 1
+      let l:new_column = strlen(l:cur_indent) + 1
     endif
     " 5. 如果 `l:cur_line` 行为空或只有空格，则清除 `l:cur_line` 行的空格
     if getline(l:cur_line) =~? '^\s*$'
@@ -2243,8 +2243,8 @@ function! SetGeneralKeyMaps()
   function! EnterWithoutTraillingComment()
     let l:cur_line = line('.')
     let l:new_line = l:cur_line + 1
-    let l:cur_indent_count = indent(l:cur_line)
-    let l:cur_indent = repeat(" ", l:cur_indent_count)
+    let l:cur_indent = &expandtab ? repeat(' ', indent(l:cur_line))
+          \ : matchstr(getline(l:cur_line), '^\s*')
     let l:paste = &paste
     try
       set paste
@@ -2253,7 +2253,7 @@ function! SetGeneralKeyMaps()
       let &paste = l:paste
     endtry
     call setline(l:new_line, l:cur_indent.getline(l:new_line))
-    call setpos('.', [0, l:new_line, l:cur_indent_count + 1, 0])
+    call setpos('.', [0, l:new_line, strlen(l:cur_indent) + 1, 0])
   endfunction
   " Ctrl-Alt/Shift-Enter新建空行
   noremap <C-M-CR> :<C-u>put _<CR>

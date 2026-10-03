@@ -121,6 +121,32 @@ function! s:LocalOptions() abort
   set nopaste
 endfunction
 
+function! s:EnterIndentation() abort
+  " Catch tabs becoming spaces and display columns being used as byte columns.
+  let l:path = s:fixtures . '/Makefile'
+  for l:helper in ['InsertEnterInNormalMode', 'EnterWithoutTraillingComment']
+    for [l:prefix, l:expandtab, l:expected] in [
+          \ ["\t", 0, "\t"], ["\t  ", 0, "\t  "],
+          \ ['    ', 1, '    '], ["\t", 1, '    ']]
+      call writefile(['all:', l:prefix . '@echo one'], l:path)
+      execute 'edit! ' . fnameescape(l:path)
+      let &l:expandtab = l:expandtab
+      call cursor(2, strlen(getline(2)) + 1)
+      call call(function(l:helper), [])
+      call assert_equal(l:expected, getline(3), l:helper . ' preserves indentation policy')
+      call assert_equal(strlen(l:expected) + 1, col('.'), l:helper . ' cursor follows indentation')
+      normal! i@echo two
+      call assert_equal(l:expected . '@echo two', getline(3), l:helper . ' inserts after indentation')
+      if !l:expandtab && executable('make')
+        write
+        let l:output = system('make -n -f ' . shellescape(l:path))
+        call assert_equal(0, v:shell_error, l:helper . ' keeps valid Make recipes: ' . l:output)
+        call assert_equal("echo one\necho two\n", l:output)
+      endif
+    endfor
+  endfor
+endfunction
+
 function! s:HeaderWidth() abort
   " Catch presentation mode and hidden column guides breaking file headers.
   let l:saved = &colorcolumn
@@ -320,7 +346,7 @@ endfunction
 
 try
   for s:check in ['ManualConfigurationReload', 'FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
-        \ 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
+        \ 'EnterIndentation', 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
         \ 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
     try
       call call(function('s:' . s:check), [])
