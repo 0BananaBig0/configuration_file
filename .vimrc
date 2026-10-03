@@ -169,13 +169,13 @@ function! ConfigureDelayedPlugin()
       normal! ggdd`s
     endfunction
     function! UpdateMarkdownMenu()
-      let l:previous_column = col('.')
-      let l:previous_line = line('.')
-      let l:previous_total_line_count = line('$')
+      normal! ms
       call LoadMarkdownToc(':UpdateToc')
       UpdateToc
-      let l:new_line = l:previous_line + (line('$') - l:previous_total_line_count)
-      call setpos('.', [0, l:new_line, l:previous_column, 0])
+      " A mark inside the replaced TOC may have been deleted.
+      if line("'s") > 0
+        normal! `s
+      endif
     endfunction
   endfunction
 
