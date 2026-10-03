@@ -255,6 +255,31 @@ function! s:SourceWindow() abort
   call CompileAndExcute()
 endfunction
 
+function! s:InitializeDirectoriesPreservesWindow() abort
+  let l:windows = []
+  for l:name in ['first', 'second']
+    let l:root = s:fixtures . '/' . l:name
+    call mkdir(l:root . '/.git', 'p')
+    call writefile(['text'], l:root . '/main.txt')
+    execute 'tabedit ' . fnameescape(l:root . '/main.txt')
+    call add(l:windows, [win_getid(), l:root])
+    belowright split
+    call add(l:windows, [win_getid(), l:root])
+  endfor
+  call win_gotoid(l:windows[0][0])
+  call InitializeCwdForEachTab()
+  call assert_equal(l:windows[0][0], win_getid(), 'directory initialization restores the original split and tab')
+  for [l:winid, l:root] in l:windows
+    let [l:tabnr, l:winnr] = win_id2tabwin(l:winid)
+    call assert_equal(l:root, getcwd(l:winnr, l:tabnr), 'each source window gets its workspace directory')
+  endfor
+  belowright new
+  setlocal buftype=nofile
+  let l:aux = win_getid()
+  call InitializeCwdForEachTab()
+  call assert_equal(l:aux, win_getid(), 'directory initialization restores auxiliary-window focus')
+endfunction
+
 function! s:LiteralRootMarkers() abort
   " Catch treating bracket characters in directory names as glob patterns.
   let l:root = s:fixtures . '/project [one]'
@@ -378,7 +403,7 @@ endfunction
 try
   for s:check in ['ManualConfigurationReload', 'FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
         \ 'EnterIndentation', 'AltEnterIndentation', 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
-        \ 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
+        \ 'InitializeDirectoriesPreservesWindow', 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
     try
       call call(function('s:' . s:check), [])
     catch

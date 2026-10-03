@@ -2455,11 +2455,12 @@ function! SetGeneralKeyMaps()
     endfor
   endfunction
   function! InitializeCwdForEachTab()
-    let l:current_tab = tabpagenr()
-    tabdo windo silent! call EnterIntoWorkspaceOrFilePath()
-    if l:current_tab != tabpagenr()
-      execute "tabn " . l:current_tab
-    endif
+    let l:current_winid = win_getid()
+    try
+      tabdo windo silent! call EnterIntoWorkspaceOrFilePath()
+    finally
+      call win_gotoid(l:current_winid)
+    endtry
   endfunction
   function! SetZshIfExists()
     let l:zsh = exepath('zsh')
