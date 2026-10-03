@@ -1954,6 +1954,10 @@ function! SetTitle()
   endif
   call append('$', '')
   call setpos('.', [0, line('$'), 0, 0])
+  " plug#load 在重载时会 doautocmd BufRead，触发 /etc/vimrc 的 BufReadPost 钩子
+  " normal! g`" 跳到 '" 位置（新文件时是第 1 行），光标被拽离末行；
+  " 把 '" 标记一并设到末行，跳转后光标仍停在最后一行
+  call setpos("'\"", [0, line('$'), 0, 0])
 endfunction
 augroup Local_Autocmd_Group
   autocmd!

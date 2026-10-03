@@ -222,6 +222,8 @@ function! s:HeaderFileKinds() abort
             \ l:name . ' keeps generated includes and header guard')
     endif
     call assert_equal('', getline('$'), l:name . ' keeps final blank line')
+    call assert_equal(line('$'), line('.'), l:name . ' leaves the cursor on the last line')
+    call assert_equal(line('$'), line("'\""), l:name . ' pins the restart mark to the last line')
   endfor
 endfunction
 
