@@ -986,6 +986,10 @@ function! ConfigureManualLoadPlugin()
     endfor
     return l:rows
   endfunction
+  function! s:QuickuiSearchInstructions() abort
+    return 'Search '.g:quickui_cheatsheet_search_direction
+          \ .g:quickui_cheatsheet_search_input.'_   Enter: search   Esc: cancel'
+  endfunction
   function! QuickuiBuildKeyMapCheatsheet()
     let l:window_width = min([180, max([40, &columns - 8])])
     let l:lines = QuickuiCheatsheetCategoryRows(l:window_width)
@@ -998,8 +1002,7 @@ function! ConfigureManualLoadPlugin()
       endif
     endfor
     if get(g:, 'quickui_cheatsheet_search_active', 0)
-      let l:instructions = 'Search '.g:quickui_cheatsheet_search_direction
-            \ .g:quickui_cheatsheet_search_input.'_   Enter: search   Esc: cancel'
+      let l:instructions = s:QuickuiSearchInstructions()
       let l:instructions_second_line = ''
     else
       let l:instructions = '1-9/a-f/i/m/o/p: fold   z/r: fold/unfold all   gg/G: top/bottom   /?: search   n/N: next/prev'
@@ -1009,7 +1012,18 @@ function! ConfigureManualLoadPlugin()
           \ QuickuiCheatsheetTruncate(l:instructions_second_line, l:window_width), ''] + l:lines,
           \ l:window_width]
   endfunction
-  function! QuickuiRefreshKeyMapCheatsheet(winid)
+  function! QuickuiRefreshKeyMapCheatsheet(winid, prompt_only=0)
+    if a:prompt_only
+      let l:window_width = min([180, max([40, &columns - 8])])
+      let l:buffer = winbufnr(a:winid)
+      let l:window_height = min([max([6, &lines - 6]), getbufinfo(l:buffer)[0].linecount])
+      let l:options = popup_getoptions(a:winid)
+      if l:options.minwidth == l:window_width && l:options.minheight == l:window_height
+        call setbufline(l:buffer, 1,
+              \ QuickuiCheatsheetTruncate(s:QuickuiSearchInstructions(), l:window_width))
+        return
+      endif
+    endif
     let [l:lines, l:window_width] = QuickuiBuildKeyMapCheatsheet()
     call popup_settext(a:winid, l:lines)
     let l:window_height = min([max([6, &lines - 6]), len(l:lines)])
@@ -1063,10 +1077,10 @@ function! ConfigureManualLoadPlugin()
         let g:quickui_cheatsheet_search_input = strcharpart(
               \ g:quickui_cheatsheet_search_input, 0,
               \ strchars(g:quickui_cheatsheet_search_input) - 1)
-        call QuickuiRefreshKeyMapCheatsheet(a:winid)
+        call QuickuiRefreshKeyMapCheatsheet(a:winid, 1)
       elseif a:key =~# '^[[:print:]]$'
         let g:quickui_cheatsheet_search_input .= a:key
-        call QuickuiRefreshKeyMapCheatsheet(a:winid)
+        call QuickuiRefreshKeyMapCheatsheet(a:winid, 1)
       endif
       return 1
     endif
@@ -1972,29 +1986,27 @@ function! SetGeneralKeyMaps()
     endif
     echo l:nearest_name
   endfunction
-  function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword)
+  function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword, label_from_declaration=0)
     let l:block_name = getline('.')
     if l:block_name !~ a:name_keyword
       let l:block_name = getline(search(a:name_keyword, 'bcnWz'))
     endif
+    let l:show_name = a:label_from_declaration
+          \ ? get(matchlist(l:block_name, '^\s*\(\S\+\)'), 1, a:show_name) : a:show_name
     let l:block_end_position = strridx(l:block_name, a:end_keyword)
     if(l:block_end_position > 0)
       let l:block_name = strpart(l:block_name, 0, l:block_end_position)
     endif
-    let l:block_name = strpart(l:block_name, stridx(l:block_name, a:show_name) + len(a:show_name) + 1)
+    let l:block_name = strpart(l:block_name, stridx(l:block_name, l:show_name) + len(l:show_name) + 1)
     let l:block_name = trim(l:block_name, ' ', 1)
-    echo a:show_name '-->' l:block_name
+    echo l:show_name '-->' l:block_name
   endfunction
   function! ShowCurrentFuncCodeBlockName()
     let l:end_keyword = '{'
     if &filetype=='tcl'
-      if expand('%:e')=='tcl'
-        let l:name_keyword = 'proc\s\+.\+\s*{'
-        let l:show_name = 'proc'
-      else
-        let l:name_keyword = '^iProc\s\+.\+\s*{'
-        let l:show_name = 'iProc'
-      endif
+      let l:name_keyword = '^\s*\%(proc\|iProc\)\s\+.\+\s*{'
+      " Keep the previous label as a fallback when no declaration is found.
+      let l:show_name = expand('%:e')=='tcl' ? 'proc' : 'iProc'
     elseif &filetype=='perl'
         let l:name_keyword = 'sub\s\+.\+\s*{'
         let l:show_name = 'sub'
@@ -2013,9 +2025,9 @@ function! SetGeneralKeyMaps()
     else
       let l:name_keyword = '^module\s\+.\+\s*(\|^Module\s\+.\+\s*{'
       let l:show_name = 'module'
-      let l:end_keyword = &filetype=='verilog' ? '(' : '{'
+      let l:end_keyword = (&filetype=='verilog' || &filetype=='systemverilog') ? '(' : '{'
     endif
-    call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
+    call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword, &filetype=='tcl')
   endfunction
   function! ShowCurrentNoneFuncCodeBlockName()
     let l:end_keyword = '{'
@@ -2035,7 +2047,7 @@ function! SetGeneralKeyMaps()
   function! CallShowNearestFunction()
     if &filetype=='cpp' || &filetype=='c'
        call ShowNearestClassOrStruct()
-    elseif &filetype=='verilog' || expand('%:e')=='icl' || &filetype=='tcl'
+    elseif &filetype=='verilog' || &filetype=='systemverilog' || expand('%:e')=='icl' || &filetype=='tcl'
           \ || &filetype=='perl' || &filetype=='python' || &filetype=='make'
           \ || &filetype=='vim'
        call ShowCurrentFuncCodeBlockName()
