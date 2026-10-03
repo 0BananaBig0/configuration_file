@@ -849,6 +849,10 @@ function! ConfigureDelayedPlugin()
     endif
   endfunction
   function! ToggleTerminal(height = 18)
+    if tabpagenr('$') == 1 && winnr('$') == 1 && &buftype ==# 'terminal'
+      call QuitWin()
+      return
+    endif
     " Step 1: Check if there is a terminal window visible in the current tab
     let l:terminal_shown = 0
     let l:cur_tab = tabpagenr()
@@ -862,7 +866,11 @@ function! ConfigureDelayedPlugin()
         endif
         " Switch to the terminal window to hide it
         call win_gotoid(l:win['winid'])
-        hide
+        if winnr('$') == 1
+          hide enew
+        else
+          hide
+        endif
       endif
     endfor
     " Step 2: If no terminal window is visible, check for a hidden terminal buffer

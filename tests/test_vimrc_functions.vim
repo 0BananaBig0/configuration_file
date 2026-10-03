@@ -57,6 +57,49 @@ function! s:TerminalTabs() abort
   call assert_false(bufexists(l:closed), 'closing a tab terminates its tracked terminal')
 endfunction
 
+function! s:SoleTerminalWindow() abort
+  " The last-window case must exit a child Vim, not the test runner.
+  let l:child = s:fixtures . '/toggle-last-terminal.vim'
+  call writefile([
+        \ 'source ' . fnameescape(s:vimrc),
+        \ 'call timer_stopall()',
+        \ 'call SetGeneralKeyMaps()',
+        \ 'call ConfigureDelayedPlugin()',
+        \ 'set noconfirm',
+        \ 'let t:term_buf = term_start("/bin/sh", {"curwin": 1, "term_kill": "term"})',
+        \ 'call ToggleTerminal()',
+        \ 'cquit 7',
+        \ ], l:child)
+  call system(join(map([exepath('vim'), '-Nu', 'NONE', '-n', '-i', 'NONE', '-es', '-S', l:child], 'shellescape(v:val)'), ' '))
+  call assert_equal(0, v:shell_error, 'F8 exits when its terminal is the only window in Vim')
+
+  let l:hidden = &hidden
+  try
+    set nohidden
+    enew!
+    let l:terminal = term_start('/bin/sh', {'curwin': 1, 'term_kill': 'term'})
+    let t:term_buf = l:terminal
+    let l:owner = tabpagenr()
+    call NewTab()
+    let l:other_terminal = bufnr()
+    tabprevious
+    call ToggleTerminal()
+    call assert_equal(l:owner, tabpagenr(), 'hiding a sole terminal stays in its tab')
+    call assert_equal(2, tabpagenr('$'), 'hiding keeps the tab open')
+    call assert_equal('', &buftype, 'an empty editing buffer replaces the terminal')
+    call assert_equal([''], getline(1, '$'))
+    call assert_equal(l:terminal, get(t:, 'term_buf', -1), 'terminal tracking stays in its owner tab')
+    call assert_equal([], win_findbuf(l:terminal), 'terminal buffer is hidden')
+    call assert_equal('run', job_status(term_getjob(l:terminal)), 'hidden terminal job keeps running')
+    call assert_equal(l:other_terminal, gettabvar(2, 'term_buf'), 'other tab keeps its own terminal')
+    call ToggleTerminal()
+    call assert_equal(l:terminal, bufnr(), 'next toggle reopens the same terminal')
+    call assert_equal(2, winnr('$'), 'terminal reopens as a split')
+  finally
+    let &hidden = l:hidden
+  endtry
+endfunction
+
 function! s:QuitPreservesSource() abort
   " Use a child Vim because the old QuitWin exits after discarding the buffer.
   let l:child = s:fixtures . '/quit.vim'
@@ -958,7 +1001,7 @@ function! s:SystemVerilogBuild() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch

@@ -376,6 +376,42 @@ function! s:MarkdownMenu() abort
   call assert_equal('text', &l:filetype, 'TOC loading preserves other filetypes')
 endfunction
 
+function! s:MarkdownUpdatePosition() abort
+  for l:grow in [0, 1]
+    for l:where in ['above', 'below', 'inside']
+      enew!
+      setlocal filetype=markdown
+      call LoadMarkdownToc(':GenTocGFM')
+      call setline(1, ['Introduction', '', '## First', 'First body'])
+      if !l:grow
+        call append('$', ['## Second', 'Second body'])
+      endif
+      call cursor(2, 1)
+      GenTocGFM
+      if l:grow
+        call append('$', ['## Second', 'Second body'])
+      else
+        call cursor(1, 1)
+        call search('^## Second$', 'W')
+        silent .,$delete _
+      endif
+      call cursor(1, 3)
+      if l:where !=# 'above'
+        call search(l:where ==# 'below' ? '^First body$' : '^- \[First\]', 'W')
+        call cursor(line('.'), 3)
+      endif
+      let l:text = getline('.')
+      call UpdateMarkdownMenu()
+      if l:where !=# 'inside'
+        call assert_equal(l:text, getline('.'), 'TOC update keeps the source line ' . l:where)
+        call assert_equal(3, col('.'), 'TOC update keeps the source column ' . l:where)
+      endif
+      call assert_equal(l:grow, index(getline(1, '$'), '- [Second](#second)') >= 0,
+            \ 'TOC update adds or removes the heading link')
+    endfor
+  endfor
+endfunction
+
 function! s:ShortcutHelp() abort
   " Keep each plugin's own shortcut descriptions and hierarchy.
   call assert_equal('Generate parameters', g:leader_key_map.a.p.p)
@@ -403,7 +439,7 @@ endfunction
 try
   for s:check in ['ManualConfigurationReload', 'FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
         \ 'EnterIndentation', 'AltEnterIndentation', 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
-        \ 'InitializeDirectoriesPreservesWindow', 'VimVisualNavigation', 'MarkdownMenu', 'ShortcutHelp']
+        \ 'InitializeDirectoriesPreservesWindow', 'VimVisualNavigation', 'MarkdownMenu', 'MarkdownUpdatePosition', 'ShortcutHelp']
     try
       call call(function('s:' . s:check), [])
     catch
