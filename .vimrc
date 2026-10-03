@@ -2511,6 +2511,8 @@ function! CocTimerStart(timer)
   endif
   call SetZshIfExists()
 endfunction
-if !exists('s:coc_timer_id')
-  let s:coc_timer_id = timer_start(333,'CocTimerStart',{'repeat':1})
+" 重载 .vimrc 时先停掉旧定时器，避免叠加；新定义在 333ms 后生效
+if exists('s:coc_timer_id')
+  call timer_stop(s:coc_timer_id)
 endif
+let s:coc_timer_id = timer_start(333,'CocTimerStart',{'repeat':1})
