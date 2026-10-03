@@ -269,7 +269,7 @@ function! s:DebuggerLaunch() abort
     let &l:filetype = l:filetype
     let g:launch_settings = []
     call LaunchVimspector()
-    call assert_equal(empty(l:want) ? [] : [{'configuration': l:want, 'Test': l:want}],
+    call assert_equal(empty(l:want) ? [] : [{'configuration': l:want}],
           \ g:launch_settings, l:filetype . ' launches the selected debug configuration once')
   endfor
   unlet g:launch_settings

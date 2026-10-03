@@ -704,7 +704,6 @@ function! ConfigureDelayedPlugin()
   let g:NERDCompactSexyComs        = 1      " 紧凑排布多行注释
   let g:NERDToggleCheckAllLines    = 1      " 检查选中项是否有没被注释的项，有则全部注释
   let g:NERDDefaultAlign           = 'left' " 逐行注释左对齐
-  let g:NERDCommentEmptyLines      = 0      " 允许空行注释
   let g:NERDTrimTrailingWhitespace = 1      " 取消注释时删除行尾空格
   let g:NERDCustomDelimiters = {
           \ 'c': {'left': '//'},
@@ -729,15 +728,7 @@ function! ConfigureDelayedPlugin()
   " 2. 全局开关（在 Matchup 加载前设，插件读取这些变量初始化）
   " --------------------------------------------------------------------------
   let g:matchup_enabled = 1                " 总开关
-  let g:matchup_motion_enabled = 1        " [% ]% g% 等，便宜，开着
-  let g:matchup_text_obj_enabled = 1       " i% a%，便宜，开着
   let g:matchup_surround_enabled = 1       " ds% cs%，可选
-  silent! nunmap [%
-  silent! xunmap [%
-  silent! ounmap [%
-  silent! nunmap ]%
-  silent! xunmap ]%
-  silent! ounmap ]%
   nmap <silent> <LocalLeader>kd <Plug>(matchup-[%)
   xmap <silent> <LocalLeader>kd <Plug>(matchup-[%)
   omap <silent> <LocalLeader>kd <Plug>(matchup-[%)
@@ -750,15 +741,11 @@ function! ConfigureDelayedPlugin()
   let g:matchup_matchparen_deferred_show_delay = 60   " 光标停 60ms 后出高亮
   let g:matchup_matchparen_deferred_hide_delay = 600  " 移走 600ms 后消高亮
   let g:matchup_matchparen_timeout = 160   " ★ 从默认 300 压到 160ms，超时放弃不重算
-  let g:matchup_matchparen_insert_timeout = 60        " 插入模式不变
   let g:matchup_matchparen_stopline = 600   " ★ 高亮搜索上下各最多 600 行
-  let g:matchup_matchparen_singleton = 0   " 没配对的不单高亮，省一次 match
   " --- 分隔符引擎（影响 motion/text-obj 速度）---
-  let g:matchup_delim_stopline = 1500      " motions 上下各搜 1500 行，默认 1500 可不改
   let g:matchup_delim_noskips = 1          " ★ 不在 comment/string 里做 keyword 匹配，C++ 大文件省不少
   " --- 不需要的功能关掉 ---
   let g:matchup_mouse_enabled = 0          " 你没鼠标需求就关
-  let g:matchup_transmute_enabled = 0      " 实验性的，关
   let g:matchup_matchparen_offscreen = {
         \ 'method':    'popup',
         \ 'fullwidth': 1,
@@ -832,7 +819,7 @@ function! ConfigureDelayedPlugin()
   function! JumpToTerm(go_to_top = 0, height = 18)
     let l:target_buf = -1
     let l:target_win = -1
-    for l:win in getwininfo()
+    for l:win in map(gettabinfo(tabpagenr())[0].windows, {_, id -> getwininfo(id)[0]})
       if l:win['terminal'] == 1 && l:win['bufnr'] > l:target_buf
         let l:target_buf = l:win['bufnr']
         let l:target_win = l:win['winid']
@@ -1240,7 +1227,6 @@ function! ConfigureManualLoadPlugin()
   " Vista setting
   noremap <Leader>vt :<C-u>Vista!!<CR>
   noremap <Leader>vf :<C-u>Vista focus<CR>
-  let g:vista_no_mappings = 0
   let g:vista_default_executive = 'coc'
   let g:vista#renderer#enable_icon = 1
   let g:vista_close_on_jump = 1
@@ -1661,7 +1647,7 @@ function! ConfigureManualLoadPlugin()
     else
       return
     endif
-    call vimspector#LaunchWithSettings(#{configuration: l:configuration, Test: l:configuration})
+    call vimspector#LaunchWithSettings(#{configuration: l:configuration})
   endfunction
   function! AddVarToWatch(selection)
     call vimspector#AddWatch(a:selection)
@@ -1857,7 +1843,7 @@ set selectmode=key
 " 通过使用: commands命令，告诉我们文件的哪一行被改变过
 set report=0
 " 在被分割的窗口间显示空白，便于阅读
-set fillchars=vert:\ ,stl:\ ,stlnc:\
+set fillchars=vert:\ ,stl:\ ,stlnc:\ " 空出 vert/stl/stlnc 字符（行尾反斜杠会被当成值）
 " 光标移动到buffer的顶部和底部时保持3行距离
 set scrolloff=3
 " 设置搜索可以循环搜索, 搜索和补全时忽略大小写,智能大小写,逐字符高亮
@@ -1882,14 +1868,12 @@ function! SetIndent()
   let &l:softtabstop = l:indent_val  " 按下Tab键时输入的宽度
   let &l:shiftwidth = l:indent_val   " 设置自动缩进时的缩进长度
 endfunction
-function! AppendInfo(info, column_limit)
-  let l:padding_str_len = 3
-  let l:padding_str = strpart(&commentstring, 0, 2)
-      \ .repeat(&commentstring[0], l:padding_str_len - 2)
-  let l:available = a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2
+function! AppendInfo(info, column_limit, left_pad, right_pad = '')
+  let l:available = a:column_limit - strdisplaywidth(a:info)
+        \ - strdisplaywidth(a:left_pad) - strdisplaywidth(a:right_pad)
   let l:start_space_len = l:available / 2
   let l:end_space_len = l:available - l:start_space_len
-  call append('$', l:padding_str.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).l:padding_str)
+  call append('$', a:left_pad.repeat(' ', l:start_space_len).a:info.repeat(' ', l:end_space_len).a:right_pad)
 endfunction
 function! SetTitle()
   let l:extension = expand('%:e')
@@ -1897,9 +1881,20 @@ function! SetTitle()
       \ || l:extension=='cu' || l:extension=='qml'
     setlocal commentstring=//\ %s
   endif
-  if empty(&commentstring) || empty(&filetype) || (strlen(&commentstring) > 3
-      \ && &commentstring[0] != &commentstring[1] && &commentstring[1] != ' ')
+  let l:cs = &commentstring
+  let l:fmt_pos = stridx(l:cs, '%s')
+  if empty(l:cs) || empty(&filetype) || l:fmt_pos < 0
     return
+  endif
+  let l:left = trim(strpart(l:cs, 0, l:fmt_pos))
+  let l:right = trim(strpart(l:cs, l:fmt_pos + 2))
+  let l:box = !empty(l:right)
+  if l:box
+    let l:left_pad = l:left . ' '
+    let l:right_pad = ' ' . l:right
+  else
+    let l:left_pad = strpart(l:cs, 0, 2) . l:cs[0]
+    let l:right_pad = l:left_pad
   endif
   if &filetype=='sh'
     call setline(1, '#!/usr/bin/env bash')
@@ -1912,15 +1907,21 @@ function! SetTitle()
   endif
   " Header width is independent of visible column guides and presentation mode.
   let l:column_limit = 80
-  let l:top_and_bottom = strpart(&commentstring, 0, 2)
-      \ .repeat(&commentstring[0], l:column_limit - 4)
-      \ .&commentstring[1].&commentstring[0]
+  if l:box
+    let l:top_and_bottom = l:left
+          \ .repeat(l:left[-1:], l:column_limit - strdisplaywidth(l:left) - strdisplaywidth(l:right))
+          \ .l:right
+  else
+    let l:top_and_bottom = strpart(l:cs, 0, 2)
+          \ .repeat(l:cs[0], l:column_limit - 4)
+          \ .l:cs[1].l:cs[0]
+  endif
   if &filetype=='sh' || &filetype=='csh' || &filetype=='perl' || &filetype=='tcl'
     call append('$', l:top_and_bottom)
   else
     call setline(1, l:top_and_bottom)
   endif
-  call AppendInfo('File Name: '.expand('%:t'), l:column_limit)
+  call AppendInfo('File Name: '.expand('%:t'), l:column_limit, l:left_pad, l:right_pad)
   let l:author = 'Huaxiao Liang'
   let l:email = 'hxliang666@qq.com'
   if exists('$GIT_AUTHOR_NAME')
@@ -1933,9 +1934,9 @@ function! SetTitle()
   elseif exists('$LOG_NAME')
     let l:email = $LOG_NAME
   endif
-  call AppendInfo('Author: '.l:author, l:column_limit)
-  call AppendInfo('Mail: '.l:email, l:column_limit)
-  call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit)
+  call AppendInfo('Author: '.l:author, l:column_limit, l:left_pad, l:right_pad)
+  call AppendInfo('Mail: '.l:email, l:column_limit, l:left_pad, l:right_pad)
+  call AppendInfo(strftime('%m/%d/%Y-%a-%H:%M:%S'), l:column_limit, l:left_pad, l:right_pad)
   call append('$', [l:top_and_bottom, ''])
   if &filetype=='c'
     call append('$', '#include <stdio.h>')
@@ -2010,7 +2011,7 @@ function! SetGeneralKeyMaps()
       " Keep the previous label as a fallback when no declaration is found.
       let l:show_name = expand('%:e')=='tcl' ? 'proc' : 'iProc'
     elseif &filetype=='perl'
-        let l:name_keyword = 'sub\s\+.\+\s*{'
+        let l:name_keyword = '^\s*sub\s\+.\+\s*{'
         let l:show_name = 'sub'
     elseif &filetype=='python'
         let l:name_keyword = '^\s*\%(async\s\+\)\?def\s\+.\+(.*'
@@ -2021,7 +2022,7 @@ function! SetGeneralKeyMaps()
         let l:show_name = 'define'
         let l:end_keyword = '\n'
     elseif &filetype=='vim'
-        let l:name_keyword = 'function\s\+.\+(\|function!\s\+.\+('
+        let l:name_keyword = '^\s*function!\=\s\+.\+('
         let l:show_name = 'function'
         let l:end_keyword = '\n'
     else
@@ -2034,13 +2035,13 @@ function! SetGeneralKeyMaps()
   function! ShowCurrentNoneFuncCodeBlockName()
     let l:end_keyword = '{'
     if &filetype=='tcl'
-        let l:name_keyword = 'namespace\s\+eval.\+{'
+        let l:name_keyword = '^\s*namespace\s\+eval.\+{'
         let l:show_name = 'namespace eval'
     elseif &filetype=='perl'
-        let l:name_keyword = 'package\s\+.\+{'
+        let l:name_keyword = '^\s*package\s\+.\+{'
         let l:show_name = 'package'
     elseif &filetype=='python'
-        let l:name_keyword = 'class\s\+.\+:'
+        let l:name_keyword = '^\s*class\s\+.\+:'
         let l:show_name = 'class'
         let l:end_keyword = ':'
     endif
@@ -2510,4 +2511,6 @@ function! CocTimerStart(timer)
   endif
   call SetZshIfExists()
 endfunction
-call timer_start(333,'CocTimerStart',{'repeat':1})
+if !exists('s:coc_timer_id')
+  let s:coc_timer_id = timer_start(333,'CocTimerStart',{'repeat':1})
+endif
