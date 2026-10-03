@@ -692,7 +692,7 @@ function! ConfigureDelayedPlugin()
   endfunction
   " Highlight the symbol and its references when holding the cursor
   augroup Plugin_Configuration_Group | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
-  hi sym_hilight guifg='White' guibg='Black'
+  hi sym_hilight guifg='White' guibg='Black' " Used in coc_settings.json"
   function! GetSelectedContent()
     return join(getregion(getpos("'<"), getpos("'>"), {'type': visualmode()}), ' ')
   endfunction
