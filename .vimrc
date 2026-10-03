@@ -1341,9 +1341,10 @@ function! ConfigureManualLoadPlugin()
     return 0
   endfunction
   function! WorkspaceHasBuildFiles(root=WorkspaceRoot()) abort
+    let l:build_files = ['CMakeLists.txt', 'CMakePresets.json', 'CMakeUserPresets.json',
+          \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache']
     for l:name in readdir(a:root)
-      if (index(['CMakeLists.txt', 'CMakePresets.json', 'CMakeUserPresets.json',
-            \ 'Makefile', 'makefile', 'GNUmakefile', '.qmake.conf', '.qmake.cache'], l:name) >= 0
+      if (index(l:build_files, l:name) >= 0
             \ || l:name =~# '\.\%(pro\|pri\|cmake\|mk\)$')
             \ && filereadable(a:root . '/' . l:name)
         return 1
@@ -1556,16 +1557,13 @@ function! ConfigureManualLoadPlugin()
     call ReshapeVimspectorWins()
   endfunction
   function! QuitVimspectorWins()
-    if exists("g:vimspector_session_windows.disassembly")
-      \ && win_id2win(g:vimspector_session_windows.disassembly) > 0
-      call win_gotoid(g:vimspector_session_windows.disassembly)
-      quit!
-    endif
-    if exists("g:vimspector_session_windows.terminal")
-      \ && win_id2win(g:vimspector_session_windows.terminal) > 0
-      call win_gotoid(g:vimspector_session_windows.terminal)
-      quit!
-    endif
+    for l:window in ['disassembly', 'terminal']
+      if exists('g:vimspector_session_windows.' . l:window)
+            \ && win_id2win(g:vimspector_session_windows[l:window]) > 0
+        call win_gotoid(g:vimspector_session_windows[l:window])
+        quit!
+      endif
+    endfor
   endfunction
   function! RestartVimspector()
     call QuitVimspectorWins()
