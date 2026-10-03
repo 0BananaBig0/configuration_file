@@ -905,6 +905,11 @@ function! ConfigureManualLoadPlugin()
   function! QuickuiInstallKeyMapMenus()
     let g:quickui_keymap_groups = s:ShortcutGroups()
   endfunction
+  function! s:QuickuiFoldAllGroups()
+    for l:group in g:quickui_keymap_groups
+      let g:quickui_cheatsheet_folded[l:group[0]] = 1
+    endfor
+  endfunction
   function! QuickuiCheatsheetTruncate(text, width)
     if a:width <= 0
       return ''
@@ -1079,9 +1084,7 @@ function! ConfigureManualLoadPlugin()
       call QuickuiRefreshKeyMapCheatsheet(a:winid)
       return 1
     elseif a:key ==# 'z'
-      for l:group in g:quickui_keymap_groups
-        let g:quickui_cheatsheet_folded[l:group[0]] = 1
-      endfor
+      call s:QuickuiFoldAllGroups()
       call QuickuiRefreshKeyMapCheatsheet(a:winid)
       return 1
     elseif a:key ==# 'r'
@@ -1120,9 +1123,7 @@ function! ConfigureManualLoadPlugin()
     endif
     let g:quickui_cheatsheet_toggle_keys = split('123456789abcdefimop', '\zs')
     let g:quickui_cheatsheet_folded = {}
-    for l:group in g:quickui_keymap_groups
-      let g:quickui_cheatsheet_folded[l:group[0]] = 1
-    endfor
+    call s:QuickuiFoldAllGroups()
     let g:quickui_cheatsheet_search_active = 0
     let g:quickui_cheatsheet_pending_g = 0
     unlet! g:quickui_cheatsheet_search_pattern g:quickui_cheatsheet_search_direction
@@ -1700,7 +1701,10 @@ function! ConfigureManualLoadPlugin()
   function! StopAllThreads()
     call s:VimspectorCommand('thread apply all stop')
   endfunction
-  augroup Plugin_Configuration_Group | autocmd User VimspectorTerminalOpened call s:SetUpTerminal() | augroup END
+  augroup Plugin_Configuration_Group
+    autocmd! User VimspectorTerminalOpened
+    autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
+  augroup END
 
 
 
@@ -1848,7 +1852,7 @@ function! SetIndent()
 endfunction
 function! AppendInfo(info, column_limit)
   let l:padding_str_len = 3
-  let l:padding_str = &commentstring[0].&commentstring[1]
+  let l:padding_str = strpart(&commentstring, 0, 2)
       \ .repeat(&commentstring[0], l:padding_str_len - 2)
   let l:available = a:column_limit - strdisplaywidth(a:info) - l:padding_str_len * 2
   let l:start_space_len = l:available / 2
@@ -1876,7 +1880,7 @@ function! SetTitle()
   endif
   " Header width is independent of visible column guides and presentation mode.
   let l:column_limit = 80
-  let l:top_and_bottom = &commentstring[0].&commentstring[1]
+  let l:top_and_bottom = strpart(&commentstring, 0, 2)
       \ .repeat(&commentstring[0], l:column_limit - 4)
       \ .&commentstring[1].&commentstring[0]
   if &filetype=='sh' || &filetype=='csh' || &filetype=='perl' || &filetype=='tcl'
@@ -1963,6 +1967,7 @@ function! SetGeneralKeyMaps()
     echo a:show_name '-->' l:block_name
   endfunction
   function! ShowCurrentFuncCodeBlockName()
+    let l:end_keyword = '{'
     if &filetype=='tcl'
       if expand('%:e')=='tcl'
         let l:name_keyword = 'proc\s\+.\+\s*{'
@@ -1977,28 +1982,24 @@ function! SetGeneralKeyMaps()
     elseif &filetype=='python'
         let l:name_keyword = 'def\s\+.\+(.*'
         let l:show_name = 'def'
+        let l:end_keyword = ':'
     elseif &filetype=='make'
         let l:name_keyword = '^define\s\+.\+'
         let l:show_name = 'define'
+        let l:end_keyword = '\n'
     elseif &filetype=='vim'
         let l:name_keyword = 'function\s\+.\+(\|function!\s\+.\+('
         let l:show_name = 'function'
+        let l:end_keyword = '\n'
     else
       let l:name_keyword = '^module\s\+.\+\s*(\|^Module\s\+.\+\s*{'
       let l:show_name = 'module'
-    endif
-    if &filetype=='verilog'
-      let l:end_keyword = '('
-    elseif &filetype=='python'
-      let l:end_keyword = ':'
-    elseif &filetype=='make' || &filetype=='vim'
-      let l:end_keyword = '\n'
-    else
-      let l:end_keyword = '{'
+      let l:end_keyword = &filetype=='verilog' ? '(' : '{'
     endif
     call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
   endfunction
   function! ShowCurrentNoneFuncCodeBlockName()
+    let l:end_keyword = '{'
     if &filetype=='tcl'
         let l:name_keyword = 'namespace\s\+eval.\+{'
         let l:show_name = 'namespace eval'
@@ -2008,11 +2009,7 @@ function! SetGeneralKeyMaps()
     elseif &filetype=='python'
         let l:name_keyword = 'class\s\+.\+:'
         let l:show_name = 'class'
-    endif
-    if &filetype=='python'
-      let l:end_keyword = ':'
-    else
-      let l:end_keyword = '{'
+        let l:end_keyword = ':'
     endif
     call ShowCurrentCodeBlockName(l:name_keyword, l:show_name, l:end_keyword)
   endfunction
