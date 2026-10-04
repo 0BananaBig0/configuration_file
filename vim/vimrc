@@ -191,9 +191,19 @@ function! ConfigureDelayedPlugin()
           \ ['<LocalLeader>je', 'Next function end', 'n', 'N/V'],
           \ ['<LocalLeader>kc', 'Previous comment block', 'n', 'N/V'],
           \ ['<LocalLeader>jc', 'Next comment block', 'n', 'N/V'],
+          \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
+          \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
           \ ['<Leader>`', 'Show nearest function or class', 'n'],
           \ ['`<Leader>', 'Show nearest non-function block', 'n'],
           \ ['<LocalLeader>u', 'Clear search highlight', 'n'],
+          "\ Matching delimiters (vim-matchup)
+          \ ['%', 'Jump to matching delimiter', 'n', 'N/V/O'],
+          \ ['g%', 'Jump to matching delimiter from before cursor', 'n', 'N/V/O'],
+          \ ['z%', 'Jump inside next match', 'n', 'N/V/O'],
+          \ ['a%', 'Select around matching delimiters', 'x', 'V/O'],
+          \ ['i%', 'Select inside matching delimiters', 'x', 'V/O'],
+          \ ['cs%', 'Change surrounding delimiters', 'n'],
+          \ ['ds%', 'Delete surrounding delimiters', 'n'],
           \ ]
     " Files and working directory
     let l:general_key_maps = [
@@ -331,6 +341,36 @@ function! ConfigureDelayedPlugin()
           \ ['<F7>', 'Format document', 'n'],
           \ ['<F7>', 'Format selection', 'x'],
           \ ]])
+    call add(l:groups, ['Claude', [
+          \ ['<C-C>', 'Interrupt, or clear input', 'n', 'CLI'],
+          \ ['<Esc>', 'Interrupt, or close a dialog', 'n', 'CLI'],
+          \ ['<Esc><Esc>', 'Clear draft, or open rewind menu', 'n', 'CLI'],
+          \ ['<C-D>', 'Exit the session', 'n', 'CLI'],
+          \ ['<C-L>', 'Redraw the screen', 'n', 'CLI'],
+          \ ['<C-O>', 'Toggle transcript viewer', 'n', 'CLI'],
+          \ ['<C-R>', 'Reverse search command history', 'n', 'CLI'],
+          \ ['<C-B>', 'Background running tasks', 'n', 'CLI'],
+          \ ['<C-T>', 'Toggle the task checklist', 'n', 'CLI'],
+          \ ['<C-S>', 'Stash or restore prompt', 'n', 'CLI'],
+          \ ['<C-Z>', 'Suspend to the shell', 'n', 'CLI'],
+          \ ['<S-TAB>', 'Cycle permission modes', 'n', 'CLI'],
+          \ ['<Alt-P>', 'Switch model', 'n', 'CLI'],
+          \ ['<Alt-T>', 'Toggle extended thinking', 'n', 'CLI'],
+          \ ['<Alt-O>', 'Toggle fast mode', 'n', 'CLI'],
+          \ ['<C-X><C-K>', 'Stop all background subagents', 'n', 'CLI'],
+          \ ['<C-X><C-E>', 'Edit the prompt in $EDITOR', 'n', 'CLI'],
+          \ ['<C-X><C-S>', 'Send queued messages now', 'n', 'CLI'],
+          \ ['<C-V>', 'Paste image from clipboard', 'n', 'CLI'],
+          \ ['<C-G>', 'Open the prompt in an editor', 'n', 'CLI'],
+          \ ['/', 'Open the slash-command menu', 'n', 'CLI'],
+          \ ['!', 'Run a local shell command', 'n', 'CLI'],
+          \ ['@', 'Mention a file or a session', 'n', 'CLI'],
+          \ ['?', 'Toggle the shortcut help panel', 'n', 'CLI'],
+          \ ['\<Enter>', 'Insert a newline (multiline)', 'n', 'CLI'],
+          \ ['<C-J>', 'Insert a newline (multiline)', 'n', 'CLI'],
+          \ ['<TAB>', 'Accept a completion or comment', 'n', 'CLI'],
+          \ ['<Up>/<Down>', 'Recall history or queued items', 'n', 'CLI'],
+          \ ]])
     call add(l:groups, ['Codex', [
           \ ['/', 'Open the slash-command menu', 'n', 'CLI'],
           \ ['<Ctrl-g>', 'Open editor for multiline prompt', 'n', 'CLI'],
@@ -370,17 +410,6 @@ function! ConfigureDelayedPlugin()
           \ ['<Leader>mg', 'Generate table of contents', 'n'],
           \ ['<Leader>mu', 'Update table of contents', 'n'],
           \ ['<Leader>mf', 'Fix Markdown lint errors', 'n'],
-          \ ]])
-    call add(l:groups, ['Matchup', [
-          \ ['%', 'Jump to matching delimiter', 'n', 'N/V/O'],
-          \ ['g%', 'Jump to matching delimiter from before cursor', 'n', 'N/V/O'],
-          \ ['z%', 'Jump inside next match', 'n', 'N/V/O'],
-          \ ['a%', 'Select around matching delimiters', 'x', 'V/O'],
-          \ ['i%', 'Select inside matching delimiters', 'x', 'V/O'],
-          \ ['cs%', 'Change surrounding delimiters', 'n'],
-          \ ['ds%', 'Delete surrounding delimiters', 'n'],
-          \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
-          \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
           \ ]])
     call add(l:groups, ['NERDCommenter', [
           \ ['<F3>', 'Comment', 'n', 'N/V/O'],
