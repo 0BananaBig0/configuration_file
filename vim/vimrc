@@ -2140,7 +2140,7 @@ function! SetGeneralKeyMaps()
       elseif &filetype=='markdown'
         CocCommand markdown-preview-enhanced.openPreview
       elseif &filetype=='vim'
-        source ~/.vimrc
+        source ~/.vim/vimrc
       elseif s:IsAuxiliaryBuffer()
         if JumpToTheMainWin()
           call CompileAndExcute()
