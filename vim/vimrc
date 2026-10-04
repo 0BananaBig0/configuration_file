@@ -94,7 +94,7 @@ Plug 'skywind3000/vim-quickui', {'on': []}
 " 文件目录插件
 Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
-Plug 'liuchengxu/vista.vim', {'on': ['Vista!!', 'Vista focus']}
+Plug 'liuchengxu/vista.vim', {'on': ['Vista']}
 " 书签插件，用于写代码注解等等
 Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
 " Multiple highlights
@@ -2309,13 +2309,13 @@ function! SetGeneralKeyMaps()
   noremap Q <Nop>
   " Disable q in normal mode
   noremap q <Nop>
-  " When pressing <Shift-*>, the $, #, : and @ should not be included in the selection.
+  " When pressing <Shift-*>, the $, #, : and % should not be included in the selection.
   set iskeyword-=$
   set iskeyword-=#
   set iskeyword-=:
-  set iskeyword+=%
+  set iskeyword-=%
+  " When pressing <Shift-*>, the -, / and . should be included in the selection.
   set iskeyword+=-
-  " When pressing <Shift-*>, the / and . should be included in the selection.
   set iskeyword+=/
   set iskeyword+=.
   noremap <C-S-t> :<C-u>call NewTab()<CR>
