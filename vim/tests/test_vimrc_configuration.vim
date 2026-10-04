@@ -1,11 +1,11 @@
 " Run: vim -Nu NONE -n -i NONE -es -S tests/test_vimrc_configuration.vim
 set nocompatible noswapfile
 let s:repo = expand('<sfile>:p:h:h')
-execute 'source ' . fnameescape(get(g:, 'vimrc_under_test', s:repo . '/.vimrc'))
+execute 'source ' . fnameescape(get(g:, 'vimrc_under_test', s:repo . '/vimrc'))
 call timer_stopall()
 " Plugin helpers become available in their owning configuration phase.
 let s:vimrc_sid = filter(getscriptinfo(),
-      \ {_, script -> script.name ==# fnamemodify(get(g:, 'vimrc_under_test', s:repo . '/.vimrc'), ':p')})[0].sid
+      \ {_, script -> script.name ==# fnamemodify(get(g:, 'vimrc_under_test', s:repo . '/vimrc'), ':p')})[0].sid
 for s:helper in ['ConfigureMarkdownPlugin', 'ConfigureWhichKey',
       \ '<SNR>' . s:vimrc_sid . '_ShortcutGroups',
       \ '<SNR>' . s:vimrc_sid . '_WhichKeyMap',

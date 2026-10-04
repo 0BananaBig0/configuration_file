@@ -1,7 +1,7 @@
 " Run: vim -Nu NONE -n -i NONE -es -S tests/test_vimspector_project_debug.vim
 set nocompatible noswapfile
 let s:repo = expand('<sfile>:p:h:h')
-execute 'source ' . fnameescape(get(g:, 'vimrc_under_test', s:repo . '/.vimrc'))
+execute 'source ' . fnameescape(get(g:, 'vimrc_under_test', s:repo . '/vimrc'))
 call timer_stopall()
 call SetGeneralKeyMaps()
 call ConfigureDelayedPlugin()

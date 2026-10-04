@@ -1738,8 +1738,8 @@ function! ConfigureManualLoadPlugin()
   let g:Lf_CursorBlink = 0
   let g:Lf_RgConfig = [
           \ '--max-columns=150',
-          \ '--type-add web:*.{html,css,js}*',
-          \ '--glob=!git/*',
+          \ '--type-add web:*.{html,css,js}',
+          \ '--glob=!.git/*',
           \ '--hidden'
       \ ]
   let g:Lf_PreviewInPopup = 1
@@ -2126,62 +2126,60 @@ function! SetGeneralKeyMaps()
     let l:compiler = &filetype=='cpp' ? 'g++ -Weffc++' : 'gcc'
     return ' cd '.shellescape(l:cur_file_path, 1).' && '.l:compiler.l:compile_single_file
   endfunction
-  if !(exists('*CompileAndExcute') && &filetype=='vim')
-    function! CompileAndExcute()
-      let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
-      let l:source_file = shellescape(expand('%:p'), 1)
-      let l:interpreter = get({'python': 'python3', 'sh': 'bash', 'csh': 'csh',
-            \ 'perl': 'perl', 'tcl': 'tclsh'}, &ignorecase ? tolower(&filetype) : &filetype, '')
-      if !empty(l:interpreter) && (&filetype != 'python'
-            \ || (expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'))
-        exec l:compile_exec.' /usr/bin/env '.l:interpreter.' '.l:source_file
-      elseif &filetype=='verilog' || &filetype=='systemverilog'
-        exec l:compile_exec.CPPCompilation().' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
-      elseif &filetype=='markdown'
-        CocCommand markdown-preview-enhanced.openPreview
-      elseif &filetype=='vim'
-        source ~/.vim/vimrc
-      elseif s:IsAuxiliaryBuffer()
-        if JumpToTheMainWin()
-          call CompileAndExcute()
-        endif
-      else
-        let l:build_info = {}
-        let l:cpp_compilation = CPPCompilation(l:build_info)
-        let l:program_name = expand('%:t:r').'.exe'
-        if l:build_info.project
-          let l:build_program = shellescape('build/'.l:program_name, 1)
-          let l:local_program = shellescape('./'.l:program_name, 1)
-          let l:source_program = shellescape(expand('%:p:r').'.exe', 1)
-          let l:build_native = shellescape('build/'.expand('%:t:r'), 1)
-          let l:local_native = shellescape('./'.expand('%:t:r'), 1)
-          let l:source_native = shellescape(expand('%:p:r'), 1)
-          exec l:compile_exec.l:cpp_compilation
-                \.' && if [ -e '.l:build_program.' ]; then'
-                \.' '.l:build_program.';'
-                \.'  elif [ -e '.l:local_program.' ]; then'
-                \.' '.l:local_program.';'
-                \.'  elif [ -e '.l:source_program.' ]; then'
-                \.' '.l:source_program.';'
-                \.'  elif [ -f '.l:build_native.' ] && [ -x '.l:build_native.' ]; then'
-                \.' '.l:build_native.';'
-                \.'  elif [ -f '.l:local_native.' ] && [ -x '.l:local_native.' ]; then'
-                \.' '.l:local_native.';'
-                \.'  elif [ -f '.l:source_native.' ] && [ -x '.l:source_native.' ]; then'
-                \.' '.l:source_native.';'
-                \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
-                \.' build/*.exe;'
-                \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
-                \.' ./*.exe;'
-                \.' else'
-                \.' '.shellescape(expand('%:p:h'), 1).'/*.exe;'
-                \.' fi'
-        elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
-          exec l:compile_exec.l:cpp_compilation.' && '.shellescape('./'.l:program_name, 1)
-        endif
+  function! CompileAndExcute()
+    let l:compile_exec = ':AsyncRun -cwd=$(VIM_FILEDIR) -strip -rows=3 -listed=1 -hidden=1 -focus=0 -post=call\ JumpToTerm()'
+    let l:source_file = shellescape(expand('%:p'), 1)
+    let l:interpreter = get({'python': 'python3', 'sh': 'bash', 'csh': 'csh',
+          \ 'perl': 'perl', 'tcl': 'tclsh'}, &ignorecase ? tolower(&filetype) : &filetype, '')
+    if !empty(l:interpreter) && (&filetype != 'python'
+          \ || (expand('%:t') != 'SConstruct' && expand('%:t') != 'SConscript'))
+      exec l:compile_exec.' /usr/bin/env '.l:interpreter.' '.l:source_file
+    elseif &filetype=='verilog' || &filetype=='systemverilog'
+      exec l:compile_exec.CPPCompilation().' && gtkwave '.shellescape(expand('%:t:r').'.vcd', 1)
+    elseif &filetype=='markdown'
+      CocCommand markdown-preview-enhanced.openPreview
+    elseif &filetype=='vim'
+      source ~/.vim/vimrc
+    elseif s:IsAuxiliaryBuffer()
+      if JumpToTheMainWin()
+        call CompileAndExcute()
       endif
-    endfunction
-  endif
+    else
+      let l:build_info = {}
+      let l:cpp_compilation = CPPCompilation(l:build_info)
+      let l:program_name = expand('%:t:r').'.exe'
+      if l:build_info.project
+        let l:build_program = shellescape('build/'.l:program_name, 1)
+        let l:local_program = shellescape('./'.l:program_name, 1)
+        let l:source_program = shellescape(expand('%:p:r').'.exe', 1)
+        let l:build_native = shellescape('build/'.expand('%:t:r'), 1)
+        let l:local_native = shellescape('./'.expand('%:t:r'), 1)
+        let l:source_native = shellescape(expand('%:p:r'), 1)
+        exec l:compile_exec.l:cpp_compilation
+              \.' && if [ -e '.l:build_program.' ]; then'
+              \.' '.l:build_program.';'
+              \.'  elif [ -e '.l:local_program.' ]; then'
+              \.' '.l:local_program.';'
+              \.'  elif [ -e '.l:source_program.' ]; then'
+              \.' '.l:source_program.';'
+              \.'  elif [ -f '.l:build_native.' ] && [ -x '.l:build_native.' ]; then'
+              \.' '.l:build_native.';'
+              \.'  elif [ -f '.l:local_native.' ] && [ -x '.l:local_native.' ]; then'
+              \.' '.l:local_native.';'
+              \.'  elif [ -f '.l:source_native.' ] && [ -x '.l:source_native.' ]; then'
+              \.' '.l:source_native.';'
+              \.'  elif [ -d "./build" ] && find ./build -maxdepth 1 -name "*.exe" | grep -q .; then'
+              \.' build/*.exe;'
+              \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
+              \.' ./*.exe;'
+              \.' else'
+              \.' '.shellescape(expand('%:p:h'), 1).'/*.exe;'
+              \.' fi'
+      elseif ((&filetype=='c' || &filetype=='cpp') && expand('%:e')!~'^h.*') || &filetype=='cuda'
+        exec l:compile_exec.l:cpp_compilation.' && '.shellescape('./'.l:program_name, 1)
+      endif
+    endif
+  endfunction
   function! CompileCommand()
     let l:compile_only = ':AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm(1)'
     if &filetype=='verilog' || &filetype=='systemverilog'
@@ -2350,7 +2348,7 @@ function! SetGeneralKeyMaps()
   function! GetLaunchDir() abort
     if &buftype ==# 'terminal'
       let l:terminal_job = term_getjob(bufnr('%'))
-      if job_status(l:terminal_job) ==# 'run'
+      if !empty(l:terminal_job) && job_status(l:terminal_job) ==# 'run'
         let l:terminal_pid = get(job_info(l:terminal_job), 'process', 0)
         if l:terminal_pid > 0
           let l:target_dir = resolve('/proc/'.l:terminal_pid.'/cwd')

@@ -1,7 +1,7 @@
 " Run: vim -Nu NONE -n -i NONE -es -S tests/test_vimrc_functions.vim
 set nocompatible noswapfile hidden noconfirm
 let s:repo = expand('<sfile>:p:h:h')
-let s:vimrc = get(g:, 'vimrc_under_test', s:repo . '/.vimrc')
+let s:vimrc = get(g:, 'vimrc_under_test', s:repo . '/vimrc')
 execute 'source ' . fnameescape(s:vimrc)
 call timer_stopall()
 call SetGeneralKeyMaps()

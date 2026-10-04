@@ -3,7 +3,7 @@
 " Reports five-sample median milliseconds per call; setup is not timed.
 set nocompatible noswapfile hidden noconfirm
 let s:repo = expand('<sfile>:p:h:h')
-let s:vimrc = get(g:, 'vimrc_under_test', s:repo . '/.vimrc')
+let s:vimrc = get(g:, 'vimrc_under_test', s:repo . '/vimrc')
 execute 'source ' . fnameescape(s:vimrc)
 call timer_stopall()
 call SetGeneralKeyMaps()
