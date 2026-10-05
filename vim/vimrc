@@ -133,6 +133,14 @@ noremap <Leader>per :<C-u>colorscheme dracula<CR>
 
 
 function! ConfigureDelayedPlugin()
+  function! s:ReplayFileTypeEvent() abort
+    " Buffers without a filetype have no FileType setup to replay.
+    if empty(&l:filetype)
+      return
+    endif
+    " Keep the full replay for ftplugins, Matchup initialization and loading hooks.
+    execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
+  endfunction
   function! ConfigureMarkdownPlugin()
     " Coc-markmap, coc-markdownlint setting
     " Watch workflow from the whole file
@@ -152,11 +160,8 @@ function! ConfigureDelayedPlugin()
     let g:vmt_auto_update_on_save = 0
     let g:vmt_list_item_char = '-'
     function! LoadMarkdownToc(function_name) abort
-      let l:filetype = &l:filetype
       call plug#load('vim-markdown-toc')
-      if l:filetype ==# 'markdown'
-        setlocal filetype=markdown
-      endif
+      tabdo bufdo call s:ReplayFileTypeEvent()
       if !exists(a:function_name)
         throw 'vim-markdown-toc did not define ' . a:function_name
       endif
@@ -862,20 +867,6 @@ function! ConfigureDelayedPlugin()
           \ ['jc', 'Next comment block'],
           \ ])
   endfunction
-  function! s:EnsureMatchupForCurrentBuffer() abort
-      " Buffers without a filetype have no FileType setup to replay.
-      if empty(&l:filetype)
-          return
-      endif
-      call plug#load('vim-matchup')
-      " Skip replay until this buffer's filetype changes again.
-      if get(b:, 'matchup_lazy_replayed_ft', '') ==# &l:filetype
-          return
-      endif
-      let b:matchup_lazy_replayed_ft = &l:filetype
-      " Keep the full replay for ftplugins, Matchup initialization and loading hooks.
-      execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
-  endfunction
   augroup Vim-Matchup_Group
     autocmd!
     " --------------------------------------------------------------------------
@@ -888,11 +879,10 @@ function! ConfigureDelayedPlugin()
             \ | let b:matchup_matchparen_fallback = 0
           \ | endif
     autocmd FileType vim call ConfigureVimNavigationKeyMaps()
-    " 切换 buffer、打开分屏或 tab 时都会覆盖到
-    autocmd BufEnter * ++nested call <SID>EnsureMatchupForCurrentBuffer()
   augroup END
   " The startup buffer's FileType event predates this delayed setup.
-  call s:EnsureMatchupForCurrentBuffer()
+  call plug#load('vim-matchup')
+  tabdo bufdo call s:ReplayFileTypeEvent()
 
 
 
@@ -1421,6 +1411,7 @@ function! ConfigureManualLoadPlugin()
     noremap <Leader>gb :<C-u>call gitblame#echo()<CR>
     normal! ms
     call plug#load('vim-fugitive', 'vim-gitgutter', 'git-blame.vim')
+    tabdo bufdo call s:ReplayFileTypeEvent()
     if !exists('*FugitiveStatusline')
       throw 'vim-fugitive did not define FugitiveStatusline()'
     endif
