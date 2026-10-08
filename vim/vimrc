@@ -5,9 +5,12 @@ set termguicolors
 " 不少插件的信息更新都会需要这个时间
 set updatetime=333
 " 设置<ESC>键响应时间
+" 必须同时开启 ttimeout，否则 ttimeoutlen 会被忽略、键码也去等 timeoutlen
+set ttimeout
 set ttimeoutlen=0
 " Setting keymapping timeout
-set timeoutlen=333
+" 映射序列（如 <C-Bslash><C-n>）的等待时间，给足 1000ms 避免两键按慢了被打断
+set timeoutlen=1000
 " 匹配括号高亮的时间（单位是十分之一秒）
 set matchtime=1
 " 打开文件时进行解码的猜测列表
@@ -929,6 +932,8 @@ function! ConfigureDelayedPlugin()
     endfor
     if l:target_win != -1
       call win_gotoid(l:target_win)
+      " 'number' is window-local: force it off on the terminal window
+      setlocal nonumber norelativenumber
       call feedkeys("\<C-Bslash>\<C-n>", 'n')
       let t:term_buf = l:target_buf
       exec 'resize ' . a:height
@@ -968,6 +973,8 @@ function! ConfigureDelayedPlugin()
       if l:latest_terminal != -1 && bufexists(l:latest_terminal)
         " Open the terminal buffer in a new split at the bottom with the specified height
         exec 'belowright ' . a:height . ' split | b ' . l:latest_terminal
+        " 'number' is window-local: force it off on the window showing the terminal
+        setlocal nonumber norelativenumber
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
         let l:terminal_directory = GetLaunchDir()
@@ -980,6 +987,8 @@ function! ConfigureDelayedPlugin()
               \ 'cwd': l:terminal_directory,
               \ }
         let t:term_buf = term_start(&shell, l:terminal_options)
+        " 'number' is window-local: force it off right after the terminal is created
+        setlocal nonumber norelativenumber
         exec 'resize ' . a:height
       endif
       if &buftype ==# 'terminal' && !exists('b:asyncrun_bid')
@@ -1685,6 +1694,9 @@ function! ConfigureManualLoadPlugin()
   function! s:SetUpTerminal()
     call win_splitmove(g:vimspector_session_windows.terminal,
           \ g:vimspector_session_windows.output, {'vertical': 1, 'rightbelow': 1})
+    " 'number' is window-local: force it off on the vimspector terminal window
+    call win_execute(g:vimspector_session_windows.terminal,
+          \ 'setlocal nonumber norelativenumber')
     call ReshapeVimspectorWins()
   endfunction
   function! QuitVimspectorWins()
@@ -2478,6 +2490,8 @@ function! SetGeneralKeyMaps()
             \ 'cwd': l:target_dir,
             \ }
       let t:term_buf = term_start(&shell, l:terminal_options)
+      " 'number' is window-local: force it off right after the terminal is created
+      setlocal nonumber norelativenumber
     endif
   endfunction
   function! CloseAndBackTab() abort
