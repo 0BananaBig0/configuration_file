@@ -30,7 +30,7 @@ augroup Auto_Set_FileType_Group
   autocmd!
   autocmd BufNewFile */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | setlocal filetype=cpp | endif
   autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf setlocal filetype=xml
-  autocmd BufNewFile *.v setlocal filetype=verilog
+  autocmd BufNewFile,BufRead *.v setlocal filetype=verilog
   autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* setlocal filetype=tcl
   autocmd BufNewFile,BufRead *.stil setlocal filetype=stil
 augroup END
