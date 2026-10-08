@@ -276,7 +276,7 @@ function! ConfigureDelayedPlugin()
           "\ Terminal
           \ ['<C-S-t>', 'Open terminal in a new tab', 'n', 'N/I/T'],
           \ ['<F8>', 'Toggle tracked terminal for current tab', 'n', 'N/T'],
-          \ ['<C-\><C-n>', 'Enter Normal mode from terminal', 't'],
+          \ ['<C-Bslash><C-n>', 'Enter Normal mode from terminal', 't'],
           \ ['<C-w>"+', 'Paste clipboard in terminal', 't'],
           \ ['<C-S-v>', 'Paste clipboard in terminal', 't'],
           "\ Editing
@@ -929,7 +929,7 @@ function! ConfigureDelayedPlugin()
     endfor
     if l:target_win != -1
       call win_gotoid(l:target_win)
-      call feedkeys("\<C-\>\<C-n>", 'n')
+      call feedkeys("\<C-Bslash>\<C-n>", 'n')
       let t:term_buf = l:target_buf
       exec 'resize ' . a:height
     endif
@@ -1588,9 +1588,9 @@ function! ConfigureManualLoadPlugin()
   noremap <C-8> :<C-u>VimspectorShowOutput Console<CR>
   inoremap <C-8> <C-o>:VimspectorShowOutput Console<CR>
   tnoremap <C-8> <C-w>:VimspectorShowOutput Console<CR>
-  noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-\><C-n>
-  inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-\><C-n>
-  tnoremap <C-9> <C-w>:call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-\><C-n>
+  noremap <C-9> :<C-u>call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-Bslash><C-n>
+  inoremap <C-9> <C-o>:call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-Bslash><C-n>
+  tnoremap <C-9> <C-w>:call win_gotoid(g:vimspector_session_windows.terminal)<CR><C-Bslash><C-n>
   noremap <C-0> :<C-u>call ListAllBreakPoints()<CR>
   inoremap <C-0> <C-o>:call ListAllBreakPoints()<CR>
   tnoremap <C-0> <C-w>:call ListAllBreakPoints()<CR>
@@ -2565,7 +2565,7 @@ function! SetGeneralKeyMaps()
   noremap <M-f> :<C-u>call EnterIntoWorkspaceOrFilePath(0)<CR>
   inoremap <M-f> <C-o>:call EnterIntoWorkspaceOrFilePath(0)<CR>
   tnoremap <M-f> <C-w>:call EnterIntoWorkspaceOrFilePath(0)<CR>
-  tnoremap <C-\><C-n> <C-\><C-n>:setlocal nonumber norelativenumber<CR>
+  tnoremap <C-Bslash><C-n> <C-Bslash><C-n>:setlocal nonumber norelativenumber<CR>
   " Alt+n跳到第n个tab，0<=n<10
   function! TabPosActivateBuffer(index)
     if a:index <= tabpagenr('$')
