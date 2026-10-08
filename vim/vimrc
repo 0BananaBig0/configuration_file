@@ -123,23 +123,46 @@ call plug#end()
 colorscheme dracula
 hi Terminal guibg=#282a36 guifg=#f8f8f2
 noremap <Leader>ppt :<C-u>colorscheme zellner<CR>
-                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 23<CR>
+                  \ :set guifont=FantasqueSansMNerdFontMono\ 23<CR>
                   \ :set colorcolumn=0<CR>
 noremap <Leader>per :<C-u>colorscheme dracula<CR>
                   \ :<C-u>hi Terminal guibg=#282a36 guifg=#f8f8f2<CR>
-                  \ :set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 18<CR>
+                  \ :set guifont=FantasqueSansMNerdFontMono\ 18<CR>
                   \ :set colorcolumn=80,120,160<CR>
 
 
 
 function! ConfigureDelayedPlugin()
-  function! s:ReplayFileTypeEvent() abort
-    " Buffers without a filetype have no FileType setup to replay.
-    if empty(&l:filetype)
+  " Replay the FileType event for every window WITHOUT moving the cursor, the
+  " current window or the current tab page.
+  " :tabdo/:windo/:bufdo always leave the LAST item current, so tabdo bufdo used
+  " to switch every tab page to the last buffer (the terminal) when sourcing vimrc.
+  function! s:SafeReplayFileTypeEvent() abort
+    let l:replay =
+          \ 'if empty(&l:buftype) && !empty(&l:filetype) | '
+          \ . 'let w:__replay_view = winsaveview() | '
+          \ . 'execute "doautocmd <nomodeline> FileType " . fnameescape(&l:filetype) | '
+          \ . 'call winrestview(w:__replay_view) | unlet! w:__replay_view | '
+          \ . 'endif'
+    if exists('*win_execute')
+      " Preferred: run inside each window's own context. No window/tab switch,
+      " no WinEnter/WinLeave, and the alternate window (CTRL-W p) is untouched.
+      for l:win in getwininfo()
+        call win_execute(l:win.winid, l:replay)
+      endfor
       return
     endif
-    " Keep the full replay for ftplugins, Matchup initialization and loading hooks.
-    execute 'doautocmd <nomodeline> FileType ' . fnameescape(&l:filetype)
+    " Fallback for Vim without win_execute(): win_getid() is globally unique,
+    " so win_gotoid() restores both the tab page and the window at once.
+    let l:current_winid = win_getid()
+    try
+      for l:win in getwininfo()
+        execute 'noautocmd call win_gotoid(' . l:win.winid . ')'
+        execute l:replay
+      endfor
+    finally
+      execute 'noautocmd call win_gotoid(' . l:current_winid . ')'
+    endtry
   endfunction
   function! ConfigureMarkdownPlugin()
     " Coc-markmap, coc-markdownlint setting
@@ -161,7 +184,7 @@ function! ConfigureDelayedPlugin()
     let g:vmt_list_item_char = '-'
     function! LoadMarkdownToc(function_name) abort
       call plug#load('vim-markdown-toc')
-      tabdo bufdo call s:ReplayFileTypeEvent()
+      call s:SafeReplayFileTypeEvent()
       if !exists(a:function_name)
         throw 'vim-markdown-toc did not define ' . a:function_name
       endif
@@ -215,7 +238,7 @@ function! ConfigureDelayedPlugin()
           \ ['<LocalLeader>w', 'Write file', 'n'],
           \ ['<LocalLeader>q', 'Quit window', 'n'],
           \ ['<M-q>', 'Quit window', 'n', 'N/I/T'],
-          \ ['<LocalLeader>r', 'Enter Into Workspace Root', 'n'],
+          \ ['<LocalLeader>s', 'Enter Into Workspace Root', 'n'],
           \ ['<M-s>', 'Enter Into Workspace Root', 'n', 'N/I/T'],
           \ ['<LocalLeader>f', 'Enter Into File Path', 'n'],
           \ ['<M-f>', 'Enter Into File Path', 'n', 'N/I/T'],
@@ -881,8 +904,13 @@ function! ConfigureDelayedPlugin()
     autocmd FileType vim call ConfigureVimNavigationKeyMaps()
   augroup END
   " The startup buffer's FileType event predates this delayed setup.
-  call plug#load('vim-matchup')
-  tabdo bufdo call s:ReplayFileTypeEvent()
+  " Matchup only needs the replay when it is loaded for the very first time;
+  " skipping it later keeps :source from touching every window on every reload.
+  if !get(s:, 'matchup_replayed', 0)
+    call plug#load('vim-matchup')
+    call s:SafeReplayFileTypeEvent()
+    let s:matchup_replayed = 1
+  endif
 
 
 
@@ -1411,7 +1439,7 @@ function! ConfigureManualLoadPlugin()
     noremap <Leader>gb :<C-u>call gitblame#echo()<CR>
     normal! ms
     call plug#load('vim-fugitive', 'vim-gitgutter', 'git-blame.vim')
-    tabdo bufdo call s:ReplayFileTypeEvent()
+    call s:SafeReplayFileTypeEvent()
     if !exists('*FugitiveStatusline')
       throw 'vim-fugitive did not define FugitiveStatusline()'
     endif
@@ -1709,7 +1737,7 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! LaunchVimspector()
     if !exists(':VimspectorShowOutput')
-      set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 15
+      set guifont=FantasqueSansMNerdFontMono\ 15
       call plug#load('vimspector')
     endif
     call JumpToTheMainWin()
@@ -2529,7 +2557,7 @@ function! SetGeneralKeyMaps()
       execute 'lcd ' . fnameescape(l:target_dir)
     endif
   endfunction
-  noremap <LocalLeader>r :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
+  noremap <LocalLeader>s :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
   noremap <M-s> :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
   inoremap <M-s> <C-o>:call EnterIntoWorkspaceOrFilePath()<CR>
   tnoremap <M-s> <C-w>:call EnterIntoWorkspaceOrFilePath()<CR>
@@ -2555,11 +2583,21 @@ function! SetGeneralKeyMaps()
     endfor
   endfunction
   function! InitializeCwdForEachTab()
+    " :lcd is window-local, so it must run inside every window's own context.
+    if exists('*win_execute')
+      for l:win in getwininfo()
+        call win_execute(l:win.winid, 'silent! call EnterIntoWorkspaceOrFilePath()')
+      endfor
+      return
+    endif
     let l:current_winid = win_getid()
     try
-      tabdo windo silent! call EnterIntoWorkspaceOrFilePath()
+      for l:win in getwininfo()
+        execute 'noautocmd call win_gotoid(' . l:win.winid . ')'
+        silent! call EnterIntoWorkspaceOrFilePath()
+      endfor
     finally
-      call win_gotoid(l:current_winid)
+      execute 'noautocmd call win_gotoid(' . l:current_winid . ')'
     endtry
   endfunction
   function! SetZshIfExists()
