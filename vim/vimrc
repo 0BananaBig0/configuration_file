@@ -142,7 +142,7 @@ function! ConfigureDelayedPlugin()
   " to switch every tab page to the last buffer (the terminal) when sourcing vimrc.
   function! s:SafeReplayFileTypeEvent() abort
     let l:replay =
-          \ 'if empty(&l:buftype) && !empty(&l:filetype) | '
+          \ 'if empty(&l:buftype) && !empty(&l:filetype) && &l:filetype !=# "netrw" | '
           \ . 'let w:__replay_view = winsaveview() | '
           \ . 'execute "doautocmd <nomodeline> FileType " . fnameescape(&l:filetype) | '
           \ . 'call winrestview(w:__replay_view) | unlet! w:__replay_view | '
