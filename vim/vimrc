@@ -2598,21 +2598,10 @@ function! SetGeneralKeyMaps()
   endfunction
   function! InitializeCwdForEachTab()
     " :lcd is window-local, so it must run inside every window's own context.
-    if exists('*win_execute')
-      for l:win in getwininfo()
-        call win_execute(l:win.winid, 'silent! call EnterIntoWorkspaceOrFilePath()')
-      endfor
-      return
-    endif
-    let l:current_winid = win_getid()
-    try
-      for l:win in getwininfo()
-        execute 'noautocmd call win_gotoid(' . l:win.winid . ')'
-        silent! call EnterIntoWorkspaceOrFilePath()
-      endfor
-    finally
-      execute 'noautocmd call win_gotoid(' . l:current_winid . ')'
-    endtry
+    for l:win in getwininfo()
+      call win_execute(l:win.winid, 'silent! call EnterIntoWorkspaceOrFilePath()')
+    endfor
+    return
   endfunction
   function! SetZshIfExists()
     let l:zsh = exepath('zsh')
