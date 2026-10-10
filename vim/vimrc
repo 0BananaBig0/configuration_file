@@ -2478,10 +2478,10 @@ function! SetGeneralKeyMaps()
     return isdirectory(l:file_directory) ? l:file_directory : getcwd()
   endfunction
   function! NewTab(mode = 'terminal') abort
-    let l:target_dir = GetLaunchDir()
     tabnew
-    exec 'lcd ' . fnameescape(l:target_dir)
     if a:mode ==# 'terminal'
+      let l:target_dir = GetLaunchDir()
+      exec 'lcd ' . fnameescape(l:target_dir)
       let l:terminal_options = {
             \ 'curwin': 1,
             \ 'norestore': 1,
@@ -2492,6 +2492,8 @@ function! SetGeneralKeyMaps()
       let t:term_buf = term_start(&shell, l:terminal_options)
       " 'number' is window-local: force it off right after the terminal is created
       setlocal nonumber norelativenumber
+    else
+      call EnterIntoWorkspaceOrFilePathIfNotInWorkspace()
     endif
   endfunction
   function! CloseAndBackTab() abort
@@ -2563,12 +2565,25 @@ function! SetGeneralKeyMaps()
   command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
   function! s:EditWithWorkspaceCheck(filename) abort
     execute 'edit ' . a:filename
-    call EnterIntoWorkspaceOrFilePath()
+    call EnterIntoWorkspaceOrFilePathIfNotInWorkspace()
   endfunction
   function! EnterIntoWorkspaceOrFilePath(into_work_space = 1) abort
     let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetLaunchDir()
     if l:target_dir !=# getcwd()
       execute 'lcd ' . fnameescape(l:target_dir)
+    endif
+  endfunction
+  function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1) abort
+    let l:file_path = GetLaunchDir()
+    let l:file_work_space_root = WorkspaceRoot(l:file_path)
+    let l:cwd_work_space_root  = WorkspaceRoot(getcwd())
+    " If invalid, change tab-local working directory to workspace root
+    if l:file_work_space_root !=# l:cwd_work_space_root
+      if a:into_work_space == 1
+        execute 'lcd ' . l:file_work_space_root
+      else
+        execute 'lcd ' . l:file_path
+      endif
     endif
   endfunction
   noremap <LocalLeader>s :<C-u>call EnterIntoWorkspaceOrFilePath()<CR>
@@ -2599,7 +2614,7 @@ function! SetGeneralKeyMaps()
   function! InitializeCwdForEachTab()
     " :lcd is window-local, so it must run inside every window's own context.
     for l:win in getwininfo()
-      call win_execute(l:win.winid, 'silent! call EnterIntoWorkspaceOrFilePath()')
+      call win_execute(l:win.winid, 'silent! call EnterIntoWorkspaceOrFilePathIfNotInWorkspace()')
     endfor
     return
   endfunction
