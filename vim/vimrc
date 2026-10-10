@@ -105,11 +105,11 @@ Plug 'lfv89/vim-interestingwords', {'on': []}
 " Multiple cursors
 Plug 'mg979/vim-visual-multi', {'on':[]}
 " Git command
-Plug 'tpope/vim-fugitive', {'on': []}
+Plug 'tpope/vim-fugitive', {'on': ['Git']}
 " Git status show
-Plug 'airblade/vim-gitgutter', {'on': []}
+Plug 'airblade/vim-gitgutter', {'on': ['Git']}
 " Git blame info
-Plug 'zivyangll/git-blame.vim', {'on': []}
+Plug 'zivyangll/git-blame.vim', {'on': ['Git']}
 " c/cpp debug
 Plug 'puremourning/vimspector', {'on': []}
 " 快速查找插件，包括查找文件，当前文件函数，模糊查找字段
