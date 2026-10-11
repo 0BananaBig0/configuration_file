@@ -222,21 +222,21 @@ function! s:NewTabDirectory() abort
           \ getcwd(), l:mode . ' uses its directory rule')
     if l:mode ==# 'terminal'
       let l:terminal = bufnr('%')
-      call assert_equal(l:root . '/src', GetLaunchPath(), 'terminal process uses the source directory')
+      call assert_equal(l:root . '/src', GetCurrentBufferDirectory(), 'terminal process uses the source directory')
       call mkdir(l:root . '/elsewhere', 'p')
       call term_sendkeys(l:terminal, 'cd ' . shellescape(l:root . '/elsewhere') . "\n")
       let l:deadline = reltime()
-      while GetLaunchPath() !=# l:root . '/elsewhere' && reltimefloat(reltime(l:deadline)) < 3
+      while GetCurrentBufferDirectory() !=# l:root . '/elsewhere' && reltimefloat(reltime(l:deadline)) < 3
         sleep 10m
       endwhile
-      call assert_equal(l:root . '/elsewhere', GetLaunchPath(), 'fixture changes the terminal directory')
+      call assert_equal(l:root . '/elsewhere', GetCurrentBufferDirectory(), 'fixture changes the terminal directory')
       call NewTab('empty_tab')
       call assert_equal(l:root . '/src', getcwd(), 'empty tab retains cwd within the terminal workspace')
       tabclose!
       call NewTab('terminal')
       let l:child_terminal = bufnr('%')
       call assert_equal(l:root . '/elsewhere', getcwd(), 'terminal tab inherits the live terminal directory')
-      call assert_equal(l:root . '/elsewhere', GetLaunchPath(), 'child terminal launches in the live directory')
+      call assert_equal(l:root . '/elsewhere', GetCurrentBufferDirectory(), 'child terminal launches in the live directory')
       tabclose!
       execute 'bwipeout! ' . l:child_terminal
       tabclose!

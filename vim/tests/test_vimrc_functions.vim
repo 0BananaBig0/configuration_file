@@ -668,7 +668,7 @@ function! s:WindowDirectoryContext() abort
   execute 'lcd ' . fnameescape(l:root . '/build')
   let l:target = win_getid()
   call win_gotoid(l:caller)
-  call win_execute(l:target, 'let g:launch_path = GetLaunchPath()')
+  call win_execute(l:target, 'let g:launch_path = GetCurrentBufferDirectory()')
   call assert_equal(l:root . '/src', g:launch_path, 'named target uses its file directory')
   call InitializeCwdForEachTab()
   call assert_equal(l:caller, win_getid(), 'initialization keeps caller focus')
@@ -695,7 +695,7 @@ function! s:WindowDirectoryContext() abort
       execute 'file ' . fnameescape(l:name)
     endif
     call win_gotoid(l:caller)
-    call win_execute(l:target, 'let g:launch_path = GetLaunchPath()')
+    call win_execute(l:target, 'let g:launch_path = GetCurrentBufferDirectory()')
     call assert_equal(l:root . '/build', g:launch_path, 'unnamed or invalid target uses its own cwd')
   endfor
   call win_gotoid(l:target)
@@ -703,9 +703,64 @@ function! s:WindowDirectoryContext() abort
   call term_wait(l:terminal, 100)
   call assert_equal('dead', job_status(term_getjob(l:terminal)), 'terminal fixture has exited')
   call win_gotoid(l:caller)
-  call win_execute(l:target, 'let g:launch_path = GetLaunchPath()')
+  call win_execute(l:target, 'let g:launch_path = GetCurrentBufferDirectory()')
   call assert_equal(l:root . '/build', g:launch_path, 'exited terminal uses its own window cwd')
   call assert_equal(s:fixtures, getcwd(0), 'target queries preserve caller cwd')
+endfunction
+
+function! s:BufferDirectoryTypes() abort
+  let l:root = s:fixtures . '/browser [one] project'
+  call mkdir(l:root . '/.git', 'p')
+  call mkdir(l:root . '/browse', 'p')
+  call mkdir(l:root . '/cwd', 'p')
+  enew!
+  execute 'lcd ' . fnameescape(l:root . '/cwd')
+  let g:netrw_home = s:fixtures
+  let g:netrw_dirhistmax = 0
+  let g:netrw_keepdir = 1
+  packadd netrw
+  execute 'edit ' . fnameescape(l:root . '/browse')
+  call netrw#LocalBrowseCheck(l:root . '/browse')
+  call assert_equal('netrw', &filetype, 'fixture opens the installed netrw browser')
+  let l:position = getpos('.')
+  let l:window = win_getid()
+  call assert_equal(b:netrw_curdir, GetCurrentBufferDirectory(), 'netrw uses its browsing directory')
+  call assert_equal(l:root, WorkspaceRoot(), 'netrw finds the browsing directory workspace')
+  call assert_equal(l:root . '/cwd', getcwd(0), 'directory lookup does not change netrw cwd')
+  call assert_equal(l:position, getpos('.'), 'directory lookup does not move netrw cursor')
+  call assert_equal(l:window, win_getid(), 'directory lookup keeps the netrw window')
+  call NewTab('empty_tab')
+  call assert_equal(l:root . '/cwd', getcwd(0), 'new editing tab preserves cwd inside the browser workspace')
+  tabclose!
+  call NewTab('terminal')
+  let l:terminal = bufnr('%')
+  call assert_equal(l:root . '/browse', GetCurrentBufferDirectory(), 'terminal tab launches from the browsed directory')
+  tabclose!
+  execute 'bwipeout! ' . l:terminal
+
+  " A netrw tree buffer's name need not track the current browsing directory.
+  let b:netrw_curdir = l:root . '/cwd'
+  call assert_equal(l:root . '/cwd', GetCurrentBufferDirectory(), 'netrw metadata takes priority over its buffer name')
+  call writefile([''], l:root . '/cwd/Makefile')
+  call assert_match('cd ' . escape(shellescape(l:root . '/cwd'), '\.^$~[]*') . ' && bear --append -- make',
+        \ CPPCompilation(), 'build discovery includes the current browsing directory')
+  let b:netrw_curdir = l:root . '/missing'
+  call assert_equal(getcwd(0), GetCurrentBufferDirectory(), 'invalid browser directory falls back to window cwd')
+  unlet b:netrw_curdir
+  call assert_equal(getcwd(0), GetCurrentBufferDirectory(), 'missing browser directory falls back to window cwd')
+  let b:netrw_curdir = 'scp://example.invalid/project/'
+  call assert_equal(getcwd(0), GetCurrentBufferDirectory(), 'remote browsing falls back to a local window directory')
+  let b:netrw_curdir = l:root . '/browse'
+
+  call plug#load('nerdtree')
+  execute 'NERDTree ' . fnameescape(l:root . '/browse')
+  call assert_equal('nerdtree', &filetype, 'fixture opens the installed NERDTree browser')
+  call assert_equal(b:NERDTree.root.path.str(), GetCurrentBufferDirectory(), 'NERDTree uses its root directory')
+  NERDTreeClose
+  enew!
+  execute 'file ' . fnameescape(l:root . '/browse')
+  setlocal filetype=text
+  call assert_equal(l:root . '/browse', GetCurrentBufferDirectory(), 'a directory-named buffer represents that directory')
 endfunction
 
 function! s:MultipleTerminals() abort
@@ -845,12 +900,16 @@ function! s:WorkspaceTransitions() abort
   call assert_equal(l:root, getcwd(), 'new marker is discovered on the next call')
   let l:unmarked = tempname()
   call mkdir(l:unmarked, 'p')
+  let l:root_patterns = g:root_patterns
   try
+    " Ignore ambient ancestor markers such as /tmp/.git for this unmarked fixture.
+    let g:root_patterns = ['.vimrc-test-root']
     execute 'lcd ' . fnameescape(l:unmarked)
     let l:output = execute('call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(1, getcwd())')
     call assert_equal(2, len(split(trim(l:output), '\n')), 'preserve both missing-root diagnostics')
     call assert_equal(l:unmarked, getcwd())
   finally
+    let g:root_patterns = l:root_patterns
     execute 'lcd ' . fnameescape(s:repo)
     call delete(l:unmarked, 'rf')
   endtry
@@ -1270,7 +1329,7 @@ function! s:SystemVerilogBuild() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'WindowDirectoryContext', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'ProjectBuildsForAllFiletypes', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'WindowDirectoryContext', 'BufferDirectoryTypes', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'ProjectBuildsForAllFiletypes', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch

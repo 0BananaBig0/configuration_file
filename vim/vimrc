@@ -801,7 +801,7 @@ function! ConfigureDelayedPlugin()
           \ || index(['terminal', 'nofile'], getbufvar(a:buffer, '&buftype')) >= 0
   endfunction
   function! WorkspaceRoot(file_path='')
-    let l:file_path = empty(a:file_path) ? GetLaunchPath() : a:file_path
+    let l:file_path = empty(a:file_path) ? GetCurrentBufferDirectory() : a:file_path
     let l:root_pattern_path = FindRootPatternPath(l:file_path) " Where we store the opened file
     if empty(l:root_pattern_path)
       echo 'You had better create a root-pattern file like .git in your project.'
@@ -1047,7 +1047,7 @@ function! ConfigureDelayedPlugin()
         setlocal nonumber norelativenumber
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
-        let l:terminal_directory = GetLaunchPath()
+        let l:terminal_directory = GetCurrentBufferDirectory()
         exec 'belowright ' . a:height . ' new'
         let l:terminal_options = {
               \ 'curwin': 1,
@@ -1434,7 +1434,7 @@ function! ConfigureManualLoadPlugin()
   let g:bookmark_save_per_working_dir = 1
   function! g:BMWorkDirFileLocation()
     let l:bookmark_root_location = s:UserHome().'/.vim/.vim-bookmarks'
-    let l:bookmark_path = l:bookmark_root_location.expand('%:p:h')
+    let l:bookmark_path = l:bookmark_root_location.GetCurrentBufferDirectory()
     let l:bookmark_file = simplify(l:bookmark_path.'/'.expand('%:t').'.bookmarks')
     if !isdirectory(l:bookmark_path)
       call mkdir(l:bookmark_path, 'p')
@@ -2291,7 +2291,7 @@ function! SetGeneralKeyMaps()
   noremap <Leader><F2> :<C-u>call CompileCommand()<CR>
   function! CPPCompilation(build_info={})
     let l:cpp_workspace_root = WorkspaceRoot()
-    let l:cur_file_path = expand('%:p:h')
+    let l:cur_file_path = GetCurrentBufferDirectory()
     let l:all_possible_paths = [l:cpp_workspace_root]
           \ + reverse(s:AncestorPaths(l:cur_file_path, [l:cpp_workspace_root]))
     " Optional output metadata avoids classifying builds by command text.
@@ -2367,6 +2367,7 @@ function! SetGeneralKeyMaps()
         let l:build_native = shellescape('build/'.expand('%:t:r'), 1)
         let l:local_native = shellescape('./'.expand('%:t:r'), 1)
         let l:source_native = shellescape(expand('%:p:r'), 1)
+        let l:source_directory = shellescape(GetCurrentBufferDirectory(), 1)
         exec l:compile_exec.l:cpp_compilation
               \.' && if [ -e '.l:build_program.' ]; then'
               \.' '.l:build_program.';'
@@ -2384,8 +2385,8 @@ function! SetGeneralKeyMaps()
               \.' build/*.exe;'
               \.'  elif find . -maxdepth 1 -name "*.exe" | grep -q .; then'
               \.' ./*.exe;'
-              \.'  elif find '.shellescape(expand('%:p:h'), 1).' -maxdepth 1 -name "*.exe" | grep -q .; then'
-              \.' '.shellescape(expand('%:p:h'), 1).'/*.exe;'
+              \.'  elif find '.l:source_directory.' -maxdepth 1 -name "*.exe" | grep -q .; then'
+              \.' '.l:source_directory.'/*.exe;'
               \.' fi'
       elseif !empty(l:interpreter)
         exec l:compile_exec.' /usr/bin/env '.l:interpreter.' '.shellescape(expand('%:p'), 1)
@@ -2563,8 +2564,14 @@ function! SetGeneralKeyMaps()
   inoremap <C-M-l> <C-o>gt
   inoremap <C-M-k> <C-o>gt
   inoremap <C-S-V> <C-R>+
-  function! GetLaunchPath() abort
-    if &buftype ==# 'terminal'
+  function! GetCurrentBufferDirectory() abort
+    if &filetype ==# 'netrw'
+      let l:directory = get(b:, 'netrw_curdir', '')
+      return isdirectory(l:directory) ? l:directory : getcwd(0)
+    elseif &filetype ==# 'nerdtree'
+      let l:directory = exists('b:NERDTree') ? b:NERDTree.root.path.str() : ''
+      return isdirectory(l:directory) ? l:directory : getcwd(0)
+    elseif &buftype ==# 'terminal'
       let l:terminal_job = term_getjob(bufnr('%'))
       if !empty(l:terminal_job) && job_status(l:terminal_job) ==# 'run'
         let l:terminal_pid = get(job_info(l:terminal_job), 'process', 0)
@@ -2581,11 +2588,12 @@ function! SetGeneralKeyMaps()
       return getcwd(0)
     endif
     " A shared buffer's short name can resolve against win_execute()'s caller cwd.
-    let l:file_directory = fnamemodify(getbufinfo(bufnr('%'))[0].name, ':h')
+    let l:buffer_path = getbufinfo(bufnr('%'))[0].name
+    let l:file_directory = isdirectory(l:buffer_path) ? l:buffer_path : fnamemodify(l:buffer_path, ':h')
     return isdirectory(l:file_directory) ? l:file_directory : getcwd(0)
   endfunction
   function! NewTab(mode = 'terminal') abort
-    let l:target_dir = GetLaunchPath()
+    let l:target_dir = GetCurrentBufferDirectory()
     let l:previous_cwd = getcwd(0)
     tabnew
     if a:mode ==# 'terminal'
@@ -2677,12 +2685,12 @@ function! SetGeneralKeyMaps()
     call EnterIntoWorkspaceOrFilePathIfNotInWorkspace()
   endfunction
   function! EnterIntoWorkspaceOrFilePath(into_work_space = 1) abort
-    let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetLaunchPath()
+    let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetCurrentBufferDirectory()
     if l:target_dir !=# getcwd(0)
       execute 'lcd ' . fnameescape(l:target_dir)
     endif
   endfunction
-  function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1, file_path = GetLaunchPath()) abort
+  function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1, file_path = GetCurrentBufferDirectory()) abort
     let l:file_path = a:file_path
     let l:file_work_space_root = WorkspaceRoot(l:file_path)
     let l:cwd = getcwd(0)
