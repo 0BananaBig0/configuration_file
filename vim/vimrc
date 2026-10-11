@@ -293,6 +293,8 @@ function! ConfigureDelayedPlugin()
           \ ['<C-M-CR>', 'Insert a blank line', 'i'],
           \ ['<C-S-CR>', 'Insert a blank line', 'n'],
           \ ['<C-S-CR>', 'Insert a blank line', 'i'],
+          \ ['q', 'Disabled (macro recording)', 'n', 'N/V/O'],
+          \ ['Q', 'Disabled (Ex mode)', 'n', 'N/V/O'],
           "\ Diff and cleanup
           \ ['<LocalLeader><F4>', 'Open vertical diff', 'n'],
           \ ['<LocalLeader>a', 'Wrap all diff windows', 'n'],
@@ -482,6 +484,9 @@ function! ConfigureDelayedPlugin()
           \ ['<C-0>', 'List all breakpoints', 'n', 'N/I/T'],
           \ [']v', 'Add variable to watches', 'n', 'N/V'],
           \ [']e', 'Evaluate expression', 'n'],
+          \ ['<Tab>', 'Complete expression or select next item', 'i'],
+          \ ['<S-Tab>', 'Select previous item or backspace', 'i'],
+          \ ['<CR>', 'Confirm completion or submit expression', 'i'],
           \ ['<C-x><C-o>', 'Complete watch or console expression', 'i'],
           \ [']<F8>', 'Show full variable values', 'n'],
           \ [']<F7>', 'Move up stack frame', 'n'],
@@ -515,13 +520,13 @@ function! ConfigureDelayedPlugin()
           \ ['<Leader>vf', 'Focus symbol window', 'n'],
           \ ]])
     call add(l:groups, ['VisualMulti', [
-          \ ['<C-n>', 'Start multiple cursors', 'n'],
+          \ ['<C-n>', 'Start multiple cursors', 'n', 'N/V'],
           \ ]])
     call add(l:groups, ['WhichKey', [
-          \ ['<Leader>', 'Show Leader mappings', 'n'],
-          \ ['<LocalLeader>', 'Show LocalLeader mappings', 'n'],
-          \ ['[', 'Show left-bracket mappings', 'n'],
-          \ [']', 'Show right-bracket mappings', 'n'],
+          \ ['<Leader>', 'Show Leader mappings', 'n', 'N/V/O'],
+          \ ['<LocalLeader>', 'Show LocalLeader mappings', 'n', 'N/V/O'],
+          \ ['[', 'Show left-bracket mappings', 'n', 'N/V/O'],
+          \ [']', 'Show right-bracket mappings', 'n', 'N/V/O'],
           \ ]])
     return l:groups
   endfunction
@@ -601,7 +606,7 @@ function! ConfigureDelayedPlugin()
           \ 't': {'name': 'which_key_ignore'},
           \ }, l:groups)
     let g:right_bracket_key_map = s:WhichKeyMap(']', {
-          \ 'm': {'name': '+Python Debug Mode'},
+          \ 'm': {'name': 'which_key_ignore'},
           \ 'p': {'name': 'which_key_ignore'},
           \ 't': {'name': 'which_key_ignore'},
           \ }, l:groups)
@@ -609,6 +614,7 @@ function! ConfigureDelayedPlugin()
     call which_key#register(get(g:, 'maplocalleader', ','), "g:local_key_map")
     call which_key#register('[', "g:left_bracket_key_map")
     call which_key#register(']', "g:right_bracket_key_map")
+    call s:MirrorVimspectorWhichKeyEntries()
   endfunction
   " Mirror existing prefix maps into a WhichKey dict as flat two-key entries with
   " real commands (not bare descriptions): WhichKey's native parse nests ',jc' /
@@ -629,6 +635,28 @@ function! ConfigureDelayedPlugin()
             \ . '''call feedkeys("'' . l:rhs . ''", "'' . (l:mapd.noremap ? ''nt'' : ''mt'') . ''")'','
             \ . ' l:entry[1]]'
     endfor
+  endfunction
+  function! s:MirrorVimspectorWhichKeyEntries() abort
+    call s:MirrorFlatWhichKeyEntries('g:right_bracket_key_map', ']', [
+          \ ['mp', 'Enable Python project debugging'],
+          \ ['ms', 'Use Python single-file debugging'],
+          \ ['pc', 'Control child processes'],
+          \ ['pd', 'Detach child processes'],
+          \ ['pf', 'Follow child processes'],
+          \ ['pp', 'Follow parent process'],
+          \ ['pi', 'List processes'],
+          \ ['ps', 'Switch process'],
+          \ ['ta', 'Show all backtraces'],
+          \ ['tb', 'Show current backtrace'],
+          \ ['tl', 'Set backtrace limit'],
+          \ ['ts', 'Switch thread'],
+          \ ['tc', 'Continue all threads'],
+          \ ['tt', 'Stop all threads'],
+          \ ])
+    " Debug-mode mappings are Normal-only; executable flat entries bypass native mode checks.
+    let g:right_bracket_key_map_visual = filter(deepcopy(g:right_bracket_key_map),
+          \ {key, _ -> index(['m', 'mp', 'ms'], key) < 0})
+    call which_key#register(']', "g:right_bracket_key_map_visual", 'v')
   endfunction
   call ConfigureWhichKey()
   call ConfigureMarkdownPlugin()
@@ -1622,6 +1650,8 @@ function! ConfigureManualLoadPlugin()
   noremap ]tt :<C-u>call StopAllThreads()<CR>
   nnoremap ]v :call AddVarToWatch(expand('<cword>'))<CR>
   vnoremap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
+  " Show mode/process/thread shortcuts directly while keeping their hidden submenus dispatchable.
+  call s:MirrorVimspectorWhichKeyEntries()
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare

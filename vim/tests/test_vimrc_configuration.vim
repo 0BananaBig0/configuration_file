@@ -414,6 +414,22 @@ function! s:MarkdownUpdatePosition() abort
   endfor
 endfunction
 
+function! s:WhichKeyLeaves(node, prefix) abort
+  let l:keys = []
+  for [l:key, l:value] in items(a:node)
+    if l:key ==# 'name'
+      continue
+    endif
+    let l:full_key = a:prefix . l:key
+    if type(l:value) == v:t_dict
+      call extend(l:keys, s:WhichKeyLeaves(l:value, l:full_key))
+    else
+      call add(l:keys, l:full_key)
+    endif
+  endfor
+  return l:keys
+endfunction
+
 function! s:ShortcutHelp() abort
   " Keep each plugin's own shortcut descriptions and hierarchy.
   call assert_equal('Generate parameters', g:leader_key_map.a.p.p)
@@ -444,11 +460,107 @@ function! s:ShortcutHelp() abort
   call assert_equal('Next error diagnostic', g:left_bracket_key_map.je[1])
   call assert_match('^call feedkeys(', g:left_bracket_key_map.tc[0])
   call assert_match('^call feedkeys(', g:left_bracket_key_map.je[0])
+  " Tree membership is insufficient when the renderer hides a parent group.
+  call ConfigureWhichKey()
+  let l:whichkey_sid = filter(getscriptinfo(),
+        \ {_, script -> script.name =~# '/autoload/which_key.vim$'})[0].sid
+  call call(function('<SNR>' . l:whichkey_sid . '_cache_key'), ['n', ']'])
+  let l:runtime = call(function('<SNR>' . l:whichkey_sid . '_create_runtime'), ['n', ']'])
+  let g:which_key_origin_winid = win_getid()
+  let l:right_menu = join(which_key#renderer#prepare(l:runtime)[1], "\n")
+  for l:key in ['mp', 'ms', 'pc', 'pd', 'pf', 'pp', 'pi', 'ps', 'ta', 'tb', 'tl', 'ts', 'tc', 'tt']
+    call assert_match('\<' . l:key . '\>', l:right_menu, '] menu displays ' . l:key)
+  endfor
+  call call(function('<SNR>' . l:whichkey_sid . '_cache_key'), ['v', ']'])
+  let l:visual_runtime = call(function('<SNR>' . l:whichkey_sid . '_create_runtime'), ['v', ']'])
+  let l:visual_keys = s:WhichKeyLeaves(l:visual_runtime, ']')
+  for l:key in [']mp', ']ms']
+    call assert_equal(-1, index(l:visual_keys, l:key), 'Normal-only shortcut is absent from Visual WhichKey: ' . l:key)
+  endfor
+  function! ControlAllChildrenProcessess()
+    let g:test_whichkey_process_action = 1
+  endfunction
+  try
+    let g:test_whichkey_process_action = 0
+    call feedkeys('pc', 't')
+    call which_key#start(0, 0, ']')
+    call feedkeys('', 'xt')
+    call assert_equal(1, g:test_whichkey_process_action, ']pc dispatches from WhichKey')
+  finally
+    call which_key#window#close()
+    unlet! g:test_whichkey_process_action
+    call ConfigureManualLoadPlugin()
+  endtry
   call QuickuiInstallKeyMapMenus()
   call assert_equal(['Refactor symbol', 'Refactor selection'], map(filter(deepcopy(g:quickui_keymap_groups),
         \ {_, group -> group[0] ==# 'COC'})[0][1]->filter({_, row -> row[0] ==# '[f'}),
         \ {_, row -> row[1]}))
+  " Catch defined shortcuts disappearing from either help view, including lazy maps.
+  let l:documented = {}
+  let l:prefix_keys = {}
+  for [l:prefix, l:tree] in [['<Leader>', g:leader_key_map],
+        \ ['<LocalLeader>', g:local_key_map], ['[', g:left_bracket_key_map],
+        \ [']', g:right_bracket_key_map]]
+    let l:prefix_keys[l:prefix] = s:WhichKeyLeaves(l:tree, '')
+  endfor
+  for l:group in g:quickui_keymap_groups
+    for l:row in l:group[1]
+      if index(['CLI', 'Win'], get(l:row, 3, '')) >= 0
+        continue
+      endif
+      let l:key = substitute(l:row[0], '<[^>]*>', '\L&', 'g')
+      let l:documented[l:key] = get(l:documented, l:key, '')
+            \ . get(l:row, 3, l:row[2] ==# 'x' ? 'V' : toupper(l:row[2]))
+    endfor
+  endfor
+  for l:line in readfile(get(g:, 'vimrc_under_test', s:repo . '/vimrc'))
+    let l:map = matchlist(l:line,
+          \ '^\s*\([nvxsoictl]\?noremap\|[nvxsoictl]\?map\)\s\+\(.*\)')
+    if empty(l:map)
+      continue
+    endif
+    let l:key = matchstr(substitute(l:map[2],
+          \ '^\%(<\%(silent\|buffer\|expr\|nowait\|script\|unique\)>\s*\)\+', '', ''), '^\S\+')
+    let l:normalized = substitute(l:key, '<[^>]*>', '\L&', 'g')
+    call assert_true(has_key(l:documented, l:normalized), 'QuickUI documents ' . l:key)
+    if l:map[1] =~# '^[vxoit]'
+      let l:mode = l:map[1][0] =~# '[vx]' ? 'V' : toupper(l:map[1][0])
+      call assert_match(l:mode, get(l:documented, l:normalized, ''), 'QuickUI mode for ' . l:key)
+    endif
+    for l:prefix in keys(l:prefix_keys)
+      if stridx(l:key, l:prefix) == 0 && l:key !=# l:prefix
+        let l:suffix = substitute(strpart(l:key, strlen(l:prefix)), '<S-\([a-z]\)>', '\U\1', 'g')
+        call assert_true(index(l:prefix_keys[l:prefix], l:suffix) >= 0, 'WhichKey documents ' . l:key)
+      endif
+    endfor
+  endfor
+  for l:number in range(0, 9)
+    call assert_match('N/I/T', get(l:documented, '<m-' . l:number . '>', ''), 'generated tab shortcut')
+  endfor
+  let l:prompt_keys = map(filter(deepcopy(g:quickui_keymap_groups),
+        \ {_, group -> group[0] ==# 'Vimspector'})[0][1], {_, row -> row[0]})
+  for l:key in ['<Tab>', '<S-Tab>', '<CR>', '<C-x><C-o>']
+    call assert_true(index(l:prompt_keys, l:key) >= 0, 'debugger completion documents ' . l:key)
+  endfor
+  " Removed Vim-file shortcuts must not reappear through native mapping parsing.
   enew!
+  setfiletype vim
+  let l:removed = ['[[', ']]', '[]', '][', '["', ']"']
+  for l:key in l:removed
+    call assert_false(has_key(l:documented, l:key), 'QuickUI omits removed ' . l:key)
+    call assert_equal('', maparg(l:key, 'n'), 'removed Normal mapping ' . l:key)
+    call assert_equal('', maparg(l:key, 'x'), 'removed Visual mapping ' . l:key)
+  endfor
+  for l:mode in ['n', 'v']
+    for l:prefix in ['[', ']']
+      call call(function('<SNR>' . l:whichkey_sid . '_cache_key'), [l:mode, l:prefix])
+      let l:runtime = call(function('<SNR>' . l:whichkey_sid . '_create_runtime'), [l:mode, l:prefix])
+      let l:runtime_keys = s:WhichKeyLeaves(l:runtime, l:prefix)
+      for l:key in l:removed
+        call assert_equal(-1, index(l:runtime_keys, l:key), 'WhichKey omits removed ' . l:mode . ' ' . l:key)
+      endfor
+    endfor
+  endfor
   call setline(1, 'hello_world')
   call cursor(1, 2)
   call assert_equal('hello_world', expand('<cword>'), 'keyword cleanup retains letters')

@@ -222,7 +222,13 @@ try
       call assert_equal('', maparg(s:key, 't'))
       call assert_equal('', maparg(s:key, 'v'))
     endfor
-    call assert_equal('+Python Debug Mode', g:right_bracket_key_map.m.name)
+    " Exercise the flat mode shortcuts through WhichKey's actual dispatch.
+    for [s:suffix, s:want] in [['ms', v:false], ['mp', v:true]]
+      call feedkeys(s:suffix, 't')
+      call which_key#start(0, 0, ']')
+      call feedkeys('', 'xt')
+      call assert_equal(s:want, s:ProjectFlag(s:root), 'WhichKey dispatches ]' . s:suffix)
+    endfor
     call QuickuiInstallKeyMapMenus()
     let s:entries = filter(copy(filter(copy(g:quickui_keymap_groups),
           \ {_, group -> group[0] ==# 'Vimspector'})[0][1]),
