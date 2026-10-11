@@ -64,6 +64,9 @@ let g:python_highlight_func_calls = 1
 let g:python_highlight_class_vars = 1
 let g:python_highlight_operators = 1
 let g:python_highlight_file_headers_as_comments = 1
+
+
+
 let g:coc_start_at_startup = 0
 call plug#begin('~/.vim/plugged')
 " Vim theme, No_Lazy
@@ -774,7 +777,7 @@ function! ConfigureDelayedPlugin()
   endfunction
   " Highlight the symbol and its references when holding the cursor
   augroup Plugin_Configuration_Group | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
-  hi sym_hilight guifg='White' guibg='Black' " Used in coc_settings.json"
+  hi sym_hilight guifg=White guibg=Black " Used in coc_settings.json"
   function! GetSelectedContent()
     return join(getregion(getpos("'<"), getpos("'>"), {'type': visualmode()}), ' ')
   endfunction
@@ -879,17 +882,25 @@ function! ConfigureDelayedPlugin()
           \ ['jc', 'Next comment block'],
           \ ])
   endfunction
+  function! ConfigureLargeFileBuffer() abort
+    let l:name = expand('<afile>')
+    if empty(l:name)
+      let l:name = bufname('%')
+    endif
+    " getfsize() returns -1 (missing) and 0 (directory); both are <= the limit.
+    if empty(l:name) || getfsize(l:name) <= get(g:, 'large_file_bytes', 10 * 1024 * 1024)
+      return
+    endif
+    setlocal nowrap nolist nocursorline
+    let b:matchup_matchparen_enabled = 0
+  endfunction
   augroup Vim-Matchup_Group
     autocmd!
     " --------------------------------------------------------------------------
     " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
     " --------------------------------------------------------------------------
-    " C/C++ 头文件经常 3000+ 行，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
-    autocmd FileType c,cpp,opencl,verilog
-          \ if line('$') > 3000
-            \ | let b:matchup_matchparen_enabled = 0
-            \ | let b:matchup_matchparen_fallback = 0
-          \ | endif
+    " C/C++ files > 10 MB，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
+    autocmd BufReadPre * call ConfigureLargeFileBuffer()
     autocmd FileType vim call ConfigureVimNavigationKeyMaps()
   augroup END
   " The startup buffer's FileType event predates this delayed setup.
@@ -898,6 +909,9 @@ function! ConfigureDelayedPlugin()
   if !get(s:, 'matchup_replayed', 0)
     call plug#load('vim-matchup')
     call s:SafeReplayFileTypeEvent()
+    for l:win in getwininfo()
+      call win_execute(l:win.winid, 'silent! call ConfigureLargeFileBuffer()')
+    endfor
     let s:matchup_replayed = 1
   endif
 
@@ -1335,9 +1349,6 @@ function! ConfigureManualLoadPlugin()
 
 
   " Vim-bookmarks setting
-  function! s:UserHome() abort
-    return empty($SUDO_USER) ? $HOME : '/home/'.$SUDO_USER
-  endfunction
   let g:bookmark_no_default_key_mappings = 1
   let g:bookmark_auto_close = 1
   let g:bookmark_auto_save = 1
@@ -1933,7 +1944,7 @@ set viminfo+=!
 " 增强模式中的命令行自动完成/补全操作
 set wildmode=list:longest
 " Prevent exe files from appearing in auto-completion
-set wildignore=*.exe
+set wildignore=*.exe,*.o,*.a,*.so,*.pyc,*.class,build/*,.git/*,node_modules/*
 " 使回格键（backspace）正常处理indent, eol, nostop等
 set backspace=indent,eol,nostop
 " 允许backspace和光标键跨越行边界
@@ -1947,6 +1958,16 @@ set report=0
 set fillchars=vert:\ ,stl:\ ,stlnc:\ " 空出 vert/stl/stlnc 字符（行尾反斜杠会被当成值）
 " 光标移动到buffer的顶部和底部时保持3行距离
 set scrolloff=3
+" Switching buffers in the same window with <C-i>/<C-o>/... hides the modified buffer instead of discarding its changes.
+set hidden
+function! s:UserHome() abort
+  return empty($SUDO_USER) ? $HOME : '/home/'.$SUDO_USER
+endfunction
+set undofile
+let &undodir = expand(s:UserHome().'/.vim/undodir')
+if !isdirectory(&undodir)
+  call mkdir(&undodir, 'p', 0700)
+endif
 " 设置搜索可以循环搜索, 搜索和补全时忽略大小写,智能大小写,逐字符高亮
 set wrapscan
 set ignorecase
@@ -1954,7 +1975,6 @@ set smartcase
 set hlsearch
 set incsearch
 set autoindent
-set smartindent
 set expandtab                 " 把Tab字符用空格代替，和tabstop相关
 set list                      " Enable special character display
 set listchars=tab:>>¦,trail:• " Show a tab as >>¦, show a trailing space as •
@@ -2633,4 +2653,4 @@ endfunction
 if exists('s:coc_timer_id')
   call timer_stop(s:coc_timer_id)
 endif
-let s:coc_timer_id = timer_start(333,'CocTimerStart',{'repeat':1})
+let s:coc_timer_id = timer_start(333,'CocTimerStart')
