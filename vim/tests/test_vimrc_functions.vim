@@ -892,6 +892,9 @@ function! s:InterpreterCommands() abort
       call CompileAndExcute()
       call assert_equal('/usr/bin/env ' . l:interpreter . ' ' . shellescape(l:file),
             \ trim(g:build_command), l:filetype . ' keeps interpreter and quoted filename')
+      let g:build_command = ''
+      call CompileCommand()
+      call assert_equal('', g:build_command, 'compile-only does not execute standalone ' . l:filetype)
     endfor
 
     " Invoking Bash as sh enables POSIX mode and changes errexit in substitutions.
@@ -920,8 +923,8 @@ function! s:InterpreterCommands() abort
       call assert_match('bear --append -- scons -j12', g:build_command, l:name . ' uses SCons')
       setlocal filetype=sh
       call CompileAndExcute()
-      call assert_equal('/usr/bin/env bash ' . shellescape(l:file), trim(g:build_command),
-            \ 'SCons filename does not override another interpreter')
+      call assert_match('bear --append -- scons -j12', g:build_command,
+            \ 'project build takes priority over another interpreter')
     endfor
 
     execute 'edit ' . fnameescape(s:fixtures . '/main.py')
@@ -956,7 +959,7 @@ function! s:BuildCommands() abort
   endtry
   if !empty(g:build_command)
     call assert_match('cd ' . escape(shellescape(l:root . '/src'), '\.^$~[]*') . ' && iverilog', g:build_command, 'valid Verilog command after cd')
-    call assert_match('&& vvp', g:build_command)
+    call assert_notmatch('&& vvp\|gtkwave', g:build_command, 'compile-only does not simulate or open waveforms')
     call assert_match('JumpToTerm(1)', g:build_command, 'compile-only terminal behavior')
   endif
 
@@ -1004,7 +1007,7 @@ function! s:BuildCommands() abort
         \ ['c', 'c', 'gcc -fsanitize=address,undefined,leak -g -pedantic-errors'
         \ . " -Wall -Wextra -Wconversion -Wsign-conversion -Wshadow 'main file.c' -o 'main file.exe'"],
         \ ['cuda', 'cu', "nvcc -g 'main file.cu' -o 'main file.exe'"],
-        \ ['verilog', 'v', "iverilog *.v -o 'main file.out' && vvp 'main file.out'"]]
+        \ ['verilog', 'v', "iverilog *.v -o 'main file.out'"]]
     let l:file = l:root . '/src/main file.' . l:extension
     call writefile([''], l:file)
     execute 'edit ' . fnameescape(l:file)
@@ -1020,6 +1023,71 @@ function! s:BuildCommands() abort
       call assert_notmatch("&& '\./main file.exe'", g:build_command, 'compile-only does not run CUDA output')
     endif
   endfor
+endfunction
+
+function! s:ProjectBuildsForAllFiletypes() abort
+  command! -bang -nargs=* AsyncRun let g:build_command = <q-args>
+  command! -nargs=* CocCommand let g:preview_command = <q-args>
+  let l:root = s:fixtures . '/all filetypes project'
+  call mkdir(l:root . '/.git', 'p')
+  call mkdir(l:root . '/src', 'p')
+  call writefile([''], l:root . '/Makefile')
+  call writefile(['source'], l:root . '/src/main.txt')
+  execute 'edit ' . fnameescape(l:root . '/src/main.txt')
+  for l:filetype in ['python', 'sh', 'csh', 'perl', 'tcl', 'markdown', 'verilog', 'systemverilog', 'text', 'make', 'cpp', 'cuda']
+    let &l:filetype = l:filetype
+    let g:preview_command = ''
+    for l:function in ['CompileCommand', 'CompileAndExcute']
+      let g:build_command = ''
+      try
+        call call(function(l:function), [])
+      catch
+        call assert_report(l:function . ' for ' . l:filetype . ': ' . v:exception)
+      endtry
+      call assert_match('cd ' . escape(shellescape(l:root), '\.^$~[]*') . ' && bear --append -- make -j12',
+            \ g:build_command, l:function . ' prefers the project for ' . l:filetype)
+      call assert_notmatch('/usr/bin/env\|iverilog\|gtkwave', g:build_command,
+            \ 'project build bypasses standalone handling: ' . l:filetype)
+      if l:function ==# 'CompileCommand'
+        call assert_notmatch(' && if ', g:build_command, 'compile-only omits executable launch')
+      else
+        call assert_match(' && if ', g:build_command, 'compile-and-run includes executable launch')
+      endif
+    endfor
+    call assert_equal('', g:preview_command, 'Markdown preview does not override a project build')
+  endfor
+
+  " Auxiliary classification wins even when its filetype has a standalone command.
+  setlocal filetype=text
+  let l:source = win_getid()
+  belowright new
+  setlocal buftype=nofile filetype=python
+  let l:auxiliary = win_getid()
+  for l:function in ['CompileCommand', 'CompileAndExcute']
+    call win_gotoid(l:auxiliary)
+    let g:build_command = ''
+    call call(function(l:function), [])
+    call assert_equal(l:source, win_getid(), l:function . ' redirects to the source window')
+    call assert_match('bear --append -- make -j12', g:build_command, 'auxiliary buffer uses source project')
+  endfor
+  call win_gotoid(l:auxiliary)
+  close!
+  setlocal filetype=vim
+  let g:build_command = ''
+  call CompileCommand()
+  call assert_equal('', g:build_command, 'Vim compile-only is exempt from project dispatch')
+  let g:compile_vim_reloaded = 0
+  augroup VimrcCompileTest_Group
+    autocmd!
+    autocmd SourceCmd */.vim/vimrc let g:compile_vim_reloaded = 1
+  augroup END
+  try
+    call CompileAndExcute()
+    call assert_equal(1, g:compile_vim_reloaded, 'Vim compile-and-run retains its configuration reload')
+    call assert_equal('', g:build_command, 'Vim reload bypasses the project build')
+  finally
+    autocmd! VimrcCompileTest_Group
+  endtry
 endfunction
 
 function! s:BuildRoutingIgnoresFilenames() abort
@@ -1100,6 +1168,9 @@ function! s:ProjectExecutableLocations() abort
     call delete(l:native)
     call delete(l:root . '/main file.exe')
   endfor
+  let l:output = system('cd ' . shellescape(l:root) . ' && ' . l:run)
+  call assert_equal(0, v:shell_error, 'successful project without a generated executable does not fail')
+  call assert_equal('', l:output, 'no executable means no launch')
 endfunction
 
 function! s:ProjectBuilds() abort
@@ -1170,12 +1241,14 @@ function! s:SystemVerilogBuild() abort
     call CompileCommand()
     call assert_match('iverilog -g2012 ', g:build_command, 'compile shortcut runs SystemVerilog')
     call assert_match('JumpToTerm(1)', g:build_command, 'compile shortcut keeps terminal behavior')
+    call assert_notmatch('&& vvp\|gtkwave', g:build_command, 'SystemVerilog compile-only does not simulate')
     let g:build_command = ''
     call CompileAndExcute()
     call assert_match('iverilog -g2012 ', g:build_command, 'run shortcut runs SystemVerilog')
+    call assert_match('&& vvp', g:build_command, 'run shortcut simulates after compiling')
     call assert_match("&& gtkwave 'top file.vcd'", g:build_command, 'run shortcut opens its waveform')
     if executable('iverilog') && executable('vvp')
-      let l:output = system(l:command)
+      let l:output = system(l:command . ' && vvp ' . shellescape(l:root . '/top file.out'))
       call assert_equal(0, v:shell_error, 'compile and run SystemVerilog: ' . l:output)
       call assert_equal(l:mixed ? ['SV PASS', 'V PASS'] : ['SV PASS'],
             \ sort(split(l:output, "\n")), 'SV-only and mixed-language sources run')
@@ -1190,14 +1263,14 @@ function! s:SystemVerilogBuild() abort
         \ 'include the new source before AsyncRun saves it')
   write
   if executable('iverilog') && executable('vvp')
-    let l:output = system(l:command)
+    let l:output = system(l:command . ' && vvp ' . shellescape(l:root . '/new file.out'))
     call assert_equal(0, v:shell_error, 'compile the newly saved source: ' . l:output)
     call assert_equal(['NEW PASS', 'SV PASS', 'V PASS'], sort(split(l:output, "\n")))
   endif
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'WindowDirectoryContext', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'WindowDirectoryContext', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'ProjectBuildsForAllFiletypes', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch
