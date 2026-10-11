@@ -205,12 +205,12 @@ function! ConfigureDelayedPlugin()
   function! s:ShortcutGroups() abort
     let l:groups = []
     let l:search_key_maps = [
-          \ ['<LocalLeader>ks', 'Previous function start', 'n', 'N/V'],
-          \ ['<LocalLeader>js', 'Next function start', 'n', 'N/V'],
-          \ ['<LocalLeader>ke', 'Previous function end', 'n', 'N/V'],
-          \ ['<LocalLeader>je', 'Next function end', 'n', 'N/V'],
-          \ ['<LocalLeader>kc', 'Previous comment block', 'n', 'N/V'],
-          \ ['<LocalLeader>jc', 'Next comment block', 'n', 'N/V'],
+          \ ['<LocalLeader>ks', 'Previous function start', 'n', 'N/V', 'vim'],
+          \ ['<LocalLeader>js', 'Next function start', 'n', 'N/V', 'vim'],
+          \ ['<LocalLeader>ke', 'Previous function end', 'n', 'N/V', 'vim'],
+          \ ['<LocalLeader>je', 'Next function end', 'n', 'N/V', 'vim'],
+          \ ['<LocalLeader>kc', 'Previous comment block', 'n', 'N/V', 'vim'],
+          \ ['<LocalLeader>jc', 'Next comment block', 'n', 'N/V', 'vim'],
           \ ['<LocalLeader>kd', 'Previous unmatched delimiter', 'n', 'N/V/O'],
           \ ['<LocalLeader>jd', 'Next unmatched delimiter', 'n', 'N/V/O'],
           \ ['<Leader>`', 'Show nearest function or class', 'n'],
@@ -535,6 +535,7 @@ function! ConfigureDelayedPlugin()
     for l:group in a:groups
       for l:mapping in l:group[1]
         if l:mapping[2] !=# 'n' || stridx(l:mapping[0], a:prefix) != 0
+              \ || !empty(get(l:mapping, 4, ''))
           continue
         endif
         let l:key = strpart(l:mapping[0], l:prefix_length)
@@ -561,6 +562,37 @@ function! ConfigureDelayedPlugin()
     " WhichKey's ranged feedkeys() call moves the cursor before replaying the action.
     call winrestview(l:view)
   endfunction
+  function! s:VisualWhichKeyMap(dict, prefix) abort
+    let l:dict = deepcopy(a:dict)
+    for [l:key, l:value] in items(l:dict)
+      if l:key ==# 'name'
+        continue
+      endif
+      if type(l:value) == v:t_dict
+        let l:dict[l:key] = s:VisualWhichKeyMap(l:value, a:prefix . l:key)
+        if !empty(filter(copy(l:dict[l:key]), {key, _ -> key !=# 'name'}))
+          continue
+        endif
+      elseif !empty(maparg(a:prefix . l:key, 'x'))
+        continue
+      endif
+      call remove(l:dict, l:key)
+    endfor
+    return l:dict
+  endfunction
+  function! s:RefreshVisualWhichKeyMaps() abort
+    for [l:name, l:prefix] in [['leader', get(g:, 'mapleader', "\\")],
+          \ ['local', get(g:, 'maplocalleader', ',')],
+          \ ['left_bracket', '['], ['right_bracket', ']']]
+      let g:[l:name . '_key_map_visual'] = s:VisualWhichKeyMap(g:[l:name . '_key_map'], l:prefix)
+    endfor
+  endfunction
+  function! s:LocalWhichKeyMap(mode) abort
+    let l:dict = deepcopy(a:mode ==# 'n' ? g:local_key_map : g:local_key_map_visual)
+    call s:MirrorFlatWhichKeyEntries(l:dict, get(g:, 'maplocalleader', ','),
+          \ s:vim_navigation_entries, a:mode)
+    return l:dict
+  endfunction
   function! ConfigureWhichKey()
     let g:which_key_use_floating_win = 0
     let g:which_key_fallback_to_native_key = 0
@@ -576,7 +608,7 @@ function! ConfigureDelayedPlugin()
     vnoremap <LocalLeader> :<C-u>call <SID>ShowVisualWhichKey(',')<CR>
     vnoremap [ :<C-u>call <SID>ShowVisualWhichKey('[')<CR>
     vnoremap ] :<C-u>call <SID>ShowVisualWhichKey(']')<CR>
-    let l:groups = s:ShortcutGroups()
+    let l:groups = s:shortcut_groups
     let g:leader_key_map = s:WhichKeyMap('<Leader>', {
           \ 'a': {'name': '+Automatic Verilog', 'p': {'name': '+Parameters'}},
           \ 'b': {'name': '+Bookmarks'},
@@ -611,9 +643,13 @@ function! ConfigureDelayedPlugin()
           \ 't': {'name': 'which_key_ignore'},
           \ }, l:groups)
     call which_key#register(get(g:, 'mapleader', "\\"), "g:leader_key_map")
-    call which_key#register(get(g:, 'maplocalleader', ','), "g:local_key_map")
+    call which_key#register(get(g:, 'mapleader', "\\"), "g:leader_key_map_visual", 'v')
+    call which_key#register(get(g:, 'maplocalleader', ','), expand('<SID>') . "LocalWhichKeyMap('n')", 'n')
+    call which_key#register(get(g:, 'maplocalleader', ','), expand('<SID>') . "LocalWhichKeyMap('x')", 'v')
     call which_key#register('[', "g:left_bracket_key_map")
+    call which_key#register('[', "g:left_bracket_key_map_visual", 'v')
     call which_key#register(']', "g:right_bracket_key_map")
+    call which_key#register(']', "g:right_bracket_key_map_visual", 'v')
     call s:MirrorVimspectorWhichKeyEntries()
   endfunction
   " Mirror existing prefix maps into a WhichKey dict as flat two-key entries with
@@ -621,19 +657,18 @@ function! ConfigureDelayedPlugin()
   " '[tc' under their first char, so a flat string desc would display but dispatch
   " as missing_mapping. Real [cmd, desc] lists make both views work: the prefix
   " menu shows js/tc/... directly, and joining (or the hidden group) executes.
-  function! s:MirrorFlatWhichKeyEntries(dict_name, prefix, entries) abort
+  function! s:MirrorFlatWhichKeyEntries(dict_name, prefix, entries, mode='n') abort
+    let l:dict = type(a:dict_name) == v:t_string ? eval(a:dict_name) : a:dict_name
     for l:entry in a:entries
-      let l:mapd = maparg(a:prefix . l:entry[0], 'n', 0, 1)
-      if empty(l:mapd)
+      let l:key = a:prefix . l:entry[0]
+      if empty(maparg(l:key, a:mode))
         continue
       endif
-      let l:rhs = l:mapd.rhs
-      let l:rhs = substitute(l:rhs, '\', '\\\\', 'g')
-      let l:rhs = substitute(l:rhs, '<\([^<>]*\)>', '\\<\1>', 'g')
-      let l:rhs = substitute(l:rhs, '"', '\\"', 'g')
-      execute 'let ' . a:dict_name . '[l:entry[0]] = ['
-            \ . '''call feedkeys("'' . l:rhs . ''", "'' . (l:mapd.noremap ? ''nt'' : ''mt'') . ''")'','
-            \ . ' l:entry[1]]'
+      " Replay the mapping itself to preserve its mode, buffer and <SID> context.
+      let l:dict[l:entry[0]] = ['call feedkeys(' . string(l:key) . ', "mt")', l:entry[1]]
+      if type(get(l:dict, l:entry[0][0], 0)) == v:t_dict
+        let l:dict[l:entry[0][0]][strpart(l:entry[0], 1)] = l:entry[1]
+      endif
     endfor
   endfunction
   function! s:MirrorVimspectorWhichKeyEntries() abort
@@ -653,11 +688,18 @@ function! ConfigureDelayedPlugin()
           \ ['tc', 'Continue all threads'],
           \ ['tt', 'Stop all threads'],
           \ ])
-    " Debug-mode mappings are Normal-only; executable flat entries bypass native mode checks.
-    let g:right_bracket_key_map_visual = filter(deepcopy(g:right_bracket_key_map),
-          \ {key, _ -> index(['m', 'mp', 'ms'], key) < 0})
-    call which_key#register(']', "g:right_bracket_key_map_visual", 'v')
+    call s:RefreshVisualWhichKeyMaps()
   endfunction
+  " Rebuild once per setup so reloading vimrc picks up edited descriptions.
+  let s:shortcut_groups = s:ShortcutGroups()
+  let s:vim_navigation_entries = []
+  for l:group in s:shortcut_groups
+    for l:row in l:group[1]
+      if get(l:row, 4, '') ==# 'vim'
+        call add(s:vim_navigation_entries, [strpart(l:row[0], strlen('<LocalLeader>')), l:row[1]])
+      endif
+    endfor
+  endfor
   call ConfigureWhichKey()
   call ConfigureMarkdownPlugin()
 
@@ -899,16 +941,6 @@ function! ConfigureDelayedPlugin()
     xnoremap <silent><buffer> <LocalLeader>jc :<C-U>call <SID>SearchVisualVimNavigation('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
     nnoremap <silent><buffer> <LocalLeader>kc :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
     xnoremap <silent><buffer> <LocalLeader>kc :<C-U>call <SID>SearchVisualVimNavigation('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
-    " Mirror the maps into the WhichKey dict so ',' shows js/je/... directly
-    " (see s:MirrorFlatWhichKeyEntries for why bare descs would not dispatch).
-    call s:MirrorFlatWhichKeyEntries('g:local_key_map', ',', [
-          \ ['ks', 'Previous function start'],
-          \ ['js', 'Next function start'],
-          \ ['ke', 'Previous function end'],
-          \ ['je', 'Next function end'],
-          \ ['kc', 'Previous comment block'],
-          \ ['jc', 'Next comment block'],
-          \ ])
   endfunction
   function! ConfigureLargeFileBuffer() abort
     let l:name = expand('<afile>')
@@ -1030,6 +1062,7 @@ function! ConfigureDelayedPlugin()
   noremap <F8> :<C-u>call ToggleTerminal()<CR>
   tnoremap <F8> <C-w>:call ToggleTerminal()<CR>
   noremap <LocalLeader><F8> :<C-u>AsyncRun! -cwd=$(VIM_FILEDIR) -strip -rows=3 -hidden=1 -focus=0 -post=call\ JumpToTerm()<Space>
+  call s:RefreshVisualWhichKeyMaps()
 endfunction
 
 
@@ -1040,8 +1073,11 @@ function! ConfigureManualLoadPlugin()
   let g:quickui_show_tip = 1
   let g:quickui_color_scheme = 'system'
   function! QuickuiInstallKeyMapMenus()
-    let g:quickui_keymap_groups = s:ShortcutGroups()
+    let g:quickui_keymap_groups = deepcopy(s:shortcut_groups)
   endfunction
+  if exists('g:quickui_keymap_groups')
+    call QuickuiInstallKeyMapMenus()
+  endif
   function! s:QuickuiFoldAllGroups()
     for l:group in g:quickui_keymap_groups
       let g:quickui_cheatsheet_folded[l:group[0]] = 1
@@ -1059,11 +1095,15 @@ function! ConfigureManualLoadPlugin()
   endfunction
   function! QuickuiCheatsheetKeyMapLine(key_map, width)
     let l:mode_name = get(a:key_map, 3, a:key_map[2] ==# 'x' ? 'V' : toupper(a:key_map[2]))
+    let l:description = a:key_map[1]
+    if !empty(get(a:key_map, 4, ''))
+      let l:description = '[' . a:key_map[4] . '] ' . l:description
+    endif
     let l:key = a:key_map[0].' ['.l:mode_name.']'
     let l:key_width = min([22, max([12, a:width / 2])])
     let l:description_width = a:width - l:key_width - 3
     let l:key = QuickuiCheatsheetTruncate(l:key, l:key_width)
-    let l:description = QuickuiCheatsheetTruncate(a:key_map[1], l:description_width)
+    let l:description = QuickuiCheatsheetTruncate(l:description, l:description_width)
     return '  '.printf('%-*S', l:key_width, l:key).' '.l:description
   endfunction
   function! QuickuiCheatsheetGroup(group, width, toggle_key)
@@ -1650,8 +1690,6 @@ function! ConfigureManualLoadPlugin()
   noremap ]tt :<C-u>call StopAllThreads()<CR>
   nnoremap ]v :call AddVarToWatch(expand('<cword>'))<CR>
   vnoremap ]v :<C-u> call AddVarToWatch(GetSelectedContent())<CR>
-  " Show mode/process/thread shortcuts directly while keeping their hidden submenus dispatchable.
-  call s:MirrorVimspectorWhichKeyEntries()
   sign define vimspectorBP            text=B texthl=WarningMsg
   sign define vimspectorBPCond        text=BC texthl=WarningMsg
   sign define vimspectorBPLog         text=BL texthl=SpellRare
@@ -1899,6 +1937,8 @@ function! ConfigureManualLoadPlugin()
   noremap <Leader>aw :call g:AutoWire()<ESC>
   noremap <Leader>ad :call g:AutoDef()<ESC>
   " vim-verilog-instance
+  " Refresh after all manual mappings are defined, including Visual actions.
+  call s:MirrorVimspectorWhichKeyEntries()
 endfunction
 
 
@@ -2514,9 +2554,10 @@ function! SetGeneralKeyMaps()
     return isdirectory(l:file_directory) ? l:file_directory : getcwd()
   endfunction
   function! NewTab(mode = 'terminal') abort
+    let l:target_dir = GetLaunchPath()
+    let l:previous_cwd = getcwd()
     tabnew
     if a:mode ==# 'terminal'
-      let l:target_dir = GetLaunchPath()
       exec 'lcd ' . fnameescape(l:target_dir)
       let l:terminal_options = {
             \ 'curwin': 1,
@@ -2529,7 +2570,8 @@ function! SetGeneralKeyMaps()
       " 'number' is window-local: force it off right after the terminal is created
       setlocal nonumber norelativenumber
     else
-      call EnterIntoWorkspaceOrFilePathIfNotInWorkspace()
+      exec 'lcd ' . fnameescape(l:previous_cwd)
+      call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(1, l:target_dir)
     endif
   endfunction
   function! CloseAndBackTab() abort
@@ -2609,8 +2651,8 @@ function! SetGeneralKeyMaps()
       execute 'lcd ' . fnameescape(l:target_dir)
     endif
   endfunction
-  function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1) abort
-    let l:file_path = GetLaunchPath()
+  function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1, file_path = GetLaunchPath()) abort
+    let l:file_path = a:file_path
     let l:file_work_space_root = WorkspaceRoot(l:file_path)
     let l:cwd_work_space_root  = WorkspaceRoot(getcwd())
     " If invalid, change tab-local working directory to workspace root
@@ -2667,6 +2709,7 @@ endfunction
 " After 333ms, call the coc.nvim, markdown-preview and so on
 function! CocTimerStart(timer)
   call SetGeneralKeyMaps()
+  call SetZshIfExists()
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
   call InitializeTabPos()
@@ -2677,7 +2720,6 @@ function! CocTimerStart(timer)
       autocmd VimEnter * silent! call InitializeCwdForEachTab()
     augroup END
   endif
-  call SetZshIfExists()
 endfunction
 " 重载 .vimrc 时先停掉旧定时器，避免叠加；新定义在 333ms 后生效
 if exists('s:coc_timer_id')

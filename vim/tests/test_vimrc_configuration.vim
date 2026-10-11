@@ -431,15 +431,18 @@ function! s:WhichKeyLeaves(node, prefix) abort
 endfunction
 
 function! s:ShortcutHelp() abort
+  enew!
+  setlocal filetype=vim
+  let l:local_map = call(function('<SNR>' . s:vimrc_sid . '_LocalWhichKeyMap'), ['n'])
   " Keep each plugin's own shortcut descriptions and hierarchy.
   call assert_equal('Generate parameters', g:leader_key_map.a.p.p)
   call assert_equal('Load Git plugins', g:leader_key_map.g.i.t)
   call assert_equal('Restore editor appearance', g:leader_key_map.p.e.r)
   call assert_equal('Clear all word highlights', g:leader_key_map.w.H)
   call assert_equal('Next unmatched delimiter', g:local_key_map.j.d)
-  call assert_equal('Previous function start', g:local_key_map.k.s)
-  call assert_equal('Previous function end', g:local_key_map.k.e)
-  call assert_equal('Previous comment block', g:local_key_map.k.c)
+  call assert_equal('Previous function start', l:local_map.k.s)
+  call assert_equal('Previous function end', l:local_map.k.e)
+  call assert_equal('Previous comment block', l:local_map.k.c)
   " Matchup kd/jd are mirrored flat with [cmd, desc] after their maps are defined.
   call assert_equal('Previous unmatched delimiter', g:local_key_map.kd[1])
   call assert_equal('Next unmatched delimiter', g:local_key_map.jd[1])
@@ -499,7 +502,7 @@ function! s:ShortcutHelp() abort
   let l:documented = {}
   let l:prefix_keys = {}
   for [l:prefix, l:tree] in [['<Leader>', g:leader_key_map],
-        \ ['<LocalLeader>', g:local_key_map], ['[', g:left_bracket_key_map],
+        \ ['<LocalLeader>', l:local_map], ['[', g:left_bracket_key_map],
         \ [']', g:right_bracket_key_map]]
     let l:prefix_keys[l:prefix] = s:WhichKeyLeaves(l:tree, '')
   endfor

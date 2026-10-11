@@ -712,7 +712,7 @@ function! s:NativeHelpers() abort
   call feedkeys("\<M-s>", 'xt')
   call assert_equal(l:root, getcwd(), 'Alt-S actually enters the workspace')
   call NewTab('empty_tab')
-  call assert_equal(l:root . '/src', getcwd(), 'new tab inherits launch directory with special characters')
+  call assert_equal(l:root, getcwd(), 'empty tab preserves the previous cwd within the file workspace')
   call CloseAndBackTab()
 
   " A nearer marker wins even when a distant marker has higher priority.
