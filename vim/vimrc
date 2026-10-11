@@ -147,25 +147,11 @@ function! ConfigureDelayedPlugin()
           \ . 'execute "doautocmd <nomodeline> FileType " . fnameescape(&l:filetype) | '
           \ . 'call winrestview(w:__replay_view) | unlet! w:__replay_view | '
           \ . 'endif'
-    if exists('*win_execute')
-      " Preferred: run inside each window's own context. No window/tab switch,
-      " no WinEnter/WinLeave, and the alternate window (CTRL-W p) is untouched.
-      for l:win in getwininfo()
-        call win_execute(l:win.winid, l:replay)
-      endfor
-      return
-    endif
-    " Fallback for Vim without win_execute(): win_getid() is globally unique,
-    " so win_gotoid() restores both the tab page and the window at once.
-    let l:current_winid = win_getid()
-    try
-      for l:win in getwininfo()
-        execute 'noautocmd call win_gotoid(' . l:win.winid . ')'
-        execute l:replay
-      endfor
-    finally
-      execute 'noautocmd call win_gotoid(' . l:current_winid . ')'
-    endtry
+    " Preferred: run inside each window's own context. No window/tab switch,
+    " no WinEnter/WinLeave, and the alternate window (CTRL-W p) is untouched.
+    for l:win in getwininfo()
+      call win_execute(l:win.winid, l:replay)
+    endfor
   endfunction
   function! ConfigureMarkdownPlugin()
     " Coc-markmap, coc-markdownlint setting
@@ -1878,7 +1864,7 @@ endfunction
 
 " 会使vim看起来不友好的命令
 if has('gui_running')
-  set guifont=FantasqueSansM\ Nerd\ Font\ Mono\ 18
+  set guifont=FantasqueSansMNerdFontMono\ 18
   " 设置光标格式竖纹：ver33  下划线：hor20   方块：block,其中数字为百分比
   set guicursor=c-i:ver33-Cursor
   set guicursor+=a:blinkon0
@@ -2634,7 +2620,7 @@ function! CocTimerStart(timer)
   call ConfigureDelayedPlugin()
   call ConfigureManualLoadPlugin()
   call InitializeTabPos()
-  if exists('v:vim_did_enter') && v:vim_did_enter
+  if v:vim_did_enter
     silent! call InitializeCwdForEachTab()
   else
     augroup Local_Autocmd_Group
