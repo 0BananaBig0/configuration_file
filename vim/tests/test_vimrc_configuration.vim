@@ -229,6 +229,7 @@ endfunction
 
 function! s:SourceWindow() abort
   " Catch selecting an old auxiliary window instead of the actual source.
+  let l:cwd = getcwd()
   enew!
   setlocal buftype=nofile filetype=help
   let l:aux = win_getid()
@@ -240,8 +241,12 @@ function! s:SourceWindow() abort
   call JumpToTheMainWin()
   call assert_equal(l:source, win_getid(), 'old auxiliary window is skipped')
   call win_gotoid(l:aux)
-  call assert_equal(s:fixtures, WorkspaceRoot(), 'workspace comes from source')
-  call assert_equal(l:source, win_getid(), 'workspace navigation selects source')
+  let l:aux_root = s:fixtures . '/auxiliary'
+  call mkdir(l:aux_root . '/.git', 'p')
+  execute 'lcd ' . fnameescape(l:aux_root)
+  call assert_equal(l:aux_root, WorkspaceRoot(), 'workspace comes from current window')
+  call assert_equal(l:aux, win_getid(), 'workspace lookup preserves focus')
+  call win_gotoid(l:source)
   " Screen order must not replace the existing lowest-window-ID preference.
   leftabove new
   setlocal buftype= filetype=python
@@ -255,6 +260,7 @@ function! s:SourceWindow() abort
   " Both compile helpers must terminate when no eligible window exists.
   call CompileCommand()
   call CompileAndExcute()
+  execute 'lcd ' . fnameescape(l:cwd)
 endfunction
 
 function! s:InitializeDirectoriesPreservesWindow() abort

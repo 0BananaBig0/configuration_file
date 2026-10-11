@@ -585,6 +585,12 @@ function! s:CodeBlockFiletypes() abort
         bwipeout!
       endfor
     endfor
+    enew!
+    setlocal filetype=vim
+    set ignorecase
+    call setline(1, 'FUNCTION! Work()')
+    call assert_equal('function --> Work()', trim(execute('call ShowCurrentFuncCodeBlockName()')),
+          \ 'legacy Vim keeps its lowercase label with ignorecase')
     for l:extension in ['tcl', 'dofile', 'pdl']
       enew!
       execute 'file ' . fnameescape(s:fixtures . '/mixed.' . l:extension)
@@ -613,6 +619,10 @@ function! s:CodeBlockDeclarations() abort
         \ ['python', 'py', ['def real():', '    # def fake():', '    pass'], 'def --> real()'],
         \ ['python', 'py', ['def real():', '    text = "def fake():"', '    pass'], 'def --> real()'],
         \ ['python', 'py', ['class Worker:', '    async def work():', '        pass'], 'def --> work()'],
+        \ ['vim', 'vim', ['vim9script', 'def Work(): number', '  return 1', 'enddef'], 'def --> Work(): number'],
+        \ ['vim', 'vim', ['vim9script', '  export def Work()', '    # def Fake()', '    return', '  enddef'], 'def --> Work()'],
+        \ ['vim', 'vim', ['export def Work()'], 'def --> Work()'],
+        \ ['vim', 'vim', ['  function! Work()', '    " def Fake()', '    return', '  endfunction'], 'function --> Work()'],
         \ ['cpp', 'cpp', ['namespace N {', '  class Widget {', '    int x;'], 'class Widget'],
         \ ['c', 'c', ['void f() {', '  struct Local {', '    int x;'], 'struct Local'],
         \ ['verilog', 'v', ['  module Top(input x);', '    wire y;'], 'module --> Top'],
@@ -727,8 +737,9 @@ function! s:NativeHelpers() abort
         \ 'pattern order breaks ties in the nearest marked directory')
   call delete(l:root . '/src/.git')
   call delete(l:root . '/src/.root')
-  " Auxiliary buffers use the source window; ordinary splits keep their focus.
-  let l:source_win = win_getid()
+  " Workspace lookup uses the current window, including auxiliary buffers.
+  let l:aux_root = s:fixtures . '/auxiliary'
+  call mkdir(l:aux_root . '/.git', 'p')
   for l:filetype in ['help', 'VimspectorPrompt', 'vista', 'nerdtree', 'python']
     belowright new
     let &l:filetype = l:filetype
@@ -736,8 +747,9 @@ function! s:NativeHelpers() abort
       setlocal buftype=nofile
     endif
     let l:aux_win = win_getid()
-    call assert_equal(l:root, WorkspaceRoot(), l:filetype . ' uses source workspace')
-    call assert_equal(l:source_win, win_getid(), l:filetype . ' restores source focus')
+    execute 'lcd ' . fnameescape(l:aux_root)
+    call assert_equal(l:aux_root, WorkspaceRoot(), l:filetype . ' uses current workspace')
+    call assert_equal(l:aux_win, win_getid(), l:filetype . ' keeps current focus')
     call win_execute(l:aux_win, 'close')
   endfor
   belowright split
@@ -746,6 +758,36 @@ function! s:NativeHelpers() abort
   call assert_equal(l:ordinary_win, win_getid(), 'ordinary source split keeps focus')
   close
   execute 'lcd ' . fnameescape(s:repo)
+endfunction
+
+function! s:WorkspaceTransitions() abort
+  let l:root = s:fixtures . '/transition'
+  call mkdir(l:root . '/src/deep', 'p')
+  call mkdir(l:root . '/.git', 'p')
+  for l:mode in [0, 1]
+    execute 'lcd ' . fnameescape(l:root . '/src/deep')
+    call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(l:mode, getcwd())
+    call assert_equal(l:root . '/src/deep', getcwd(), 'equal paths preserve cwd')
+    execute 'lcd ' . fnameescape(s:fixtures)
+    call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(l:mode, l:root . '/src')
+    call assert_equal(l:mode ? l:root : l:root . '/src', getcwd(), 'different workspaces respect directory mode')
+  endfor
+  execute 'lcd ' . fnameescape(l:root . '/src/deep')
+  call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(1, getcwd())
+  call writefile([''], l:root . '/src/.root')
+  call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(1, l:root)
+  call assert_equal(l:root, getcwd(), 'new marker is discovered on the next call')
+  let l:unmarked = tempname()
+  call mkdir(l:unmarked, 'p')
+  try
+    execute 'lcd ' . fnameescape(l:unmarked)
+    let l:output = execute('call EnterIntoWorkspaceOrFilePathIfNotInWorkspace(1, getcwd())')
+    call assert_equal(2, len(split(trim(l:output), '\n')), 'preserve both missing-root diagnostics')
+    call assert_equal(l:unmarked, getcwd())
+  finally
+    execute 'lcd ' . fnameescape(s:repo)
+    call delete(l:unmarked, 'rf')
+  endtry
 endfunction
 
 function! CaptureAsyncRun(opts) abort
@@ -1089,7 +1131,7 @@ function! s:SystemVerilogBuild() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'NativeHelpers', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch
