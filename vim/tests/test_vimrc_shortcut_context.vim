@@ -27,6 +27,34 @@ function! s:ReplayFlat(visual, prefix, key) abort
   call feedkeys("\<F12>\<Esc>", 'xt')
 endfunction
 
+function! s:Vim9CommentNavigation() abort
+  enew!
+  call setline(1, ['vim9script', 'def First()', '  return', 'enddef',
+        \ 'var text = "# string"', '# first comment', '# continued comment',
+        \ 'var x = 0', 'def Second()', 'enddef'])
+  setlocal filetype=vim
+  for [l:line, l:key, l:want] in [[2, 'jc', 6], [10, 'kc', 7]]
+    call cursor(l:line, 1)
+    call s:ReplayFlat(0, ',', l:key)
+    call assert_equal(l:want, line('.'), 'Vim9 Normal comment block boundary: ' . l:key)
+    call cursor(l:line, 1)
+    normal! vl
+    let l:anchor = getpos('v')
+    execute "normal! \<Esc>"
+    call s:ReplayFlat(1, ',', l:key)
+    call assert_equal('visual', g:shortcut_context_selection[0], 'Vim9 comment search keeps Visual mode')
+    call assert_equal(l:anchor, g:shortcut_context_selection[1], 'Vim9 comment search keeps anchor')
+    call assert_equal(l:want, g:shortcut_context_selection[2][1], 'Vim9 Visual comment block boundary: ' . l:key)
+  endfor
+  " Editing the directive must change the search without reinstalling mappings.
+  call setline(1, '" legacy script')
+  call setline(6, '" first comment')
+  call setline(7, '" continued comment')
+  call cursor(2, 1)
+  call s:ReplayFlat(0, ',', 'jc')
+  call assert_equal(6, line('.'), 'legacy comments remain available after editing the directive')
+endfunction
+
 function! s:VisualDiagnostics() abort
   enew!
   let l:normal = s:Runtime('n', '[')
@@ -171,7 +199,16 @@ function! s:NewTabDirectory() abort
         \ [l:standalone . '/main.txt', l:other, l:standalone]]
     execute 'edit ' . fnameescape(l:file)
     execute 'lcd ' . fnameescape(l:cwd)
-    call NewTab('empty_tab')
+    let l:root_patterns = g:root_patterns
+    try
+      if l:file ==# l:standalone . '/main.txt'
+        " Ancestor markers such as /tmp/.git must not mark this standalone fixture.
+        let g:root_patterns = ['.vimrc-test-root']
+      endif
+      call NewTab('empty_tab')
+    finally
+      let g:root_patterns = l:root_patterns
+    endtry
     call assert_equal(l:want, getcwd(), 'empty tab applies the previous file and cwd workspace rule')
     call assert_equal('', bufname('%'), 'new editing tab remains empty')
     tabclose!
@@ -213,7 +250,7 @@ endfunction
 nnoremap <F12> <Cmd>let g:shortcut_context_selection = ['normal', getpos('v'), getpos('.')]<CR>
 xnoremap <F12> <Cmd>let g:shortcut_context_selection = ['visual', getpos('v'), getpos('.')]<CR>
 try
-  for s:check in ['VisualDiagnostics', 'VisualNavigation', 'FiletypeNavigation',
+  for s:check in ['VisualDiagnostics', 'VisualNavigation', 'Vim9CommentNavigation', 'FiletypeNavigation',
         \ 'CurrentBufferMapping', 'NewTabDirectory', 'MetadataReload']
     try
       call call(function('s:' . s:check), [])

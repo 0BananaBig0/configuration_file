@@ -921,6 +921,19 @@ function! ConfigureDelayedPlugin()
     normal! gv
     call search(a:pattern, a:flags)
   endfunction
+  function! s:SearchVimComment(flags, visual=0) abort
+    if a:visual
+      normal! gv
+    endif
+    " Use the same Vim9 detection as Vim's syntax file, at search time.
+    let l:vim9 = get(b:, 'vimsyn_force_vim9script', 0)
+          \ || "\n" . join(getline(1, 32), "\n") =~# '\nvim9s\%[cript]\>'
+    let l:comment = l:vim9 ? '#' : '"'
+    let l:pattern = a:flags ==# 'W'
+          \ ? '\%(^\s*'.l:comment.'.*\n\)\@<!\%(^\s*'.l:comment.'\)'
+          \ : '\%(^\s*'.l:comment.'.*\n\)\%(^\s*'.l:comment.'\)\@!'
+    call search(l:pattern, a:flags)
+  endfunction
   function! ConfigureVimNavigationKeyMaps()
     for l:key in ['[[', ']]', '[]', '][', '["', ']"']
       execute 'silent! nunmap <buffer> ' . l:key
@@ -934,10 +947,10 @@ function! ConfigureDelayedPlugin()
     xnoremap <silent><buffer> <LocalLeader>ke m':<C-U>call <SID>SearchVisualVimNavigation('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "bW")<CR>
     nnoremap <silent><buffer> <LocalLeader>je m':call search('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
     xnoremap <silent><buffer> <LocalLeader>je m':<C-U>call <SID>SearchVisualVimNavigation('^\s*end\(f\%[unction]\\|\(export\s\+\)\?def\)\>', "W")<CR>
-    nnoremap <silent><buffer> <LocalLeader>jc :call search('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
-    xnoremap <silent><buffer> <LocalLeader>jc :<C-U>call <SID>SearchVisualVimNavigation('\%(^\s*".*\n\)\@<!\%(^\s*"\)', "W")<CR>
-    nnoremap <silent><buffer> <LocalLeader>kc :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
-    xnoremap <silent><buffer> <LocalLeader>kc :<C-U>call <SID>SearchVisualVimNavigation('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+    nnoremap <silent><buffer> <LocalLeader>jc :call <SID>SearchVimComment("W")<CR>
+    xnoremap <silent><buffer> <LocalLeader>jc :<C-U>call <SID>SearchVimComment("W", 1)<CR>
+    nnoremap <silent><buffer> <LocalLeader>kc :call <SID>SearchVimComment("bW")<CR>
+    xnoremap <silent><buffer> <LocalLeader>kc :<C-U>call <SID>SearchVimComment("bW", 1)<CR>
   endfunction
   function! ConfigureLargeFileBuffer() abort
     let l:name = expand('<afile>')
@@ -2178,24 +2191,40 @@ function! SetGeneralKeyMaps()
     endif
     echo l:nearest_name
   endfunction
+  function! s:PythonHeaderEnd(declaration) abort
+    " Skip quoted defaults and annotations before looking for a trailing comment.
+    " shortcut: nested f-string quotes need a Python tokenizer if those headers are used.
+    let l:strings = '"""\%([^\\]\|\\.\)\{-}"""\|''''''\%([^\\]\|\\.\)\{-}'''''''
+          \ . '\|"\%([^"\\]\|\\.\)*"\|''\%([^''\\]\|\\.\)*'''
+    let l:offset = 0
+    while 1
+      let [l:token, l:start, l:end] = matchstrpos(a:declaration, l:strings . '\|#', l:offset)
+      if l:start < 0 || l:token ==# '#'
+        return strridx(l:start < 0 ? a:declaration : strpart(a:declaration, 0, l:start), ':')
+      endif
+      let l:offset = l:end
+    endwhile
+  endfunction
   function! ShowCurrentCodeBlockName(name_keyword, show_name, end_keyword, label_from_declaration=0)
     let l:block_name = getline('.')
     if l:block_name !~ a:name_keyword
       let l:block_name = getline(search(a:name_keyword, 'bcnWz'))
     endif
-    let l:show_name = a:label_from_declaration
+    let l:declaration_name = a:label_from_declaration
           \ ? get(matchlist(l:block_name, '^\s*\%(export\s\+\)\?\(\h\w*\)'), 1, a:show_name) : a:show_name
+    let l:show_name = l:declaration_name
     if a:show_name ==# 'function'
-      let l:show_name = tolower(l:show_name)
+      let l:show_name = l:show_name =~? '^fu\%[nction]$' ? 'function' : tolower(l:show_name)
     endif
-    let l:block_end_position = strridx(l:block_name, a:end_keyword)
+    let l:block_end_position = &filetype ==# 'python' && a:show_name ==# 'def' && a:end_keyword ==# ':'
+          \ ? s:PythonHeaderEnd(l:block_name) : strridx(l:block_name, a:end_keyword)
     if l:block_end_position < 0 && a:show_name ==# 'module' && a:end_keyword ==# '('
       let l:block_end_position = stridx(l:block_name, ';')
     endif
     if(l:block_end_position > 0)
       let l:block_name = strpart(l:block_name, 0, l:block_end_position)
     endif
-    let l:block_name = strpart(l:block_name, matchend(l:block_name, '\c\V'.escape(l:show_name, '\')) + 1)
+    let l:block_name = strpart(l:block_name, matchend(l:block_name, '\c\V'.escape(l:declaration_name, '\')) + 1)
     let l:block_name = trim(l:block_name, ' ', 1)
     echo l:show_name '-->' l:block_name
   endfunction
@@ -2217,7 +2246,7 @@ function! SetGeneralKeyMaps()
         let l:show_name = 'define'
         let l:end_keyword = '\n'
     elseif &filetype=='vim'
-        let l:name_keyword = '^\s*\%(function!\=\|\%(export\s\+\)\?def\)\s\+.\+('
+        let l:name_keyword = '^\s*\%(fu\%[nction]!\=\|\%(export\s\+\)\?def\)\s\+.\+('
         let l:show_name = 'function'
         let l:end_keyword = '\n'
     else
@@ -2548,14 +2577,18 @@ function! SetGeneralKeyMaps()
           endif
         endif
       endif
-      return getcwd()
+      return getcwd(0)
     endif
-    let l:file_directory = expand('%:p:h')
-    return isdirectory(l:file_directory) ? l:file_directory : getcwd()
+    if empty(bufname('%'))
+      return getcwd(0)
+    endif
+    " A shared buffer's short name can resolve against win_execute()'s caller cwd.
+    let l:file_directory = fnamemodify(getbufinfo(bufnr('%'))[0].name, ':h')
+    return isdirectory(l:file_directory) ? l:file_directory : getcwd(0)
   endfunction
   function! NewTab(mode = 'terminal') abort
     let l:target_dir = GetLaunchPath()
-    let l:previous_cwd = getcwd()
+    let l:previous_cwd = getcwd(0)
     tabnew
     if a:mode ==# 'terminal'
       exec 'lcd ' . fnameescape(l:target_dir)
@@ -2647,16 +2680,17 @@ function! SetGeneralKeyMaps()
   endfunction
   function! EnterIntoWorkspaceOrFilePath(into_work_space = 1) abort
     let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetLaunchPath()
-    if l:target_dir !=# getcwd()
+    if l:target_dir !=# getcwd(0)
       execute 'lcd ' . fnameescape(l:target_dir)
     endif
   endfunction
   function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1, file_path = GetLaunchPath()) abort
     let l:file_path = a:file_path
     let l:file_work_space_root = WorkspaceRoot(l:file_path)
+    let l:cwd = getcwd(0)
     " Keep both diagnostics when an unmarked directory is its own fallback root.
-    let l:cwd_work_space_root = l:file_path ==# getcwd() && l:file_work_space_root !=# l:file_path
-          \ ? l:file_work_space_root : WorkspaceRoot(getcwd())
+    let l:cwd_work_space_root = l:file_path ==# l:cwd && l:file_work_space_root !=# l:file_path
+          \ ? l:file_work_space_root : WorkspaceRoot(l:cwd)
     " If invalid, change tab-local working directory to workspace root
     if l:file_work_space_root !=# l:cwd_work_space_root
       if a:into_work_space == 1

@@ -535,6 +535,7 @@ endfunction
 function! s:CodeBlockNames() abort
   " Catch inverted matching or changed backward searches when reusing the line.
   enew
+  setlocal filetype=python
   let l:lines = ['# heading', 'def First():', '  pass', 'def Second():', '  pass']
   call setline(1, l:lines)
   for [l:line, l:want] in [[1, 'def -->'], [2, 'def --> First'],
@@ -588,9 +589,13 @@ function! s:CodeBlockFiletypes() abort
     enew!
     setlocal filetype=vim
     set ignorecase
-    call setline(1, 'FUNCTION! Work()')
-    call assert_equal('function --> Work()', trim(execute('call ShowCurrentFuncCodeBlockName()')),
-          \ 'legacy Vim keeps its lowercase label with ignorecase')
+    for l:keyword in ['fu', 'fun', 'func', 'funct', 'functi', 'functio', 'function']
+      for l:bang in ['', '!']
+        call setline(1, '  ' . toupper(l:keyword) . l:bang . ' Work()')
+        call assert_equal('function --> Work()', trim(execute('call ShowCurrentFuncCodeBlockName()')),
+              \ 'legacy Vim keeps its lowercase label with ignorecase: ' . l:keyword . l:bang)
+      endfor
+    endfor
     for l:extension in ['tcl', 'dofile', 'pdl']
       enew!
       execute 'file ' . fnameescape(s:fixtures . '/mixed.' . l:extension)
@@ -619,10 +624,16 @@ function! s:CodeBlockDeclarations() abort
         \ ['python', 'py', ['def real():', '    # def fake():', '    pass'], 'def --> real()'],
         \ ['python', 'py', ['def real():', '    text = "def fake():"', '    pass'], 'def --> real()'],
         \ ['python', 'py', ['class Worker:', '    async def work():', '        pass'], 'def --> work()'],
+        \ ['python', 'py', ['def Work():  # TODO: check input', '    pass'], 'def --> Work()'],
+        \ ['python', 'py', ['def Work(value: str = "a: # literal") -> "Result: type": # TODO:', '    pass'], 'def --> Work(value: str = "a: # literal") -> "Result: type"'],
+        \ ['python', 'py', ["def Work(value='it\\\'s # text:') -> dict[str, int]: # TODO: check", '    pass'], "def --> Work(value='it\\\'s # text:') -> dict[str, int]"],
+        \ ['python', 'py', ['def Work(value="""a # text:"""): # TODO: check', '    pass'], 'def --> Work(value="""a # text:""")'],
         \ ['vim', 'vim', ['vim9script', 'def Work(): number', '  return 1', 'enddef'], 'def --> Work(): number'],
         \ ['vim', 'vim', ['vim9script', '  export def Work()', '    # def Fake()', '    return', '  enddef'], 'def --> Work()'],
         \ ['vim', 'vim', ['export def Work()'], 'def --> Work()'],
         \ ['vim', 'vim', ['  function! Work()', '    " def Fake()', '    return', '  endfunction'], 'function --> Work()'],
+        \ ['vim', 'vim', ['  fu! Work()', '    return', '  endfu'], 'function --> Work()'],
+        \ ['vim', 'vim', ['fun Work()', '    return', 'endfun'], 'function --> Work()'],
         \ ['cpp', 'cpp', ['namespace N {', '  class Widget {', '    int x;'], 'class Widget'],
         \ ['c', 'c', ['void f() {', '  struct Local {', '    int x;'], 'struct Local'],
         \ ['verilog', 'v', ['  module Top(input x);', '    wire y;'], 'module --> Top'],
@@ -640,6 +651,61 @@ function! s:CodeBlockDeclarations() abort
     call assert_equal(l:lines, getline(1, '$'), 'declaration lookup preserves text')
     bwipeout!
   endfor
+endfunction
+
+function! s:WindowDirectoryContext() abort
+  set noundofile
+  let l:root = s:fixtures . '/window project'
+  call mkdir(l:root . '/.git', 'p')
+  call mkdir(l:root . '/src', 'p')
+  call mkdir(l:root . '/build', 'p')
+  call writefile(['text'], l:root . '/src/main.txt')
+  enew!
+  execute 'lcd ' . fnameescape(s:fixtures)
+  let l:caller = win_getid()
+  tabedit
+  execute 'edit ' . fnameescape(l:root . '/src/main.txt')
+  execute 'lcd ' . fnameescape(l:root . '/build')
+  let l:target = win_getid()
+  call win_gotoid(l:caller)
+  call win_execute(l:target, 'let g:launch_path = GetLaunchPath()')
+  call assert_equal(l:root . '/src', g:launch_path, 'named target uses its file directory')
+  call InitializeCwdForEachTab()
+  call assert_equal(l:caller, win_getid(), 'initialization keeps caller focus')
+  let [l:tab, l:win] = win_id2tabwin(l:target)
+  call assert_equal(l:root . '/build', getcwd(l:win, l:tab), 'initialization preserves target cwd inside its workspace')
+  " Changing one split's cwd can change the shared buffer's short filename.
+  call win_gotoid(l:target)
+  execute 'lcd ' . fnameescape(s:fixtures)
+  belowright split
+  let l:sibling = win_getid()
+  call win_gotoid(l:caller)
+  call InitializeCwdForEachTab()
+  for l:winid in [l:target, l:sibling]
+    let [l:tab, l:win] = win_id2tabwin(l:winid)
+    call assert_equal(l:root, getcwd(l:win, l:tab), 'shared-buffer splits initialize from the absolute filename')
+  endfor
+  call win_gotoid(l:target)
+  execute 'lcd ' . fnameescape(l:root . '/build')
+  call win_gotoid(l:caller)
+  for l:name in ['', l:root . '/missing/main.txt']
+    call win_gotoid(l:target)
+    enew!
+    if !empty(l:name)
+      execute 'file ' . fnameescape(l:name)
+    endif
+    call win_gotoid(l:caller)
+    call win_execute(l:target, 'let g:launch_path = GetLaunchPath()')
+    call assert_equal(l:root . '/build', g:launch_path, 'unnamed or invalid target uses its own cwd')
+  endfor
+  call win_gotoid(l:target)
+  let l:terminal = term_start(['/bin/sh', '-c', 'exit'], {'curwin': 1})
+  call term_wait(l:terminal, 100)
+  call assert_equal('dead', job_status(term_getjob(l:terminal)), 'terminal fixture has exited')
+  call win_gotoid(l:caller)
+  call win_execute(l:target, 'let g:launch_path = GetLaunchPath()')
+  call assert_equal(l:root . '/build', g:launch_path, 'exited terminal uses its own window cwd')
+  call assert_equal(s:fixtures, getcwd(0), 'target queries preserve caller cwd')
 endfunction
 
 function! s:MultipleTerminals() abort
@@ -1131,7 +1197,7 @@ function! s:SystemVerilogBuild() abort
 endfunction
 
 try
-  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
+  for s:check in ['TerminalTabs', 'SoleTerminalWindow', 'MultipleTerminals', 'QuitPreservesSource', 'CancelledQuit', 'DebuggerCommands', 'DebuggerLaunch', 'DebuggerLayout', 'DebuggerWindowClosing', 'LazyPlugins', 'CheatsheetCategories', 'CheatsheetSearch', 'CheatsheetWidths', 'CodeBlockNames', 'CodeBlockFiletypes', 'CodeBlockDeclarations', 'WindowDirectoryContext', 'NativeHelpers', 'WorkspaceTransitions', 'AsyncRunPaths', 'InterpreterCommands', 'BuildCommands', 'BuildRoutingIgnoresFilenames', 'ProjectExecutableLocations', 'ProjectBuilds', 'SystemVerilogBuild']
     try
       call call(function('s:' . s:check), [])
     catch
