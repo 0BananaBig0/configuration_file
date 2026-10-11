@@ -705,7 +705,7 @@ function! ConfigureDelayedPlugin()
     return l:paths
   endfunction
   function! FindRootPatternPath(target_path)
-    let l:paths = s:AncestorPaths(a:target_path, [$HOME, '/home/'.$SUDO_USER])
+    let l:paths = s:AncestorPaths(a:target_path, [s:UserHome()])
     " Prefer the nearest directory, then marker order within that directory.
     for l:possible_path in l:paths
       for l:pattern in g:root_patterns
@@ -734,7 +734,7 @@ function! ConfigureDelayedPlugin()
     if s:IsAuxiliaryBuffer()
       call JumpToTheMainWin() " Avoid potential bugs
     endif
-    let l:file_path = empty(a:file_path) ? GetLaunchDir() : a:file_path
+    let l:file_path = empty(a:file_path) ? GetLaunchPath() : a:file_path
     let l:root_pattern_path = FindRootPatternPath(l:file_path) " Where we store the opened file
     if empty(l:root_pattern_path)
       echo 'You had better create a root-pattern file like .git in your project.'
@@ -776,7 +776,7 @@ function! ConfigureDelayedPlugin()
     endif
   endfunction
   " Highlight the symbol and its references when holding the cursor
-  augroup Plugin_Configuration_Group | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
+  augroup Coc_Group | autocmd! | autocmd CursorHold * call CocActionAsync('highlight') | augroup END
   hi sym_hilight guifg=White guibg=Black " Used in coc_settings.json"
   function! GetSelectedContent()
     return join(getregion(getpos("'<"), getpos("'>"), {'type': visualmode()}), ' ')
@@ -888,7 +888,7 @@ function! ConfigureDelayedPlugin()
       let l:name = bufname('%')
     endif
     " getfsize() returns -1 (missing) and 0 (directory); both are <= the limit.
-    if empty(l:name) || getfsize(l:name) <= get(g:, 'large_file_bytes', 10 * 1024 * 1024)
+    if empty(l:name) || getfsize(l:name) <= get(g:, 'large_file_bytes', 1024 * 1024)
       return
     endif
     setlocal nowrap nolist nocursorline
@@ -899,7 +899,7 @@ function! ConfigureDelayedPlugin()
     " --------------------------------------------------------------------------
     " 3. 大文件 / 特定 ft 按 buffer 关 matchparen（可选但推荐）
     " --------------------------------------------------------------------------
-    " C/C++ files > 10 MB，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
+    " C/C++ files > 1 MB，嵌套模板 rainbow 已经在烧了，matchparen 也别添乱
     autocmd BufReadPre * call ConfigureLargeFileBuffer()
     autocmd FileType vim call ConfigureVimNavigationKeyMaps()
   augroup END
@@ -977,7 +977,7 @@ function! ConfigureDelayedPlugin()
         setlocal nonumber norelativenumber
       else
         " If no terminal buffer exists, open a new terminal at the bottom with the specified height
-        let l:terminal_directory = GetLaunchDir()
+        let l:terminal_directory = GetLaunchPath()
         exec 'belowright ' . a:height . ' new'
         let l:terminal_options = {
               \ 'curwin': 1,
@@ -993,7 +993,7 @@ function! ConfigureDelayedPlugin()
       endif
       if &buftype ==# 'terminal' && !exists('b:asyncrun_bid')
         let l:terminal_job = term_getjob(bufnr('%'))
-        if job_status(l:terminal_job) ==# 'run' && mode() !=# 't'
+        if !empty(l:terminal_job) && job_status(l:terminal_job) ==# 'run' && mode() !=# 't'
           silent! normal! i
         endif
       endif
@@ -1643,7 +1643,7 @@ function! ConfigureManualLoadPlugin()
     let l:base = strpart(getline('.'), l:start, col('.') - 1 - l:start)
     let l:matches = call(&omnifunc, [0, l:base])
     if mode() ==# 'i' && l:position == [bufnr(), line('.'), col('.')]
-      call complete(l:start + 1, l:matches.words)
+      call complete(l:start + 1, get(l:matches, 'words', []))
     endif
   endfunction
   function! s:ConfigureVimspectorPrompt() abort
@@ -1831,8 +1831,8 @@ function! ConfigureManualLoadPlugin()
   function! StopAllThreads()
     call s:VimspectorCommand('interrupt -a')
   endfunction
-  augroup Plugin_Configuration_Group
-    autocmd! User VimspectorTerminalOpened
+  augroup Vimspector_Group
+    autocmd!
     autocmd User VimspectorTerminalOpened call s:SetUpTerminal()
   augroup END
 
@@ -2466,7 +2466,7 @@ function! SetGeneralKeyMaps()
   inoremap <C-M-l> <C-o>gt
   inoremap <C-M-k> <C-o>gt
   inoremap <C-S-V> <C-R>+
-  function! GetLaunchDir() abort
+  function! GetLaunchPath() abort
     if &buftype ==# 'terminal'
       let l:terminal_job = term_getjob(bufnr('%'))
       if !empty(l:terminal_job) && job_status(l:terminal_job) ==# 'run'
@@ -2486,7 +2486,7 @@ function! SetGeneralKeyMaps()
   function! NewTab(mode = 'terminal') abort
     tabnew
     if a:mode ==# 'terminal'
-      let l:target_dir = GetLaunchDir()
+      let l:target_dir = GetLaunchPath()
       exec 'lcd ' . fnameescape(l:target_dir)
       let l:terminal_options = {
             \ 'curwin': 1,
@@ -2570,25 +2570,25 @@ function! SetGeneralKeyMaps()
   " Define the main command (capital E) – safe and explicit
   command! -nargs=1 -complete=file E call s:EditWithWorkspaceCheck(<q-args>)
   function! s:EditWithWorkspaceCheck(filename) abort
-    execute 'edit ' . a:filename
+    execute 'edit ' . fnameescape(a:filename)
     call EnterIntoWorkspaceOrFilePathIfNotInWorkspace()
   endfunction
   function! EnterIntoWorkspaceOrFilePath(into_work_space = 1) abort
-    let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetLaunchDir()
+    let l:target_dir = a:into_work_space ? WorkspaceRoot() : GetLaunchPath()
     if l:target_dir !=# getcwd()
       execute 'lcd ' . fnameescape(l:target_dir)
     endif
   endfunction
   function! EnterIntoWorkspaceOrFilePathIfNotInWorkspace(into_work_space = 1) abort
-    let l:file_path = GetLaunchDir()
+    let l:file_path = GetLaunchPath()
     let l:file_work_space_root = WorkspaceRoot(l:file_path)
     let l:cwd_work_space_root  = WorkspaceRoot(getcwd())
     " If invalid, change tab-local working directory to workspace root
     if l:file_work_space_root !=# l:cwd_work_space_root
       if a:into_work_space == 1
-        execute 'lcd ' . l:file_work_space_root
+        execute 'lcd ' . fnameescape(l:file_work_space_root)
       else
-        execute 'lcd ' . l:file_path
+        execute 'lcd ' . fnameescape(l:file_path)
       endif
     endif
   endfunction
