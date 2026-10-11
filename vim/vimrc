@@ -102,7 +102,7 @@ Plug 'preservim/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeCWD']}
 " 标签窗口列表插件
 Plug 'liuchengxu/vista.vim', {'on': ['Vista']}
 " 书签插件，用于写代码注解等等
-Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate']}
+Plug 'MattesGroeger/vim-bookmarks', {'on': ['BookmarkToggle', 'BookmarkShowAll', 'BookmarkAnnotate', 'BookmarkNext', 'BookmarkPrev', 'BookmarkClear', 'BookmarkClearAll']}
 " Multiple highlights
 Plug 'lfv89/vim-interestingwords', {'on': []}
 " Multiple cursors
