@@ -68,6 +68,7 @@
         },
         "ignore_code_blocks": true
     },
+    "markdown-preview-enhanced.singlePreview": false,
     "perl.enable": true,
     "perl.logLevel": 2,
     "perl.logFile": "${HOME}/.vim/.coc-perl.log",
@@ -108,6 +109,6 @@
     "coc.source.word.priority": 30,
     "coc.source.word.shortcut": "W",
     "json.schemaDownload.trustedDomains": {
-      "https://puremourning.github.io": true
+        "https://puremourning.github.io": true
     },
 }
