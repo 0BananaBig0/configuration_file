@@ -2595,6 +2595,9 @@ function! SetGeneralKeyMaps()
   function! NewTab(mode = 'terminal') abort
     let l:target_dir = GetCurrentBufferDirectory()
     let l:previous_cwd = getcwd(0)
+    if !isdirectory(l:previous_cwd)
+      let l:previous_cwd = s:UserHome()
+    endif
     tabnew
     if a:mode ==# 'terminal'
       exec 'lcd ' . fnameescape(l:target_dir)
