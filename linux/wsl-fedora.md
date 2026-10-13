@@ -55,6 +55,7 @@ sudo dnf install -y kmodtool akmods mokutil openssl dkms
 sudo dnf --enablerepo='*debug*' install -y libatomic-debuginfo libstdc++-debuginfo glibc-debuginfo libgcc-debuginfo gdb gcc g++ make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf
 # sudo dnf provides */xxx.so
 sudo dnf install -y python3-devel libxml2-devel libxslt-devel
+sudo dnf install unifont-fonts dejavu-sans-mono-fonts gnu-free-mono-fonts -y
 mkdir -p ~/wsl_shared_folder/font
 cd ~/wsl_shared_folder/font
 
