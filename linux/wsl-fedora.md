@@ -55,32 +55,7 @@ sudo dnf install -y kmodtool akmods mokutil openssl dkms
 sudo dnf --enablerepo='*debug*' install -y libatomic-debuginfo libstdc++-debuginfo glibc-debuginfo libgcc-debuginfo gdb gcc g++ make cmake valgrind gcc g++ llvm clang clangd clang-tools-extra autoconf
 # sudo dnf provides */xxx.so
 sudo dnf install -y python3-devel libxml2-devel libxslt-devel
-sudo dnf install unifont-fonts dejavu-sans-mono-fonts gnu-free-mono-fonts -y
-mkdir -p ~/wsl_shared_folder/font
-cd ~/wsl_shared_folder/font
 
-for font in FantasqueSansMono; do
-  if [ ! -f "${font}.zip" ]; then
-    echo "下载 ${font}.zip..."
-    curl -fL --retry 3 --connect-timeout 10 \
-      "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.0/${font}.zip" \
-      -o "${font}.zip" || echo "⚠️ ${font}.zip 下载失败，跳过"
-  fi
-done
-
-for font in FantasqueSansMono; do
-  [ -f "${font}.zip" ] && unzip -o "${font}.zip" -d "${font}" 2>/dev/null || true
-done
-
-if [ -d "FantasqueSansMono" ]; then
-  sudo cp -r FantasqueSansMono /usr/share/fonts/ 2>/dev/null || true
-  sudo chown -R root:root /usr/share/fonts/FantasqueSansMono 2>/dev/null || true
-  sudo chmod -R 755 /usr/share/fonts/FantasqueSansMono 2>/dev/null || true
-fi
-
-sudo mkdir -p /usr/share/fonts/win11
-sudo ln -sf /mnt/c/Windows/Fonts/* /usr/share/fonts/win11/ 2>/dev/null || true
-sudo fc-cache -fv
 cp /home/banana/configuration_file/.gdbinit ~
 cp /home/banana/configuration_file/coc-settings.json ~/.vim
 cp /home/banana/configuration_file/.vimrc ~
@@ -90,6 +65,10 @@ cp /home/banana/configuration_file/ys_modified.zsh-theme ~/.oh-my-zsh/custom
 cp /home/banana/configuration_file/init.vim ~/.config/nvim
 cp /home/banana/configuration_file/.tessent_startup ~
 source ~/.zshrc
+install_font_all
+sudo mkdir -p /usr/share/fonts/win11
+sudo ln -sf /mnt/c/Windows/Fonts/* /usr/share/fonts/win11/ 2>/dev/null || true
+sudo fc-cache -fv
 
 python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 python3 -m pip install --user scons ipdb pylint yapf pygments cmakelang cmake-language-server \
