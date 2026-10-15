@@ -1960,7 +1960,7 @@ if has('gui_running')
   set guicursor=c-i:ver33-Cursor
   set guicursor+=a:blinkon0
   " 设定窗口大小
-  set lines=60 columns=120
+  set lines=39 columns=159
   " 隐藏滚动栏
   set guioptions-=r
   " tab显示tab_num:文件名
