@@ -27,6 +27,16 @@
                 "systemverilog.launchConfiguration": "verilator --lint-only --language 1364-2005",
                 "systemverilog.formatCommand": "verible-verilog-format --column_limit=80 --indentation_spaces=4 --wrap_spaces=4"
             }
+        },
+        "tclsp": {
+            "command": "tclsp",
+            "filetypes": [
+                "tcl",
+                "sdc",
+                "xdc",
+                "upf"
+            ],
+            "trace.server": "off"
         }
     },
     "workspace.rootPatterns": [

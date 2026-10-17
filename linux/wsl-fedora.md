@@ -71,9 +71,24 @@ sudo ln -sf /mnt/c/Windows/Fonts/* /usr/share/fonts/win11/ 2>/dev/null || true
 sudo fc-cache -fv
 
 python3 -m pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
-python3 -m pip install --user scons ipdb pylint yapf pygments cmakelang cmake-language-server \
-                       pyright cppman you-get sphinx sphinx-rtd-theme autopep8 pyverilog ply \
-                       vim-vint tclint black pysnooper neovim ijson cryptography fonttools #not do for root
+python3 -m pip install --user ipdb pysnooper neovim ply pyverilog ijson cryptography pygments
+python3 -m pip uninstall -y cmake-language-server cmakelang pyright pylint tclint vim-vint \
+    scons yapf autopep8 black you-get cppman fonttools sphinx sphinx-rtd-theme
+pipx install cmake-language-server cmakelang
+pipx install pyright
+pipx install pylint
+pipx install tclint
+pipx install vim-vint
+pipx install scons
+pipx install pylint
+pipx install yapf
+pipx install autopep8
+pipx install black
+pipx install you-get
+pipx install cppman
+pipx install fonttools
+pipx install sphinx
+pipx inject sphinx sphinx-rtd-theme      # ← theme must live in sphinx's own venv
 cargo install du-dust bottom cargo-cache asm-lsp eza --locked
 
 # also for root
