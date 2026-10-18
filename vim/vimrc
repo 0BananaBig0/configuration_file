@@ -7,14 +7,14 @@ set updatetime=333
 " 设置<ESC>键响应时间
 " 必须同时开启 ttimeout，否则 ttimeoutlen 会被忽略、键码也去等 timeoutlen
 set ttimeout
-set ttimeoutlen=0
+set ttimeoutlen=100
 " Setting keymapping timeout
 " 映射序列（如 <C-Bslash><C-n>）的等待时间，给足 1000ms 避免两键按慢了被打断
 set timeoutlen=1000
 " 匹配括号高亮的时间（单位是十分之一秒）
 set matchtime=1
 " 打开文件时进行解码的猜测列表
-set fileencodings=ucs-bom,utf-8,utf-16,utf-32,shift-jis,gb18030,big5,latin1
+set fileencodings=ucs-bom,utf-8,gb18030,big5,shift-jis,latin1
 " 把当前文件转换为当前系统编码进行处理，这里为utf-8
 set encoding=utf-8
 scriptencoding utf-8
@@ -175,10 +175,9 @@ function! ConfigureDelayedPlugin()
     let g:vmt_auto_update_on_save = 0
     let g:vmt_list_item_char = '-'
     function! LoadMarkdownToc(function_name) abort
-      call plug#load('vim-markdown-toc')
-      call s:SafeReplayFileTypeEvent()
       if !exists(a:function_name)
-        throw 'vim-markdown-toc did not define ' . a:function_name
+        call plug#load('vim-markdown-toc')
+        call s:SafeReplayFileTypeEvent()
       endif
     endfunction
     function! CreateMarkdownMenu()

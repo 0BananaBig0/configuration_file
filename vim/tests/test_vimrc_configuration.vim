@@ -66,6 +66,12 @@ function! s:UnicodeFiles() abort
     call assert_true(&bomb, l:name . ' retains its BOM')
     call assert_equal(l:encoding, &fileencoding, l:name . ' detects byte order')
   endfor
+  " Legacy Chinese bytes must not be accepted as BOM-less UTF-16 or Shift-JIS.
+  let l:path = s:fixtures . '/gb18030.txt'
+  call writefile(0zC4E3BAC3, l:path)
+  execute 'edit! ' . fnameescape(l:path)
+  call assert_equal('你好', getline(1), 'GB18030 text decodes correctly')
+  call assert_equal('gb18030', &fileencoding, 'GB18030 is detected without a BOM')
 endfunction
 
 function! s:ExistingFileTypes() abort
@@ -364,6 +370,25 @@ function! s:VimVisualNavigation() abort
   endtry
 endfunction
 
+function! s:MarkdownLazyLoading() abort
+  " First load applies filetype defaults; later requests must skip the replay.
+  call writefile(['print("test")'], s:fixtures . '/toc-other.py')
+  call writefile(['# Title', '', '## Section'], s:fixtures . '/toc.md')
+  execute 'edit! ' . fnameescape(s:fixtures . '/toc-other.py')
+  setlocal shiftwidth=8
+  let l:other = win_getid()
+  execute 'split ' . fnameescape(s:fixtures . '/toc.md')
+  for [l:request, l:shiftwidth] in [['first load', 4], ['already loaded', 8]]
+    call LoadMarkdownToc(':GenTocGFM')
+    call assert_equal(l:shiftwidth, getwinvar(l:other, '&shiftwidth'),
+          \ l:request . ' replays filetype defaults only during initialization')
+    call win_execute(l:other, 'setlocal shiftwidth=8')
+  endfor
+  call CreateMarkdownMenu()
+  call assert_true(index(getline(1, '$'), '- [Title](#title)') >= 0,
+        \ 'named Markdown file still generates a TOC')
+endfunction
+
 function! s:MarkdownMenu() abort
   " Catch first-use TOC loading after an unnamed buffer's FileType event.
   enew!
@@ -578,7 +603,7 @@ endfunction
 try
   for s:check in ['ManualConfigurationReload', 'FiletypeLoading', 'UnicodeFiles', 'ExistingFileTypes', 'LocalOptions',
         \ 'EnterIndentation', 'AltEnterIndentation', 'HeaderWidth', 'HeaderFileKinds', 'SourceWindow', 'LiteralRootMarkers', 'VisualWhichKey',
-        \ 'InitializeDirectoriesPreservesWindow', 'VimVisualNavigation', 'MarkdownMenu', 'MarkdownUpdatePosition', 'ShortcutHelp']
+        \ 'InitializeDirectoriesPreservesWindow', 'VimVisualNavigation', 'MarkdownLazyLoading', 'MarkdownMenu', 'MarkdownUpdatePosition', 'ShortcutHelp']
     try
       call call(function('s:' . s:check), [])
     catch
