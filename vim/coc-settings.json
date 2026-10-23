@@ -1,5 +1,9 @@
 {
     "languageserver": {
+        "icl": {
+            "command": "icl-lsp",
+            "filetypes": ["icl"]
+        },
         "assembly": {
             "command": "asm-lsp",
             "filetypes": [
