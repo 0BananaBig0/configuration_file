@@ -111,14 +111,14 @@ sudo npm cache clean --force
 sudo npm install -g neovim
 gem install neovim --bindir=$HOME/.local/bin
 
-cd ~/wsl_shared_folder/fedora_pack
-wget https://ftp.gnu.org/gnu/bison/bison-3.3.tar.gz
-x bison-3.3.tar.gz
-rm bison-3.3.tar.gz
-cd bison-3.3
-./configure
-make
-sudo make install
+# cd ~/wsl_shared_folder/fedora_pack
+# wget https://mirrors.tuna.tsinghua.edu.cn/gnu/bison/bison-3.3.tar.gz
+# x bison-3.3.tar.gz
+# rm bison-3.3.tar.gz
+# cd bison-3.3
+# ./configure
+# make
+# sudo make install
 
 sudo dnf install -y perl-AnyEvent perl-Data-Dump perl-JSON perl-Moose perl-PadWalker perl-Scalar-List-Utils
 sudo dnf install -y perl-App-cpanminus perl-Coro perl-AnyEvent perl-Class-Refresh perl-YAML perl-Data-Dump
