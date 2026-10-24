@@ -31,7 +31,8 @@ augroup Auto_Set_FileType_Group
   autocmd BufNewFile */include/* if expand('%:e')=='' && (&filetype == 'conf' || &filetype == '') | setlocal filetype=cpp | endif
   autocmd BufNewFile,BufRead *.launch,*.qrc,*.conf setlocal filetype=xml
   autocmd BufNewFile,BufRead *.v setlocal filetype=verilog
-  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile,*.pdl,*.pdl.* setlocal filetype=tcl
+  autocmd BufNewFile,BufRead *.tessent_startup,*.dofile setlocal filetype=tcl
+  autocmd BufNewFile,BufRead *.pdl,*.pdl.* setlocal filetype=pdl
   autocmd BufNewFile,BufRead *.stil setlocal filetype=stil
   autocmd BufNewFile,BufRead *.icl setlocal filetype=icl
 augroup END
@@ -84,6 +85,8 @@ Plug 'bfrg/vim-c-cpp-modern', {'for': ['c', 'cpp', 'cuda', 'opencl']}
 Plug 'vim-python/python-syntax', {'for': ['python']}
 " Highlight qmake syntax
 Plug 'artoj/qmake-syntax-vim', {'for': ['qmake']}
+" Highlight icl-pdl syntax
+Plug '0BananaBig0/icl_toolsets', {'rtp': 'vim-icl-pdl-modern', 'for': ['icl', 'pdl']}
 " Vim快捷键管理和提示插件, Delay-load
 Plug 'liuchengxu/vim-which-key', {'on': []}
 " 补全插件, 动态检测语法插件, 可鼠标停留显示信息, Delay-load
@@ -872,6 +875,8 @@ function! ConfigureDelayedPlugin()
           \ 'yacc': {'left': '//'},
           \ 'qmake': {'left': '#'},
           \ 'qml': {'left': '//'},
+          \ 'icl': {'left': '//'},
+          \ 'pdl': {'left': '#'},
           \ 'stil': {'left': '/*', 'right': '*/'}
           \ } " Use custom delimiers  to comment source codes.
   let g:NERDCreateDefaultMappings = 0
